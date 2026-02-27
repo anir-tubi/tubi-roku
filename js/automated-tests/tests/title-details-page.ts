@@ -498,7 +498,7 @@ describe('Title Details Page', function () {
 
 
   // Test Rail Link: Manual test - All interactive buttons work correctly
-  it('Test all detail page buttons: Like, Dislike, and Delete History @guest,@details_page,@buttons', async () => {
+  it('C876709 - Test all detail page buttons: Like, Dislike, and Delete History @guest,@details_page,@buttons', async () => {
     // Start application and navigate to movies page
     await startApplicationWithExperimentOverrides('movies', { shouldCreateNewUser: true });
     await testUtils.waitForElementToHaveFocus('movieScreenRowList', 'Timed out waiting for Rowlist to have focus');

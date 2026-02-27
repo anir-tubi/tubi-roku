@@ -832,8 +832,8 @@ describe('MyStuff', function () {
     await testUtils.waitForPlayerStateToEqual('previewVideoPlayer', ['stopped', '', 'none']);
   });
 
-  // https://tubi.testrail.io/index.php?/cases/view/439741
-  it('439741- Registered User - Kids Mode - My Stuff should show Kids rated titles, @mystuff @kidsmode', async () => {
+  // https://tubi.testrail.io/index.php?/cases/view/C43828
+  it('C43828- Registered User - Kids Mode - My Stuff should show Kids rated titles, @mystuff @kidsmode', async () => {
 
     // Create user and add BOTH kids and adult content to watch list and viewing history
     const user = await testUtils.createRegisteredUser();

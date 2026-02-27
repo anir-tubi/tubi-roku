@@ -257,8 +257,4 @@ async function setPCToLittleKids() {
   await ecp.sendKeypress(ecp.Key.Ok);
 }
 
-async function selectOlderKidsFromParentalSettings() {
-  await ecp.sendKeypress(ecp.Key.Right, { wait: 200 });
-  await ecp.sendKeypress(ecp.Key.Up, { count: 2, wait: 200 });
-  await ecp.sendKeypress(ecp.Key.Ok);
-}
+async function selectOlderKidsFromParentalSettings() { await shared.selectParentalControlLevel('olderKids'); }

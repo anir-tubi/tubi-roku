@@ -425,9 +425,8 @@ class TestUtils {
       constantsUpdates['settings.enableFailSafe'] = true;
     }
 
-    if (args.isAutoplayEnabled !== undefined) {
-      constantsUpdates['deviceInfo.isAutoplayEnabled'] = args.isAutoplayEnabled;
-    }
+    // Default to true to override cases where autoplay is disabled at device level
+    constantsUpdates['deviceInfo.isAutoplayEnabled'] = args.isAutoplayEnabled ?? true;
 
     if (args.disableSkinAds !== undefined) {
       constantsUpdates['settings.disableSkinAds'] = args.disableSkinAds;

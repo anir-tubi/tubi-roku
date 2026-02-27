@@ -61,23 +61,15 @@ exports.mochaHooks = {
   },
   async afterEach() {
     const test: Mocha.Test = this.currentTest;
-    if (test.state === 'failed' && test.err) {
+    if (test.state === 'failed') {
       const baseScreenshotPath = path.join(testUtils.testsOutputFolder, 'screenshots');
       try {
         const screenshot = await device.getTestScreenshot(this, baseScreenshotPath, '_' + Date.now().toString());
         test.err['screenshotPath'] = screenshot.path;
       } catch (e) { }
       try {
-        const telnetLog = await device.getTelnetLog();
-        if (telnetLog) {
-          test.err['telnetLog'] = telnetLog;
-          console.log(`\n  --- Telnet Log (${test.title}) ---`);
-          console.log(telnetLog);
-          console.log('  --- End Telnet Log ---\n');
-        }
-      } catch (e: any) {
-        console.log(`\n  --- Telnet Log (${test.title}): failed to retrieve - ${e.message} ---\n`);
-      }
+        test.err['telnetLog'] = await device.getTelnetLog();
+      } catch (e) { }
     }
   },
   async afterAll() {
@@ -85,7 +77,7 @@ exports.mochaHooks = {
       const host = device.getCurrentDeviceConfig().host;
       const workerId = process.env.MOCHA_WORKER_ID ?? '0';
       console.log(`\n  Suite completed on device ${host} (worker ${workerId})\n`);
-    } catch (_) {}
+    } catch (_) { }
     await odc.shutdown();
   }
 };

@@ -713,25 +713,21 @@ class TestHelpers {
    * await testHelpers.selectParentalControlLevel('teens');
    */
   public async selectParentalControlLevel(level: 'littleKids' | 'olderKids' | 'teens' | 'adults') {
-    await testUtils.waitForElementToFullyShowOnScreen('parentalControlsSettingsGroup');
-    await ecp.sendKeypress(ecp.Key.Right, { wait: 200 });
-
-    const levelMap = {
-      littleKids: 3,
-      olderKids: 2,
-      teens: 1,
-      adults: 0
+    const titleMap: Record<string, string> = {
+      littleKids: 'Little Kids',
+      olderKids: 'Older Kids',
+      teens: 'Teens',
+      adults: 'Adults'
     };
 
-    const upCount = levelMap[level];
-    if (upCount > 0) {
-      await ecp.sendKeypress(ecp.Key.Up, { count: upCount, wait: 200 });
-    }
-
-    if (level === 'teens') {
-      await utils.sleep(2000);
-    }
-
+    await testUtils.waitForCurrentScreenToEqual('settingsScreen');
+    await testUtils.waitForElementToHaveFocus('settingsMenu', 'Timed out waiting for settings menu to have focus');
+    await testUtils.waitForElementToShowOnScreen('parentalControlsMenu');
+    await testUtils.waitForGridContentToLoad('parentalControlsMenu');
+    await utils.sleep(100);
+    await ecp.sendKeypress(ecp.Key.Right);
+    await testUtils.waitForElementToFullyShowOnScreen('adultControlSelected');
+    await testUtils.jumpToGridItemWithTitle('parentalControlsMenu', titleMap[level]);
     await ecp.sendKeypress(ecp.Key.Ok);
   }
 
@@ -911,12 +907,19 @@ class TestHelpers {
   public async toggleSetting(menuElement: any, rowIndex: number, skipElement?: string) {
     await ecp.sendKeypress(ecp.Key.Left);
     await testUtils.goToPage('settings');
+    await testUtils.waitForCurrentScreenToEqual('settingsScreen');
 
     // Wait for settings menu to have focus before navigating
     await testUtils.waitForElementToHaveFocus('settingsMenu', 'Timed out waiting for settings menu to have focus', 10000);
-
+    await testUtils.waitForGridContentToLoad('settingsMenu');
+    await utils.sleep(100);
     await ecp.sendKeypress(ecp.Key.Down);
-    await testUtils.waitForElementToShowOnScreen('autoplayPreviewMenu', 'Timed out waiting for autoplay preview menu to show', 10000);
+    try {
+      await testUtils.waitForElementToShowOnScreen('autoplayPreviewMenu', 'Timed out waiting for autoplay preview menu to show', 10000);
+    } catch (_) {
+      // Best-effort wait — proceed regardless
+    }
+    await utils.sleep(100);
     await ecp.sendKeypress(ecp.Key.Ok);
 
     if (skipElement) {

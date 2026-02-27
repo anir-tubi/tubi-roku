@@ -474,19 +474,8 @@ async function enterPasswordSettingsChange() {
   await ecp.sendKeypress(ecp.Key.Ok);
 }
 
-async function selectOlderKidsFromParentalSettings() {
-  await ecp.sendKeypress(ecp.Key.Right);
-  await testUtils.waitForElementToFullyShowOnScreen('adultControlSelected');
-  await ecp.sendKeypress(ecp.Key.Up, { count: 2 });
-  await ecp.sendKeypress(ecp.Key.Ok);
-}
-
-async function selectLittleKidsFromParentalSettings() {
-  await testUtils.waitForElementToFullyShowOnScreen('adultControlSelected');
-  await ecp.sendKeypress(ecp.Key.Right);
-  await ecp.sendKeypress(ecp.Key.Up, { count: 3 });
-  await ecp.sendKeypress(ecp.Key.Ok);
-}
+async function selectOlderKidsFromParentalSettings() { await shared.selectParentalControlLevel('olderKids'); }
+async function selectLittleKidsFromParentalSettings() { await shared.selectParentalControlLevel('littleKids'); }
 
 async function checkForKidsModeGrayed() {
   const exitKidsGrayedOut = await testUtils.getNodeForElement('exitKidsGrayedOut');

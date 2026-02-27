@@ -33,16 +33,15 @@ describe('Parental Controls', function () {
         contentID: '679437'
       }
     });
+    await testUtils.waitForCurrentScreenToEqual('homeScreen', 5000);
 
     // Verify that the detail screen is not loaded (restricted content blocked)
     let detailScreenLoaded = false;
     try {
       await testUtils.waitForCurrentScreenToEqual('detailScreen', 5000);
       detailScreenLoaded = true;
-    } catch (_) {}
+    } catch (_) { }
     expect(detailScreenLoaded, 'Detail screen should not have loaded for restricted content').to.be.false;
-    await testUtils.waitForCurrentScreenToEqual('homeScreen', 5000);
-
   });
 
   // https://tubi.testrail.io/index.php?/cases/view/537375
@@ -74,15 +73,14 @@ describe('Parental Controls', function () {
         contentID: '580334'
       }
     });
-
+    await testUtils.waitForCurrentScreenToEqual('homeScreen', 5000);
     // Verify that the detail screen is not loaded (restricted content blocked)
     let detailScreenLoaded = false;
     try {
       await testUtils.waitForCurrentScreenToEqual('detailScreen', 5000);
       detailScreenLoaded = true;
-    } catch (_) {}
+    } catch (_) { }
     expect(detailScreenLoaded, 'Detail screen should not have loaded for restricted content').to.be.false;
-    await testUtils.waitForCurrentScreenToEqual('homeScreen', 5000);
 
   });
 
@@ -111,15 +109,14 @@ describe('Parental Controls', function () {
         contentID: '580334'
       }
     });
-
+    await testUtils.waitForCurrentScreenToEqual('homeScreen', 5000);
     // Verify that the detail screen is not loaded (restricted content blocked)
     let detailScreenLoaded = false;
     try {
       await testUtils.waitForCurrentScreenToEqual('detailScreen', 5000);
       detailScreenLoaded = true;
-    } catch (_) {}
+    } catch (_) { }
     expect(detailScreenLoaded, 'Detail screen should not have loaded for restricted content').to.be.false;
-    await testUtils.waitForCurrentScreenToEqual('homeScreen', 5000);
   });
 
   // https://tubi.testrail.io/index.php?/cases/view/535834
@@ -730,32 +727,10 @@ async function createWatchList(user) {
   await user.addContentToWatchList(movieContentNR);
 }
 
-async function selectOlderKidsFromParentalSettings() {
-  await ecp.sendKeypress(ecp.Key.Right);
-  await testUtils.waitForElementToFullyShowOnScreen('adultControlSelected');
-  await testUtils.jumpToGridItemWithTitle('parentalControlsMenu', 'Older Kids');
-  await ecp.sendKeypress(ecp.Key.Ok);
-}
-
-async function selectLittleKidsFromParentalSettings() {
-  await ecp.sendKeypress(ecp.Key.Right);
-  await testUtils.waitForElementToFullyShowOnScreen('adultControlSelected');
-  await testUtils.jumpToGridItemWithTitle('parentalControlsMenu', 'Little Kids');
-  await ecp.sendKeypress(ecp.Key.Ok);
-}
-
-async function selectTeensFromParentalSettings() {
-  await ecp.sendKeypress(ecp.Key.Right);
-  await testUtils.waitForElementToFullyShowOnScreen('adultControlSelected');
-  await testUtils.jumpToGridItemWithTitle('parentalControlsMenu', 'Teens');
-  await ecp.sendKeypress(ecp.Key.Ok);
-}
-
-async function selectAdultsFromParentalSettings() {
-  await ecp.sendKeypress(ecp.Key.Right);
-  await testUtils.waitForElementToFullyShowOnScreen('adultControlSelected');
-  await ecp.sendKeypress(ecp.Key.Ok);
-}
+async function selectOlderKidsFromParentalSettings() { await shared.selectParentalControlLevel('olderKids'); }
+async function selectLittleKidsFromParentalSettings() { await shared.selectParentalControlLevel('littleKids'); }
+async function selectTeensFromParentalSettings() { await shared.selectParentalControlLevel('teens'); }
+async function selectAdultsFromParentalSettings() { await shared.selectParentalControlLevel('adults'); }
 
 // Navigate right until the grid is in focus
 async function navigateRightToGrid() {

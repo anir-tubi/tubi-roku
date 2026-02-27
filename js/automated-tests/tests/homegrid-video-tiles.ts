@@ -1895,7 +1895,7 @@ describe('HomeGrid Video Tiles', function () {
   });
 
   // Test for video preview resume when returning from side nav
-  it('Video preview resumes when user returns from side nav to video tiles @guest @videopreview @video_tiles', async () => {
+  it('C842092 - Video preview resumes when user returns from side nav to video tiles @guest @videopreview @video_tiles', async () => {
     await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: false });
     await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for videoTitlesRowList to have focus');
 
@@ -1938,7 +1938,7 @@ describe('HomeGrid Video Tiles', function () {
   });
 
   // Test: Scroll down vertically through entire home grid and verify no duplicate containers
-  it('Should scroll through entire home grid without duplicate containers @video_tiles', async () => {
+  it('C862444 - Should scroll through entire home grid without duplicate containers @video_tiles', async () => {
     await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: false });
     await testUtils.waitForCurrentScreenToEqual('homeScreen', 15000);
     await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for featured rowlist to have focus', 15000);
@@ -2148,7 +2148,7 @@ describe('HomeGrid Video Tiles', function () {
   });
 
   // Test: Scroll horizontally through comedy row and verify no duplicate content with pagination
-  it('Should scroll horizontally through comedy row without duplicate content @video_tiles', async () => {
+  it('C862445 - Should scroll horizontally through comedy row without duplicate content @video_tiles', async () => {
     await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: false });
     await testUtils.waitForCurrentScreenToEqual('homeScreen', 15000);
     await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for featured rowlist to have focus', 15000);
@@ -2194,7 +2194,7 @@ describe('HomeGrid Video Tiles', function () {
   });
 
   // Test Rail Link: TBD - Wrapper Ad Autoplay Test
-  it('Wrapper ad should autoplay into fullscreen and return to home screen after completion @guest @ads @video_tiles', async () => {
+  it('C842131 - Wrapper ad should autoplay into fullscreen and return to home screen after completion @guest @ads @video_tiles', async () => {
     // Set up ads endpoint mock before launching app
     proxy.resume();
     const proxyPromise = adTestHelpers.mockAds([AdType.Wrapper, AdType.Spotlight]);
@@ -2270,7 +2270,7 @@ describe('HomeGrid Video Tiles', function () {
   });
 
   // Test Rail Link: TBD - Video tiles visibility when scrolling from wrapper ad
-  it('Video tiles are shown when scrolling down from wrapper ad and hidden when scrolling back up @guest @ads @video_tiles', async () => {
+  it('C842117 - Video tiles are shown when scrolling down from wrapper ad and hidden when scrolling back up @guest @ads @video_tiles', async () => {
     // Set up ads endpoint mock before launching app
     proxy.resume();
     const proxyPromise = adTestHelpers.mockAds([AdType.Wrapper]);
@@ -2325,7 +2325,7 @@ describe('HomeGrid Video Tiles', function () {
   });
 
   // Test Rail Link: TBD - Spotlight Container Ad Loop Test
-  it('Spotlight container ad should loop continuously in the grid @guest @ads @video_tiles', async () => {
+  it('C842134 - Spotlight container ad should loop continuously in the grid @guest @ads @video_tiles', async () => {
     // Set up ads endpoint mock before launching app
     proxy.resume();
     const proxyPromise = adTestHelpers.mockAds([AdType.Spotlight]);
@@ -2374,7 +2374,7 @@ describe('HomeGrid Video Tiles', function () {
   });
 
   // Test Rail Link: TBD - HDC Carousel Ad Test
-  it('HDC carousel ad should display with proper brand elements @guest @ads @video_tiles', async () => {
+  it('C842102 - HDC carousel ad should display with proper brand elements @guest @ads @video_tiles', async () => {
     // Set up ads endpoint mock with carousel override
     proxy.resume();
     const proxyPromise = adTestHelpers.mockAds([AdType.Carousel]);
@@ -2503,7 +2503,7 @@ describe('HomeGrid Video Tiles', function () {
   });
 
   // Test Rail Link: TBD - HDC Carousel Ad Auto-rotate with Preview Disabled
-  it('HDC carousel ad auto-rotate works when preview is turned off @guest @ads @video_tiles', async () => {
+  it('C842133 - HDC carousel ad auto-rotate works when preview is turned off @guest @ads @video_tiles', async () => {
     /**
      * Test Steps:
      * 1. Launch app with video preview disabled
@@ -2600,7 +2600,7 @@ describe('HomeGrid Video Tiles', function () {
   });
 
   // Test Rail Link: TBD - Video tile preview restoration after valid_duration expires
-  it('Video tile overlay and preview display correctly after valid_duration expires @guest @videopreview @video_tiles', async () => {
+  it('C842095 - Video tile overlay and preview display correctly after valid_duration expires @guest @videopreview @video_tiles', async () => {
     // Helper function to normalize IDs by removing leading zeros for comparison (series IDs sometimes have leading zeros)
     const normalizeId = (id: string) => String(Number(id));
 

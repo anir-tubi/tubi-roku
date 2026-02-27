@@ -3,10 +3,10 @@ import { ecp, utils } from 'roku-test-automation';
 import { testUtils } from '../test-utils';
 import { shared } from '../test-helpers';
 
-describe(' Send Feedback Captions Checks', function () {
+describe('Send Feedback Tests', function () {
 
   // Test Rail link: https://tubi.testrail.io/index.php?/cases/view/574103
-  it('574103 Guest user shows the feedback icon on movie player, @send_feedback', async () => {
+  it('C574103 Guest user shows the feedback icon on movie player, @send_feedback', async () => {
     // Start app with Guest user
     await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: false });
     await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');
@@ -36,7 +36,7 @@ describe(' Send Feedback Captions Checks', function () {
   });
 
   // Test Rail link: https://tubi.testrail.io/index.php?/cases/view/574104
-  it('574104 Guest user shows the feedback icon on series player, @send_feedback', async () => {
+  it('C574104 Guest user shows the feedback icon on series player, @send_feedback', async () => {
     // Start app with Guest user
     await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: false });
     await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');
@@ -66,7 +66,7 @@ describe(' Send Feedback Captions Checks', function () {
   });
 
   // Test Rail link: https://tubi.testrail.io/index.php?/cases/view/574105
-  it('574105 Registered user shows the feedback icon on movie player, @send_feedback', async () => {
+  it('C574105 Registered user shows the feedback icon on movie player, @send_feedback', async () => {
     // Start app with Registered user
     await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: true });
     await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');
@@ -96,7 +96,7 @@ describe(' Send Feedback Captions Checks', function () {
   });
 
   // Test Rail link: https://tubi.testrail.io/index.php?/cases/view/574106
-  it('574106 Registered user shows the feedback icon on series player, @send_feedback', async () => {
+  it('C574106 Registered user shows the feedback icon on series player, @send_feedback', async () => {
     // Start app with Registered user
     await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: true });
     await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');
@@ -126,7 +126,7 @@ describe(' Send Feedback Captions Checks', function () {
   });
 
   // Test Rail link: https://tubi.testrail.io/index.php?/cases/view/574107
-  it('574107 User clicks on the send feedback icon and menu show up, @send_feedback', async () => {
+  it('C574107 User clicks on the send feedback icon and menu show up, @send_feedback', async () => {
     // Start app
     await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: false });
     await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');
@@ -154,7 +154,7 @@ describe(' Send Feedback Captions Checks', function () {
   });
 
   // Test Rail link: https://tubi.testrail.io/index.php?/cases/view/574108
-  it('574108 User could scroll down/up on the side menu to browse options of user feedback, @send_feedback', async () => {
+  it('C574108 User could scroll down/up on the side menu to browse options of user feedback, @send_feedback', async () => {
     // Start app
     await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: false });
     await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');
@@ -185,7 +185,7 @@ describe(' Send Feedback Captions Checks', function () {
   });
 
   // Test Rail link: https://tubi.testrail.io/index.php?/cases/view/574109
-  it('574109 User could choose one item and see the confirm page, @send_feedback', async () => {
+  it('C574109 User could choose one item and see the confirm page, @send_feedback', async () => {
     // Start app
     await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: false });
     await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');
@@ -226,7 +226,7 @@ describe(' Send Feedback Captions Checks', function () {
   });
 
   // Test Rail link: https://tubi.testrail.io/index.php?/cases/view/574110
-  it('574110 User could close the send feedback side menu be pressing back button, @send_feedback', async () => {
+  it('C574110 User could close the send feedback side menu be pressing back button, @send_feedback', async () => {
     // Start app
     await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: false });
     await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');
@@ -262,7 +262,7 @@ describe(' Send Feedback Captions Checks', function () {
   });
 
   // Test Rail link: https://tubi.testrail.io/index.php?/cases/view/574111
-  it('574111 User could back to send feedback side menu from confirm page by pressing back button, @send_feedback', async () => {
+  it('C574111 User could back to send feedback side menu from confirm page by pressing back button, @send_feedback', async () => {
     // Start app
     await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: false });
     await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');
@@ -313,7 +313,7 @@ describe(' Send Feedback Captions Checks', function () {
   });
 
   // Test Rail link: https://tubi.testrail.io/index.php?/cases/view/574113
-  it('574113 User could submit the issue automatically aftering clicking one item from the panel, @send_feedback', async () => {
+  it('C574113 User could submit the issue automatically aftering clicking one item from the panel, @send_feedback', async () => {
     // Start app
     await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: false });
     await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');
@@ -375,7 +375,7 @@ describe(' Send Feedback Captions Checks', function () {
   });
 
   // Test Rail link: https://tubi.testrail.io/index.php?/cases/view/574114
-  it('574114 User could scan the QR code to report issue on mobile phone, @send_feedback', async () => {
+  it('C574114 User could scan the QR code to report issue on mobile phone, @send_feedback', async () => {
 
     // Start app
     await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: false });
@@ -424,7 +424,7 @@ describe(' Send Feedback Captions Checks', function () {
   });
 
   // Test Rail link: https://tubi.testrail.io/index.php?/cases/view/678503
-  it('678503 When feedack panel is open, the content playback is NOT paused, @send_feedback', async () => {
+  it('C678503 When feedack panel is open, the content playback is NOT paused, @send_feedback', async () => {
 
     // Start app
     await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: false });
@@ -457,7 +457,7 @@ describe(' Send Feedback Captions Checks', function () {
   });
 
   // Test Rail link: https://tubi.testrail.io/index.php?/cases/view/574116
-  it('574116 User could NOT submit feedback during pre-roll ads playback, @send_feedback', async () => {
+  it('C574116 User could NOT submit feedback during pre-roll ads playback, @send_feedback', async () => {
     // Start app
     await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: false });
     await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');
@@ -490,7 +490,7 @@ describe(' Send Feedback Captions Checks', function () {
   });
 
   // Test Rail link: https://tubi.testrail.io/index.php?/cases/view/574117
-  it('574117 User could NOT submit feedback during mid-roll ads playback, @send_feedback', async () => {
+  it('C574117 User could NOT submit feedback during mid-roll ads playback, @send_feedback', async () => {
     // Start app
     await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: false });
     await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');
@@ -538,7 +538,7 @@ describe(' Send Feedback Captions Checks', function () {
   });
 
   // Test Rail link: https://tubi.testrail.io/index.php?/cases/view/574118
-  it('574118 The feedback icon should be hidden in kids mode, @send_feedback', async () => {
+  it('C574118 The feedback icon should be hidden in kids mode, @send_feedback', async () => {
     // Start app
     await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: false });
     await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');
@@ -564,7 +564,7 @@ describe(' Send Feedback Captions Checks', function () {
   });
 
   // Test Rail link: https://tubi.testrail.io/index.php?/cases/view/574119
-  it('574119 The feedback icon should be hidden when turns on parent control, @send_feedback', async () => {
+  it('C574119 The feedback icon should be hidden when turns on parent control, @send_feedback', async () => {
     // Start app
     await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: true });
     // Set Parental Controls to Little Kids
@@ -612,7 +612,7 @@ describe(' Send Feedback Captions Checks', function () {
   });
 
   // Test Rail link: https://tubi.testrail.io/index.php?/cases/view/749378
-  it('749378 When "Close" button is in focus, press a navigational button, @send_feedback', async () => {
+  it('C749378 When "Close" button is in focus, press a navigational button, @send_feedback', async () => {
     // Start app
     await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: false });
     await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');
@@ -678,7 +678,7 @@ describe(' Send Feedback Captions Checks', function () {
   });
 
   // Test Rail link: https://tubi.testrail.io/index.php?/cases/view/749379
-  it('749379 When user selects an issue, the Thank You/QR Code page is shown, @send_feedback', async () => {
+  it('C749379 When user selects an issue, the Thank You/QR Code page is shown, @send_feedback', async () => {
     // Start app
     await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: false });
     await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');

@@ -248,20 +248,5 @@ async function verifyEspanolDisabledTeens() {
   expect(espanolDisabledButton.text).to.equal('OK');
 }
 
-async function selectLittleKidsFromParentalSettings() {
-  await testUtils.waitForElementToFullyShowOnScreen('parentalControlsSettingsGroup');
-  await ecp.sendKeypress(ecp.Key.Right);
-  await utils.sleep(2000);
-  await ecp.sendKeypress(ecp.Key.Up, { count: 3 });
-  await utils.sleep(2000);
-  await ecp.sendKeypress(ecp.Key.Ok);
-}
-
-async function selectTeensFromParentalSettings() {
-  await testUtils.waitForElementToFullyShowOnScreen('parentalControlsSettingsGroup');
-  await ecp.sendKeypress(ecp.Key.Right);
-  await utils.sleep(3000);
-  await ecp.sendKeypress(ecp.Key.Up, { count: 1 });
-  await utils.sleep(3000);
-  await ecp.sendKeypress(ecp.Key.Ok);
-}
+async function selectLittleKidsFromParentalSettings() { await shared.selectParentalControlLevel('littleKids'); }
+async function selectTeensFromParentalSettings() { await shared.selectParentalControlLevel('teens'); }

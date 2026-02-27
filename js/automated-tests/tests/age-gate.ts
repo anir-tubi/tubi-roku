@@ -65,6 +65,8 @@ describe('Age Gate', function () {
   // Test Rail link: https://tubi.testrail.io/index.php?/cases/view/242820
   it('C242820 - COPPA V3 - Guest User enters in age greater than 12 they are directed to the Tubi Homepage (non-kids), @age_gate, @smoke', async () => {
     await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: false });
+    await testUtils.waitForCurrentScreenToEqual('homeScreen');
+    await testUtils.waitForGridContentToLoad('videoTitlesRowList');
     await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');
 
 
@@ -96,6 +98,8 @@ describe('Age Gate', function () {
   // https://tubi.testrail.io/index.php?/cases/view/242819
   it('C242819 - COPPA V3 - Guest User enters in age lower than 13 they are locked into kids mode, @age_gate, @smoke', async () => {
     await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: false });
+    await testUtils.waitForCurrentScreenToEqual('homeScreen');
+    await testUtils.waitForGridContentToLoad('videoTitlesRowList');
     await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');
 
     // Open Kids Mode

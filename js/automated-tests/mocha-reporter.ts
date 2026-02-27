@@ -1,184 +1,210 @@
-// Mocha doesn't support multiple reporters by itself. We want to do onscreen output for progress tracking,
-// json output that will be used for importing into Testrail, html report output through mochawesome,
-// and optionally allure results for nightly CI reports.
-// When DASHBOARD_API_URL is set, suite results are also sent to the Automation UI dashboard in real time.
+// Mocha doesn't support multiple reporters by itself. We want to do onscreen output
+// for progress tracking, json output that will be used for importing into Testrail,
+// and html report output through mochawesome so we use this to do that.
+//
+// Allure results are generated separately by post-processing Mochawesome JSON output
+// via mochawesome-to-allure.ts, avoiding allure-mocha's incompatibility with --parallel.
+//
+// When DASHBOARD_REPORTING is enabled and GITHUB_TOKEN is available, per-suite
+// progress updates are dispatched to dashboard-api.yml after each suite completes.
 import * as mocha from 'mocha';
 import * as Mochawesome from 'mochawesome';
-import * as fs from 'fs';
+import * as https from 'https';
+import * as path from 'path';
 
-let AllureMochaReporter: any = null;
-try {
-  AllureMochaReporter = require('allure-mocha');
-} catch (_) {
-  // allure-mocha not installed — skip
+interface TestResult {
+  title: string;
+  fullTitle: string;
+  duration: number;
+  state: string;
+  error?: string;
 }
 
-let DashboardManagerModule: any = null;
-try {
-  DashboardManagerModule = require('./dashboard-manager');
-} catch (_) {
-  // dashboard-manager not available — skip
-}
-
-interface SuiteContext {
-  startTime: number;
-  passed: Array<{ title: string; duration: number }>;
-  failed: Array<{ title: string; duration: number; error: string }>;
+interface PendingSuite {
+  suiteName: string;
+  tests: TestResult[];
 }
 
 class MochaReporter {
   private mochawesomeReporter: Mochawesome;
   private jsonReporter: mocha.reporters.JSON;
-  private allureReporter: any;
-  private dashboardManager: any;
-  private suiteStack: SuiteContext[];
-  private totalPassed: number;
-  private totalFailed: number;
-  private runStartTime: number;
+  private dashboardEnabled: boolean;
+  private githubToken: string;
+  private githubRepository: string;
+  private dashboardBranch: string;
+  private platform: string;
+  private pendingTests: Map<string, PendingSuite> = new Map();
 
   constructor(runner: mocha.Runner, options: mocha.MochaOptions) {
     this.mochawesomeReporter = new Mochawesome(runner, options);
     this.jsonReporter = new mocha.reporters.JSON(runner, options);
 
-    const enableAllure = process.env.ENABLE_ALLURE === 'true' || !!process.env.DASHBOARD_API_URL;
-    if (enableAllure && AllureMochaReporter) {
-      this.allureReporter = new AllureMochaReporter(runner, options);
+    this.githubToken = process.env.GITHUB_TOKEN || '';
+    this.githubRepository = process.env.GITHUB_REPOSITORY || '';
+    this.dashboardBranch = process.env.DASHBOARD_BRANCH || 'master';
+    this.platform = process.env.PLATFORM || 'roku';
+    this.dashboardEnabled =
+      process.env.DASHBOARD_REPORTING === 'true' &&
+      !!this.githubToken &&
+      !!this.githubRepository;
+
+    if (this.dashboardEnabled) {
+      console.log('  [Dashboard] Per-suite reporting enabled');
+
+      runner.on(mocha.Runner.constants.EVENT_TEST_PASS, (test: mocha.Test) => {
+        this.accumulateTest(test, 'passed');
+      });
+
+      runner.on(mocha.Runner.constants.EVENT_TEST_FAIL, (test: mocha.Test) => {
+        this.accumulateTest(test, 'failed');
+      });
+
+      runner.on(mocha.Runner.constants.EVENT_SUITE_END, (suite: mocha.Suite) => {
+        this.onSuiteEnd(suite);
+      });
+    }
+  }
+
+  /**
+   * Accumulates a test result keyed by file path. Extracts the top-level suite
+   * name from fullTitle since suite.parent/file are unavailable in parallel mode.
+   */
+  private accumulateTest(test: mocha.Test, state: string): void {
+    const file = (test as any).file as string;
+    if (!file) return;
+
+    const fullTitle = test.fullTitle?.() || test.title;
+    const suiteName = fullTitle.substring(0, fullTitle.length - test.title.length).trim();
+
+    if (!this.pendingTests.has(file)) {
+      this.pendingTests.set(file, { suiteName, tests: [] });
     }
 
-    this.suiteStack = [];
-    this.totalPassed = 0;
-    this.totalFailed = 0;
-    this.runStartTime = Date.now();
+    this.pendingTests.get(file)!.tests.push({
+      title: test.title,
+      fullTitle,
+      duration: test.duration || 0,
+      state,
+      error: state === 'failed' ? (test.err?.message || 'Unknown error') : undefined,
+    });
+  }
 
-    const dashboardApiUrl = process.env.DASHBOARD_API_URL;
-    if (dashboardApiUrl && DashboardManagerModule) {
-      let bucketId = process.env.BUCKET_ID;
-      if (!bucketId) {
-        try {
-          if (fs.existsSync('.test-bucket-id')) {
-            bucketId = fs.readFileSync('.test-bucket-id', 'utf-8').trim();
-          }
-        } catch (_) {}
-      }
+  /**
+   * On EVENT_SUITE_END, finds accumulated tests matching the suite title,
+   * builds a payload, and dispatches it to the dashboard.
+   */
+  private onSuiteEnd(suite: mocha.Suite): void {
+    if (suite.root) return;
 
-      if (bucketId) {
-        this.dashboardManager = new DashboardManagerModule.DashboardManager({
-          apiUrl: dashboardApiUrl,
-          platform: process.env.PLATFORM || 'roku',
-          bucketId,
-        });
-
-        console.log(`Dashboard reporting enabled: ${dashboardApiUrl}`);
-        console.log(`  Running in CI mode with Bucket ID: ${bucketId}`);
-        this.setupDashboardListeners(runner);
-      } else {
-        console.log('Dashboard reporting skipped: no BUCKET_ID or .test-bucket-id found');
+    for (const [file, data] of this.pendingTests) {
+      if (data.suiteName === suite.title) {
+        this.reportSuite(file, data);
+        this.pendingTests.delete(file);
+        break;
       }
     }
   }
 
-  private setupDashboardListeners(runner: mocha.Runner): void {
-    runner.on('suite', (suite: mocha.Suite) => {
-      if (suite.root) return;
-      this.suiteStack.push({
-        startTime: Date.now(),
-        passed: [],
-        failed: [],
+  /** Builds and dispatches a suite result payload. */
+  private reportSuite(file: string, data: PendingSuite): void {
+    const passed = data.tests.filter(t => t.state === 'passed');
+    const failed = data.tests.filter(t => t.state === 'failed');
+
+    if (passed.length === 0 && failed.length === 0) return;
+
+    const suitePath = path.relative(process.cwd(), file);
+
+    const suiteData = {
+      event: 'test_suite_completed',
+      timestamp: new Date().toISOString(),
+      workerId: process.env.MOCHA_WORKER_ID || '0',
+      platform: this.platform,
+      suite: {
+        path: suitePath,
+        name: data.suiteName,
+        duration: data.tests.reduce((sum, t) => sum + t.duration, 0),
+      },
+      results: {
+        passed: passed.length,
+        failed: failed.length,
+      },
+      tests: {
+        passed: passed.map(t => ({
+          title: t.title,
+          fullName: t.fullTitle,
+          duration: t.duration,
+        })),
+        failed: failed.map(t => ({
+          title: t.title,
+          fullName: t.fullTitle,
+          duration: t.duration,
+          failureMessages: [t.error || 'Unknown error'],
+        })),
+      },
+    };
+
+    const status = failed.length > 0 ? 'FAIL' : 'PASS';
+    console.log(`  [Dashboard] ${status} ${data.suiteName} (P:${passed.length} F:${failed.length})`);
+
+    this.dispatchSuiteResult(suiteData);
+  }
+
+  /**
+   * Dispatches dashboard-api.yml with send-suite action via the GitHub API.
+   * Fire-and-forget: errors are logged but never disrupt tests.
+   */
+  private dispatchSuiteResult(suiteData: unknown): void {
+    try {
+      const [owner, repo] = this.githubRepository.split('/');
+      const body = JSON.stringify({
+        ref: this.dashboardBranch,
+        inputs: {
+          action: 'send-suite',
+          platform: this.platform,
+          suite_data: JSON.stringify(suiteData),
+        },
       });
-    });
 
-    runner.on('pass', (test: mocha.Test) => {
-      const ctx = this.suiteStack[this.suiteStack.length - 1];
-      if (ctx) {
-        ctx.passed.push({
-          title: test.fullTitle(),
-          duration: test.duration || 0,
-        });
-      }
-      this.totalPassed++;
-    });
+      const req = https.request({
+        hostname: 'api.github.com',
+        path: `/repos/${owner}/${repo}/actions/workflows/dashboard-api.yml/dispatches`,
+        method: 'POST',
+        headers: {
+          'Authorization': `token ${this.githubToken}`,
+          'Accept': 'application/vnd.github.v3+json',
+          'User-Agent': 'roku-mocha-reporter',
+          'Content-Type': 'application/json',
+          'Content-Length': Buffer.byteLength(body),
+        },
+      }, (res) => {
+        if (res.statusCode === 204) {
+          console.log('  [Dashboard] Dispatch accepted');
+        } else {
+          let responseBody = '';
+          res.on('data', (chunk: Buffer) => { responseBody += chunk; });
+          res.on('end', () => {
+            console.log(`  [Dashboard] Dispatch HTTP ${res.statusCode}: ${responseBody}`);
+          });
+        }
+      });
 
-    runner.on('fail', (test: mocha.Test, err: Error) => {
-      const ctx = this.suiteStack[this.suiteStack.length - 1];
-      if (ctx) {
-        ctx.failed.push({
-          title: test.fullTitle(),
-          duration: test.duration || 0,
-          error: err.message || String(err),
-        });
-      }
-      this.totalFailed++;
-    });
+      req.on('error', (err: Error) => {
+        console.log(`  [Dashboard] Dispatch error: ${err.message}`);
+      });
 
-    runner.on('suite end', (suite: mocha.Suite) => {
-      if (suite.root) return;
-      const ctx = this.suiteStack.pop();
-      if (!ctx || (ctx.passed.length === 0 && ctx.failed.length === 0)) return;
-
-      const suitePath = suite.file ? suite.file.replace(process.cwd() + '/', '') : suite.title;
-
-      if (this.dashboardManager) {
-        this.dashboardManager.sendSuiteResult({
-          suitePath,
-          suiteName: suite.title,
-          duration: Date.now() - ctx.startTime,
-          passed: ctx.passed.length,
-          failed: ctx.failed.length,
-          passedTests: ctx.passed,
-          failedTests: ctx.failed,
-        }).catch(() => {});
-      }
-    });
-
-    runner.on('end', () => {
-      const duration = Date.now() - this.runStartTime;
-      const summary = {
-        totalTests: this.totalPassed + this.totalFailed,
-        passed: this.totalPassed,
-        failed: this.totalFailed,
-        duration,
-      };
-
-      try {
-        fs.writeFileSync('.test-run-summary.json', JSON.stringify(summary));
-      } catch (_) {}
-
-      if (this.dashboardManager) {
-        this.dashboardManager.completeTestRun(this.totalPassed, this.totalFailed, duration).catch(() => {});
-      }
-    });
+      req.write(body);
+      req.end();
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : String(err);
+      console.log(`  [Dashboard] Dispatch failed: ${message}`);
+    }
   }
 
   done(failures: number, fn?: (failures: number) => void): void {
-    const finishMochawesome = () => {
-      if (this.mochawesomeReporter.done) {
-        this.mochawesomeReporter.done(failures, fn);
-      } else if (fn) {
-        fn(failures);
-      }
-    };
-
-    if (this.allureReporter && this.allureReporter.done) {
-      let called = false;
-      const onAllureDone = () => {
-        if (called) return;
-        called = true;
-        finishMochawesome();
-      };
-
-      const timeout = setTimeout(onAllureDone, 5000);
-
-      try {
-        this.allureReporter.done(failures, () => {
-          clearTimeout(timeout);
-          onAllureDone();
-        });
-      } catch (_) {
-        clearTimeout(timeout);
-        onAllureDone();
-      }
-    } else {
-      finishMochawesome();
+    if (this.mochawesomeReporter.done) {
+      this.mochawesomeReporter.done(failures, fn);
+    } else if (fn) {
+      fn(failures);
     }
   }
 }

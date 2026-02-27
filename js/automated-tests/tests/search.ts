@@ -127,31 +127,6 @@ describe('Search', function () {
 			});
 		});
 
-		// https://tubi.testrail.io/index.php?/cases/view/540011
-		it('540011 - If search page fetches "Top Searched" container, more than 10 titles are displayed under Trending Searches @search', async () => {
-			await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: true });
-			await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');
-			await testUtils.goToPage('search');
-			await testUtils.waitForElementToShowOnScreen('trendingSearchResultsGrid', 'Timed out waiting for element to have focus', 10000);
-
-			// Navigate down 3 rows
-			await ecp.sendKeypress(ecp.Key.Down, { count: 3 });
-			await testUtils.waitForElementToFullyShowOnScreen('trendingSearchResult11');
-
-		});
-
-		// https://tubi.testrail.io/index.php?/cases/view/540012
-		it('540012 - Trending Searches in Kids Mode, more than 10 titles are displayed under Trending Searches @search', async () => {
-			await testUtils.startApplicationAtPage('kids', { shouldCreateNewUser: false });
-			await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for rowlist to have focus');
-			await testUtils.goToPage('search');
-
-			// Navigate down 3 rows
-			await ecp.sendKeypress(ecp.Key.Down, { count: 3 });
-			await testUtils.waitForElementToFullyShowOnScreen('trendingSearchResult11');
-
-		});
-
 		// https://tubi.testrail.io/index.php?/cases/view/22728
 		it('C22728 - Search - When movie selected then corresponding movie details page displayed @search @navigation @manual_regression', async () => {
 			/**

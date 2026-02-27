@@ -33,6 +33,7 @@ jobs:
             has_multi=$(echo "$runners" | jq -r '
               [.runners[]
                 | select(.status=="online")
+                | select(.busy==false)
                 | select(.labels[]?.name=="multi-device")
               ] | length > 0
             ')

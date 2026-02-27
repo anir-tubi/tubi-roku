@@ -272,7 +272,6 @@ async function runAutomatedTests(done, branch = '', tags = [], testsPath = 'js/a
     `--reporter-option output=${jsonReportOutputPath}`, // output path for json reporter
     `--reporter-option reportDir=${testUtils.testsOutputFolder}/html`, // folder for mochawesome
     `--reporter-option reportFilename=report`, // filename for mochawesome
-    `--reporter-option json=false`, // turn off json output for mochawesome
     '--exit' // Force mocha to exit after tests complete
   ];
 
@@ -540,107 +539,18 @@ function serveAllureReport(done) {
 
 
 /**
- * Creates a new test bucket on the Automation UI dashboard.
- * Persists the bucket ID to disk for the mocha reporter and closeTestBucket to use.
- *
- * Env: DASHBOARD_API_URL (required), PLATFORM, tag, RUNNERS, GITHUB_RUN_ID.
+ * Converts Mochawesome JSON output to allure-results/ files.
+ * Run this after tests complete and before generateAllureReport.
  */
-function startTestBucket(done) {
-  const { DashboardManager } = require('./automated-tests/dashboard-manager');
-
-  const dashboardApiUrl = process.env.DASHBOARD_API_URL;
-  if (!dashboardApiUrl) {
-    done(new Error('DASHBOARD_API_URL is required'));
-    return;
-  }
-
-  const rawTag = process.env.tag;
-  const tag = (rawTag && rawTag.startsWith('@')) ? rawTag : null;
-
-  DashboardManager.startBucket({
-    dashboardApiUrl,
-    platform: process.env.PLATFORM || 'roku',
-    tag,
-    runners: process.env.RUNNERS || '1',
-    githubActionId: process.env.GITHUB_RUN_ID || null,
-  }).then((bucketId) => {
-    if (bucketId) {
-      log(`Test bucket created: ${bucketId}`);
-    } else {
-      log('Warning: Dashboard did not return a bucket ID');
-    }
-    done();
-  }).catch((err) => {
-    done(err);
-  });
-}
-
-
-/**
- * Closes the active test bucket on the Automation UI dashboard.
- * Reads the test summary written by the mocha reporter to include final counts.
- * Cleans up all temp files (.test-bucket-id, .test-bucket-data.json, .test-run-summary.json).
- *
- * Env: DASHBOARD_API_URL (required), TEST_OUTCOME
- */
-function closeTestBucket(done) {
-  const { DashboardManager } = require('./automated-tests/dashboard-manager');
-
-  const dashboardApiUrl = process.env.DASHBOARD_API_URL;
-  if (!dashboardApiUrl) {
-    done(new Error('DASHBOARD_API_URL is required'));
-    return;
-  }
-
-  const success = process.env.TEST_OUTCOME !== 'failure';
-  DashboardManager.closeBucket({ dashboardApiUrl, success })
-    .then(() => done())
-    .catch((err) => done(err));
-}
-
-
-/**
- * Pushes the generated Allure report to the Automation UI dashboard
- * via the /api/reports/ingest-direct endpoint.
- * Spawns push-report-to-dashboard.ts as a child process.
- *
- * Env: API_URL (required - full ingest-direct endpoint URL), PLATFORM, REPORT_ID, GITHUB_RUN_ID
- */
-function pushReportToDashboard(done) {
-  const apiUrl = process.env.API_URL;
-  if (!apiUrl) {
-    log('API_URL not set, skipping report push');
-    done();
-    return;
-  }
-
-  const reportDir = 'allure-report';
-  if (!fs.existsSync(reportDir)) {
-    done(new Error('Allure report directory not found. Generate the report first.'));
-    return;
-  }
-
-  const childEnv = {
-    ...process.env,
-    REPORT_DIR: reportDir,
-    API_URL: apiUrl,
-    PLATFORM: process.env.PLATFORM || 'roku',
-    REPORT_ID: process.env.REPORT_ID || process.env.GITHUB_RUN_ID || String(Date.now()),
-  };
-
+function convertToAllureResults(done) {
   const finish = onceCallback(done);
-  const { spawn } = require('child_process');
-  const child = spawn('npx', ['ts-node', 'js/automated-tests/push-report-to-dashboard.ts'], {
-    stdio: 'inherit',
-    env: childEnv,
-  });
-
-  child.on('exit', (code) => {
-    finish(code !== 0 ? new Error(`Push report exited with code ${code}`) : undefined);
-  });
-  child.on('error', (err) => {
-    finish(new Error(`Failed to push report: ${err.message}`));
-  });
+  const { execSync } = require('child_process');
+  try {
+    execSync('npx ts-node js/automated-tests/mochawesome-to-allure.ts', { stdio: 'inherit' });
+    finish();
+  } catch (err) {
+    finish(new Error('Failed to convert Mochawesome output to Allure results'));
+  }
 }
 
 
@@ -657,7 +567,5 @@ module.exports = {
   generateAllureReport,
   clearAllureResults,
   serveAllureReport,
-  startTestBucket,
-  closeTestBucket,
-  pushReportToDashboard
+  convertToAllureResults,
 };

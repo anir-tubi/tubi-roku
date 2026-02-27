@@ -546,7 +546,7 @@ describe('Categories', function () {
   });
 
   // https://tubi.testrail.io/index.php?/cases/view/690606
-  it('690606 - Pressing "back" from details page takes user back to category tile screen, @categories', async () => {
+  it('C768183 - Pressing "back" from details page takes user back to category tile screen, @categories', async () => {
     await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: false });
     await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');
 

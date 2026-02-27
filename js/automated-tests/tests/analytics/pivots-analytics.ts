@@ -133,7 +133,7 @@ describe('Pivots Analytics Tests', function () {
    *   - ComponentInteractionEvent (CollectionComponent, sub_type=PIVOT, TOGGLE_ON)
    *   - NavigateWithinPageEvent (CategoryComponent → CollectionComponent dest)
    */
-  it('CXXXXX - ComponentInteraction and NavigateWithinPage fire when pressing Up to focus pivot menu @pivots @analytics', async () => {
+  it('C855177 - ComponentInteraction and NavigateWithinPage fire when pressing Up to focus pivot menu @pivots @analytics', async () => {
     const analyticsEvents: any[] = [];
 
     await safeResumeProxy();
@@ -254,7 +254,7 @@ describe('Pivots Analytics Tests', function () {
    * Tracking:
    *   - ComponentInteractionEvent (ButtonComponent, button_value=BACK_FOCUS_PIVOT, button_type=IMAGE, CONFIRM)
    */
-  it('CXXXXX - ComponentInteraction fires when pressing Back to focus pivot menu @pivots @analytics', async () => {
+  it('C855092 - ComponentInteraction fires when pressing Back to focus pivot menu @pivots @analytics', async () => {
     const analyticsEvents: any[] = [];
 
     await safeResumeProxy();
@@ -320,7 +320,7 @@ describe('Pivots Analytics Tests', function () {
    *   - ComponentInteractionEvent (CollectionComponent, sub_type=PIVOT, TOGGLE_ON)
    *   - NavigateWithinPageEvent (LeftSideNavComponent → CollectionComponent dest)
    */
-  it('CXXXXX - ComponentInteraction and NavigateWithinPage fire when pressing Right from nav to focus pivot menu @pivots @analytics', async () => {
+  it('C855190 - ComponentInteraction and NavigateWithinPage fire when pressing Right from nav to focus pivot menu @pivots @analytics', async () => {
     const analyticsEvents: any[] = [];
 
     await safeResumeProxy();
@@ -444,7 +444,7 @@ describe('Pivots Analytics Tests', function () {
    * Tracking:
    *   - NavigateWithinPageEvent (CollectionComponent, sub_type=PIVOT, means_of_navigation=SCROLL)
    */
-  it('CXXXXX - NavigateWithinPage fires when scrolling between pivots @pivots @analytics', async () => {
+  it('C855178 - NavigateWithinPage fires when scrolling between pivots @pivots @analytics', async () => {
     const analyticsEvents: any[] = [];
 
     await safeResumeProxy();
@@ -518,7 +518,7 @@ describe('Pivots Analytics Tests', function () {
    * Tracking:
    *   - ComponentInteractionEvent (CollectionComponent, sub_type=PIVOT, TOGGLE_OFF)
    */
-  it('CXXXXX - ComponentInteraction TOGGLE_OFF fires when moving focus away from pivots @pivots @analytics', async () => {
+  it('C855179 - ComponentInteraction TOGGLE_OFF fires when moving focus away from pivots @pivots @analytics', async () => {
     const analyticsEvents: any[] = [];
 
     await safeResumeProxy();
@@ -585,7 +585,7 @@ describe('Pivots Analytics Tests', function () {
    *   - ComponentInteractionEvent (CollectionComponent PIVOT, TOGGLE_OFF)
    *   - NavigateWithinPageEvent (CollectionComponent → LeftSideNavComponent)
    */
-  it('CXXXXX - Analytics fire when pressing Left from pivot row to open left nav @pivots @analytics', async () => {
+  it('C855178 - Analytics fire when pressing Left from pivot row to open left nav @pivots @analytics', async () => {
     const analyticsEvents: any[] = [];
 
     await safeResumeProxy();
@@ -709,7 +709,7 @@ describe('Pivots Analytics Tests', function () {
    *   - NavigateToPageEvent (CollectionComponent PIVOT → SearchPage)
    *   - PageLoadEvent (SearchPage, SUCCESS)
    */
-  it('CXXXXX - Analytics fire when selecting search pivot pill @pivots @analytics', async () => {
+  it('C855180 - Analytics fire when selecting search pivot pill @pivots @analytics', async () => {
     const analyticsEvents: any[] = [];
 
     await safeResumeProxy();
@@ -832,7 +832,7 @@ describe('Pivots Analytics Tests', function () {
    *   - NavigateToPageEvent (CollectionComponent PIVOT → CollectionPage, dest section=PIVOT)
    *   - PageLoadEvent (CollectionPage, section=PIVOT, SUCCESS)
    */
-  it('CXXXXX - Analytics fire when selecting a pivot pill and landing on pivot page @pivots @analytics', async () => {
+  it('C855181 - Analytics fire when selecting a pivot pill and landing on pivot page @pivots @analytics', async () => {
     const analyticsEvents: any[] = [];
 
     await safeResumeProxy();
@@ -953,7 +953,7 @@ describe('Pivots Analytics Tests', function () {
    * Tracking:
    *   - StartPreviewEvent (VIDEO_IN_GRID, CollectionPage PIVOT, CategoryComponent)
    */
-  it('CXXXXX - StartPreview fires when focusing on video tile on pivot page @pivots @analytics', async () => {
+  it('C855182 - StartPreview fires when focusing on video tile on pivot page @pivots @analytics', async () => {
     const analyticsEvents: any[] = [];
 
     await safeResumeProxy();
@@ -1040,7 +1040,7 @@ describe('Pivots Analytics Tests', function () {
    * Tracking:
    *   - NavigateWithinPageEvent (CollectionPage PIVOT, CategoryComponent, means_of_navigation=BUTTON)
    */
-  it('CXXXXX - NavigateWithinPage fires when navigating between tiles on pivot page @pivots @analytics', async () => {
+  it('C855183 - NavigateWithinPage fires when navigating between tiles on pivot page @pivots @analytics', async () => {
     const analyticsEvents: any[] = [];
 
     await safeResumeProxy();
@@ -1117,7 +1117,7 @@ describe('Pivots Analytics Tests', function () {
    * Tracking:
    *   - PreviewPlayProgressEvent every ~10s (VIDEO_IN_GRID, CollectionPage PIVOT, CategoryComponent)
    */
-  it('CXXXXX - PreviewPlayProgress fires during video preview on pivot page @pivots @analytics', async () => {
+  it('C855184 - PreviewPlayProgress fires during video preview on pivot page @pivots @analytics', async () => {
     const analyticsEvents: any[] = [];
 
     await safeResumeProxy();
@@ -1206,7 +1206,7 @@ describe('Pivots Analytics Tests', function () {
    * Tracking:
    *   - FinishPreviewEvent (has_completed=false, VIDEO_IN_GRID, CollectionPage PIVOT)
    */
-  it('CXXXXX - FinishPreview fires with has_completed=false when navigating away from tile on pivot page @pivots @analytics', async () => {
+  it('C855185 - FinishPreview fires with has_completed=false when navigating away from tile on pivot page @pivots @analytics', async () => {
     const analyticsEvents: any[] = [];
 
     await safeResumeProxy();
@@ -1296,7 +1296,7 @@ describe('Pivots Analytics Tests', function () {
    *   - NavigateToPageEvent (CategoryComponent → VideoPage or SeriesDetailPage)
    *   - PageLoadEvent (VideoPage or SeriesDetailPage, SUCCESS)
    */
-  it('CXXXXX - Analytics fire when selecting a title on pivot page to go to details @pivots @analytics', async () => {
+  it('C855186 - Analytics fire when selecting a title on pivot page to go to details @pivots @analytics', async () => {
     const analyticsEvents: any[] = [];
 
     await safeResumeProxy();
@@ -1403,7 +1403,7 @@ describe('Pivots Analytics Tests', function () {
    *   - PageLoadEvent (VideoPlayerPage, SUCCESS)
    *   - StartVideoEvent (video_id, playback_source=UNKNOWN_PLAYBACK_SOURCE)
    */
-  it('CXXXXX - Analytics fire when pressing Play on a tile on pivot page to enter playback @pivots @analytics', async () => {
+  it('C855186 - Analytics fire when pressing Play on a tile on pivot page to enter playback @pivots @analytics', async () => {
     const analyticsEvents: any[] = [];
 
     await safeResumeProxy();
@@ -1542,7 +1542,7 @@ describe('Pivots Analytics Tests', function () {
    *   - StartVideoEvent (video_id, playback_source=VIDEO_PREVIEWS)
    *   - PlayProgressEvent (video_id, playback_source=VIDEO_PREVIEWS) [optional, may not fire immediately]
    */
-  it('CXXXXX - Analytics fire when preview completes and autostarts playback on pivot page @pivots @analytics', async () => {
+  it('C855191 - Analytics fire when preview completes and autostarts playback on pivot page @pivots @analytics', async () => {
     const analyticsEvents: any[] = [];
 
     await safeResumeProxy();
@@ -1738,7 +1738,7 @@ describe('Pivots Analytics Tests', function () {
    *   - NavigateToPageEvent (SearchPage → HomePage, dest CollectionComponent search)
    *   - PageLoadEvent (HomePage, SUCCESS)
    */
-  it('CXXXXX - Analytics fire when pressing Back from search to return to pivot @pivots @analytics', async () => {
+  it('C855187 - Analytics fire when pressing Back from search to return to pivot @pivots @analytics', async () => {
     const analyticsEvents: any[] = [];
 
     await safeResumeProxy();
@@ -1826,7 +1826,7 @@ describe('Pivots Analytics Tests', function () {
    *   - NavigateToPageEvent (CollectionPage PIVOT → HomePage, dest CollectionComponent)
    *   - PageLoadEvent (HomePage, SUCCESS)
    */
-  it('CXXXXX - Analytics fire when pressing Back from pivot page to return to home @pivots @analytics', async () => {
+  it('C855188 - Analytics fire when pressing Back from pivot page to return to home @pivots @analytics', async () => {
     const analyticsEvents: any[] = [];
 
     await safeResumeProxy();
@@ -1925,7 +1925,7 @@ describe('Pivots Analytics Tests', function () {
    *   - NavigateToPageEvent (VideoPage/SeriesDetailPage → CollectionPage PIVOT)
    *   - PageLoadEvent (CollectionPage PIVOT, SUCCESS)
    */
-  it('CXXXXX - Analytics fire when pressing Back from details to return to pivot page @pivots @analytics', async () => {
+  it('C855189 - Analytics fire when pressing Back from details to return to pivot page @pivots @analytics', async () => {
     const analyticsEvents: any[] = [];
 
     await safeResumeProxy();

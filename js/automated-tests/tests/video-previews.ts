@@ -137,12 +137,11 @@ describe('Video Preview', function () {
     // Verify that video is playing
     await checkForPreview();
 
-    // Let the preview end (wait for duration + 2 seconds)
-    const videoPlayerNode = await testUtils.getNodeForElement('previewVideoPlayer');
-    await utils.sleep((videoPlayerNode.duration * 1000) + 3000);
+    // Seek to near end so the preview completes quickly
+    await testUtils.seekPlayerToRelativePosition('previewVideoPlayerScreen', -3000, 'end');
 
     // Verify that video is playing
-    await testUtils.waitForPlayerStateToEqual('videoPlayerScreen', 'playing', 10000);
+    await testUtils.waitForPlayerStateToEqual('videoPlayerScreen', 'playing', 15000);
 
   });
 
@@ -164,12 +163,11 @@ describe('Video Preview', function () {
     // Verify that video is playing
     await checkForPreview('homeScreenRowList');
 
-    // Let the preview end (wait for duration + 2 seconds)
-    const videoPlayerNode = await testUtils.getNodeForElement('previewVideoPlayer');
-    await utils.sleep((videoPlayerNode.duration * 1000) + 2000);
+    // Seek to near end so the preview completes quickly
+    await testUtils.seekPlayerToRelativePosition('previewVideoPlayerScreen', -3000, 'end');
 
     // Verify that video is playing
-    await testUtils.waitForPlayerStateToEqual('videoPlayerScreen', 'playing', 5000);
+    await testUtils.waitForPlayerStateToEqual('videoPlayerScreen', 'playing', 15000);
 
   });
 

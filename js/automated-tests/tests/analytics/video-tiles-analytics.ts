@@ -124,7 +124,7 @@ describe('Video Tiles Analytics Tests', function () {
    * - PageLoadEvent (page_load: home_page or for_you_page when landing on that surface)
    * This test verifies all three pages (Movies, TV Shows, Espanol) fire all three events.
    */
-  it('CXXXXX - ComponentInteraction, NavigateToPage, and PageLoad fire for Movies, TV Shows, and Espanol from left nav @video_tiles @analytics', async () => {
+  it('C869294 - ComponentInteraction, NavigateToPage, and PageLoad fire for Movies, TV Shows, and Espanol from left nav @video_tiles @analytics', async () => {
     /**
      * Pre-conditions:
      * - roku_video_tiles_1_9 experiment enabled
@@ -301,7 +301,7 @@ describe('Video Tiles Analytics Tests', function () {
    * A: Users in Kids mode viewing any page.
    * Tracking: page_load with app_mode=KIDS_MODE so we can segment by Kids usage.
    */
-  it('CXXXXX - Page load event includes app_mode KIDS_MODE when in kids mode @video_tiles @analytics', async () => {
+  it('C869297 - Page load event includes app_mode KIDS_MODE when in kids mode @video_tiles @analytics', async () => {
     /**
      * Pre-conditions:
      * - roku_video_tiles_1_9 experiment enabled
@@ -383,7 +383,7 @@ describe('Video Tiles Analytics Tests', function () {
    * A: Users focus on content with video tiles and video preview starts within the tile.
    * Tracking: start_preview (video_player=VIDEO_IN_GRID, CategoryComponent, home_page).
    */
-  it('CXXXXX - Start preview event fires when video tile gains focus @video_tiles @analytics', async () => {
+  it('C869298 - Start preview event fires when video tile gains focus @video_tiles @analytics', async () => {
     /**
      * Pre-conditions:
      * - roku_video_tiles_1_9 experiment enabled
@@ -472,7 +472,7 @@ describe('Video Tiles Analytics Tests', function () {
    * Tracking: navigate_within_page (CategoryComponent, means_of_navigation=BUTTON,
    * vertical_location, horizontal_location, home_page with content_mode).
    */
-  it('CXXXXX - Navigate within page event fires when navigating between video tiles @video_tiles @analytics', async () => {
+  it('C869295 - Navigate within page event fires when navigating between video tiles @video_tiles @analytics', async () => {
     /**
      * Pre-conditions:
      * - roku_video_tiles_1_9 experiment enabled
@@ -658,7 +658,7 @@ describe('Video Tiles Analytics Tests', function () {
    * A: User takes no action and video preview keeps playing.
    * Tracking: preview_play_progress every ~10s (position, view_time, CategoryComponent, home_page).
    */
-  it('CXXXXX - Preview play progress events fire every 10 seconds during video preview playback @video_tiles @analytics', async () => {
+  it('C869296 - Preview play progress events fire every 10 seconds during video preview playback @video_tiles @analytics', async () => {
     /**
      * Pre-conditions:
      * - roku_video_tiles_1_9 experiment enabled
@@ -693,17 +693,15 @@ describe('Video Tiles Analytics Tests', function () {
       await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: true, clearRegistry: false });
       await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus', 20000);
 
-      // Find and navigate to a tile that has a video preview
-      await testHelpers.findAndNavigateToVideoPreviewContent('videoTitlesRowList', true, 5);
-      await utils.sleep(3000);
-
-      // Verify we received preview_play_progress events
-      expect(analyticsEvents.length).to.be.greaterThan(0, 'Should receive preview_play_progress events');
+      // Find and navigate to a series tile that has a video preview
+      await testHelpers.findAndNavigateToVideoPreviewContent('videoTitlesRowList', true, 5, 2000, 's');
+      await testUtils.waitForPlayerStateToEqual('previewVideoPlayer', 'playing', 15000);
+      // Since we send preview progress events every 10 seconds, we need to wait for at least 2 events to be captured
+      await utils.sleep(22000);
 
       // Validate the first preview_play_progress event structure
       const progressEvent = analyticsEvents.find(e => e.event?.preview_play_progress);
       expect(progressEvent).to.exist;
-
       validateAnalyticsEvent(
         progressEvent,
         {
@@ -749,7 +747,7 @@ describe('Video Tiles Analytics Tests', function () {
    * A: User navigates away from the tile before the preview reaches the end.
    * Tracking: finish_preview with has_completed=false (VIDEO_IN_GRID, CategoryComponent).
    */
-  it('CXXXXX - Finish preview event fires with has_completed=false when user navigates away @video_tiles @analytics', async () => {
+  it('C869300 - Finish preview event fires with has_completed=false when user navigates away @video_tiles @analytics', async () => {
     /**
      * Pre-conditions:
      * - roku_video_tiles_1_9 experiment enabled
@@ -843,7 +841,7 @@ describe('Video Tiles Analytics Tests', function () {
    * Tracking: finish_preview has_completed=true; navigate_to_page (video_player_page);
    * page_load (video_player_page); start_video (VIDEO_PREVIEWS); play_progress (VIDEO_PREVIEWS).
    */
-  it('CXXXXX - Finish preview event with has_completed=true and subsequent video player events @video_tiles @analytics', async () => {
+  it('C869301 - Finish preview event with has_completed=true and subsequent video player events @video_tiles @analytics', async () => {
     /**
      * Pre-conditions:
      * - roku_video_tiles_1_9 experiment enabled
@@ -987,7 +985,7 @@ describe('Video Tiles Analytics Tests', function () {
    * navigate_to_page (video_page/series_detail_page); page_load for details;
    * preview_play_progress with video_player=BANNER and PreviewComponent.
    */
-  it('CXXXXX - Click video tile during preview navigates to details page with banner preview @video_tiles @analytics', async () => {
+  it('C869298 - Click video tile during preview navigates to details page with banner preview @video_tiles @analytics', async () => {
     /**
      * Pre-conditions:
      * - roku_video_tiles_1_9 experiment enabled
@@ -1139,7 +1137,7 @@ describe('Video Tiles Analytics Tests', function () {
    * ComponentInteractionEvent (MiddleNavComponent, PLAY) fires before NavigateToPageEvent to video player
    * when user presses Play on the details page.
    */
-  it('CXXXXX - Press Play on details page fires ComponentInteractionEvent (PLAY) then NavigateToPageEvent @video_tiles @analytics', async () => {
+  it('C869299 - Press Play on details page fires ComponentInteractionEvent (PLAY) then NavigateToPageEvent @video_tiles @analytics', async () => {
     /**
      * Pre-conditions:
      * - roku_video_tiles_1_9 experiment enabled
@@ -1227,7 +1225,7 @@ describe('Video Tiles Analytics Tests', function () {
    * navigate_to_page (home_page/for_you_page); page_load for home;
    * preview_play_progress with VIDEO_IN_GRID and CategoryComponent.
    */
-  it('CXXXXX - Back from details page returns to video tile with preview continuing @video_tiles @analytics', async () => {
+  it('C869298 - Back from details page returns to video tile with preview continuing @video_tiles @analytics', async () => {
     /**
      * Pre-conditions:
      * - roku_video_tiles_1_9 experiment enabled
@@ -1396,7 +1394,7 @@ describe('Video Tiles Analytics Tests', function () {
    * ComponentInteractionEvent (ButtonComponent, LEFT, IMAGE, user_interaction CONFIRM) fires when user
    * presses Left on details page (when focus is not on secondary menu or related grid), then NavigateToPageEvent back to home.
    */
-  it('CXXXXX - Press Left on details page fires ComponentInteractionEvent (LEFT, IMAGE, CONFIRM) then returns to tile @video_tiles @analytics', async () => {
+  it('C869298 - Press Left on details page fires ComponentInteractionEvent (LEFT, IMAGE, CONFIRM) then returns to tile @video_tiles @analytics', async () => {
     /**
      * Pre-conditions:
      * - roku_video_tiles_1_9 experiment enabled
@@ -1487,7 +1485,7 @@ describe('Video Tiles Analytics Tests', function () {
    * optionally navigate_within_page (for_you_page + mystuff_component) when navigating within the grid.
    * Left nav section for My Stuff is QUEUE.
    */
-  it('CXXXXX - MyStuff screen fires page_load, navigate_to_page, and navigate_within_page when applicable @video_tiles @analytics', async () => {
+  it('C869292 - MyStuff screen fires page_load, navigate_to_page, and navigate_within_page when applicable @video_tiles @analytics', async () => {
     /**
      * Test Steps:
      * 1. Launch app as guest, navigate to MyStuff via left nav (My Stuff -> QUEUE)

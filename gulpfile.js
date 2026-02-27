@@ -1259,24 +1259,14 @@ function serveAllureReport(done) {
   return automatedTests().serveAllureReport(done);
 }
 
-function startTestBucket(done) {
-  return automatedTests().startTestBucket(done);
-}
-
-function closeTestBucket(done) {
-  return automatedTests().closeTestBucket(done);
-}
-
-function pushReportToDashboard(done) {
-  return automatedTests().pushReportToDashboard(done);
+function convertToAllureResults(done) {
+  return automatedTests().convertToAllureResults(done);
 }
 
 exports.generateAllureReport = generateAllureReport;
 exports.clearAllureResults = clearAllureResults;
 exports.serveAllureReport = serveAllureReport;
-exports.startTestBucket = startTestBucket;
-exports.closeTestBucket = closeTestBucket;
-exports.pushReportToDashboard = pushReportToDashboard;
+exports.convertToAllureResults = convertToAllureResults;
 
 exports.runToolingTests = series(setAutomatedTestsConfig, clean, buildInstalled, runToolingTests);
 

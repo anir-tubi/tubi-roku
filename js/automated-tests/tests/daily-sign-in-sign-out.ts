@@ -23,7 +23,7 @@ import { shared } from '../test-helpers';
 describe('Daily Sign In/Sign Out Automation', function () {
   this.timeout(300000); // 5 minutes timeout for the entire test
 
-  it('Daily - Sign up and Sign Out Flow @daily_sign_in_sign_out', async () => {
+  it('C825399 - Daily Sign up and Sign Out Flow @daily_sign_in_sign_out', async () => {
     // Step 1: Launch app as guest user
     await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: false });
     await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');
@@ -109,7 +109,7 @@ describe('Daily Sign In/Sign Out Automation', function () {
 
   });
 
-  it('Daily - Sign In Flow @daily_sign_in_sign_out', async () => {
+  it('C781337 - Daily Sign In Flow @daily_sign_in_sign_out', async () => {
     // Step 1: Create a registered user and sign them in initially
     const user = await testUtils.createRegisteredUser();
 
