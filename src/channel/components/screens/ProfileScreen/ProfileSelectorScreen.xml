@@ -47,8 +47,6 @@
         drawFocusFeedbackOnTop="false"
         itemComponentName="ProfileMenuItem" />
 
-      <SimpleButton
-        id="ContinueGuestButton" />
     </LayoutGroup>
   </children>
 </component>

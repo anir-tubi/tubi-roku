@@ -1090,6 +1090,14 @@ Function bookmarkFailed(detailScreen, addBookmarkResult)
     responseCode = addBookmarkResult.code
   end if
 
+  onAddToQueueRetryCallback = onAddToQueueRetry
+  addToQueueRetryParams = [
+    detailScreen
+  ]
+
+  onCloseErrorModalCallback = invalid
+  title = getTranslation("error_tryAgain_title")
+
   ' set up the error modal dialog
   errorCode = getUserFacingErrorCode(m.constants.errors.context.videoDetailScreen, m.constants.errors.subtypes.addBookmarkError, responseCode)
   message = ""
@@ -1103,6 +1111,16 @@ Function bookmarkFailed(detailScreen, addBookmarkResult)
     end if
 
     message = getTranslation("screenDetails_error_noQueueUpcoming_description")
+    messageStr = getErrorMessage(message, errorCode)
+  else if responseCode = 403 AND isUserInMultiAccount() = true AND isKidsUIOn() = true
+
+    title = getTranslation("restricted_content_title")
+    messageStr = getTranslation("restricted_content_description")
+    dialogEvent = getDetailScreenDialogAnalyticEvent(content, "ADD_TO_QUEUE", errorCode, m.constants)
+    detailScreen.stringQueueButton = getTranslation("screenDetails_button_queue")
+    onAddToQueueRetryCallback = invalid
+    addToQueueRetryParams = invalid
+    onCloseErrorModalCallback = onCloseErrorModal
   else
     dialogEvent = getDetailScreenDialogAnalyticEvent(content, "ADD_TO_QUEUE", errorCode, m.constants)
     detailScreen.stringQueueButton = getTranslation("screenDetails_button_queue")
@@ -1113,22 +1131,19 @@ Function bookmarkFailed(detailScreen, addBookmarkResult)
     else if detailScreen.availabilityType = m.constants.ui.contentTimings.replay
       message = getTranslation("screenDetails_error_noQueueReplay_description")
     end if
-
+    messageStr = getErrorMessage(message, errorCode)
   end if
-  title = getTranslation("error_tryAgain_title")
+
 
   modalInfo = {
     title: title
-    message: getErrorMessage(message, errorCode)
+    message: messageStr
     openTrackEvent: dialogEvent
     trackingTask: m.trackingLoggingTask
   }
 
-  addToQueueRetryParams = [
-    detailScreen
-  ]
 
-  showErrorModal(modalInfo, onAddToQueueRetry, addToQueueRetryParams)
+  showErrorModal(modalInfo, onAddToQueueRetryCallback, addToQueueRetryParams, onCloseErrorModalCallback)
 
 End Function
 

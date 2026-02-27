@@ -2405,7 +2405,7 @@ Function getTranslation_en_US()
     },
     "add_more_accounts": {
       "description": "Button text displayed on profile selector screen",
-      "message": "Add More Accounts"
+      "message": "Add more accounts"
     },
     "screenSettings_menu_Account": {
       "description": "A menu Item for the Settings screen",
@@ -2759,6 +2759,14 @@ Function getTranslation_en_US()
     "guest_tile_sign_up_now": {
       "description": "Button text on guest user tile prompting sign-up",
       "message": "Sign Up Now"
+    },
+    "restricted_content_description": {
+      "description": "Title of the dialog window that is shown when a content is restricted",
+      "message": "You cannot view this content because of the current parental control settings.\nPlease update your settings or select something else to watch"
+    },
+    "restricted_content_title": {
+      "description": "Title of the dialog window that is shown when a content is restricted",
+      "message": "Restricted Content"
     }
   }
 End Function

@@ -82,7 +82,11 @@ Function setTypographyOfLabel(labelNode, typographyId, overrides = invalid)
     aaTypography = constants.typographyAA[typographyId]
     if aaTypography <> invalid
       sFontFile = getTypographyFontFile(aaTypography)
-      nFontSize = getTypographyFontSize(aaTypography)
+      if overrides <> invalid AND overrides.fontSize <> invalid
+        nFontSize = overrides.fontSize
+      else
+        nFontSize = getTypographyFontSize(aaTypography)
+      end if
 
       nLineSpacing = 0
       if overrides <> invalid AND overrides.lineSpacing <> invalid

@@ -11,7 +11,7 @@ Function init()
   topRef.observeFieldScoped("showArrow", "onShowArrowChanged")
 
   m.typographyConstants = getTypographyConstants()
-  setTypographyOfLabel(m.tooltipText, m.typographyConstants.ids.bodyExtraSmallStrong)
+  setTypographyOfLabel(m.tooltipText, m.typographyConstants.ids.bodyExtraSmallStrong, { lineSpacing: 0, fontSize: 20 })
 
   ' Initialize arrow visibility
   m.tooltipArrow.visible = topRef.showArrow
@@ -30,7 +30,7 @@ Function onTypographyChanged(msg)
 
   if isString(typography) = true AND m.typographyConstants.ids[typography] <> invalid
     typographyId = m.typographyConstants.ids[typography]
-    setTypographyOfLabel(m.tooltipText, typographyId)
+    setTypographyOfLabel(m.tooltipText, typographyId, { lineSpacing: 0, fontSize: 20 })
     adjustTooltipSize()
   end if
 End Function
@@ -112,32 +112,34 @@ Function positionArrow() as Void
   ' Set the rotation center to the center of the arrow image
   m.tooltipArrow.scaleRotateCenter = [arrowWidth / 2, arrowHeight / 2]
 
-  if arrowPlacement = "left"
+  if arrowPlacement = "top"
     ' No rotation, attach to left edge, centered vertically
     m.tooltipArrow.rotation = 0
-    arrowX = -arrowWidth
-    arrowY = (backgroundHeight - arrowHeight) / 2
+    arrowX = (backgroundWidth - arrowWidth) / 2
+    arrowY = -arrowHeight
+    m.tooltipArrow.translation = [arrowX, arrowY]
+
+  else if arrowPlacement = "bottom"
+    ' 180° rotation, attach to right edge, centered vertically
+    m.tooltipArrow.rotation = pi
+    arrowX = (backgroundWidth - arrowWidth) / 2
+    arrowY = backgroundHeight
     m.tooltipArrow.translation = [arrowX, arrowY]
 
   else if arrowPlacement = "right"
-    ' 180° rotation, attach to right edge, centered vertically
-    m.tooltipArrow.rotation = pi
+    ' 90° clockwise rotation (PI/2), attach to top edge, centered horizontally
+    m.tooltipArrow.rotation = -pi / 2
+
     arrowX = backgroundWidth
     arrowY = (backgroundHeight - arrowHeight) / 2
     m.tooltipArrow.translation = [arrowX, arrowY]
 
-  else if arrowPlacement = "top"
-    ' 90° clockwise rotation (PI/2), attach to top edge, centered horizontally
-    m.tooltipArrow.rotation = -pi / 2
-    arrowX = (backgroundWidth - arrowHeight) / 2
-    arrowY = -arrowWidth
-    m.tooltipArrow.translation = [arrowX, arrowY]
 
-  else if arrowPlacement = "bottom"
+  else if arrowPlacement = "left"
     ' 90° counter-clockwise rotation (-PI/2), attach to bottom edge, centered horizontally
     m.tooltipArrow.rotation = pi / 2
-    arrowX = (backgroundWidth - arrowHeight) / 2
-    arrowY = backgroundHeight
+    arrowX = -arrowWidth
+    arrowY = (backgroundHeight - arrowHeight) / 2
     m.tooltipArrow.translation = [arrowX, arrowY]
 
   end if

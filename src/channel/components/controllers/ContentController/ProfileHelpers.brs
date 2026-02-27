@@ -185,6 +185,7 @@ Function handleGuestProfileSelection()
       m.tubiAuthUpdate.initOrUpdateAuthInfo(onUpdatedAuthRetrieved, false)
       setUiModeForProfileSelected(guestProfileAuth)
       clearGlobalUserData()
+      resetUserServerPersistentData()
       updateConsentAndServerPersistentData()
     end if
   else
@@ -304,8 +305,6 @@ End Function
 
 
 Function onKidsAccountSetupContinueSelected()
-
-  currentScreen = popScreenAfterSignInProcess()
   onActivationSuccess()
   registerEvent = {
     type: "register"
@@ -316,16 +315,13 @@ Function onKidsAccountSetupContinueSelected()
 
   m.trackingLoggingTask.trackEvent = registerEvent
 
-  if currentScreen <> invalid AND currentScreen.getSubtype() = "HomeScreen" AND currentScreen.isInFocusChain() = false
-    'focus was lost to spinner in activation success, so we need to set focus to home screen if it is not in focus.
-    currentScreen.setfocus(true)
-  end if
 End Function
 
 
 Function showParentalControlPinInputScreen(signInInfo)
   parentalControlPinInputScreen = createObject("roSGNode", "ParentalControlPinInputScreen")
   parentalControlPinInputScreen.id = m.constants.ui.screenIds.parentalControlPinInputScreen
+  parentalControlPinInputScreen.screenLevel = m.constants.ui.screenLevels.ageGateScreen
   parentalControlPinInputScreen.signInInfo = signInInfo
   parentalControlPinInputScreen.observeFieldScoped("pinSubmitted", "onPinSubmittedForKidsAccount")
   parentalControlPinInputScreen.observeFieldScoped("backButtonPressed", "onBackButtonPressed")
@@ -755,6 +751,7 @@ End Function
 ' | Adult_Account(Kids_mode)| passWordGate            | No_Path                     | passwordGate             | -------                  | allowed                            | PasswordGate         | allowed
 ' | Kids_Account_(younger)  | PIN,_if_enabled         | No_Path                     | PIN,_if_enabled          | No_Path                  | allowed                            | PIN,_if_enabled      | allowed
 ' | Kids_Account_(older)    | PIN,_if_enabled         | No_Path                     | PIN,_if_enabled          | No_Path                  | allowed                            | PIN,_if_enabled      | allowed
+' | Adult Account(Kid pc)   | passWordGate            | No_Path                     | passwordGate             | No_path                  | allowed                            | PasswordGate         | allowed
 
 
 Function getUserSwitchAction(authInfo, profileSelected)
@@ -770,8 +767,10 @@ Function getUserSwitchAction(authInfo, profileSelected)
       fromAccount = "guest"
     end if
   else if accountType(authInfo) = "adult"
-    if m.uiMode = m.constants.ui.modes.kids OR m.uiMode = m.constants.ui.modes.kidsParental
+    if m.uiMode = m.constants.ui.modes.kids
       fromAccount = "adultInKidsMode"
+    else if m.uiMode = m.constants.ui.modes.kidsParental
+      fromAccount = "adultInKidsPC"
     else
       fromAccount = "adultAccount"
     end if
@@ -805,7 +804,10 @@ Function getUserSwitchAction(authInfo, profileSelected)
     "adultInKidsMode-kidsAccount": "pcCheckPasswordGate",
     "kidsAccount-guest": "pinGate",
     "kidsAccount-kidsAccount": "pcCheckPinGate",
-    "kidsAccount-adultAccount": "pinGate"
+    "kidsAccount-adultAccount": "pcCheckPinGate",
+    "adultInKidsPC-guest": "passwordGate",
+    "adultInKidsPC-adultAccount": "pcCheckPasswordGate",
+    "adultInKidsPC-kidsAccount": "pcCheckPasswordGate"
   }
 
   pcMap = {

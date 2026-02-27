@@ -1012,7 +1012,6 @@ End Function
 Function onQueueAfterSignIn()
   tubiLog("SignInHelpers.onQueueAfterSignIn")
   refreshUiAfterSignIn()
-
   if isUserInMultiAccount() = true AND isKidsUIOn() = true
     setContentToRefreshAllPersonalizedScreens() 'for kids profile, we need to refresh the homescreen.
   else

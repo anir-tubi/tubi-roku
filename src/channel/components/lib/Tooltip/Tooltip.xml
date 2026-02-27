@@ -18,13 +18,15 @@
     <!-- arrowPlacement values: top, bottom, left, right -->
     <field id="arrowPlacement" type="string" alwaysNotify="true" />
     <field id="showArrow" type="boolean" value="true" />
+    <field id="textHeight" type="float" alias="TooltipText.height" />
+    <field id="textWidth" type="float" alias="TooltipText.width" />
   </interface>
 
   <children>
     <Poster
       id="TooltipArrow"
-      uri="pkg:/images/left-arrow.png"
-      height="21"
+      uri="pkg:/images/tooltip-arrow.png"
+      height="12"
       width="21"
       loadDisplayMode="scaleToFit" />
     <Poster
@@ -37,7 +39,8 @@
       height="24"
       vertAlign="center"
       horizAlign="center"
-      maxLines="1">
+      wrap="true"
+      numLines="2">
       <Font
         role="font" />
     </Label>

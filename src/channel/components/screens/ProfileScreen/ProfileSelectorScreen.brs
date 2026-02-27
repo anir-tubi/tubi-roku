@@ -1,13 +1,10 @@
 Function init()
   m.profileMenu = m.top.findNode("ProfileMenu")
   m.profileScreenTitle = m.top.findNode("ProfileScreenTitle")
-  m.continueGuestButton = m.top.findNode("ContinueGuestButton")
+
   m.top.observeFieldScoped("content", "onCreateProfilesMenu")
   m.top.observeFieldScoped("focusedChild", "onFocusedChildChange")
   m.profileMenu.observeFieldScoped("itemSelected", "onItemSelectedChange")
-  m.continueGuestButton.observeFieldScoped("selected", "onItemSelectedChange")
-
-  m.continueGuestButton.text = getTranslation("reg_continue_as_guest_button_title")
   m.profileScreenTitle.text = getTranslation("profile_selector_screen_title")
 
   typographyConstants = getTypographyConstants()
@@ -17,7 +14,6 @@ Function init()
   if theme <> invalid
     m.profileMenu.focusBitmapBlendColor = theme.focusedColor
     m.profileScreenTitle.color = theme.primaryTextColor
-    m.continueGuestButton.color = theme.focusedColor
   end if
 
   m.top.trackingPageInfo = {
@@ -49,7 +45,7 @@ End Function
 
 
 Function onFocusedChildChange(msg)
-  if m.top.isInFocusChain() = true AND m.continueGuestButton.itemHasFocus = false
+  if m.top.isInFocusChain() = true
     m.profileMenu.setFocus(true)
   end if
 End Function
@@ -57,10 +53,7 @@ End Function
 
 Function onItemSelectedChange(msg)
   itemSelected = msg.getData()
-  item = msg.getRoSGNode()
-  if item.id = "ContinueGuestButton"
-    m.top.profileSelected = "guest"
-  else
+  if itemSelected <> invalid AND m.profileMenu.content <> invalid
     profileSelected = m.profileMenu.content.getChild(itemSelected).id
     m.top.profileSelected = profileSelected
   end if
@@ -70,15 +63,7 @@ End Function
 
 Function onKeyEvent(key, press) as Boolean
   if press = true
-    if key = "down" AND m.profileMenu.isInFocusChain() = true
-      m.continueGuestButton.itemHasFocus = true
-      m.continueGuestButton.setFocus(true)
-      return true
-    else if key = "up" AND m.continueGuestButton.itemHasFocus = true
-      m.profileMenu.setFocus(true)
-      m.continueGuestButton.itemHasFocus = false
-      return true
-    else if key = "back" AND m.top.disableBack = true
+    if key = "back" AND m.top.disableBack = true
       return true
     end if
   end if

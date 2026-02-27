@@ -682,17 +682,29 @@ Function onShowAddAccountsTooltipChanged()
     m.bottomTextStr = getTranslation("add_more_accounts")
     if m.addAccountsTooltip = invalid
       m.addAccountsTooltip = CreateObject("roSGNode", "Tooltip")
-      m.addAccountsTooltip.arrowPlacement = "left"
+      m.addAccountsTooltip.id = "addAccountsTooltip"
+      m.addAccountsTooltip.autoSize = false
+      m.addAccountsTooltip.text = m.bottomTextStr
+      m.addAccountsTooltip.arrowPlacement = "top"
       m.addAccountsTooltip.showArrow = true
-      transX = m.ItemGroups.translation[0] + 100
-      transY = m.ItemGroups.translation[1]
+      transX = m.ItemGroups.translation[0] - 3
+      transY = m.ItemGroups.translation[1] + 63
       m.addAccountsTooltip.translation = [transX, transY]
       m.addAccountsTooltip.backgroundColor = m.toolTipColor
       m.addAccountsTooltip.arrowColor = m.toolTipColor
       m.addAccountsTooltip.textColor = m.toolTipTextColor
-      m.addAccountsTooltip.text = getTranslation("add_more_accounts")
-      m.top.appendChild(m.addAccountsTooltip)
+      m.addAccountsTooltip.width = 115
+      m.addAccountsTooltip.height = 64
+      m.addAccountsTooltip.textHeight = 58
+      m.addAccountsTooltip.textWidth = 115
+      m.addAccountsTooltip.typography = "bodyExtraSmallStrong"
+      m.addAccountsTooltip.horizontalPadding = 10
 
+
+      m.top.appendChild(m.addAccountsTooltip)
+      m.addAccountsTooltip.opacity = 0.0
+
+      animate(m.addAccountsTooltip, { opacity: 1.0, duration: 0.4 })
       'create timer to hide tooltip after 12 seconds
       m.toolTipTimer = CreateObject("roSGNode", "Timer")
       m.toolTipTimer.repeat = false
@@ -880,8 +892,9 @@ Function verticallyCenterSideNav()
   translationY = (1080 - sideNavHeight) / 2
   m.ItemGroups.translation = [translationX, translationY]
   if m.addAccountsTooltip <> invalid
-    transX = translationX + 100
-    transY = translationY
+    'transX = translationX - 5
+    transX = translationX - 3
+    transY = translationY + 63
     m.addAccountsTooltip.translation = [transX, transY]
   end if
 End Function
@@ -915,10 +928,14 @@ Function onToolTipTimerFired()
     m.toolTipTimer.unobserveFieldScoped("fire")
     m.toolTipTimer.control = "stop"
     m.toolTipTimer = invalid
-    if m.addAccountsTooltip <> invalid
-      m.addAccountsTooltip.visible = false
+
+    callbackFun = Function()
       m.top.removeChild(m.addAccountsTooltip)
       m.addAccountsTooltip = invalid
+    End Function
+
+    if m.addAccountsTooltip <> invalid
+      fade(m.addAccountsTooltip, "out", 0.4, 0.0, -1, callbackFun)
     end if
   end if
 End Function
