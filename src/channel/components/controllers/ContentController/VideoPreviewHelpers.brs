@@ -144,7 +144,7 @@ Function onVideoPreviewStateChanged(msg)
       else if item <> invalid AND item.gridItemType = m.constants.ui.gridItemTypes.adRowlistCarousel OR item.gridItemType = m.constants.ui.gridItemTypes.adRowlistSpotlight
         '// Simply stop the video preview for adRowlistCarousel or adRowlistSpotlight content
         m.backgroundGroup.posterVisible = true
-        if isVideoTileEnabledScreen() = false AND item.gridItemType = m.constants.ui.gridItemTypes.adRowlistCarousel
+        if isCurrentScreenHomeScreen() = true AND item.gridItemType = m.constants.ui.gridItemTypes.adRowlistCarousel
           currentScreen.allowCarouselAutoRotate = true
         end if
       else if m.maintask.isHdmiStatusOk = true AND isFullPlayerBlockedForUser = false
@@ -230,7 +230,7 @@ Function startVideoPreview(content, pageInfo = {}, componentInfo = {})
 
     ' If the experiment is enabled and focused content is from featured row than expand preview to full screen.
     if content.gridItemType = m.constants.ui.gridItemTypes.skinAd OR content.gridItemType = m.constants.ui.gridItemTypes.adRowlistCarousel OR content.gridItemType = m.constants.ui.gridItemTypes.adRowlistSpotlight
-      if content.gridItemType = m.constants.ui.gridItemTypes.adRowlistCarousel AND isVideoTileEnabledScreen() = false
+      if content.gridItemType = m.constants.ui.gridItemTypes.adRowlistCarousel AND isCurrentScreenHomeScreen() = true
         currentScreen = getCurrentScreen()
         if currentScreen <> invalid
           currentScreen.allowCarouselAutoRotate = false
