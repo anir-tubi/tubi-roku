@@ -12,9 +12,9 @@ run-name: ${{ format('{0}; {1}', github.ref_name, inputs.tag || 'Run All Tests')
 
 # Controls when the action will run.
 on:
-  # Run automatically at 2 AM Eastern time (6 AM UTC for EDT, 7 AM UTC for EST)
+  # Run automatically at 4:45 AM UTC / 11:45 PM Eastern time / 8:45 PM Pacific time
   schedule:
-    - cron: '0 6 * * *'
+    - cron: '45 4 * * *'  
     
   # Also allow manual trigger
   workflow_dispatch:
@@ -69,251 +69,25 @@ on:
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
-  # Job to determine the target branches to run the tests against
-  set-target-branches:
-    runs-on: ubuntu-latest
-    outputs:
-      branches: ${{ steps.set-matrix.outputs.branches }}
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
-      
-      - name: Build matrix of target branches
-        id: set-matrix
-        run: |
-          # For manual workflow_dispatch, use the selected branch
-          if [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
-            SELECTED_BRANCH="${{ github.ref_name }}"
-            echo "Manual dispatch detected, using selected branch: $SELECTED_BRANCH"
-            echo 'branches=["'$SELECTED_BRANCH'"]' >> "$GITHUB_OUTPUT"
-            exit 0
-          fi
-
-          # For scheduled runs, find latest QA branch and build matrix with master
-          # Fetch all remote branches
-          git fetch --all
-          
-          # Find all QA branches matching pattern qa_*_*_* (e.g., qa_3_8_36) and get the most recently updated one
-          # Pattern matches: qa_ followed by digits, underscore, digits, underscore, digits
-          LATEST_QA_BRANCH=$(git for-each-ref --sort=-committerdate refs/remotes/origin/qa_* --format='%(refname:short)' | sed 's|origin/||' | grep -E '^qa_[0-9]+_[0-9]+_[0-9]+$' | head -n 1)
-          
-          # Build matrix JSON - always include master
-          if [ -z "$LATEST_QA_BRANCH" ]; then
-            echo "No QA branch found matching pattern qa_*_*_*"
-            echo 'branches=["master"]' >> "$GITHUB_OUTPUT"
-          else
-            echo "Found latest QA branch: $LATEST_QA_BRANCH"
-            echo 'branches=["master","'$LATEST_QA_BRANCH'"]' >> "$GITHUB_OUTPUT"
-          fi
-
   detect-runner:
     uses: ./.github/workflows/detect-multi-device-runner.yml
     secrets:
       ROKU_AUTO_PAT: ${{ secrets.ROKU_AUTO_PAT }}
 
   test:
-    needs: [set-target-branches, detect-runner]
-    strategy:
-      fail-fast: false
-      max-parallel: 1
-      matrix:
-        branch: ${{ fromJson(needs.set-target-branches.outputs.branches) }}
-    name: Run Automated UI Tests (${{ matrix.branch }}) [${{ needs.detect-runner.outputs.available == 'true' && 'multi-device' || 'single-device' }}]
-    runs-on: ${{ needs.detect-runner.outputs.available == 'true' && fromJSON('["self-hosted", "enabled", "roku", "automation-regression", "multi-device"]') || fromJSON('["self-hosted", "enabled", "roku", "automation-regression"]') }}
-    timeout-minutes: 240
-
-    steps:
-      - name: Job Params
-        id: branch-check
-        run: |
-          echo branch: "${{ matrix.branch }}"
-          echo tag: "${{ inputs.tag }}"
-          echo customString: "${{ inputs.customString }}"
-          echo bail: "${{ inputs.bail }}"
-          echo runner-type: "${{ needs.detect-runner.outputs.available == 'true' && 'multi-device' || 'single-device' }}"
-
-          # Branches that enable Allure reporting, dashboard, and S3 upload
-          REPORTING_BRANCHES="master"
-          if echo "$REPORTING_BRANCHES" | grep -qw "${{ matrix.branch }}"; then
-            echo "reporting=true" >> "$GITHUB_OUTPUT"
-          else
-            echo "reporting=false" >> "$GITHUB_OUTPUT"
-          fi
-
-      - uses: actions/checkout@v3
-        with:
-          ref: ${{ matrix.branch }}
-
-      - name: npm install
-        run: npm install
-
-      - name: Generate rta-config.json
-        run: node js/workflows/generateRtaConfig.js
-
-      - name: Clear Allure Results
-        if: steps.branch-check.outputs.reporting == 'true'
-        run: npx gulp clearAllureResults
-
-      - name: Trigger Dashboard Test Run Start
-        if: steps.branch-check.outputs.reporting == 'true'
-        uses: actions/github-script@v7
-        with:
-          github-token: ${{ secrets.ROKU_AUTO_PAT }}
-          script: |
-            await github.rest.actions.createWorkflowDispatch({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              workflow_id: 'dashboard-api.yml',
-              ref: '${{ matrix.branch }}',
-              inputs: {
-                action: 'start',
-                platform: 'roku',
-                tag: '${{ inputs.tag || 'Run All Tests' }}',
-                github_action_id: String(${{ github.run_id }}),
-              },
-            });
-        continue-on-error: true
-
-      - name: gulp runAutomatedTests
-        id: run-tests
-        timeout-minutes: 235
-        env:
-          runId: ${{ github.run_id }}
-          branch: ${{ matrix.branch }}
-          tag: ${{ inputs.tag || 'Run All Tests' }}
-          customString: ${{ inputs.customString || '' }}
-          bail: ${{ inputs.bail || false }}
-          retries: 1
-          PLATFORM: roku
-          GITHUB_TOKEN: ${{ secrets.ROKU_AUTO_PAT }}
-          GITHUB_REPOSITORY: ${{ github.repository }}
-          DASHBOARD_BRANCH: ${{ matrix.branch }}
-          DASHBOARD_REPORTING: ${{ steps.branch-check.outputs.reporting }}
-        run: npx gulp runAutomatedTests
-
-      - name: Set up Java for Allure
-        if: (success() || failure()) && steps.branch-check.outputs.reporting == 'true'
-        uses: actions/setup-java@v4
-        with:
-          distribution: 'temurin'
-          java-version: '17'
-
-      - name: Convert Mochawesome to Allure Results
-        if: (success() || failure()) && steps.branch-check.outputs.reporting == 'true'
-        run: npx gulp convertToAllureResults
-
-      - name: Generate Allure Report
-        if: (success() || failure()) && steps.branch-check.outputs.reporting == 'true'
-        run: npx gulp generateAllureReport
-
-      - name: Sanitize branch name for artifact upload
-        id: sanitize-branch-name
-        if: success() || failure()
-        run: |
-          SANITIZED_BRANCH_NAME=$(echo "${{ matrix.branch }}" | sed 's/[":<>|*?\\\/]/_/g' | tr -d '\r\n')
-          echo "value=$SANITIZED_BRANCH_NAME" >> "$GITHUB_OUTPUT"
-
-      - name: Upload JSON Report
-        if: success() || failure()
-        uses: actions/upload-artifact@v4
-        with:
-          name: JSON Report (${{ steps.sanitize-branch-name.outputs.value }})
-          path: out/ui-tests-output/report.json
-
-      - name: Upload HTML Report
-        if: success() || failure()
-        uses: actions/upload-artifact@v4
-        with:
-          name: HTML Report (${{ steps.sanitize-branch-name.outputs.value }})
-          path: out/ui-tests-output/html
-
-      - name: Upload Allure Report
-        if: (success() || failure()) && steps.branch-check.outputs.reporting == 'true'
-        uses: actions/upload-artifact@v4
-        with:
-          name: Allure Report (${{ steps.sanitize-branch-name.outputs.value }})
-          path: allure-report
-
-      - name: Upload Failed Test Screenshots
-        if: failure()
-        uses: actions/upload-artifact@v4
-        with:
-          name: Failed Test Screenshots (${{ steps.sanitize-branch-name.outputs.value }})
-          path: out/ui-tests-output/screenshots
-
-      - name: Send Slack Notification
-        if: success() || failure()
-        run: npx ts-node ./js/workflows/sendSlackAutomatedTestsResultNotification.ts "${{ matrix.branch }}"
-
-      - name: Extract test stats from JSON report
-        id: test-stats
-        if: (success() || failure()) && steps.branch-check.outputs.reporting == 'true'
-        run: |
-          REPORT_PATH="out/ui-tests-output/report.json"
-          if [ -f "$REPORT_PATH" ]; then
-            TOTAL=$(jq -r '.stats.tests // 0' "$REPORT_PATH")
-            PASSED=$(jq -r '.stats.passes // 0' "$REPORT_PATH")
-            FAILED=$(jq -r '.stats.failures // 0' "$REPORT_PATH")
-            SKIPPED=$(jq -r '.stats.pending // 0' "$REPORT_PATH")
-            DURATION=$(jq -r '.stats.duration // 0' "$REPORT_PATH")
-            SUITES=$(jq -r '.stats.suites // 0' "$REPORT_PATH")
-            echo "Tests: $TOTAL passed=$PASSED failed=$FAILED skipped=$SKIPPED duration=${DURATION}ms suites=$SUITES"
-          else
-            echo "Report not found, using defaults"
-            TOTAL=0; PASSED=0; FAILED=0; SKIPPED=0; DURATION=0; SUITES=0
-          fi
-          echo "total=$TOTAL" >> "$GITHUB_OUTPUT"
-          echo "passed=$PASSED" >> "$GITHUB_OUTPUT"
-          echo "failed=$FAILED" >> "$GITHUB_OUTPUT"
-          echo "skipped=$SKIPPED" >> "$GITHUB_OUTPUT"
-          echo "duration=$DURATION" >> "$GITHUB_OUTPUT"
-          echo "suites=$SUITES" >> "$GITHUB_OUTPUT"
-
-      - name: Trigger Dashboard Complete and Report Push
-        if: (success() || failure()) && steps.branch-check.outputs.reporting == 'true'
-        uses: actions/github-script@v7
-        with:
-          github-token: ${{ secrets.ROKU_AUTO_PAT }}
-          script: |
-            await github.rest.actions.createWorkflowDispatch({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              workflow_id: 'dashboard-api.yml',
-              ref: '${{ matrix.branch }}',
-              inputs: {
-                action: 'complete-and-push',
-                platform: 'roku',
-                test_outcome: '${{ steps.run-tests.outcome }}',
-                artifact_name: 'Allure Report (${{ steps.sanitize-branch-name.outputs.value }})',
-                run_id: String(${{ github.run_id }}),
-                total_tests: '${{ steps.test-stats.outputs.total }}',
-                passed_tests: '${{ steps.test-stats.outputs.passed }}',
-                failed_tests: '${{ steps.test-stats.outputs.failed }}',
-                skipped_tests: '${{ steps.test-stats.outputs.skipped }}',
-                duration_ms: '${{ steps.test-stats.outputs.duration }}',
-                total_suites: '${{ steps.test-stats.outputs.suites }}',
-              },
-            });
-        continue-on-error: true
-
-      - name: Trigger S3 upload workflow
-        if: (success() || failure()) && steps.branch-check.outputs.reporting == 'true'
-        uses: actions/github-script@v7
-        with:
-          github-token: ${{ secrets.ROKU_AUTO_PAT }}
-          script: |
-            await github.rest.actions.createWorkflowDispatch({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              workflow_id: 'upload-reports-to-s3.yml',
-              ref: 'master',
-              inputs: {
-                artifact_name: 'Allure Report (${{ steps.sanitize-branch-name.outputs.value }})',
-                run_id: String(${{ github.run_id }}),
-                platform: 'roku',
-                env: '${{ matrix.branch == 'master' && 'production' || 'staging' }}',
-              },
-            });
-        continue-on-error: true
+    needs: detect-runner
+    name: Run Automated UI Tests [${{ needs.detect-runner.outputs.available == 'true' && 'multi-device' || 'single-device' }}]
+    permissions:
+      contents: read
+      issues: write
+      pull-requests: write
+    uses: ./.github/workflows/run-automated-tests.yml
+    with:
+      runner-labels: ${{ needs.detect-runner.outputs.available == 'true' && '["self-hosted", "enabled", "roku", "automation-regression", "multi-device"]' || '["self-hosted", "enabled", "roku", "automation-regression"]' }}
+      runner-type: ${{ needs.detect-runner.outputs.available == 'true' && 'multi-device' || 'single-device' }}
+      target-branch: ${{ github.ref_name }}
+      tag: ${{ inputs.tag || 'Run All Tests' }}
+      customString: ${{ inputs.customString || '' }}
+      bail: ${{ inputs.bail || false }}
+    secrets:
+      ROKU_AUTO_PAT: ${{ secrets.ROKU_AUTO_PAT }}

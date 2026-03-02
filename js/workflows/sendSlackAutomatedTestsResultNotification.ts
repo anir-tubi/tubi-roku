@@ -6,9 +6,8 @@ const report = JSON.parse(fs.readFileSync(jsonReportOutputPath, 'utf8'));
 const env = process.env;
 const workflowRunUrl = `${env.GITHUB_SERVER_URL}/${env.GITHUB_REPOSITORY}/actions/runs/${env.GITHUB_RUN_ID}`;
 
-// Get branch name - prefer CLI arg (from matrix job), else fallback to GitHub refs
-const branchArg = process.argv[2];
-const rawBranch = branchArg || env.GITHUB_HEAD_REF || env.GITHUB_REF_NAME || 'unknown';
+// Get branch name - prefer CLI arg (passed from the job), else fallback to GitHub refs
+const rawBranch = process.argv[2] || env.GITHUB_HEAD_REF || env.GITHUB_REF_NAME || 'unknown';
 
 // Use actual failures array length instead of stats.failures
 // This ensures hook failures and affected tests are counted correctly
@@ -87,7 +86,7 @@ if (report.deviceInfo || report.runInfo) {
 }
 
 // Build Slack blocks for rich formatting
-const blocks = [
+const blocks: Record<string, any>[] = [
   {
     type: 'header',
     text: {

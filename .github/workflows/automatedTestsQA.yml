@@ -1,0 +1,80 @@
+# This workflow executes the Automated UI Tests against a QA branch nightly
+name: Automated UI Tests - QA Branch
+
+run-name: 'QA Branch; Run All Tests'
+
+on:
+  # Run automatically at 9:15 AM UTC / 4:15 AM Eastern time / 1:15 AM Pacific time
+  # This schedule is offset by 4.5 hours from the tests running on the master branch.
+  schedule:
+    - cron: '15 9 * * *'
+
+  # Also allow manual trigger
+  workflow_dispatch:
+    inputs:
+      tag:
+        type: choice
+        description: 'Mainly for debugging this workflow.'
+        default: 'Run All Tests'
+        options:
+          - 'Run All Tests'
+          - '@smoke'
+      bail:
+        description: 'Stop running on first test failure'
+        default: true
+        type: boolean
+
+jobs:
+  # Job to determine the target branches to run the tests against
+  set-target-branches:
+    runs-on: ubuntu-latest
+    outputs:
+      branches: ${{ steps.set-matrix.outputs.branches }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      
+      - name: Build matrix of target branches
+        id: set-matrix
+        run: |
+          # Fetch all remote branches to ensure we have the latest ones
+          git fetch --all
+          
+          # Find all QA branches matching pattern qa_*_*_* (e.g., qa_3_8_36) and get the most recently updated one
+          # Pattern matches: qa_ followed by digits, underscore, digits, underscore, digits
+          LATEST_QA_BRANCH=$(git for-each-ref --sort=-committerdate refs/remotes/origin/qa_* --format='%(refname:short)' | sed 's|origin/||' | grep -E '^qa_[0-9]+_[0-9]+_[0-9]+$' | head -n 1)
+          
+          if [ -z "$LATEST_QA_BRANCH" ]; then
+            echo "No QA branch found matching pattern qa_*_*_*"
+            echo 'branches=[]' >> "$GITHUB_OUTPUT"
+          else
+            echo "Found latest QA branch: $LATEST_QA_BRANCH"
+            echo "branches=[\"${LATEST_QA_BRANCH}\"]" >> "$GITHUB_OUTPUT"
+          fi
+
+  detect-runner:
+    uses: ./.github/workflows/detect-multi-device-runner.yml
+    secrets:
+      ROKU_AUTO_PAT: ${{ secrets.ROKU_AUTO_PAT }}
+
+  test:
+    needs: [set-target-branches, detect-runner]
+    strategy:
+      matrix:
+        branch: ${{ fromJson(needs.set-target-branches.outputs.branches) }}
+    name: (${{ matrix.branch }}); Run All Tests [${{ needs.detect-runner.outputs.available == 'true' && 'multi-device' || 'single-device' }}]
+    permissions:
+      contents: read
+      issues: write
+      pull-requests: write
+    uses: ./.github/workflows/run-automated-tests.yml
+    with:
+      runner-labels: ${{ needs.detect-runner.outputs.available == 'true' && '["self-hosted", "enabled", "roku", "automation-regression", "multi-device"]' || '["self-hosted", "enabled", "roku", "automation-regression"]' }}
+      runner-type: ${{ needs.detect-runner.outputs.available == 'true' && 'multi-device' || 'single-device' }}
+      target-branch: ${{ matrix.branch }}
+      tag: ${{ inputs.tag || 'Run All Tests' }}
+      bail: ${{ inputs.bail || false }}
+    secrets:
+      ROKU_AUTO_PAT: ${{ secrets.ROKU_AUTO_PAT }}
