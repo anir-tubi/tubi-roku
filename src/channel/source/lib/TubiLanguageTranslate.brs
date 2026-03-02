@@ -5185,6 +5185,14 @@ Function getTranslation_es_MX()
     "guest_tile_sign_up_now": {
       "description": "Button text on guest user tile prompting sign-up",
       "message": "Regístrate ahora"
+    },
+    "restricted_content_description": {
+      "description": "Title of the dialog window that is shown when a content is restricted",
+      "message": "No puedes ver este contenido debido a la configuración actual de control parental.\nActualiza tu configuración o elige otro contenido"
+    },
+    "restricted_content_title": {
+      "description": "Title of the dialog window that is shown when a content is restricted",
+      "message": "Contenido restringido"
     }
   }
 End Function
@@ -7605,6 +7613,14 @@ Function getTranslation_fr_CA()
     "guest_tile_sign_up_now": {
       "description": "Button text on guest user tile prompting sign-up",
       "message": "Inscrivez-vous maintenant"
+    },
+    "restricted_content_description": {
+      "description": "Title of the dialog window that is shown when a content is restricted",
+      "message": "Vous ne pouvez pas voir ce contenu en raison des paramètres actuels du contrôle parental.\nModifiez vos paramètres ou choisissez autre chose"
+    },
+    "restricted_content_title": {
+      "description": "Title of the dialog window that is shown when a content is restricted",
+      "message": "Contenu restreint"
     }
   }
 End Function
