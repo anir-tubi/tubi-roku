@@ -989,6 +989,38 @@ Function getTranslation_en_US()
       "message": "Parental controls setting has changed to Adults. Parental controls will be password protected after 5 minutes.",
       "note": "This translation is used as screenSettings_error_parentalChanges_description_group[variable], please double check that it is not needed before deleting"
     },
+    "screenSettings_error_parentalChanges_multi_account": {
+      "description": "Title of dialog when content settings has changed in multi-account mode",
+      "message": "Content Settings Updated"
+    },
+    "screenSettings_error_parentalChanges_description_multi_account_default": {
+      "description": "Description of dialog when content settings has changed in multi-account mode",
+      "message": "Content Settings have changed."
+    },
+    "screenSettings_error_parentalChanges_description_multi_account_group0": {
+      "description": "Success message when content settings has changed to group 0 (Little Kids) in multi-account mode",
+      "message": "You will be directed to Tubi Kids.\n\n Content Settings changed to:\n Age Rating 4-6 (TV-G, G)."
+    },
+    "screenSettings_error_parentalChanges_description_multi_account_group1": {
+      "description": "Success message when content settings has changed to group 1 (Older Kids) in multi-account mode",
+      "message": "You will be directed to Tubi Kids.\n\n Content Settings changed to:\n Age Rating 10-12 (TV-PG, PG)."
+    },
+    "screenSettings_error_parentalChanges_description_multi_account_group2": {
+      "description": "Success message when content settings has changed to group 2 (Teens) in multi-account mode",
+      "message": "Content Settings changed to: Teen (TV-14, PG-13)."
+    },
+    "screenSettings_error_parentalChanges_description_multi_account_group3": {
+      "description": "Success message when content settings has changed to group 3 (Adults) in multi-account mode",
+      "message": "Content Settings changed to: Adult (TV-MA, R, NC-17)."
+    },
+    "screenSettings_error_parentalChanges_description_multi_account_group4": {
+      "description": "Success message when content settings has changed to group 4 (Age Rating 1-3) in multi-account mode - user directed to Tubi Kids",
+      "message": "You will be directed to Tubi Kids.\n\n Content Settings changed to:\n Age Rating 1-3 (TV-Y)."
+    },
+    "screenSettings_error_parentalChanges_description_multi_account_group5": {
+      "description": "Success message when content settings has changed to group 5 (Age Rating 7-9) in multi-account mode - user directed to Tubi Kids",
+      "message": "You will be directed to Tubi Kids.\n\n Content Settings changed to:\n Age Rating 7-9 (TV-Y7, TV-Y7-FV)."
+    },
     "screenSettings_error_signInParental_description": {
       "description": "Description of message to let users know that they must be signed in to adjust the parental controls.",
       "message": "You must be signed in to adjust parental controls"

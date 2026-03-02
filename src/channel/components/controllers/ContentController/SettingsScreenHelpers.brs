@@ -634,14 +634,28 @@ Function refreshUIAfterParentalControlsChange()
 
   parentalSetting = m.settingsScreen.parentalSettingSelected
   sMessageID = ""
-  if type(parentalSetting) = "roInt"
-    sMessageID = "screenSettings_error_parentalChanges_description_group" + parentalSetting.toStr()
-  end if
-  if sMessageID = ""
-    sMessageID = "screenSettings_error_parentalChanges_description_default"
+  message = ""
+  if isUserInMultiAccount() = true
+    if type(parentalSetting) = "roInt"
+      sMessageID = "screenSettings_error_parentalChanges_description_multi_account_group" + parentalSetting.toStr()
+    end if
+
+    if sMessageID = ""
+      sMessageID = "screenSettings_error_parentalChanges_description_multi_account_default"
+    end if
+
+    title = getTranslation("screenSettings_error_parentalChanges_multi_account")
+  else
+    if type(parentalSetting) = "roInt"
+      sMessageID = "screenSettings_error_parentalChanges_description_group" + parentalSetting.toStr()
+    end if
+    if sMessageID = ""
+      sMessageID = "screenSettings_error_parentalChanges_description_default"
+    end if
+
+    title = getTranslation("screenSettings_error_parentalChanges")
   end if
 
-  title = getTranslation("screenSettings_error_parentalChanges")
   message = getTranslation(sMessageID)
   showSimpleInstantResumableModal(title, message, [], dialogEvent, m.trackingLoggingTask)
 End Function
