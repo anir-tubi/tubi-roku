@@ -982,12 +982,13 @@ End Function
 Function updateFocusXOffset(currFocusRow)
   rowContent = m.top.content
   focusXOffsets = m.rowList.focusXOffset
+  isComponentInFocusChain = m.top.isInFocusChain() = true
   if isNode(rowContent) = true AND isNonEmptyArray(focusXOffsets) = true
     focusXOffset = []
     for i = 0 to rowContent.getChildCount() - 1
       category = rowContent.getChild(i)
       gridItemType = category.gridItemType
-      if i = currFocusRow AND isVideoTileEnabledContainer(gridItemType) = true
+      if i = currFocusRow AND isVideoTileEnabledContainer(gridItemType) = true AND isComponentInFocusChain = true
         focusXOffset.push(m.expandedTileFocusXOffset)
       else
         focusXOffset.push(0)
