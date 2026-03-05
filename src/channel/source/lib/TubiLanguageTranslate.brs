@@ -3516,6 +3516,38 @@ Function getTranslation_es_MX()
       "message": "La configuración de los controles parentales ha cambiado a Adultos. Los controles parentales estarán protegidos con contraseña después de 5 minutos.",
       "note": "This translation is used as screenSettings_error_parentalChanges_description_group[variable], please double check that it is not needed before deleting"
     },
+    "screenSettings_error_parentalChanges_multi_account": {
+      "description": "Title of dialog when content settings has changed in multi-account mode",
+      "message": "Configuración de contenido actualizada"
+    },
+    "screenSettings_error_parentalChanges_description_multi_account_default": {
+      "description": "Description of dialog when content settings has changed in multi-account mode",
+      "message": "La configuración de contenido ha cambiado."
+    },
+    "screenSettings_error_parentalChanges_description_multi_account_group0": {
+      "description": "Success message when content settings has changed to group 0 (Little Kids) in multi-account mode",
+      "message": "Serás dirigido a Tubi Kids.\n\n La configuración cambió a:\n Clasificación 4-6 (TV-G, G)."
+    },
+    "screenSettings_error_parentalChanges_description_multi_account_group1": {
+      "description": "Success message when content settings has changed to group 1 (Older Kids) in multi-account mode",
+      "message": "Serás dirigido a Tubi Kids.\n\n La configuración cambió a:\n Clasificación 10-12 (TV-PG, PG)."
+    },
+    "screenSettings_error_parentalChanges_description_multi_account_group2": {
+      "description": "Success message when content settings has changed to group 2 (Teens) in multi-account mode",
+      "message": "La configuración cambió a: Adolescente (TV-14, PG-13)."
+    },
+    "screenSettings_error_parentalChanges_description_multi_account_group3": {
+      "description": "Success message when content settings has changed to group 3 (Adults) in multi-account mode",
+      "message": "La configuración cambió a: Adulto (TV-MA, R, NC-17)."
+    },
+    "screenSettings_error_parentalChanges_description_multi_account_group4": {
+      "description": "Success message when content settings has changed to group 4 (Age Rating 1-3) in multi-account mode - user directed to Tubi Kids",
+      "message": "Serás dirigido a Tubi Kids.\n\n La configuración cambió a:\n Clasificación 1-3 (TV-Y)."
+    },
+    "screenSettings_error_parentalChanges_description_multi_account_group5": {
+      "description": "Success message when content settings has changed to group 5 (Age Rating 7-9) in multi-account mode - user directed to Tubi Kids",
+      "message": "Serás dirigido a Tubi Kids.\n\n La configuración cambió a:\n Clasificación 7-9 (TV-Y7, TV-Y7-FV)."
+    },
     "screenSettings_error_signInParental_description": {
       "description": "Description of message to let users know that they must be signed in to adjust the parental controls.",
       "message": "Debes iniciar sesión para ajustar los controles parentales"
@@ -5943,6 +5975,38 @@ Function getTranslation_fr_CA()
       "description": "Success message when parental controls has changed to group 3",
       "message": "Les paramètres du contrôle parental pour les " + Chr(34) + "Adultes" + Chr(34) + " ont été modifiés. Le contrôle parental sera protégé par un mot de passe après 5 minutes.",
       "note": "This translation is used as screenSettings_error_parentalChanges_description_group[variable], please double check that it is not needed before deleting"
+    },
+    "screenSettings_error_parentalChanges_multi_account": {
+      "description": "Title of dialog when content settings has changed in multi-account mode",
+      "message": "Paramètres de contenu mis à jour"
+    },
+    "screenSettings_error_parentalChanges_description_multi_account_default": {
+      "description": "Description of dialog when content settings has changed in multi-account mode",
+      "message": "Les paramètres de contenu ont changé."
+    },
+    "screenSettings_error_parentalChanges_description_multi_account_group0": {
+      "description": "Success message when content settings has changed to group 0 (Little Kids) in multi-account mode",
+      "message": "Vous serez dirigé vers Tubi Kids.\n\n Les paramètres ont été changés à :\n Cote d’âge 4-6 (TV-G, G)."
+    },
+    "screenSettings_error_parentalChanges_description_multi_account_group1": {
+      "description": "Success message when content settings has changed to group 1 (Older Kids) in multi-account mode",
+      "message": "Vous serez dirigé vers Tubi Kids.\n\n Les paramètres ont été changés à :\n Cote d’âge 10-12 (TV-PG, PG)."
+    },
+    "screenSettings_error_parentalChanges_description_multi_account_group2": {
+      "description": "Success message when content settings has changed to group 2 (Teens) in multi-account mode",
+      "message": "Les paramètres ont été changés à : Adolescent (TV-14, PG-13)."
+    },
+    "screenSettings_error_parentalChanges_description_multi_account_group3": {
+      "description": "Success message when content settings has changed to group 3 (Adults) in multi-account mode",
+      "message": "Les paramètres ont été changés à : Adulte (TV-MA, R, NC-17)."
+    },
+    "screenSettings_error_parentalChanges_description_multi_account_group4": {
+      "description": "Success message when content settings has changed to group 4 (Age Rating 1-3) in multi-account mode - user directed to Tubi Kids",
+      "message": "Vous serez dirigé vers Tubi Kids.\n\n Les paramètres ont été changés à :\n Cote d’âge 1-3 (TV-Y)."
+    },
+    "screenSettings_error_parentalChanges_description_multi_account_group5": {
+      "description": "Success message when content settings has changed to group 5 (Age Rating 7-9) in multi-account mode - user directed to Tubi Kids",
+      "message": "Vous serez dirigé vers Tubi Kids.\n\n Les paramètres ont été changés à :\n Cote d’âge 7-9 (TV-Y7, TV-Y7-FV)."
     },
     "screenSettings_error_signInParental_description": {
       "description": "Description of message to let users know that they must be signed in to adjust the parental controls.",
