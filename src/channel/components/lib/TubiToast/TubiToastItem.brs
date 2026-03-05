@@ -73,6 +73,8 @@ Function onShow(_msg)
   'Message
   if inputArgs.message <> invalid AND inputArgs.message <> ""
     m.infoPaneText.text = inputArgs.message
+    m.infoPaneText.visible = true
+    m.infoPaneText.scale = [1, 1]
     msgWidth = m.infoPaneText.boundingRect().width
 
     if msgWidth + imageWidth >= 546
@@ -87,7 +89,9 @@ Function onShow(_msg)
       m.infoPaneText.color = inputArgs.messageColor
     end if
   else
-    m.infoPaneMsgArea.removeChild(m.infoPaneText)
+    m.infoPaneText.text = ""
+    m.infoPaneText.visible = false
+    m.infoPaneText.scale = [0, 0]
   end if
 
   'Calculations of various required fields
