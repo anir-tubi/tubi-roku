@@ -137,7 +137,7 @@
       uri="pkg:/images/menu-focus-$$RES$$.9.png" />
     <MarkupGrid
       id="ProfileSelectionMenu"
-      translation="[33,81]"
+      translation="[33,91]"
       itemSize="[438, 100]"
       drawFocusFeedbackOnTop="false"
       itemComponentName="ProfileSideNavItem"

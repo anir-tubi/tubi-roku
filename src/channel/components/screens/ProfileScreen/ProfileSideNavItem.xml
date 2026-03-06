@@ -47,13 +47,14 @@
       id="LabelParent"
       layoutDirection="vert"
       translation="[88, 30]"
-      itemSpacings="[4]"
+      itemSpacings="[0]"
       horizAlignment="left"
       vertAlignment="custom">
       <Group>
         <Label
           id="Label"
           width="269"
+          vertAlign="center"
           height="40">
           <Font
             id="Font"
@@ -62,6 +63,7 @@
         <Label
           id="focusedLabel"
           width="269"
+          vertAlign="center"
           height="40"
           opacity="0">
           <Font
@@ -73,19 +75,22 @@
       <Group
         id="subTxtParent">
         <Label
-          id="subTxt">
+          id="subTxt"
+          vertAlign="center"
+          height="28">
           <Font
             role="font" />
         </Label>
         <Label
-          id="subTxtFocused">
+          id="subTxtFocused"
+          vertAlign="center"
+          height="28">
           <Font
             role="font" />
         </Label>
       </Group>
       <Group
-        id="kidsLogoGroup"
-        visible="false">
+        id="kidsLogoGroup">
         <Poster
           id="kidsLogo"
           opacity="1"

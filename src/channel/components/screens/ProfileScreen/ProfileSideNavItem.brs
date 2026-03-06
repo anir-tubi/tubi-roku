@@ -23,8 +23,8 @@ Function init()
   m.top.observeFieldScoped("focusPercent", "onFocusPercentChange")
 
   typographyConstants = getTypographyConstants()
-  setTypographyOfLabel(m.subTxt, typographyConstants.ids.bodyExtraSmallStrong)
-  setTypographyOfLabel(m.subTxtFocused, typographyConstants.ids.bodyExtraSmallStrong)
+  setTypographyOfLabel(m.subTxt, typographyConstants.ids.bodyExtraSmall)
+  setTypographyOfLabel(m.subTxtFocused, typographyConstants.ids.bodyExtraSmall)
   setTypographyOfLabel(m.label, typographyConstants.ids.bodyMediumStrong)
   setTypographyOfLabel(m.focusedLabel, typographyConstants.ids.bodyMediumStrong)
   setTypographyOfLabel(m.menuItemText, typographyConstants.ids.bodyMediumStrong)
@@ -76,23 +76,27 @@ Function onItemContentChange(msg)
 
         m.labelParent.appendChild(m.subTxtParent)
       end if
-      transY = (m.top.height - m.labelParent.boundingRect().height) / 2
-      m.labelParent.translation = [88, transY]
+
       m.subTxt.text = item.shortDescriptionLine1
       m.subTxtFocused.text = item.shortDescriptionLine1
+      m.labelParent.removeChild(m.kidsLogoGroup)
+
     else
       m.labelParent.removeChild(m.subTxtParent)
-      transY = (m.top.height - m.labelParent.boundingRect().height) / 2
-      m.labelParent.translation = [88, transY]
       if item.isKidsAccount = true
-        m.kidsLogoGroup.visible = true
+        kidsLogoGroupPresent = (m.kidsLogoGroup.getParent() <> invalid)
+        if kidsLogoGroupPresent = false
+          m.labelParent.appendChild(m.kidsLogoGroup)
+        end if
       else
-        m.kidsLogoGroup.visible = false
+        m.labelParent.removeChild(m.kidsLogoGroup)
       end if
     end if
 
     m.label.text = item.title
     m.focusedLabel.text = item.title
+    transY = (m.top.height - m.labelParent.boundingRect().height) / 2
+    m.labelParent.translation = [88, transY]
 
     if m.top.index = 0
       m.sideIcon.visible = true
@@ -129,7 +133,8 @@ Function onFocusPercentChange()
     m.sideIcon.opacity = 1 - focusPercent
   end if
 
-  if m.kidsLogoGroup.visible = true
+  kidsLogoGroupPresent = (m.kidsLogoGroup.getParent() <> invalid)
+  if kidsLogoGroupPresent = true
     m.kidsLogo.opacity = 1 - focusPercent
     m.kidsLogoFocused.opacity = focusPercent
   end if
