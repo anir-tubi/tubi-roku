@@ -107,12 +107,12 @@ async function makeReleasePrs(done) {
   const minorBuildTag = getBuildTag('minor');
   const fullBuildTag = getBuildTag('revision');
 
-  // rename the local branch name so it looks like "release_2_14_34"
+  // create a new branch off the current branch so it looks like "release_2_14_34"
   const releaseBranchName = `release_${fullBuildTag}`;
-  log(`...Renaming the local branch to ${releaseBranchName}`);
-  const gitRename = `git branch -m ${releaseBranchName}`;
-  const gitRenameErrorMsg = `Could not rename the local branch to ${releaseBranchName}`;
-  execShellCommand(done, gitRename, gitRenameErrorMsg);
+  log(`...Creating a new branch ${releaseBranchName} from the current branch`);
+  const gitCreateBranch = `git checkout -b ${releaseBranchName}`;
+  const gitCreateBranchErrorMsg = `Could not create new branch ${releaseBranchName}`;
+  execShellCommand(done, gitCreateBranch, gitCreateBranchErrorMsg);
 
   const cdnBranchName = `roku_${fullBuildTag}`;
 
