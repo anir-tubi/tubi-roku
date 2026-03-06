@@ -2074,7 +2074,7 @@ Function tubiMetadataTranslate_buildEmptyMyStuffCategoryAA(container)
     ' MyStuff screen is always eligible (in videoTilesEligibleScreenIds) and always in standard mode
     useVideoTilesFormat = false
     if m.statSigExperiments <> invalid
-      experiment = m.statSigExperiments.getExperimentResource("", "roku_video_tiles_1_9")
+      experiment = m.statSigExperiments.getExperimentResource("", "roku_video_tiles_1_9_1")
       useVideoTilesFormat = (experiment.enabled = true)
     end if
 
@@ -3335,7 +3335,7 @@ Function tubiMetadataTranslate_isVideoTileEnabledScreen(screenId = "", uiMode = 
   end if
 
   if m.statSigExperiments <> invalid
-    experiment = m.statSigExperiments.getExperimentResource("", "roku_video_tiles_1_9")
+    experiment = m.statSigExperiments.getExperimentResource("", "roku_video_tiles_1_9_1")
     return experiment <> invalid AND isAA(experiment.enabled_screens) = true AND experiment.enabled_screens.doesExist(screenId)
   end if
 

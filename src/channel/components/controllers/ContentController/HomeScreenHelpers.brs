@@ -623,8 +623,8 @@ Function respondToHomeScreenSuccessResponse(screenID, rawResponse)
       ' Log experiment exposure for all eligible screens where experiment controls behavior
       ' Exclude homeScreen in standard mode (always enabled, not experiment-controlled)
       ' This ensures both treatment and control groups are logged for accurate A/B testing
-      if isNode(rawResponse) = true AND rawResponse.getChildCount() > 0 AND m.constants.ui.videoTilesEligibleScreenIds[screenID] = true AND (screenID <> m.constants.ui.screenIds.homeScreen OR isKidsUIOn() = true)
-        getStatsigExperimentResource("", "roku_video_tiles_1_9", true)
+      if isNode(rawResponse) = true AND rawResponse.getChildCount() > 0 AND (screenID <> m.constants.ui.screenIds.homeScreen OR isKidsUIOn() = true)
+        getStatsigExperimentResource("", "roku_video_tiles_1_9_1", true)
       end if
 
       if enableVideoTiles

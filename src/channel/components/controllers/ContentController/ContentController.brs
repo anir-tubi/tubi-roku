@@ -206,7 +206,7 @@ Function addControllerUi()
   ' Holds the poster for the video tile that is in transit.That is in case of user scrolling down next container poster vs previous container poster when scrolling up.
   m.inTransitInlineVideoMetadataOverlay = m.top.findNode("inTransitInlineVideoMetadataOverlay")
   m.videoTileOverlayGroup = m.top.findNode("videoTileOverlayGroup")
-  experiment = getStatsigExperimentResource("", "roku_video_tiles_1_9", false)
+  experiment = getStatsigExperimentResource("", "roku_video_tiles_1_9_1", false)
   videoTilesListTranslation = m.constants.ui.videoTilesListTranslation
   ' Using clipping rect to ensure that when scrolling up the video tile gets clipped along with the rest of the row list tiles
   m.videoTileOverlayGroup.clippingRect = [videoTilesListTranslation[0], videoTilesListTranslation[1], 1920, 1080]

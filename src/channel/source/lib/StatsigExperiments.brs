@@ -90,7 +90,7 @@ Function StatsigExperimentsInterface(statsigExperimentsInfo) as Object
       ' enabled_screens: AA mapping screen IDs to boolean (true = enabled for that screen)
       ' Possible screen ID values: movieScreen, tvScreen, espanolScreen, myStuffScreen
       ' Note: homeScreen is always enabled in standard mode (not controlled by experiment)
-      roku_video_tiles_1_9: {
+      roku_video_tiles_1_9_1: {
         default: { enabled_screens: {} }
       }
 

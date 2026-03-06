@@ -123,7 +123,7 @@ Function onMyStuffBatchResponse(response)
       screen.content = response
       screen.contentUpdated = true
 
-      getStatsigExperimentResource("", "roku_video_tiles_1_9", true)
+      getStatsigExperimentResource("", "roku_video_tiles_1_9_1", true)
     else
       modalInfo = {
         message: getTranslation("error_noContent_description")

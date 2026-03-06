@@ -23,7 +23,7 @@ import {
 
 /**
  * Video Tiles Analytics Test Suite
- * Tests analytics events for roku_video_tiles_1_9 experiment
+ * Tests analytics events for roku_video_tiles_1_9_1 experiment
  *
  * Based on: [TV] Video Tiles Surface Expansion Exp 1.9 Analytics Events Instrumentation
  * Google Doc: https://docs.google.com/document/d/1x8tNzLAh_Zs5qh1rwuc4jwwD4FDnR2_gwsPTMJz5Y8c/edit?tab=t.0
@@ -127,7 +127,7 @@ describe('Video Tiles Analytics Tests', function () {
   it('C869294 - ComponentInteraction, NavigateToPage, and PageLoad fire for Movies, TV Shows, and Espanol from left nav @video_tiles @analytics', async () => {
     /**
      * Pre-conditions:
-     * - roku_video_tiles_1_9 experiment enabled
+     * - roku_video_tiles_1_9_1 experiment enabled
      * - User is on home screen
      *
      * Test Steps:
@@ -304,7 +304,7 @@ describe('Video Tiles Analytics Tests', function () {
   it('C869297 - Page load event includes app_mode KIDS_MODE when in kids mode @video_tiles @analytics', async () => {
     /**
      * Pre-conditions:
-     * - roku_video_tiles_1_9 experiment enabled
+     * - roku_video_tiles_1_9_1 experiment enabled
      * - User is in Kids mode
      *
      * Test Steps:
@@ -386,7 +386,7 @@ describe('Video Tiles Analytics Tests', function () {
   it('C869298 - Start preview event fires when video tile gains focus @video_tiles @analytics', async () => {
     /**
      * Pre-conditions:
-     * - roku_video_tiles_1_9 experiment enabled
+     * - roku_video_tiles_1_9_1 experiment enabled
      * - User is on home screen with video tiles enabled
      * - Video preview is enabled in settings
      * 
@@ -475,7 +475,7 @@ describe('Video Tiles Analytics Tests', function () {
   it('C869295 - Navigate within page event fires when navigating between video tiles @video_tiles @analytics', async () => {
     /**
      * Pre-conditions:
-     * - roku_video_tiles_1_9 experiment enabled
+     * - roku_video_tiles_1_9_1 experiment enabled
      * - User is on home screen with video tiles enabled
      *
      * Test Steps:
@@ -661,7 +661,7 @@ describe('Video Tiles Analytics Tests', function () {
   it('C869296 - Preview play progress events fire every 10 seconds during video preview playback @video_tiles @analytics', async () => {
     /**
      * Pre-conditions:
-     * - roku_video_tiles_1_9 experiment enabled
+     * - roku_video_tiles_1_9_1 experiment enabled
      * - User is on home screen with video tiles enabled
      * - Video preview is enabled in settings
      * 
@@ -750,7 +750,7 @@ describe('Video Tiles Analytics Tests', function () {
   it('C869300 - Finish preview event fires with has_completed=false when user navigates away @video_tiles @analytics', async () => {
     /**
      * Pre-conditions:
-     * - roku_video_tiles_1_9 experiment enabled
+     * - roku_video_tiles_1_9_1 experiment enabled
      * - User is on home screen with video tiles enabled
      * - Video preview is enabled in settings
      * - A video preview is currently playing
@@ -844,7 +844,7 @@ describe('Video Tiles Analytics Tests', function () {
   it('C869301 - Finish preview event with has_completed=true and subsequent video player events @video_tiles @analytics', async () => {
     /**
      * Pre-conditions:
-     * - roku_video_tiles_1_9 experiment enabled
+     * - roku_video_tiles_1_9_1 experiment enabled
      * - User is on home screen with video tiles enabled
      * - Video preview is enabled in settings
      * - A video preview is currently playing
@@ -988,7 +988,7 @@ describe('Video Tiles Analytics Tests', function () {
   it('C869298 - Click video tile during preview navigates to details page with banner preview @video_tiles @analytics', async () => {
     /**
      * Pre-conditions:
-     * - roku_video_tiles_1_9 experiment enabled
+     * - roku_video_tiles_1_9_1 experiment enabled
      * - User is on home screen with video tiles enabled
      * - Video preview is currently playing in a tile
      *
@@ -1140,7 +1140,7 @@ describe('Video Tiles Analytics Tests', function () {
   it('C869299 - Press Play on details page fires ComponentInteractionEvent (PLAY) then NavigateToPageEvent @video_tiles @analytics', async () => {
     /**
      * Pre-conditions:
-     * - roku_video_tiles_1_9 experiment enabled
+     * - roku_video_tiles_1_9_1 experiment enabled
      * - User is on details page (navigated from a video tile)
      *
      * Test Steps:
@@ -1228,7 +1228,7 @@ describe('Video Tiles Analytics Tests', function () {
   it('C869298 - Back from details page returns to video tile with preview continuing @video_tiles @analytics', async () => {
     /**
      * Pre-conditions:
-     * - roku_video_tiles_1_9 experiment enabled
+     * - roku_video_tiles_1_9_1 experiment enabled
      * - User is on details page (navigated from video tile)
      * - Video preview was playing when user navigated to details
      * 
@@ -1397,7 +1397,7 @@ describe('Video Tiles Analytics Tests', function () {
   it('C869298 - Press Left on details page fires ComponentInteractionEvent (LEFT, IMAGE, CONFIRM) then returns to tile @video_tiles @analytics', async () => {
     /**
      * Pre-conditions:
-     * - roku_video_tiles_1_9 experiment enabled
+     * - roku_video_tiles_1_9_1 experiment enabled
      * - User is on details page (navigated from video tile)
      * - Focus is on main menu (default) so Left triggers back
      *
