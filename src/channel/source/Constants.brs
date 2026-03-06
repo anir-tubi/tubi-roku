@@ -1047,12 +1047,6 @@ Function getConstants()
     constants.player.drmTypes.hlsv6
   ]
 
-  ' Supported schemes, in order of preference
-  constants.player.drmOrderWithoutHlsWidevine = [
-    constants.player.drmTypes.dashWidevine
-    constants.player.drmTypes.hlsv6
-  ]
-
   ' H265 is one of the video compression standards. This information is passed on api request in order to get the H265 transcoded manifests from backend.
   ' H265 codec is supported only on higher end modals.
   hevcCodec = "H265"

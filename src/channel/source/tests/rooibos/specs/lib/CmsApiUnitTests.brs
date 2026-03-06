@@ -69,7 +69,7 @@ Function cmsApi_createRelatedContentReqInfo_test()
   kidsRelatedReqOptions = {
     params: {
       "isKidsMode": true,
-      "video_resources": m.cmsApi.constants.player.drmOrderWithoutHlsWidevine
+      "video_resources": m.cmsApi.constants.player.drmOrderWithHlsWidevine
       "images[poster_tb]": m.getExpectedImageParam("poster")
       "platform": m.cmsApi.constants.platform
       "device_id": m.cmsApi.constants.deviceInfo.deviceId
@@ -94,7 +94,7 @@ Function cmsApi_createRelatedContentReqInfo_test()
   relatedReqOptions = {
     params: {
       "isKidsMode": false,
-      "video_resources": m.cmsApi.constants.player.drmOrderWithoutHlsWidevine
+      "video_resources": m.cmsApi.constants.player.drmOrderWithHlsWidevine
       "images[poster_tb]": m.getExpectedImageParam("poster")
       "platform": m.cmsApi.constants.platform
       "device_id": m.cmsApi.constants.deviceInfo.deviceId
@@ -135,7 +135,7 @@ Function cmsApi_createUpNextContentReqInfo_test()
     params: {
       "platform": m.cmsApi.constants.platform
       "device_id": m.cmsApi.constants.deviceInfo.deviceId
-      "video_resources": m.cmsApi.constants.player.drmOrderWithoutHlsWidevine
+      "video_resources": m.cmsApi.constants.player.drmOrderWithHlsWidevine
       "custom_param": 42
       "content_id": "123456"
     }
@@ -186,7 +186,7 @@ Function cmsApi_createSingleContentReqInfo_test()
       "content_id": "123456"
       "isKidsMode": false
       "includeChannels": true
-      "video_resources": m.cmsApi.constants.player.drmOrderWithoutHlsWidevine
+      "video_resources": m.cmsApi.constants.player.drmOrderWithHlsWidevine
       "images[landscape_tb]": m.getExpectedImageParam("landscape")
     }
   }

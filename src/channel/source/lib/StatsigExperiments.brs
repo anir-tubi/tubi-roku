@@ -48,7 +48,7 @@ Function StatsigExperimentsInterface(statsigExperimentsInfo) as Object
           default: { "type": "none" }
         }
         ' Testing by including hlsv6 widevine in drm selection order
-        roku_player_drm_order_hlsv6_widevine: {
+        roku_player_drm_order_hlsv6_widevine_v2: {
           default: { "enabled": false }
         }
         ' Postplay countdown timer experiment for series (roku_postplay_countdown_timer_series_v2):

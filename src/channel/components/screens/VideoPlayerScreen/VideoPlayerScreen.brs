@@ -2821,61 +2821,61 @@ End Function
 
 
 ' advanceDrmOnContent function gets triggered when player error occurs due to drm
+' When experiment roku_player_drm_order_hlsv6_widevine_v2 is enabled: if next is hlsv6_widevine_psshv0, fire exposure then use it.
+' When experiment is disabled: if next is hlsv6_widevine_psshv0, fire exposure then skip it and try the next resource.
 ' @contentNode: roSGNode, a TubiContentNode
 Function advanceDrmOnContent(contentNode)
   logDebug("VideoPlayer.advanceDrmOnContent")
 
-  if contentNode <> invalid
-    videoResources = contentNode.videoResources
-    currentVideoResourceIndex = contentNode.currentVideoResourceIndex
+  if contentNode = invalid then return false
 
-    if videoResources <> invalid AND currentVideoResourceIndex <> invalid AND currentVideoResourceIndex.Count() >= 2
-      currentCodecIndex = currentVideoResourceIndex[0]
-      currentDrmIndex = currentVideoResourceIndex[1]
+  videoResources = contentNode.videoResources
+  currentVideoResourceIndex = contentNode.currentVideoResourceIndex
+  if videoResources = invalid OR currentVideoResourceIndex = invalid OR currentVideoResourceIndex.Count() < 2
+    return false
+  end if
 
-      if videoResources[currentCodecIndex] <> invalid
-        currentResource = videoResources[currentCodecIndex][currentDrmIndex]
+  currentCodecIndex = currentVideoResourceIndex[0]
+  currentDrmIndex = currentVideoResourceIndex[1]
+  if videoResources[currentCodecIndex] = invalid then return false
 
-        nextCodecIndex = currentCodecIndex
-        nextDrmIndex = currentDrmIndex + 1
-        nextResource = invalid
+  currentResource = videoResources[currentCodecIndex][currentDrmIndex]
+  nextCodecIndex = currentCodecIndex
+  nextDrmIndex = currentDrmIndex + 1
+  nextResource = videoResources[currentCodecIndex][nextDrmIndex]
 
-        if videoResources[currentCodecIndex] <> invalid
-          nextResource = videoResources[currentCodecIndex][nextDrmIndex]
-        end if
+  if nextResource = invalid
+    nextCodecIndex = currentCodecIndex + 1
+    nextDrmIndex = 0
+    nextResource = videoResources[nextCodecIndex]
+    if nextResource <> invalid then nextResource = nextResource[nextDrmIndex]
+  end if
 
-        if nextResource = invalid
-          nextCodecIndex = currentCodecIndex + 1
-          nextDrmIndex = 0
+  if nextResource = invalid then return false
 
-          if videoResources[nextCodecIndex] <> invalid
-            nextResource = videoResources[nextCodecIndex][nextDrmIndex]
-          end if
-        end if
+  isExperimentEnabled = getStatsigExperimentResource("roku_player_improvement", "roku_player_drm_order_hlsv6_widevine_v2", false).enabled
 
-        if nextResource <> invalid AND setDrmOnContent(contentNode, nextResource, [nextCodecIndex, nextDrmIndex]) = true
-
-          ' fire exposure event for video playback
-          getStatsigExperimentResource("roku_player_improvement", "roku_player_drm_order_hlsv6_widevine", true)
-
-          sendVideoResourceFallbackToPlayerLogLib(currentResource, nextResource, "DRM")
-
-          fallbackInfo = {
-            failed_url: removeQueryParams(currentResource.url)
-            failed_drm: currentResource.type
-            fallback_url: removeQueryParams(nextResource.url)
-            fallback_drm: nextResource.type
-            model: m.constants.deviceInfo.model
-            video_id: contentNode.id
-          }
-
-          ' log that we fell back to the next playback option after playback failed due to DRM
-          logError(FormatJSON(fallbackInfo), "videoLoad", "drm-fallback", 0.1)
-          return true
-        end if
-      end if
+  if nextResource.type = m.constants.player.drmTypes.hlsv6Widevine
+    getStatsigExperimentResource("roku_player_improvement", "roku_player_drm_order_hlsv6_widevine_v2", true)
+    if isExperimentEnabled = false
+      contentNode.currentVideoResourceIndex = [nextCodecIndex, nextDrmIndex]
+      return advanceDrmOnContent(contentNode)
     end if
   end if
+
+  if setDrmOnContent(contentNode, nextResource, [nextCodecIndex, nextDrmIndex]) = true
+    sendVideoResourceFallbackToPlayerLogLib(currentResource, nextResource, "DRM")
+    logError(FormatJSON({
+      failed_url: removeQueryParams(currentResource.url)
+      failed_drm: currentResource.type
+      fallback_url: removeQueryParams(nextResource.url)
+      fallback_drm: nextResource.type
+      model: m.constants.deviceInfo.model
+      video_id: contentNode.id
+    }), "videoLoad", "drm-fallback", 0.1)
+    return true
+  end if
+
   return false
 End Function
 
