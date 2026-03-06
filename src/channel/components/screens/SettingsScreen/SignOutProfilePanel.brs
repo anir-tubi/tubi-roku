@@ -14,7 +14,7 @@ Function init()
   m.linkedAccountsDescription = m.top.findNode("LinkedAccountsDescription")
   m.linkedAccountsGrid = m.top.findNode("LinkedAccountsGrid")
   m.top.observeFieldScoped("linkedAccounts", "onLinkedAccountsChange")
-
+  m.top.observeFieldScoped("uiMode", "updateSignOutButtonVisibility")
   m.top.observeFieldScoped("focusedChild", "onFocusedChildChange")
   m.parentalRating = m.top.findNode("ParentalRating")
   m.top.observeFieldScoped("parentalRating", "onParentalRatingChange")
@@ -63,7 +63,7 @@ End Function
 
 
 Function onFocusedChildChange(msg)
-  if m.top.hasFocus() = true then
+  if m.top.hasFocus() = true AND isSignOutButtonShown() = true
     m.signOutButton.setFocus(true)
   end if
 End Function
@@ -72,17 +72,17 @@ End Function
 Function onKeyEvent(key as String, press as Boolean) as Boolean
 
   if press then
-    if key = "OK" AND m.signOutButton.hasFocus() = true
+    if key = "OK" AND isSignOutButtonShown() = true AND m.signOutButton.hasFocus() = true
       m.top.signOutSelected = true
       return true
     else if key = "down" AND m.kidsLinked = true
-      if m.signOutButton.hasFocus() = true
+      if isSignOutButtonShown() = true AND m.signOutButton.hasFocus() = true
         m.qrCodePoster.setFocus(true)
         m.offset.translation = [m.originalOffsetX, -1000]
         return true
       end if
     else if key = "up" AND m.kidsLinked = true
-      if m.qrCodePoster.hasFocus() = true
+      if m.qrCodePoster.hasFocus() = true AND isSignOutButtonShown() = true
         m.signOutButton.setFocus(true)
         m.offset.translation = [m.originalOffsetX, -147]
         return true
@@ -99,20 +99,50 @@ Function onParentalRatingChange(msg)
 
   'TODO: write a mixin 'isKidProfile'
   if parentalRating = 0 OR parentalRating = 1 OR parentalRating = 4 OR parentalRating = 5
-    m.signOutBtnGroup.removeChild(m.signOutButton)
     m.nameEmailGroup.removeChild(m.email)
     if m.tubiKidsLogo.getParent() = invalid
       m.nameEmailGroup.appendChild(m.tubiKidsLogo)
     end if
     m.tubiKidsLogo.visible = true
   else
-    if m.signOutButton.getParent() = invalid
-      m.signOutBtnGroup.appendChild(m.signOutButton)
-    end if
     if m.email.getParent() = invalid
       m.nameEmailGroup.appendChild(m.email)
     end if
     m.nameEmailGroup.removeChild(m.tubiKidsLogo)
+  end if
+
+  updateSignOutButtonVisibility()
+End Function
+
+
+Function showSignOutButton()
+  if isSignOutButtonShown() = false
+    m.signOutBtnGroup.appendChild(m.signOutButton)
+  end if
+End Function
+
+
+Function hideSignOutButton()
+  m.signOutBtnGroup.removeChild(m.signOutButton)
+End Function
+
+
+Function isSignOutButtonShown()
+  return m.signOutButton.getParent() <> invalid
+End Function
+
+
+
+Function updateSignOutButtonVisibility()
+  parentalRating = m.top.parentalRating
+  uiMode = m.top.uiMode
+  isKidsProfile = (parentalRating = 0 OR parentalRating = 1 OR parentalRating = 4 OR parentalRating = 5)
+  isKidsUiMode = (uiMode = m.constants.ui.modes.kidsParental OR uiMode = m.constants.ui.modes.kidsAgeGate OR uiMode = m.constants.ui.modes.kidsProfile OR uiMode = m.constants.ui.modes.kids)
+
+  if isKidsProfile OR isKidsUiMode
+    hideSignOutButton()
+  else
+    showSignOutButton()
   end if
 End Function
 

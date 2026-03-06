@@ -658,6 +658,8 @@ Function refreshUIAfterParentalControlsChange()
 
   message = getTranslation(sMessageID)
   showSimpleInstantResumableModal(title, message, [], dialogEvent, m.trackingLoggingTask)
+
+  m.settingsScreen.uiMode = m.uiMode
 End Function
 
 

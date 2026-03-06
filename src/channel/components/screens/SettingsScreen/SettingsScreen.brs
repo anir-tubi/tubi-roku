@@ -597,6 +597,7 @@ Function createSignOutProfilePanel(existingPanel = invalid)
     panel.signOutText = getTranslation("screenSettings_menu_signOut")
   end if
 
+  panel.uiMode = m.top.uiMode
   panel.activationUrl = "tubi.tv/account"
   panel.initial = uCase(sInitial)
 
