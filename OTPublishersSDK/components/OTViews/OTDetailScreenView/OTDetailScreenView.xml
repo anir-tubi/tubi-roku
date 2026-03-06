@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--********** Copyright 2020 One trust.  All Rights
+Reserved. **********-->
+
+
+<component name="OTDetailScreenView" extends="Group">
+    <interface>
+        <field id="data" type="node" onchange="onContentChange" />
+        <field id="height" type="float" alwaysNotify="true" />
+        <field id="scrollHeight" type="assocarray" alwaysNotify="true" />
+        <field id="slide" type="boolean" alwaysNotify="true" onchange="onSlide" />
+        <field id="updateScroll" type="boolean" alwaysNotify="true" />
+    </interface>
+
+    <script type="text/brightscript" uri="../OTDetailScreenView/OTDetailScreenView.brs" />
+    <script type="text/brightscript" uri="../../OTCommon/OTUtilites/utils.brs"></script>
+    <script type="text/brightscript" uri="../../OTCommon/OTConstants/style.constants.brs"></script>
+    <script type="text/brightscript" uri="../../OTCommon/OTUtilites/scrollAnimation.brs"></script>
+    <script type="text/brightscript" uri="../../OTCommon/OTNavigation/navigation.brs"></script>
+    <script type="text/brightscript" uri="../../OTCommon/OTNavigation/select.brs"></script>
+    <script type="text/brightscript" uri="../../OTCommon/OTNavigation/up.brs"></script>
+    <script type="text/brightscript" uri="../../OTCommon/OTNavigation/down.brs"></script>
+    <script type="text/brightscript" uri="../../OTCommon/OTNavigation/left.brs"></script>
+    <script type="text/brightscript" uri="../../OTCommon/OTNavigation/right.brs"></script>
+    <script type="text/brightscript" uri="../../OTViewModel/eventListeners.brs"></script>
+    <script type="text/brightscript" uri="../../OTCommon/OTUtilites/bannerUtils.brs"></script>
+    <script type="text/brightscript" uri="../../OTViewModel/saveLogConsent.viewModel.brs"></script>
+    <script type="text/brightscript" uri="../../OTModel/saveLogConsent.model.brs"></script>
+    <script type="text/brightscript" uri="../../OTCommon/OTUtilites/promise.brs"></script>
+    <script type="text/brightscript" uri="../../OTServices/OTStorage/serverStorageKeys.brs"></script>
+    <script type="text/brightscript" uri="../../OTViewModel/preferenceCenter.viewModel.brs"></script>
+    <script type="text/brightscript" uri="../../OTCommon/OTUtilites/scrollAnimation.brs"></script>
+    <script type="text/brightscript" uri="../../OTModel/preferenceCenter.model.brs"></script>
+    <script type="text/brightscript" uri="../../OTModel/OTCommon.model.brs"></script>
+    <script type="text/brightscript" uri="../../OTCommon/OTUtilites/style.brs"></script>
+    <script type="text/brightscript" uri="../../OTCommon/OTUtilites/buttonUtils.brs"></script>
+    <script type="text/brightscript" uri="../../OTViewModel/OTCommon.viewModel.brs"></script>
+    <script type="text/brightscript" uri="../../OTCommon/OTConstants/application.constants.brs"></script>
+    <script type="text/brightscript" uri="../../OTCommon/OTUtilites/screenReader.brs"></script>
+    <script type="text/brightscript" uri="../../OTCommon/OTUtilites/logs.brs"></script>
+    <script type="text/brightscript" uri="../../OTCommon/OTUtilites/registry.brs"></script>
+
+    <children>
+        <Rectangle id="OTslideOverlay" width="1920" height="1080" color="0x000000" opacity="0.5" visible="false" />
+        <Rectangle id="detailScreenViewContainer">
+        <OTHeader id="OTdetailScreenHeader"></OTHeader>
+        <Rectangle id="detailScreenInnerContainer">
+            <Rectangle id="detailScreenViewSection">
+                <LayoutGroup id="headerLayout" layoutDirection="vert"
+                    vertAlignment="top">
+                    <Label id="heading" text="" wrap="true" />
+                    <MarkupGrid
+                        id="filterButtonList"
+                        itemComponentName="OTButtonView"
+                        itemSize="[336, 60]"
+                        itemSpacing="[0, 20]"
+                        translation="[0,0]"
+                        numRows="1" numColumns="2" vertFocusAnimationStyle="floatingFocus"
+                        drawFocusFeedback="false"
+                    />
+                </LayoutGroup>
+                <Rectangle id="detailScreenlayout">
+                    <LayoutGroup id="detailScreenlayoutScroll" layoutDirection="vert"
+                        vertAlignment="top">
+                        <OTMarkupList
+                            id="OTConsentButtons"
+                            itemComponentName="OTButtonView">
+                        </OTMarkupList>
+                        <Label id="alwaysActiveLabel" text="" wrap="true" visible="false" scale="[0,0]"/>
+                        <Rectangle id="descriptionRec" visible="false">
+                        </Rectangle>
+                        <Rectangle id="additionalBtnDivider" visible="false" height="2"></Rectangle>
+                        <OTMarkupList
+                            id="OTAdditionalButtons"
+                            itemComponentName="OTButtonView">
+                        </OTMarkupList>
+                        <Rectangle id="childDivider" visible="false" height="2"></Rectangle>
+                        <Rectangle id="adtlDescriptionRec" visible="false">
+                        </Rectangle>
+                         <Rectangle id="childDivider2" visible="false" height="2"></Rectangle>
+                        <LayoutGroup id="policyLinkRec" layoutDirection="vert" vertAlignment="top">
+                            <Label id="policyLinkText" text=""
+                                wrap="true"
+                            />
+                            <Poster id="qrCodeImg" width="0" height="0" uri="" loadSync="true"
+                                loadDisplayMode="scaleToFit" />
+                        </LayoutGroup>
+                        <Rectangle id="childHeadingRec">
+                            <Label id="childHeading" text="" wrap="true" />
+                        </Rectangle>
+                        <OTMarkupList
+                            id="OTPurposeChildButtons"
+                            itemComponentName="OTButtonView">
+                        </OTMarkupList>
+                    </LayoutGroup>
+                    <Rectangle id="scrollThumb" width="100" height="150" color="0xffffff"
+                        opacity="0.3" visible="false" />
+                    <Animation id="gridScrollAnimation" duration="0.4" easeFunction="linear"
+                        easeInPercent="0.2" easeOutPercent="0.8" optional="true">
+                        <Vector2DFieldInterpolator id="gridScrollAnimationInterpolator"
+                            key="[0.0, 1.0]"
+                            fieldToInterp="detailScreenlayoutScroll.translation" />
+                    </Animation>
+                    <Animation id="gridScrollThumbAnimation" duration="0.4" easeFunction="linear"
+                        easeInPercent="0.2" easeOutPercent="0.8" optional="true">
+                        <Vector2DFieldInterpolator id="gridScrollThumbAnimationInterpolator"
+                            key="[0.0, 1.0]" fieldToInterp="scrollThumb.translation" />
+                    </Animation>
+                </Rectangle>
+            </Rectangle>
+        </Rectangle>
+                </Rectangle>
+        <Animation id="OTSlideAnimation"
+            duration="0.5"
+            repeat="false"
+            easeFunction="linear">
+            <Vector2DFieldInterpolator id="OTSlideAnimationInterpolator"
+                key="[0.0, 1.0]"
+                keyValue="[ [1280.0, 0.0], [480.0, 0.0] ]"
+                fieldToInterp="detailScreenViewContainer.translation" />
+        </Animation>
+    </children>
+</component>

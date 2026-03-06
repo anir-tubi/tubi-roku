@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--********** Copyright 2020 One trust.  All Rights
+Reserved. **********-->
+
+
+<component name="OTFooter" extends="Group">
+    <interface>
+        <field id="data" type="node" onchange="onContentChange" alwaysNotify="false"/>
+        <field id="height" type="float" alwaysNotify="true" />
+        <field id="OTinitialize" type="assocarray"/>
+        <field id="viewType" type="string" value=""  onchange="onViewTypeChange"/>
+        <field id="itemFocused" type="integer" value="0"/>
+    </interface>
+
+    <script type="text/brightscript" uri="../OTFooter/OTFooter.brs" />
+    <script type="text/brightscript" uri="../../OTCommon/OTUtilites/style.brs"></script>
+    <script type="text/brightscript" uri="../../OTCommon/OTUtilites/buttonUtils.brs"></script>
+    <script type="text/brightscript" uri="../../OTCommon/OTConstants/application.constants.brs"></script>
+    <script type="text/brightscript" uri="../../OTCommon/OTConstants/style.constants.brs"></script>
+    <script type="text/brightscript" uri="../../OTCommon/OTNavigation/select.brs"></script>
+    <script type="text/brightscript" uri="../../OTViewModel/saveLogConsent.viewModel.brs"></script>
+    <script type="text/brightscript" uri="../../OTModel/saveLogConsent.model.brs"></script>
+    <script type="text/brightscript" uri="../../OTCommon/OTUtilites/promise.brs"></script>
+    <script type="text/brightscript" uri="../../OTServices/OTStorage/serverStorageKeys.brs"></script>
+    <script type="text/brightscript" uri="../../OTCommon/OTUtilites/registry.brs"></script>
+    <script type="text/brightscript" uri="../../OTViewModel/eventListeners.brs"></script>
+    <script type="text/brightscript" uri="../../OTCommon/OTConstants/application.constants.brs"></script>
+    <script type="text/brightscript" uri="../../OTCommon/OTUtilites/bannerUtils.brs"></script>
+    <script type="text/brightscript" uri="../../OTCommon/OTUtilites/utils.brs"></script>
+    <script type="text/brightscript" uri="../../OTCommon/OTUtilites/screenReader.brs"></script>
+    <script type="text/brightscript" uri="../../OTViewModel/preferenceCenter.viewModel.brs"></script>
+    <script type="text/brightscript" uri="../../OTCommon/OTUtilites/scrollAnimation.brs"></script>
+    <script type="text/brightscript" uri="../../OTModel/preferenceCenter.model.brs"></script>
+    <script type="text/brightscript" uri="../../OTModel/OTCommon.model.brs"></script>
+    <script type="text/brightscript" uri="../../OTCommon/OTNavigation/navigation.brs"></script>
+    <script type="text/brightscript" uri="../../OTCommon/OTNavigation/up.brs"></script>
+    <script type="text/brightscript" uri="../../OTCommon/OTNavigation/down.brs"></script>
+    <script type="text/brightscript" uri="../../OTCommon/OTNavigation/left.brs"></script>
+    <script type="text/brightscript" uri="../../OTCommon/OTNavigation/right.brs"></script>
+    <script type="text/brightscript" uri="../../OTCommon/OTUtilites/logs.brs"></script>
+    <script type="text/brightscript" uri="../../OTViewModel/OTCommon.viewModel.brs"></script>
+    <children>
+        
+        <Rectangle id="actionRect">
+            <MarkupGrid
+                id="buttonList"
+                itemComponentName="OTButtonView"
+                itemSize="[336, 60]"
+                itemSpacing="[0, 20]"
+                translation="[60,250]"
+                numRows="5" vertFocusAnimationStyle="floatingFocus" drawFocusFeedback="false" 
+            />
+        </Rectangle>
+
+    </children>
+</component>

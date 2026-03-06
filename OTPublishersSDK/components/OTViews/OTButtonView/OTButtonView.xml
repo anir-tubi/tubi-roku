@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<component name="OTButtonView" extends="Group">
+    <interface>
+        <field id="width" type="float" alwaysNotify="true" />
+        <field id="height" type="float" alwaysNotify="true" />
+        <field id="itemContent" type="node" onChange="itemContentChanged" />
+        <field id="focusPercent" type="float" onChange="updateFocus"
+            alwaysNotify="true" />
+        <field id="gridHasFocus" type="boolean" alwaysNotify="true" />
+        <field id="type" type="string" value="footerBtn" />
+        <field id="status" type="integer" alwaysNotify="true" onChange="setStatus" />
+        <field id="itemUnfocused" type="boolean" alwaysNotify="true" onChange="setItemUnfocused" />
+    </interface>
+    <script type="text/brightscript" uri="./OTButtonView.brs" />
+    <script type="text/brightscript" uri="../../OTCommon/OTConstants/application.constants.brs"></script>
+    <script type="text/brightscript" uri="../../OTCommon/OTUtilites/style.brs"></script>
+    <script type="text/brightscript" uri="../../OTCommon/OTConstants/style.constants.brs"></script>
+    <script type="text/brightscript" uri="../../OTCommon/OTUtilites/utils.brs"></script>
+
+    <children>
+        <Poster id="bimage" loadwidth="30" loadheight="30" width="30" height="30"
+            uri="pkg:/components/OTPublishersSDK/images/roundRec.9.png" visible="false"
+            translation="[0,0]" loadSync="true" />
+        <Poster id="bBorderimage" loadwidth="30" loadheight="30" width="30" height="30"
+            uri="pkg:/components/OTPublishersSDK/images/roundRecBorder.9.png" visible="false"
+            translation="[0,0]" loadSync="true" />
+        <Rectangle id="buttonRec" visible="true">
+            <LayoutGroup id="buttonLayout" layoutDirection="horiz" horizAlignment="left"
+                translation="[0,0]">
+                <label id="bText" text="" horizAlign="left" vertAlign="center"
+                    wrap="true" maxLines="2" muteAudioGuide="true"> </label>
+                <Label id="statusText" horizAlign="right" maxLines="2"
+                    vertAlign="center" visible="false" font="font:SmallestSystemFont"
+                    wrap="true" />
+                <Rectangle id="btnPosterRec">
+                <Poster id="statusImage" uri="" visible="false" scale="[0,0]" />
+                </Rectangle>
+                <!--      <Poster id="rightArrow" loadwidth="30" loadheight="30" width="30"
+                        height="30"
+                        uri="pkg:/components/OTPublishersSDK/images/arrow_forward.png"
+                        visible="false" /> -->
+            </LayoutGroup>
+        </Rectangle>
+        <Rectangle id="sectionDivider" visible="false" height="2"></Rectangle>
+    </children>
+</component>

@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8" ?> 
+<!--********** Copyright 2020 OneTrust.  All Rights Reserved. **********-->
+
+
+<component name="OTinitializeViewModel" extends="Group" >
+<interface>
+    <field id="eventlistener" type="node" alwaysNotify="true" />
+    <!-- cmp api -->
+    <field id="onDataSuccess" type="boolean" alwaysNotify="true" />
+    <field id="onDataSuccessMP" type="boolean" alwaysNotify="true" />
+
+    <function name="OTSdkParams" />
+    <function name="startSDK" />
+    <function name="setupUI" />
+    <function name="showBannerUI" />
+    <function name="showPreferenceCenterUI" />
+    <function name="getBannerData" />
+    <function name="getPreferenceCenterData" />
+    <function name="isBannerShown" />
+    <function name="getConsentStatusForGroupID" />
+    <function name="clearOTSDK" />
+    <function name="getConsentStatusForSDKId" />
+    <function name="getConsentStatusForVendorId" />
+    <function name="shouldShowBanner" />
+    <function name="switchUserProfile" /> 
+    <function name="deleteProfile" /> 
+    <function name="getVendorCount"/>
+    <function name="getVendorListData"/>
+    <function name="getCurrentActiveProfile"/>
+    <function name="saveConsent"/>
+    <function name="updatePurposeConsent"/>
+    <function name="updatePurposeLegitInterest"/>
+    <function name="updateVendorConsent"/>
+    <function name="updateVendorLegitInterest"/>
+
+    <!-- cmp api -->
+     <function name="showVendorListUI"/>
+    <function name="updateOTConfigs"/>
+    <function name="renameProfile"/>
+</interface>
+<script type="text/brightscript" uri="../OTinitializeViewModel/OTinitialize.viewModel.brs"></script>
+<script type="text/brightscript" uri="../../OTCommon/OTConstants/application.constants.brs"></script>
+<script type="text/brightscript" uri="../../OTCommon/OTUtilites/logs.brs"></script>
+<script type="text/brightscript" uri="../../OTCommon/OTUtilites/utils.brs"></script>
+<script type="text/brightscript" uri="../../OTCommon/OTUtilites/registry.brs"></script>
+
+<!-- cmp API utils -->
+<script type="text/brightscript" uri="../../OTCommon/OTUtilites/bannerUtils.brs"></script>
+<script type="text/brightscript" uri="../../OTCommon/OTUtilites/promise.brs"></script>
+<script type="text/brightscript" uri="../../OTCommon/OTUtilites/style.brs"></script>
+<script type="text/brightscript" uri="../../OTCommon/OTConstants/style.constants.brs"></script>
+<script type="text/brightscript" uri="../saveLogConsent.viewModel.brs"></script>
+<script type="text/brightscript" uri="../eventListeners.brs"></script>
+<script type="text/brightscript" uri="../../OTModel/saveLogConsent.model.brs"></script>
+<script type="text/brightscript" uri="../../OTModel/OTCommon.model.brs"></script>
+<script type="text/brightscript" uri="../../OTServices/OTStorage/serverStorageKeys.brs"></script>
+<script type="text/brightscript" uri="../../OTCommon/OTUtilites/utils.brs"></script>
+<script type="text/brightscript" uri="../../OTCommon/OTUtilites/network.brs"></script>
+<!-- cmp API Public methods -->
+<script type="text/brightscript" uri="../../OTPublicMethods/startSDK.brs"></script>
+<script type="text/brightscript" uri="../../OTPublicMethods/getOTData.brs"></script>
+<script type="text/brightscript" uri="../../OTPublicMethods/uiPM.brs"></script>
+<script type="text/brightscript" uri="../../OTPublicMethods/OTConfigs.brs"></script>
+<script type="text/brightscript" uri="../../OTPublicMethods/multiProfile.brs"></script>
+</component>

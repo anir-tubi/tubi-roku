@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--********** Copyright 2020 One trust.  All Rights
+Reserved. **********-->
+
+
+<component name="OTPreferenceCenter" extends="Group">
+    <interface>
+        <field id="OTinitialize" type="assocarray" />
+        <field id="data" type="assocarray" onchange="onChangeData" />
+        <field id="isChildScreen" type="boolean" onchange="isChildScreen" />
+        <field id="slideLayer" type="integer"/>
+        <field id="childData" type="array"/>
+        <field id="bannerExits" type="boolean" value="false"/>
+        <function name="setViewFocus" />
+        <function name="onKeyEvent" />
+    </interface>
+
+    <script type="text/brightscript" uri="../OTPreferenceCenter/OTPreferenceCenter.brs" />
+    <script type="text/brightscript" uri="../../OTCommon/OTConstants/application.constants.brs"></script>
+    <script type="text/brightscript" uri="../../OTCommon/OTUtilites/style.brs"></script>
+    <script type="text/brightscript" uri="../../OTCommon/OTNavigation/navigation.brs"></script>
+    <script type="text/brightscript" uri="../../OTCommon/OTNavigation/up.brs"></script>
+    <script type="text/brightscript" uri="../../OTCommon/OTNavigation/down.brs"></script>
+    <script type="text/brightscript" uri="../../OTCommon/OTNavigation/left.brs"></script>
+    <script type="text/brightscript" uri="../../OTCommon/OTNavigation/right.brs"></script>
+    <script type="text/brightscript" uri="../../OTCommon/OTUtilites/scrollAnimation.brs"></script>
+    <script type="text/brightscript" uri="../../OTCommon/OTUtilites/bannerUtils.brs"></script>
+    <script type="text/brightscript" uri="../../OTCommon/OTUtilites/logs.brs"></script>
+    <script type="text/brightscript" uri="../../OTCommon/OTConstants/style.constants.brs"></script>
+    <script type="text/brightscript" uri="../../OTViewModel/saveLogConsent.viewModel.brs"></script>
+    <script type="text/brightscript" uri="../../OTViewModel/preferenceCenter.viewModel.brs"></script>
+    <script type="text/brightscript" uri="../../OTModel/saveLogConsent.model.brs"></script>
+    <script type="text/brightscript" uri="../../OTCommon/OTUtilites/promise.brs"></script>
+    <script type="text/brightscript" uri="../../OTServices/OTStorage/serverStorageKeys.brs"></script>
+    <script type="text/brightscript" uri="../../OTCommon/OTNavigation/select.brs"></script>
+    <script type="text/brightscript" uri="../../OTViewModel/eventListeners.brs"></script>
+    <script type="text/brightscript" uri="../../OTCommon/OTUtilites/registry.brs"></script>
+    <script type="text/brightscript" uri="../../OTModel/preferenceCenter.model.brs"></script>
+    <script type="text/brightscript" uri="../../OTModel/OTCommon.model.brs"></script>
+    <script type="text/brightscript" uri="../../OTCommon/OTUtilites/utils.brs"></script>
+    <script type="text/brightscript" uri="../../OTViewModel/OTCommon.viewModel.brs"></script>
+    <script type="text/brightscript" uri="../../OTCommon/OTUtilites/screenReader.brs"></script>
+
+    <children>
+        <Rectangle id="container">
+            <Rectangle id="innerContainer">
+                <OTHeader id="OTBannerHeader"></OTHeader>
+                <OTFooter id="OTBannerFooter"></OTFooter>
+                <Rectangle id="contentContainer">
+                    <OTListView id="OTPCListView"></OTListView>
+                    <OTDetailScreenView id="OTPCDetailScreenView"></OTDetailScreenView>
+                    <OTDetailScreenView id="OTPCChildDetailScreenView"></OTDetailScreenView>
+                </Rectangle>
+            </Rectangle>
+        </Rectangle>
+        <Poster id="poweredLogo" width="136" height="16"
+            uri="pkg:/components/OTPublishersSDK/images/poweredBy_ot_logo.png"
+            translation="[1000,500]" />
+    </children>
+</component>

@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8" ?>
+ 
+<component name="OTBannerInterface" extends="ContentNode">
+ 
+<interface>
+  <field id="Hwidth" type="integer" value="0"/>
+  <field id="Hheight" type="integer" value="0"/> 
+  <field id="width" type="integer" value="0"/>
+  <field id="height" type="integer" value="0"/>
+  <field id="layout" type="string" value="bottom"/>
+  <field id="ratio" type="floatarray" value="[0,0]"/>
+  <field id="closeBtnRatio" type="float" value="0.25"/>
+  <field id="backgroundColor" type="string" value=""/>
+  <field id="buttonFocusColor" type="string" value=""/>
+  <field id="buttonFocusTextColor" type="string" value=""/>
+  <field id="logo" type="string" value="" />
+  <field id="logoVoiceOverText" type="string" value="" />
+  <field id="closeButton" type="node"/>
+  <field id="closeBtnVoiceOverText" type="string"/>
+  <field id="acceptAll" type="node" />
+  <field id="rejectAll" type="node"  />
+  <field id="showPreferences" type="node" />
+  <field id="vendorList" type="node" value="" />
+  <field id="border" type="boolean" value="false" />
+  <field id="fonts" type="assocarray" />
+  <field id="multiStyleFonts" type="assocarray" />
+  <field id="bannerReasonCode" type="string" value="0"/>
+  <field id="bannerReason" type="string" value="invalid"/>
+  <field id="pageHeaderTitle" type="node"/>
+  <field id="dpdTitle" type="node"/>
+  <field id="dpdDescription" type="node"/>
+  <field id="description" type="node"/>
+  <field id="additionalDescription" type="node"/>
+  <field id="additionalDescriptionPlacement" type="string" value=""/>
+  <field id="policyLink" type="node"/>
+</interface>
+
+</component>

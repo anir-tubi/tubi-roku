@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8" ?> 
+<!--********** Copyright 2020 OneTrust.  All Rights Reserved. **********-->
+
+<component name="OTNetworkTask" extends="Task">
+
+  <interface>
+    <field id="name" type="string" />
+    <field id="method" type="string" />
+    <field id="headers" type="assocarray" />
+    <field id="body" type="assocarray" />
+    <field id="isAuthenticatedConsent" type="boolean" value="false" />
+    <field id="response" type="assocarray" alwaysNotify="true"/>
+  </interface>
+
+  <script type="text/brightscript" uri="../OTNetworkTask/OTNetworkTask.brs" />
+  <script type="text/brightscript" uri="../../OTCommon/OTUtilites/http-request.brs"></script>
+  <script type="text/brightscript" uri="../../OTCommon/OTUtilites/network.brs"></script>
+  <script type="text/brightscript" uri="../OTStorage/serverStorageKeys.brs"></script>
+  <script type="text/brightscript" uri="../../OTCommon/OTUtilites/registry.brs"></script>
+  <script type="text/brightscript" uri="../../OTCommon/OTUtilites/utils.brs"></script>
+  <script type="text/brightscript" uri="../../OTCommon/OTUtilites/logs.brs"></script>
+  <script type="text/brightscript" uri="../../OTCommon/OTConstants/application.constants.brs"></script>
+</component>

@@ -5,10 +5,9 @@ Function showConsentScreen(callback = runControllerStartSequence)
     pageValues: {}
   }
   m.oneTrust.callFunc("showBannerUI", true)
-  m.oneTrust.observeFieldScoped("AcceptAll", "onAcceptAll")
-  m.oneTrust.observeFieldScoped("RejectAll", "onRejectAll")
-  m.oneTrust.observeFieldScoped("onHideBanner", "proceedAfterConsentUpdated")
-  m.oneTrust.observeFieldScoped("onHideFailure", "proceedAfterConsentUpdated")
+  m.oneTrust.eventlistener.observeFieldScoped("onBannerClickedAcceptAll", "onAcceptAll")
+  m.oneTrust.eventlistener.observeFieldScoped("onBannerClickedRejectAll", "onRejectAll")
+  m.oneTrust.eventlistener.observeFieldScoped("onHideBanner", "proceedAfterConsentUpdated")
   oneTrustViews = m.top.findNode("OneTrustViews")
   if oneTrustViews <> invalid
     oneTrustViews.observeFieldScoped("focusedChild", "onConsentScreenFocusChange")
@@ -28,8 +27,8 @@ Function onConsentScreenFocusChange(msg)
     if oneTrustViews <> invalid
       oneTrustViews.unObserveFieldScoped("focusedChild")
     end if
-    node.observeFieldScoped("onBannerClickedSettings", "onManagePreferencesSelected")
-    node.observeFieldScoped("onBannerClickedVendorList", "onManageVendorsSelected")
+    m.oneTrust.eventlistener.observeFieldScoped("onShowPreferenceCenter", "onManagePreferencesSelected")
+    m.oneTrust.eventlistener.observeFieldScoped("onShowVendorList", "onManageVendorsSelected")
   end if
 End Function
 
@@ -133,22 +132,22 @@ End Function
 Function onOneTrustCompLibLoadStatusChanged(msg) as Void
   loadStatus = msg.getData()
   if loadStatus = "ready"
-    initialiazeOneTrustSDK()
+    initializeOneTrustSDK()
   else if loadStatus = "failed"
     onOneTrustSDKInitializeFailure(msg)
   end if
 End Function
 
 
-Function initialiazeOneTrustSDK()
+Function initializeOneTrustSDK()
   if m.oneTrust = invalid
     m.oneTrust = CreateObject("roSGNode", "OneTrustLibrary:OTinitialize") 'bs:disable-line 1128
-    m.global.Addfield("OTsdk", "node", false)
+    m.global.addField("OTsdk", "node", false)
     ' Since One trust sdk access m.global.OTsdk within it's codebase we need to update the m.global.OTsdk to have the sdk instance.
     ' The reason why we are also storing it's reference in m scope for better performance since we access the sdk instance a lot of items during the app session.
     m.global.OTsdk = m.oneTrust
   else
-    m.global.unobserveFieldScoped("_OT_initialize_data")
+    m.oneTrust.eventlistener.unobserveFieldScoped("dataDownloadSucess")
   end if
 
   sdkParams = m.oneTrust.callFunc("OTSdkParams")
@@ -165,7 +164,7 @@ Function initialiazeOneTrustSDK()
   sdkParams.identifierType = "DeviceID"
   m.oneTrust.callFunc("setDataSubjectIdentifier", { "subjectIdentifier": identifier })
 
-  m.oneTrust.callFunc("initOTSDKData", sdkParams)
+  m.oneTrust.callFunc("startSDK", sdkParams)
   oneTrustViewsGroup = m.top.findNode("OneTrustViews")
   if oneTrustViewsGroup <> invalid
     m.oneTrust.callFunc("setupUI", { "view": oneTrustViewsGroup })
@@ -178,9 +177,8 @@ Function initialiazeOneTrustSDK()
   if isNonEmptyString(tcfString)
     onOneTrustSDKInitializeComplete()
   else
-    m.global.observeFieldScoped("_OT_initialize_data", "onOneTrustSDKInitializeComplete")
+    m.oneTrust.eventlistener.observeField("dataDownloadSucess", "onOneTrustSDKInitializeComplete")
     ' Attaching a error callback so that for any reason OT SDK failed to initialize we still continue with app load with assumption that user did not grant access.
-    m.oneTrust.observeFieldScoped("onHideFailure", "onOneTrustSDKInitializeComplete")
   end if
 End Function
 
@@ -192,8 +190,7 @@ Function onOneTrustSDKInitializeComplete()
     m.onGetConsentCompletionCallback = invalid
     getConsentCompletionCallback()
   end if
-  m.global.unobserveFieldScoped("_OT_initialize_data")
-  m.oneTrust.unobserveFieldScoped("onHideFailure")
+  m.oneTrust.eventlistener.unobserveFieldScoped("dataDownloadSucess")
 End Function
 
 
@@ -358,10 +355,9 @@ End Function
 
 
 Function proceedAfterConsentUpdated()
-  m.oneTrust.unObserveFieldScoped("AcceptAll")
-  m.oneTrust.unObserveFieldScoped("RejectAll")
-  m.oneTrust.unObserveFieldScoped("onHideBanner")
-  m.oneTrust.unObserveFieldScoped("onHideFailure")
+  m.oneTrust.eventlistener.unObserveFieldScoped("AcceptAll")
+  m.oneTrust.eventlistener.unObserveFieldScoped("RejectAll")
+  m.oneTrust.eventlistener.unObserveFieldScoped("onHideBanner")
   ' Updating the consent status.
   m.trackingLoggingTask.userConsentsOptOutStatus = getConsentsOptOutStatus()
   m.isConsentCheckComplete = true
@@ -463,7 +459,10 @@ End Function
 
 ' Creating a wrapper so that it is easier to switch to not use global and use some other method easily.
 Function getTCFString()
-  return m.global.IABTCF_TCString
+  tcfString = invalid
+  regSection = CreateObject("roRegistrySection", "TCF")
+  if regSection.exists("IABTCF_TCString") then tcfString = regSection.read("IABTCF_TCString")
+  return tcfString
 End Function
 
 

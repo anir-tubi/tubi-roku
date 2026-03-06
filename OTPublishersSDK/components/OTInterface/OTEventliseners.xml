@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<component name="OTEventliseners" extends="ContentNode">
+
+    <interface>
+        <field id="dataDownloadSucess" type="assocarray" alwaysNotify="true"/>
+        <field id="OTConsentUpdated" type="assocarray" alwaysNotify="true"/>
+        <field id="onDeleteProfileCallback" type="assocarray" alwaysNotify="true"/>
+        <field id="onSwitchUserProfileCallback" type="assocarray" alwaysNotify="true"/>
+
+        <field id="onShowBanner" type="assocarray" alwaysNotify="true" /> 
+        <field id="onHideBanner" type="assocarray" alwaysNotify="true" /> 
+        <field id="onBannerClickedAcceptAll" type="assocarray" alwaysNotify="true" />
+        <field id="onBannerClickedRejectAll" type="assocarray" alwaysNotify="true" />
+        <field id="onBannerClickedClose" type="assocarray" alwaysNotify="true" />
+        <field id="onShowPreferenceCenter" type="assocarray" alwaysNotify="true" /> 
+        <field id="onHidePreferenceCenter" type="assocarray" alwaysNotify="true" /> 
+        <field id="onPreferenceCenterAcceptAll" type="assocarray" alwaysNotify="true" />
+        <field id="onPreferenceCenterRejectAll" type="assocarray" alwaysNotify="true" />
+        <field id="onPreferenceCenterConfirmChoices" type="assocarray" alwaysNotify="true" />
+         <field id="onPreferenceCenterClose" type="assocarray" alwaysNotify="true" />
+        <field id="onPreferenceCenterPurposeConsentChanged" type="assocarray" alwaysNotify="true" />
+        <field id="onPreferenceCenterPurposeLegitimateInterestChanged" type="assocarray" alwaysNotify="true" />
+        <field id="onShowVendorList" type="assocarray" alwaysNotify="true" /> 
+        <field id="onHideVendorList" type="assocarray" alwaysNotify="true" /> 
+        <field id="onVendorConfirmChoices" type="assocarray" alwaysNotify="true" />
+        <field id="onVendorListAcceptAll" type="assocarray" alwaysNotify="true" />
+        <field id="onVendorListRejectAll" type="assocarray" alwaysNotify="true" />
+        <field id="onVendorListVendorConsentChanged" type="assocarray" alwaysNotify="true" />
+        <field id="onVendorListVendorLegitimateInterestChanged" type="assocarray" alwaysNotify="true" />
+        <field id="onShowSDKList" type="assocarray" alwaysNotify="true" /> 
+        <field id="onHideSDKList" type="assocarray" alwaysNotify="true" /> 
+        <field id="onSDKListConfirmChoices" type="assocarray" alwaysNotify="true" />
+        <field id="onSDKListAcceptAll" type="assocarray" alwaysNotify="true" />
+        <field id="onSDKListRejectAll" type="assocarray" alwaysNotify="true" />
+        <field id="onSdkListSdkConsentChanged" type="assocarray" alwaysNotify="true" />
+        <field id="allSDKViewsDismissed" type="assocarray" alwaysNotify="true" /> 
+    </interface>
+
+</component>

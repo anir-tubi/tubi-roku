@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8" ?>
+ 
+<component name="OTWCAGInterface" extends="ContentNode">
+ 
+<interface>
+    <field id="button" type="string" value="Button"/>
+    <field id="scroll" type="string" value="scrollable content"/>
+    <field id="clearButtonAnnouncement" type="string" value="Filters cleared, no items selected"/>
+    <field id="checkBoxEnabledAriaLabel" type="string" value="Check box Checked"/>
+    <field id="checkBoxDisabledAriaLabel" type="string" value="Check box Unchecked"/>
+    <field id="alphabeticFilterAriaLabel" type="string" value="Filter [X] through [Y]"/>
+    <field id="qrCodeAriaLabel" type="string" value="Scan the QR code below for [X]"/>
+    <field id="headingAriaLabel" type="string" value="Heading"/>
+    <field id="selectedAriaLabel" type="string" value="Selected"/>
+    <field id="activeAriaLabel" type="string" value="Active"/>
+    <field id="listAriaLabel" type="string" value="Menu List"/>
+    <field id="filterAriaLabel" type="string" value="Filter"/>
+    <field id="listItemAriaLabel" type="string" value="List Element"/>
+</interface>
+
+</component>

@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8" ?>
+ 
+<component name="OTDetailScreenViewInterface" extends="ContentNode">
+ 
+<interface> 
+  <field id="width" type="integer" value="0"/>
+  <field id="height" type="integer" value="0"/>
+  <field id="translation" type="floatarray" value="[0,0]"/>
+  <field id="overlayTranslation" type="floatarray" value="[0,0]"/>
+  <field id="backgroundColor" type="string"/>
+  <field id="headerNode" type="node" />
+  <field id="subHeaderNode" type="node" />
+  <field id="childHeaderText" type="node"/>
+  <field id="descriptionNode" type="node"/>
+  <field id="consentBtnNode" type="node"/>
+  <field id="consentBtnRowheights" type="floatarray" value="[0]"/>
+  <field id="additionalBtnNode" type="node"/>
+  <field id="additionalBtnRowheights" type="floatarray" value="[0]"/>
+  <field id="purposeChildBtnNode" type="node"/>
+  <field id="purposeChildBtnRowheights" type="floatarray" value="[0]"/>
+  <field id="viewIllustrations" type="array"/>
+  <field id="item" type="assocarray"/>
+  <field id="policyLink" type="node"/>
+  <field id="backButton" type="node"/>
+  <field id="viewType" type="string" value=""/>
+  <field id="lifespan" type="string" value=""/>
+  <field id="lifespanDay" type="string" value=""/>
+  <field id="lifespanDays" type="string" value=""/>
+  <field id="lifespanMonth" type="string" value=""/>
+  <field id="lifespanMonths" type="string" value=""/>
+  <field id="disclosureTitle" type="string" value=""/>
+  <field id="nonCookieUsageText" type="string" value=""/>
+  <field id="storageIdentifierText" type="string" value=""/>
+  <field id="storageIdentifierType" type="string" value=""/>
+  <field id="storagePurposes" type="string" value=""/>
+  <field id="storageDomain" type="string" value=""/>
+  <field id="dataDeclarationText" type="string" value=""/>
+  <field id="dataRetentionText" type="string" value=""/>
+  <field id="domainsUsed" type="string" value=""/>
+  <field id="domainUse" type="string" value=""/>
+  <field id="consentPurposes" type="string" value=""/>
+  <field id="features" type="string" value=""/>
+  <field id="specialFeatures" type="string" value=""/>
+  <field id="specialPurposes" type="string" value=""/>
+  <field id="legitimateInterestPurposesText" type="string" value=""/>
+  <field id="dataStdRetentionText" type="string" value=""/>
+  <field id="IABDataCategories" type="assocarray" value="{}"/>
+  <field id="iabGroups" type="assocarray" value="{}"/>
+  <field id="filterBtnNode" type="node"/>
+  <field id="filterListNode" type="node"/>
+  <field id="filterBtnSize" type="floatarray" value="[0,0]"/>
+  <field id="dsIdDetails" type="assocarray" />
+</interface>
+
+</component>

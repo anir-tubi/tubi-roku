@@ -489,7 +489,7 @@ Function getConstants()
     constants.thirdParty.oneTrust.applicationId = "018fc642-7625-7794-9589-c36d2f0bb32c-test"
   end if
   constants.thirdParty.oneTrust.location = "cdn.cookielaw.org"
-  constants.thirdParty.oneTrust.version = "202405.1.0"
+  constants.thirdParty.oneTrust.version = "202601.2.5"
 
   ' Statsig Configuration
   constants.thirdParty.statsig = {}

@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8" ?>
+ 
+<component name="OTPreferenceCenterInterface" extends="ContentNode">
+ 
+<interface>
+  <field id="Hwidth" type="integer" value="0"/>
+  <field id="Hheight" type="integer" value="0"/> 
+  <field id="width" type="integer" value="0"/>
+  <field id="height" type="integer" value="0"/>
+  <field id="ratio" type="floatarray" value="[0.25,0.55,0.2]"/>
+  <field id="closeBtnRatio" type="float" value="0.25"/>
+  <field id="backgroundColor" type="string" value=""/>
+  <field id="buttonFocusColor" type="string" value=""/>
+  <field id="buttonFocusTextColor" type="string" value=""/>
+  <field id="logo" type="string" value="" />
+  <field id="closeButton" type="node"/>
+   <field id="closeBtnVoiceOverText" type="string"/>
+  <field id="backButton" type="node"/>
+  <field id="acceptAll" type="node" />
+  <field id="rejectAll" type="node"  />
+  <field id="savePreferencesButton" type="node"  />
+  <field id="border" type="boolean" value="false" />
+  <field id="fonts" type="assocarray" />
+  <field id="multiStyleFonts" type="assocarray" />
+  <field id="policyLink" type="node"/>
+  <field id="OTListView" type="node"/>
+  <field id="consentBtn" type="node"/>
+  <field id="alwaysActiveBtn" type="node"/>
+  <field id="legitInterestBtn" type="node"/>
+  <field id="itemTitle" type="assocarray" />
+  <field id="itemDescription" type="assocarray" />
+  <field id="summaryTitle" type="assocarray" />
+  <field id="summaryDescription" type="assocarray" />
+  <field id="vendorListTextBtn" type="node"/>
+  <field id="sdkListTextBtn" type="node"/>
+  <field id="fullLegalTextBtn" type="node"/>
+  <field id="subCategoryHeaderText" type="string" value=""/>
+  <field id="menu" type="assocarray" />
+  <field id="activeTextNode" type="node" />
+  <field id="inActiveTextNode" type="node"/>
+  <field id="activeTextBtn" type="node" />
+  <field id="inActiveTextBtn" type="node"/>
+  <field id="alwaysActiveNode" type="node"/>
+  <field id="vendorsListLabel" type="string" value=""/>
+  <field id="iabVendorsBtn" type="node"/>
+  <field id="googleVendorsBtn" type="node"/>
+  <field id="illustrationsTitleText" type="string" value=""/>
+  <field id="layout" type="string" value="right"/>
+  <field id="pageHeaderTitle" type="node"/>
+  <field id="dsIdDetails" type="assocarray" />
+  <field id="interactionChoiceShow" type="boolean" value="true" />
+</interface>
+
+</component>

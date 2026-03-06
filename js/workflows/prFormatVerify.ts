@@ -6,6 +6,10 @@ const excludedFiles = [
     'src/channel/source/localClientErrorConfig.brs'
 ];
 
+const excludedDirs = [
+    'src/experiments/'
+];
+
 /*
  * Workflow script for enforcing formatting rules defined in `bsfmt.json`
  * on files changed in a Pull Request
@@ -19,6 +23,11 @@ function isBrightscriptFile(line: string) {
 function isNotExcludedFile(line: string) {
     for (const excludedFile of excludedFiles) {
         if (line.includes(excludedFile)) {
+            return false;
+        }
+    }
+    for (const excludedDir of excludedDirs) {
+        if (line.startsWith(excludedDir)) {
             return false;
         }
     }

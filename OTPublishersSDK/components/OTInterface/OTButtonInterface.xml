@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8" ?>
+ 
+<component name="OTButtonInterface" extends="ContentNode">
+ 
+<interface> 
+  <field id="text" type="string" value=""/>
+  <field id="subText" type="string" value=""/>
+  <field id="color" type="string" />
+  <field id="textColor" type="string" />
+  <field id="focusButtonColor" type="string" />
+  <field id="focusButtonTextColor" type="string" />
+  <field id="activeColor" type="string" />
+  <field id="activeTextColor" type="string" />
+  <field id="border" type="boolean" value="false" />
+  <field id="id" type="string" value=""/>
+  <field id="uId" type="string" value=""/>
+  <field id="position" type="integer"/>
+  <field id="maxLines" type="integer" value="2"/>
+  <field id="Btype" type="string" value="rectangleBtn"/>
+  <field id="horizAlign" type="string" value="left"/>
+  <field id="fonts" type="assocarray" />
+  <field id="multiStyleFonts" type="assocarray" />
+  <field id="interactionType" type="string"/>
+  <field id="eventinteractionType" type="string"/>
+  <field id="purposeItem" type="assocarray" />
+  <field id="status" type="integer" value="-1" />
+  <field id="activeTextNode" type="node" />
+  <field id="inActiveTextNode" type="node"/>
+  <field id="alwaysActiveNode" type="node"/>
+  <field id="previousNode" type="node"/>
+  <field id="parentId" type="string" value=""/>
+  <field id="ParentFirstPartyCookies" type="array" />
+  <field id="url" type="string" value=""/>
+  <field id="descriptionColor" type="string"/>
+  <field id="showDivider" type="boolean" value="false"/>
+  <field id="itemUnfocused" type="boolean" value="false" />
+</interface>
+
+</component>

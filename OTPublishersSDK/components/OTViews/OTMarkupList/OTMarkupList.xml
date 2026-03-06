@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--********** Copyright 2020 One trust.  All Rights
+Reserved. **********-->
+
+
+<component name="OTMarkupList" extends="Group">
+    <interface>
+        <field id="width" type="float" alwaysNotify="true" />
+        <field id="height" type="float" alwaysNotify="true" />
+        <field id="content" type="node" alwaysNotify="true" onChange="onContentChange" />
+        <field id="itemComponentName" type="string" />
+        <field id="itemSpacing" type="intarray" value="[0]" />
+        <field id="rowHeights" type="intarray" value="[]" />
+        <field id="itemFocused" type="integer" value="0" alwaysNotify="true"
+            onChange="onItemFocusedChange" />
+        <field id="selectedItem" type="integer" alwaysNotify="true" />
+        <field id="datatype" type="string" value="text_adtext" />
+        <field id="displayName" type="string" value="groupName" />
+        <field id="scrollHeight" type="float" alwaysNotify="true" />
+        <field id="key" type="string" alwaysNotify="true" />
+        <field id="reset" type="boolean" alwaysNotify="true" onChange="resetGrid" />
+        <field id="isScrollable" type="boolean" value="false" />
+    </interface>
+
+    <script type="text/brightscript" uri="../OTMarkupList/OTMarkupList.brs" />
+    <script type="text/brightscript" uri="../../OTCommon/OTUtilites/promise.brs"></script>
+    <script type="text/brightscript" uri="../../OTCommon/OTConstants/application.constants.brs"></script>
+    <script type="text/brightscript" uri="../../OTCommon/OTUtilites/screenReader.brs"></script>
+    <script type="text/brightscript" uri="../../OTCommon/OTUtilites/utils.brs"></script>
+
+    <children>
+        <LayoutGroup id="listViewSectionScroll" layoutDirection="vert" vertAlignment="top">
+        </LayoutGroup>
+        <Animation id="listScrollAnimation" duration="0.4" easeFunction="linear" optional="true">
+            <Vector2DFieldInterpolator id="listScrollAnimationInterpolator" key="[0.0, 1.0]"
+                fieldToInterp="listViewSectionScroll.translation" />
+        </Animation>
+    </children>
+</component>

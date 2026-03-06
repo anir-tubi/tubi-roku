@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--********** Copyright 2020 One trust.  All Rights
+Reserved. **********-->
+
+
+<component name="OTHeader" extends="Group">
+    <interface>
+        <field id="data" type="node" onchange="onContentChange" />
+        <field id="height" type="float" alwaysNotify="true" />
+        <field id="viewType" type="string" value="" onchange="onViewTypeChange"/>
+        <field id="OTinitialize" type="assocarray" />
+        <field id="isMainback" type="boolean" value="true"/>
+        <field id="bannerExits" type="boolean" value="false"/>
+    </interface>
+
+    <script type="text/brightscript" uri="../OTHeader/OTHeader.brs" />
+    <script type="text/brightscript" uri="../../OTCommon/OTUtilites/style.brs"></script>
+    <script type="text/brightscript" uri="../../OTCommon/OTUtilites/buttonUtils.brs"></script>
+    <script type="text/brightscript" uri="../../OTCommon/OTConstants/application.constants.brs"></script>
+    <script type="text/brightscript" uri="../../OTCommon/OTConstants/style.constants.brs"></script>
+    <script type="text/brightscript" uri="../../OTCommon/OTNavigation/select.brs"></script>
+    <script type="text/brightscript" uri="../../OTViewModel/saveLogConsent.viewModel.brs"></script>
+    <script type="text/brightscript" uri="../../OTModel/saveLogConsent.model.brs"></script>
+    <script type="text/brightscript" uri="../../OTCommon/OTUtilites/promise.brs"></script>
+    <script type="text/brightscript" uri="../../OTServices/OTStorage/serverStorageKeys.brs"></script>
+    <script type="text/brightscript" uri="../../OTCommon/OTUtilites/registry.brs"></script>
+    <script type="text/brightscript" uri="../../OTViewModel/eventListeners.brs"></script>
+    <script type="text/brightscript" uri="../../OTCommon/OTConstants/application.constants.brs"></script>
+    <script type="text/brightscript" uri="../../OTCommon/OTUtilites/bannerUtils.brs"></script>
+    <script type="text/brightscript" uri="../../OTCommon/OTUtilites/utils.brs"></script>
+    <script type="text/brightscript" uri="../../OTCommon/OTUtilites/screenReader.brs"></script>
+    <script type="text/brightscript" uri="../../OTViewModel/preferenceCenter.viewModel.brs"></script>
+    <script type="text/brightscript" uri="../../OTCommon/OTUtilites/scrollAnimation.brs"></script>
+    <script type="text/brightscript" uri="../../OTModel/preferenceCenter.model.brs"></script>
+    <script type="text/brightscript" uri="../../OTModel/OTCommon.model.brs"></script>
+    <script type="text/brightscript" uri="../../OTCommon/OTNavigation/navigation.brs"></script>
+    <script type="text/brightscript" uri="../../OTCommon/OTNavigation/up.brs"></script>
+    <script type="text/brightscript" uri="../../OTCommon/OTNavigation/down.brs"></script>
+    <script type="text/brightscript" uri="../../OTCommon/OTNavigation/left.brs"></script>
+    <script type="text/brightscript" uri="../../OTCommon/OTNavigation/right.brs"></script>
+    <script type="text/brightscript" uri="../../OTViewModel/OTCommon.viewModel.brs"></script>
+    <children>
+
+        <LayoutGroup id="headersection" layoutDirection="horz" vertAlignment="center"
+            translation="[0,0]" itemSpacings="[0,0,0]">
+              <OTMarkupList
+                            id="backButton"
+                            itemComponentName="OTButtonView">
+                        </OTMarkupList>
+            <Poster id="logo" translation="[0,0]" loadSync="true" loadDisplayMode="scaleTofit"
+                uri="" visible="false" />
+            <Label id="headerText" font="font:LargeBoldSystemFont" text="" wrap="true" maxlines="2"
+                translation="[0,0]" vertAlign="center" visible="false" />
+            <Label id="closeBtnVoiceOverText" font="font:smallestSystemFont" text="" wrap="true"
+                maxlines="2" translation="[0,0]" vertAlign="center" visible="false" />
+            <MarkupGrid
+                id="closetextList"
+                itemComponentName="OTButtonView"
+                itemSize="[340, 60]"
+                itemSpacing="[0, 0]"
+                translation="[940,50]"
+                numRows="1" vertFocusAnimationStyle="floatingFocus"
+                drawFocusFeedback="false" visible="false"
+            />
+        </LayoutGroup>
+
+    </children>
+</component>

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8" ?>
+ 
+<component name="OTListViewInterface" extends="ContentNode">
+ 
+<interface> 
+    <field id="width" type="integer" value="0"/>
+    <field id="height" type="integer" value="0"/>
+    <field id="backgroundColor" type="string"/>
+    <field id="searchNoResultsFoundText" type="string"/>
+    <field id="textColor" type="string"/>
+    <field id="rowheights" type="array" value="[0]"/>
+    <field id="listContentNode" type="node"/>
+    <field id="fonts" type="assocarray" />
+</interface>
+
+</component>

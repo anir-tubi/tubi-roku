@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<component name="OTTextInterface" extends="ContentNode">
+
+    <interface>
+        <field id="url" type="string" value=""/>
+        <field id="text" type="string" value="" />
+        <field id="textColor" type="string" value="" />
+    </interface>
+
+</component>

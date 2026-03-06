@@ -967,9 +967,9 @@ End Function
 Function onDidUserSelectManagePrivacySettingsButton()
   if m.oneTrust <> invalid
     m.oneTrust.callFunc("showPreferenceCenterUI")
-    m.oneTrust.unobserveFieldScoped("onHidePreferenceCenter")
-    m.oneTrust.observeFieldScoped("onHidePreferenceCenter", "onPreferenceCenterClosed")
-    m.oneTrust.observeFieldScoped("onSdkBroadCast", "onPreferencesUpdated")
+    m.oneTrust.eventlistener.unobserveFieldScoped("onHidePreferenceCenter")
+    m.oneTrust.eventlistener.observeFieldScoped("onHidePreferenceCenter", "onPreferenceCenterClosed")
+    m.oneTrust.eventlistener.observeFieldScoped("OTConsentUpdated", "onPreferencesUpdated")
   else
     ' Showing a default something went wrong error message with information to contact support.
     ' Since this a very rare edge case falling back to default.

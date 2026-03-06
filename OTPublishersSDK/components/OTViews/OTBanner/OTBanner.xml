@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--********** Copyright 2020 One trust.  All Rights
+Reserved. **********-->
+
+
+<component name="OTBanner" extends="Group">
+    <interface>
+        <field id="eventlistener" type="string" alwaysNotify="true" />
+        <field id="bannerData" type="assocarray" onchange="onBannerData" />
+        <field id="OTinitialize" type="assocarray"/>
+        <field id="hideInteractionType" type="string" />
+        <function name="setViewFocus" />
+        <function name="onKeyEvent" />
+    </interface>
+
+    <script type="text/brightscript" uri="../OTBanner/OTBanner.brs" />
+    <script type="text/brightscript" uri="../../OTCommon/OTConstants/application.constants.brs"></script>
+    <script type="text/brightscript" uri="../../OTCommon/OTUtilites/utils.brs"></script>
+    <script type="text/brightscript" uri="../../OTCommon/OTUtilites/style.brs"></script>
+    <script type="text/brightscript" uri="../../OTCommon/OTNavigation/navigation.brs"></script>
+    <script type="text/brightscript" uri="../../OTCommon/OTNavigation/up.brs"></script>
+    <script type="text/brightscript" uri="../../OTCommon/OTNavigation/down.brs"></script>
+    <script type="text/brightscript" uri="../../OTCommon/OTNavigation/left.brs"></script>
+    <script type="text/brightscript" uri="../../OTCommon/OTNavigation/right.brs"></script>
+    <script type="text/brightscript" uri="../../OTCommon/OTUtilites/scrollAnimation.brs"></script>
+    <script type="text/brightscript" uri="../../OTCommon/OTUtilites/bannerUtils.brs"></script>
+    <script type="text/brightscript" uri="../../OTCommon/OTUtilites/logs.brs"></script>
+    <script type="text/brightscript" uri="../../OTCommon/OTConstants/style.constants.brs"></script>
+    <script type="text/brightscript" uri="../../OTViewModel/saveLogConsent.viewModel.brs"></script>
+    <script type="text/brightscript" uri="../../OTModel/saveLogConsent.model.brs"></script>
+    <script type="text/brightscript" uri="../../OTCommon/OTUtilites/promise.brs"></script>
+    <script type="text/brightscript" uri="../../OTServices/OTStorage/serverStorageKeys.brs"></script>
+    <script type="text/brightscript" uri="../../OTCommon/OTNavigation/select.brs"></script>
+    <script type="text/brightscript" uri="../../OTViewModel/eventListeners.brs"></script>
+    <script type="text/brightscript" uri="../../OTCommon/OTUtilites/registry.brs"></script>
+    <script type="text/brightscript" uri="../../OTCommon/OTUtilites/utils.brs"></script>
+     <script type="text/brightscript" uri="../../OTCommon/OTUtilites/screenReader.brs"></script>
+    <script type="text/brightscript" uri="../../OTModel/banner.model.brs"></script>
+    <script type="text/brightscript" uri="../../OTViewModel/preferenceCenter.viewModel.brs"></script>
+    <script type="text/brightscript" uri="../../OTModel/preferenceCenter.model.brs"></script>
+    <script type="text/brightscript" uri="../../OTModel/OTCommon.model.brs"></script>
+    <script type="text/brightscript" uri="../../OTViewModel/OTCommon.viewModel.brs"></script>
+
+
+    <children>
+        <Rectangle id="container">
+            <Rectangle id="innerContainer">
+                <OTHeader id="OTBannerHeader"></OTHeader>
+                <Rectangle id="descriptionRec" height="700" translation="[100,165]">
+                    <LayoutGroup id="descriptionScrollRec" layoutDirection="vert" vertAlignment="top" translation="[0,0]" itemSpacings="[50]">
+                        <LayoutGroup id="bannerHeading" layoutDirection="vert" vertAlignment="top" itemSpacings="[30]">
+                        </LayoutGroup>
+                        <LayoutGroup id="dpdheading" layoutDirection="vert" vertAlignment="top" itemSpacings="[30]">
+                            <Label id="dpdTitle" text="" wrap="true" visible="false" scale="[0,0]" />
+                        </LayoutGroup>
+                    </LayoutGroup>
+                    <Rectangle id="scrollThumb" width="10" height="150" color="0xffffff" translation="[0,0]" opacity="0.3" visible="false" />
+                    <Animation id="gridScrollAnimation" duration="0.4" easeFunction="linear" easeInPercent="0.2" easeOutPercent="0.8" optional="true">
+                        <Vector2DFieldInterpolator id="gridScrollAnimationInterpolator" key="[0.0, 1.0]" fieldToInterp="descriptionScrollRec.translation" />
+                    </Animation>
+                    <Animation id="gridScrollThumbAnimation" duration="0.4" easeFunction="linear" easeInPercent="0.2" easeOutPercent="0.8" optional="true">
+                        <Vector2DFieldInterpolator id="gridScrollThumbAnimationInterpolator" key="[0.0, 1.0]" fieldToInterp="scrollThumb.translation" />
+                    </Animation>
+                </Rectangle>
+                <LayoutGroup id="policyLinkRec" layoutDirection="vert" vertAlignment="top" >
+                    <Label id="policyLinkText" text="" wrap="true" horizAlign="center" visible="false" />
+                    <Poster id="qrCodeImg" width="0" height="0" uri="" loadSync="true" loadDisplayMode="scaleToFit" visible="false" />
+                </LayoutGroup>
+                <OTFooter id="OTBannerFooter"></OTFooter>
+            </Rectangle>
+        </Rectangle>
+        <Poster id="poweredLogo" width="136" height="16" uri="pkg:/components/OTPublishersSDK/images/poweredBy_ot_logo.png" translation="[1000,500]" />
+    </children>
+</component>
