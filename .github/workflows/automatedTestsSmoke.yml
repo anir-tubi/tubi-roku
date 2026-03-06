@@ -7,6 +7,18 @@ on:
   # Triggers the workflow on pull request events but only for the master branch.
   pull_request:
     branches: [ master ]
+    paths:
+      - '.github/workflows/automatedTestsSmoke.yml'
+      - '.github/workflows/detect-multi-device-runner.yml'
+      - '.github/workflows/run-automated-tests-smoke.yml'
+      - 'automated-tests-config/**'
+      - 'build-config/**'
+      - 'config/**'
+      - 'js/automated-tests/**'
+      - 'js/workflows/**'
+      - 'js/automated-tests.js'
+      - 'src/**'
+      - 'gulpfile.js'
 
 # We want to cancel the previously running job if a new commit gets pushed
 concurrency:

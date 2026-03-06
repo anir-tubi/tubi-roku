@@ -8,10 +8,20 @@ on:
       - synchronize
     branches:
       - 'master'
+    paths:
+      - '.github/workflows/static-analysis.yml'
+      - 'scripts/sca-cmd/**'
+      - 'config/**'
+      - 'src/**'
+      - 'gulpfile.js'
 
 permissions:
   contents: read
   pull-requests: write
+
+concurrency:
+  group: ${{ github.head_ref }}-static-analysis
+  cancel-in-progress: true
 
 jobs:
   static-analysis:
