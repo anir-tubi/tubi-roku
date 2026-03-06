@@ -815,10 +815,12 @@ Function onAgeVerified(age)
   tubiLog("AgeVerificationScreen.onAgeVerified")
   m.spinner.visible = true
 
-  if isLoggedInUser() AND age >= m.constants.ui.ages.ageGate
+  ageGate = getExternalConfigValueFromGlobal("kids_mode_age_gate", m.constants.ui.ages.ageGate)
+
+  if isLoggedInUser() AND age >= ageGate
     ' age verified for logged in user so update auth info
     m.tubiAuthUpdate.updateAuthInfoWithAge(true)
-  else if age >= m.constants.ui.ages.ageGate
+  else if age >= ageGate
     ' age verified for guest user, so store age verification
     m.guestUserHasAgeInfo = setGuestUserHasAgeInfo(true)
   end if
@@ -1017,7 +1019,9 @@ Function verifyAgeOnNetworkError(errorResponse, ageVerifiedCallback)
     userEnteredAge = currentYear - birthYear.toInt()
   end if
 
-  if userEnteredAge >= m.constants.ui.ages.ageGate
+  ageGate = getExternalConfigValueFromGlobal("kids_mode_age_gate", m.constants.ui.ages.ageGate)
+
+  if userEnteredAge >= ageGate
     ageVerifiedCallback(userEnteredAge)
   else
     handle_422_451_error(handle_422_451_errorAtKidsModeExitCallback)
