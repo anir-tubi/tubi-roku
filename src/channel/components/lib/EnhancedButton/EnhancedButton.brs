@@ -52,6 +52,7 @@ Function init() as Void
   end if
 
   topRef.focusable = true
+  topRef.enableRenderTracking = true
 
   onThemeChange()
 End Function

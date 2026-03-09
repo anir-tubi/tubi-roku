@@ -10,6 +10,8 @@ Function init() as Void
   topRef.observeFieldScoped("buttonSpacing", "onButtonSpacingChange")
   topRef.observeFieldScoped("buttonBackgroundBlendColor", "onButtonBackgroundBlendColorChange")
   topRef.observeFieldScoped("focusedChild", "onButtonListFocusChange")
+  topRef.observeFieldScoped("focusedIndex", "onFocusedIndexChange")
+  m.originalTranslation = topRef.translation
 
   if m.global <> invalid
     m.global.observeFieldScoped("theme", "onThemeChange")
@@ -181,4 +183,64 @@ Function updateInactiveFocusState() as Void
     button = m.buttons[i]
     button.hideFocusFootprint = (i <> focusedIndex)
   end for
+End Function
+
+
+' Handles focused index changes
+' Updates the layout group's focused index
+' @param msg - Message object containing focused index
+Function onFocusedIndexChange(msg as Object) as Void
+  topRef = m.top
+  index = msg.getData()
+
+  animated = false
+
+  if topRef.pressedKey = "right"
+    nextChild = topRef.getChild(index)
+    if nextChild <> invalid AND nextChild.renderTracking <> "full"
+      adjustTranslationForComponent(nextChild, -1, adjustForPartiallyRenderedButton)
+      animated = true
+    end if
+  else if topRef.pressedKey = "left"
+    if index - 1 = 0
+      slideTo(topRef, m.originalTranslation, 0.15, 0.0, adjustForPartiallyRenderedButton)
+      animated = true
+    else
+      previousChild = topRef.getChild(index - 1)
+      if previousChild <> invalid AND previousChild.renderTracking <> "full"
+        adjustTranslationForComponent(previousChild, 1, adjustForPartiallyRenderedButton)
+        animated = true
+      end if
+    end if
+  end if
+
+  if animated = false
+    adjustForPartiallyRenderedButton()
+  end if
+End Function
+
+
+' Checks if the focused button is partially rendered and adjusts translation.
+' Called after scroll animation completes, or immediately if no animation was triggered.
+Function adjustForPartiallyRenderedButton() as Void
+  topRef = m.top
+  componentGainingFocus = topRef.componentGainingFocus
+  if componentGainingFocus <> invalid AND componentGainingFocus.renderTracking = "partial"
+    direction = -1
+    if topRef.pressedKey = "left" then direction = 1
+    adjustTranslationForComponent(componentGainingFocus, direction)
+  end if
+End Function
+
+
+' Animates the list translation to account for the given component's width
+' @param component - The button node whose width determines the offset
+' @param direction - -1 to shift left (scrolling forward), 1 to shift right (scrolling back)
+' @param callback - Optional function to call when animation completes
+Function adjustTranslationForComponent(component as Object, direction as Integer, callback = invalid) as Void
+  topRef = m.top
+  translation = topRef.translation
+  offset = component.boundingRect().width + (topRef.buttonSpacing[0] * 2)
+  destination = [translation[0] + (direction * offset), translation[1]]
+  slideTo(topRef, destination, 0.15, 0.0, callback)
 End Function

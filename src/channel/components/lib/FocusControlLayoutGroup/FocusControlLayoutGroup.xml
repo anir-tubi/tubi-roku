@@ -32,5 +32,8 @@
 
     <!-- Navigate within page event tracking info -->
     <field id="navigateWithinPageEventInfo" type="assocarray" alwaysNotify="true" />
+
+    <!-- Forwarded from the focused child's pressedKey -->
+    <field id="pressedKey" type="string" alwaysNotify="true" />
   </interface>
 </component>

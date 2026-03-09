@@ -2,6 +2,7 @@
 <component name="EnhancedButtonList" extends="FocusControlLayoutGroup">
 
   <script type="text/brightscript" uri="EnhancedButtonList.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/AnimationMixin.brs" />
   <script type="text/brightscript" uri="pkg:/source/lib/TimeUtils.brs" />
   <script type="text/brightscript" uri="pkg:/source/lib/MathUtils.brs" />
   <script type="text/brightscript" uri="pkg:/source/lib/TubiNodeHelpers.brs" />

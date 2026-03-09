@@ -105,6 +105,8 @@ Function onKeyEvent(key as String, press as Boolean) as Boolean
     return false
   end if
 
+  m.top.pressedKey = key
+
   index = -1
 
   if m.top.layoutDirection = "horiz" then
