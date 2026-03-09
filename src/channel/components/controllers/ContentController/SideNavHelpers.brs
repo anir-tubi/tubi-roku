@@ -609,6 +609,7 @@ Function createProfileSelectionListContentNode()
   if isUserInMultiAccount() = true
 
     profiles = m.tubiAuthUpdate.getAllProfilesAuthInfo()
+    guestPresent = (profiles["guest"] <> invalid)
     menuItems = CreateObject("roSGNode", "ContentNode")
     for each tubiId in profiles
 
@@ -656,6 +657,7 @@ Function createProfileSelectionListContentNode()
 
     end for
 
+    addItem = invalid
     if menuItems.getChildCount() < 8 AND isKidsUIOn() <> true
       'append add account item
       addItem = CreateObject("roSGNode", "SideNavContentNode")
@@ -664,9 +666,32 @@ Function createProfileSelectionListContentNode()
       addItem.iconUrl = "pkg:/images/icon-add.png"
       addItem.filledIconUrl = "pkg:/images/icon-add.png"
       addItem.shortDescriptionLine1 = getTranslation("screenSideNav_add_account_description")
+    end if
+
+
+    if guestPresent = true
+      'sort the menu items and move guest profile to the end
+      for i = 0 to menuItems.getChildCount() - 1
+        item = menuItems.getChild(i)
+        if item.id = "guest"
+          if i = 0 AND addItem <> invalid 'if profile is first item, then add add account after it
+            menuItems.insertChild(addItem, 1)
+            exit for
+          else if i > 0 ' otherwise add the add item at last followed by guest account item.
+            if addItem <> invalid
+              menuItems.appendChild(addItem)
+            end if
+            menuItems.appendChild(item)
+            exit for
+          end if
+        end if
+      end for
+    else if addItem <> invalid
       menuItems.appendChild(addItem)
     end if
+
   end if
+
   return menuItems
 End Function
 
