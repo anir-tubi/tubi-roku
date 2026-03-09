@@ -1526,7 +1526,7 @@ End Function
 
 ' What boolean value should be sent to the UAPI backend in terms of kids mode?
 Function shouldKidsModeBeSentToServer()
-  if m.uiMode = m.constants.ui.modes.kids AND isKidsModeEnabledByParentalControls() = false
+  if m.uiMode = m.constants.ui.modes.kids OR isKidsModeEnabledByParentalControls() = true
     return true
   else if m.uiMode = m.constants.ui.modes.kidsAgeGate
     return true
