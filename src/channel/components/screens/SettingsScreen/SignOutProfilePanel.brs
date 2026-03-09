@@ -14,7 +14,7 @@ Function init()
   m.linkedAccountsDescription = m.top.findNode("LinkedAccountsDescription")
   m.linkedAccountsGrid = m.top.findNode("LinkedAccountsGrid")
   m.top.observeFieldScoped("linkedAccounts", "onLinkedAccountsChange")
-  m.top.observeFieldScoped("uiMode", "updateSignOutButtonVisibility")
+  m.top.observeFieldScoped("uiMode", "onUiModeChange")
   m.top.observeFieldScoped("focusedChild", "onFocusedChildChange")
   m.parentalRating = m.top.findNode("ParentalRating")
   m.top.observeFieldScoped("parentalRating", "onParentalRatingChange")
@@ -99,19 +99,20 @@ Function onParentalRatingChange(msg)
 
   'TODO: write a mixin 'isKidProfile'
   if parentalRating = 0 OR parentalRating = 1 OR parentalRating = 4 OR parentalRating = 5
+    hideSignOutButton()
     m.nameEmailGroup.removeChild(m.email)
     if m.tubiKidsLogo.getParent() = invalid
       m.nameEmailGroup.appendChild(m.tubiKidsLogo)
     end if
     m.tubiKidsLogo.visible = true
   else
+    showSignOutButton()
     if m.email.getParent() = invalid
       m.nameEmailGroup.appendChild(m.email)
     end if
     m.nameEmailGroup.removeChild(m.tubiKidsLogo)
   end if
 
-  updateSignOutButtonVisibility()
 End Function
 
 
@@ -132,14 +133,9 @@ Function isSignOutButtonShown()
 End Function
 
 
-
-Function updateSignOutButtonVisibility()
-  parentalRating = m.top.parentalRating
-  uiMode = m.top.uiMode
-  isKidsProfile = (parentalRating = 0 OR parentalRating = 1 OR parentalRating = 4 OR parentalRating = 5)
-  isKidsUiMode = (uiMode = m.constants.ui.modes.kidsParental OR uiMode = m.constants.ui.modes.kidsAgeGate OR uiMode = m.constants.ui.modes.kidsProfile OR uiMode = m.constants.ui.modes.kids)
-
-  if isKidsProfile OR isKidsUiMode
+Function onUiModeChange(msg)
+  uiMode = msg.getData()
+  if uiMode = m.constants.ui.modes.kidsParental OR uiMode = m.constants.ui.modes.kidsAgeGate OR uiMode = m.constants.ui.modes.kidsProfile OR uiMode = m.constants.ui.modes.kids
     hideSignOutButton()
   else
     showSignOutButton()
