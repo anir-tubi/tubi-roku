@@ -349,19 +349,36 @@ describe('Details Page', function () {
       // Back out of the video player to land on Details page
       await ecp.sendKeypress(ecp.Key.Back);
 
-      // Navigate down to the YAML container and try selecting a video.
-      // Press down until YMAL row is focused - Can we create a down until function?
-      await ecp.sendKeypress(ecp.Key.Down, { count: 6 });
+      // Wait for YMAL row to render and load before trying to focus/select it.
+      await testUtils.waitForElementToShowOnScreen('relatedYMALGrid', 'Related YMAL grid not visible', 10000);
+      await testUtils.waitForGridContentToLoad('relatedYMALGrid', 10000);
 
-      //YMAL focused?
-      const relatedYMALGrid = await testUtils.getNodeForElement('relatedYMALGrid');
-      expect(relatedYMALGrid.visible).to.equal(true);
+      // Move focus down until YMAL row is actually focused (fixed Down counts are flaky).
+      await testUtils.retryWithTimeOut(async () => {
+        const isYMALFocused = await testUtils.elementIsInFocusChain('relatedYMALGrid');
+        if (!isYMALFocused) {
+          await ecp.sendKeypress(ecp.Key.Down);
+          throw new Error('YMAL row not focused yet');
+        }
+      }, 10000);
 
-      //Detail page for the selected YAML title should open after selecting
+      // Select a related title from YMAL.
       await ecp.sendKeypress(ecp.Key.Ok);
 
-      const detailInfoPanel = await testUtils.getNodeForElement('detailInfoPanel');
-      expect(detailInfoPanel.visible).to.equal(true);
+      // Validate we landed on a details page (legacy or v2) after selection.
+      const currentScreen = await testUtils.retryWithTimeOut(async () => {
+        const screen = await testUtils.getElementField('screenStack', '-1');
+        expect(['detailScreen', 'vodDetailScreen']).to.include(screen.id);
+        return screen;
+      }, 10000);
+
+      if (currentScreen.id === 'detailScreen') {
+        const detailInfoPanel = await testUtils.getNodeForElement('detailInfoPanel');
+        expect(detailInfoPanel.visible).to.equal(true);
+      } else {
+        const vodDetailScreenTitle = await testUtils.getNodeForElement('vodDetailScreenTitle');
+        expect(vodDetailScreenTitle.visible).to.equal(true);
+      }
     });
 
     // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/307688
