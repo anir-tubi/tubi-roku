@@ -622,6 +622,10 @@ Function refreshUIAfterParentalControlsChange()
     refreshScreenAfterParentalChanges()
   end if
 
+  if isUserInMultiAccount() = true
+    m.settingsScreen.uiMode = m.uiMode
+  end if
+
   dialogEvent = {
     type: "dialog"
     values: {
@@ -659,7 +663,6 @@ Function refreshUIAfterParentalControlsChange()
   message = getTranslation(sMessageID)
   showSimpleInstantResumableModal(title, message, [], dialogEvent, m.trackingLoggingTask)
 
-  m.settingsScreen.uiMode = m.uiMode
 End Function
 
 

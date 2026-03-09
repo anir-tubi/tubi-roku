@@ -57,7 +57,7 @@ Function cmsApi_createRelatedContentReqInfo_test()
     "options"
   ]
   params = [
-    "isKidsMode"
+    "is_kids_mode"
     "video_resources"
     "images[poster_tb]"
     "platform"
@@ -68,7 +68,7 @@ Function cmsApi_createRelatedContentReqInfo_test()
 
   kidsRelatedReqOptions = {
     params: {
-      "isKidsMode": true,
+      "is_kids_mode": true,
       "video_resources": m.cmsApi.constants.player.drmOrderWithHlsWidevine
       "images[poster_tb]": m.getExpectedImageParam("poster")
       "platform": m.cmsApi.constants.platform
@@ -83,7 +83,7 @@ Function cmsApi_createRelatedContentReqInfo_test()
   m.assertAAHasKeys(kidsRelatedReqInfo, infoKeys)
   m.assertEqual(kidsRelatedReqUrl, kidsRelatedReqInfo.url)
   m.assertAAHasKeys(kidsRelatedReqOptions.params, params)
-  m.assertEqual(kidsRelatedReqOptions.params["isKidsMode"], kidsRelatedReqInfo.options.params["isKidsMode"])
+  m.assertEqual(kidsRelatedReqOptions.params["is_kids_mode"], kidsRelatedReqInfo.options.params["is_kids_mode"])
   m.assertEqual(kidsRelatedReqOptions.params["video_resources"], kidsRelatedReqInfo.options.params["video_resources"])
   m.assertEqual(kidsRelatedReqOptions.params["images[poster_tb]"], kidsRelatedReqInfo.options.params["images[poster_tb]"])
   m.assertEqual(kidsRelatedReqOptions.params["platform"], kidsRelatedReqInfo.options.params["platform"])
@@ -93,7 +93,7 @@ Function cmsApi_createRelatedContentReqInfo_test()
 
   relatedReqOptions = {
     params: {
-      "isKidsMode": false,
+      "is_kids_mode": false,
       "video_resources": m.cmsApi.constants.player.drmOrderWithHlsWidevine
       "images[poster_tb]": m.getExpectedImageParam("poster")
       "platform": m.cmsApi.constants.platform
@@ -108,7 +108,7 @@ Function cmsApi_createRelatedContentReqInfo_test()
   m.assertAAHasKeys(kidsRelatedReqInfo, infoKeys)
   m.assertEqual(relatedReqUrl, relatedReqInfo.url)
   m.assertAAHasKeys(relatedReqInfo.options.params, params)
-  m.assertEqual(relatedReqInfo.options.params["isKidsMode"], relatedReqOptions.params["isKidsMode"])
+  m.assertEqual(relatedReqInfo.options.params["is_kids_mode"], relatedReqOptions.params["is_kids_mode"])
   m.assertEqual(relatedReqInfo.options.params["video_resources"], relatedReqOptions.params["video_resources"])
   m.assertEqual(relatedReqInfo.options.params["platform"], relatedReqOptions.params["platform"])
   m.assertEqual(relatedReqInfo.options.params["device_id"], relatedReqOptions.params["device_id"])
@@ -172,8 +172,8 @@ Function cmsApi_createSingleContentReqInfo_test()
     "platform"
     "device_id"
     "content_id"
-    "isKidsMode"
-    "includeChannels"
+    "is_kids_mode"
+    "include_channels"
     "video_resources"
     "images[landscape_tb]"
   ]
@@ -184,8 +184,8 @@ Function cmsApi_createSingleContentReqInfo_test()
       "platform": m.cmsApi.constants.platform
       "device_id": m.cmsApi.constants.deviceInfo.deviceId
       "content_id": "123456"
-      "isKidsMode": false
-      "includeChannels": true
+      "is_kids_mode": false
+      "include_channels": true
       "video_resources": m.cmsApi.constants.player.drmOrderWithHlsWidevine
       "images[landscape_tb]": m.getExpectedImageParam("landscape")
     }
@@ -201,15 +201,15 @@ Function cmsApi_createSingleContentReqInfo_test()
   m.assertEqual(singleContentInfo.options.params["platform"], singleContentOptions.params["platform"])
   m.assertEqual(singleContentInfo.options.params["device_id"], singleContentOptions.params["device_id"])
   m.assertEqual(singleContentInfo.options.params["content_id"], singleContentOptions.params["content_id"])
-  m.assertEqual(singleContentInfo.options.params["isKidsMode"], singleContentOptions.params["isKidsMode"])
-  m.assertEqual(singleContentInfo.options.params["includeChannels"], singleContentOptions.params["includeChannels"])
+  m.assertEqual(singleContentInfo.options.params["is_kids_mode"], singleContentOptions.params["is_kids_mode"])
+  m.assertEqual(singleContentInfo.options.params["include_channels"], singleContentOptions.params["include_channels"])
   m.assertEqual(singleContentInfo.options.params["video_resources"], singleContentOptions.params["video_resources"])
   m.assertEqual(singleContentInfo.options.params["images[landscape_tb]"], singleContentOptions.params["images[landscape_tb]"])
 
   ' include channels, with kids mode
   singleContentInfo = m.cmsApi.createSingleContentReqInfo("123456", true, true)
 
-  singleContentOptions.params["isKidsMode"] = true
+  singleContentOptions.params["is_kids_mode"] = true
 
   m.assertEqual(singleContentInfo.count(), 2)
   m.assertAAHasKeys(singleContentInfo, infoKeys)
@@ -218,16 +218,16 @@ Function cmsApi_createSingleContentReqInfo_test()
   m.assertEqual(singleContentInfo.options.params["platform"], singleContentOptions.params["platform"])
   m.assertEqual(singleContentInfo.options.params["device_id"], singleContentOptions.params["device_id"])
   m.assertEqual(singleContentInfo.options.params["content_id"], singleContentOptions.params["content_id"])
-  m.assertEqual(singleContentInfo.options.params["isKidsMode"], singleContentOptions.params["isKidsMode"])
-  m.assertEqual(singleContentInfo.options.params["includeChannels"], singleContentOptions.params["includeChannels"])
+  m.assertEqual(singleContentInfo.options.params["is_kids_mode"], singleContentOptions.params["is_kids_mode"])
+  m.assertEqual(singleContentInfo.options.params["include_channels"], singleContentOptions.params["include_channels"])
   m.assertEqual(singleContentInfo.options.params["video_resources"], singleContentOptions.params["video_resources"])
   m.assertEqual(singleContentInfo.options.params["images[landscape_tb]"], singleContentOptions.params["images[landscape_tb]"])
 
   ' don't include channels, with kids mode
   singleContentInfo = m.cmsApi.createSingleContentReqInfo("123456", false, true)
 
-  singleContentOptions.params["includeChannels"] = false
-  singleContentOptions.params["isKidsMode"] = true
+  singleContentOptions.params["include_channels"] = false
+  singleContentOptions.params["is_kids_mode"] = true
 
   m.assertEqual(singleContentInfo.count(), 2)
   m.assertAAHasKeys(singleContentInfo, infoKeys)
@@ -236,8 +236,8 @@ Function cmsApi_createSingleContentReqInfo_test()
   m.assertEqual(singleContentInfo.options.params["platform"], singleContentOptions.params["platform"])
   m.assertEqual(singleContentInfo.options.params["device_id"], singleContentOptions.params["device_id"])
   m.assertEqual(singleContentInfo.options.params["content_id"], singleContentOptions.params["content_id"])
-  m.assertEqual(singleContentInfo.options.params["isKidsMode"], singleContentOptions.params["isKidsMode"])
-  m.assertEqual(singleContentInfo.options.params["includeChannels"], singleContentOptions.params["includeChannels"])
+  m.assertEqual(singleContentInfo.options.params["is_kids_mode"], singleContentOptions.params["is_kids_mode"])
+  m.assertEqual(singleContentInfo.options.params["include_channels"], singleContentOptions.params["include_channels"])
   m.assertEqual(singleContentInfo.options.params["video_resources"], singleContentOptions.params["video_resources"])
   m.assertEqual(singleContentInfo.options.params["images[landscape_tb]"], singleContentOptions.params["images[landscape_tb]"])
 End Function
@@ -816,7 +816,7 @@ Function cmsApi_createSearchReqInfo_test()
   m.assertEqual(searchInfo.options.params["platform"], searchOptions.params["platform"])
   m.assertEqual(searchInfo.options.params["device_id"], searchOptions.params["device_id"])
   m.assertEqual(searchInfo.options.params["search"], searchOptions.params["search"])
-  m.assertEqual(searchInfo.options.params["isKidsMode"], searchOptions.params["isKidsMode"])
+  m.assertEqual(searchInfo.options.params["is_kids_mode"], searchOptions.params["is_kids_mode"])
   m.assertEqual(searchInfo.options.params["images[poster_tb]"], searchOptions.params["images[poster_tb]"])
 
   ' with kids mode
@@ -829,7 +829,7 @@ Function cmsApi_createSearchReqInfo_test()
   m.assertEqual(searchInfo.options.params["platform"], searchOptions.params["platform"])
   m.assertEqual(searchInfo.options.params["device_id"], searchOptions.params["device_id"])
   m.assertEqual(searchInfo.options.params["search"], searchOptions.params["search"])
-  m.assertEqual(searchInfo.options.params["isKidsMode"], searchOptions.params["isKidsMode"])
+  m.assertEqual(searchInfo.options.params["is_kids_mode"], searchOptions.params["is_kids_mode"])
   m.assertEqual(searchInfo.options.params["images[poster_tb]"], searchOptions.params["images[poster_tb]"])
 End Function
 

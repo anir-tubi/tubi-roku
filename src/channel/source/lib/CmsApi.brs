@@ -57,7 +57,7 @@ End Function
 
 Function cmsApi_createRelatedContentReqInfo(contentId, bKidsMode = false, limit = 0)
   options = m.getCommonOptions(true)
-  options.params["isKidsMode"] = bKidsMode
+  options.params["is_kids_mode"] = bKidsMode
   options.params["video_resources"] = m.constants.player.drmOrderWithHlsWidevine
   options.params = m.setTupianPosterParam(options.params)
 
@@ -126,8 +126,8 @@ Function cmsApi_createSingleContentReqInfo(contentId, includeChannels = false, b
   options = m.getCommonOptions(true)
 
   options.params["content_id"] = contentId
-  options.params["isKidsMode"] = bKidsMode
-  options.params["includeChannels"] = includeChannels
+  options.params["is_kids_mode"] = bKidsMode
+  options.params["include_channels"] = includeChannels
   options.params["video_resources"] = m.constants.player.drmOrderWithHlsWidevine
   options.params["limit_resolutions"] = m.constants.player.limitResolutions
 
@@ -164,8 +164,8 @@ Function cmsApi_createSeriesEpisodesBySeasonReqInfo(seriesId, season = 1, pageIn
   options.params["pagination[season]"] = season
   options.params["pagination[page_in_season]"] = pageInSeason
   options.params["pagination[page_size_in_season]"] = pageSizeInSeason
-  options.params["isKidsMode"] = bKidsMode
-  options.params["includeChannels"] = includeChannels
+  options.params["is_kids_mode"] = bKidsMode
+  options.params["include_channels"] = includeChannels
   options.params["video_resources"] = m.constants.player.drmOrderWithHlsWidevine
   options.params["limit_resolutions"] = m.constants.player.limitResolutions
   options.params = m.setImageParams(["title", "landscape", "background"], options.params)
