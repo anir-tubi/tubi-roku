@@ -56,6 +56,11 @@ Function onItemFocused(msg)
     m.featuresPanel.visible = false
   end if
 
+  ' Hide branch builds panel when navigating away from it
+  if item.id <> "branchBuilds" AND m.branchBuildsPanel <> invalid AND m.branchBuildsPanel.visible = true
+    m.branchBuildsPanel.visible = false
+  end if
+
   if item.id = "viewRegistry"
     m.infoArea.text = "Current Registry values are printed by each section. Press OK to see full registry."
   else if item.id = "clearRegistry"
@@ -78,14 +83,18 @@ Function onItemFocused(msg)
     m.infoArea.text = "Select the language for testing." + chr(10) + "Current Locale: " + m.constants.deviceInfo.locale
   else if item.id = "playerStats"
     m.infoArea.text = "This toggles the display of player stats within the video player, helping QA and developers understand the current playback."
+  else if item.id = "branchBuilds"
+    m.infoArea.text = "Select a remote component library from a feature branch. Changes require an app restart."
+    if m.branchBuildsPanel = invalid
+      showBranchBuildsPanel()
+    else if m.branchBuildsPanel.visible = false
+      m.branchBuildsPanel.visible = true
+    end if
   else if item.id = "features"
     m.infoArea.text = "Override experiment variants for testing purposes. Select an experiment to view available variants. Changes require an app restart to take effect."
-    ' Show features panel on focus (similar to proxy and country list)
     if m.featuresPanel = invalid
       showFeaturesPanel()
     else if m.featuresPanel.visible = false
-      ' Only auto-show if panel was never created or explicitly hidden by navigating away
-      ' Don't auto-show if user just closed it with left key
       m.featuresPanel.visible = true
     end if
   end if
@@ -160,6 +169,9 @@ Function onKeyEvent(key as String, press as Boolean) as Boolean
       else if m.languageListMenu <> invalid AND m.languageListMenu.isInFocusChain() = true
         m.Menu.setFocus(true)
         handled = true
+      else if m.branchBuildsPanel <> invalid AND m.branchBuildsPanel.isInFocusChain() = true
+        m.Menu.setFocus(true)
+        handled = true
       else if m.featuresPanel <> invalid AND m.featuresPanel.isInFocusChain() = true
         m.Menu.setFocus(true)
         handled = true
@@ -175,9 +187,24 @@ Function onKeyEvent(key as String, press as Boolean) as Boolean
         else if m.languageListMenu <> invalid AND m.languageListMenu.visible = true
           m.languageListMenu.setFocus(true)
           handled = true
-        else if m.featuresPanel <> invalid
+        else if m.branchBuildsPanel <> invalid
+          isBranchBuildsVisible = m.branchBuildsPanel.visible
+          isBranchBuildsItemFocused = isMenuItemFocused("branchBuilds")
+          if isBranchBuildsVisible = true OR isBranchBuildsItemFocused = true
+            if m.branchBuildsPanel.visible = false
+              m.branchBuildsPanel.visible = true
+            end if
+            m.branchBuildsPanel.setFocus(true)
+            branchBuildsGrid = m.branchBuildsPanel.findNode("branchBuildsGrid")
+            if branchBuildsGrid <> invalid
+              branchBuildsGrid.setFocus(true)
+            end if
+            handled = true
+          end if
+        end if
+        if handled = false AND m.featuresPanel <> invalid
           isFeaturesVisible = m.featuresPanel.visible
-          isFeaturesItemFocused = isFeaturesMenuItemFocused()
+          isFeaturesItemFocused = isMenuItemFocused("features")
           if isFeaturesVisible = true OR isFeaturesItemFocused = true
             ' Show features panel if it's hidden, then move focus to it
             if m.featuresPanel.visible = false
@@ -257,6 +284,8 @@ Function onTestingAidPanelItemSelected(msg)
       item.title = "Show Player Stats"
       m.global.showPlayerStats = false
     end if
+  else if item.id = "branchBuilds"
+    showBranchBuildsPanel()
   else if item.id = "features"
     showFeaturesPanel()
   end if
@@ -628,23 +657,55 @@ Function onFeaturesPanelClose() as Void
 End Function
 
 
-' Check if the features menu item is currently focused
+' Check if a specific menu item is currently focused by its id
 '
-' Traverses the menu structure to determine if the "features" item has focus.
-' Used to handle right key press to show/focus the features panel.
-'
-' @return Boolean True if features menu item is focused, false otherwise
-Function isFeaturesMenuItemFocused() as Boolean
+' @param itemId - String, the id of the menu item to check
+' @return Boolean True if the menu item with the given id is focused
+Function isMenuItemFocused(itemId as String) as Boolean
   if m.Menu <> invalid AND m.Menu.content <> invalid
     focusedIndex = m.Menu.itemFocused
     if focusedIndex >= 0
       focusedItem = m.Menu.content.getChild(focusedIndex)
       if focusedItem <> invalid
-        if focusedItem.id = "features"
+        if focusedItem.id = itemId
           return true
         end if
       end if
     end if
   end if
   return false
+End Function
+
+
+' Show or create the branch builds panel
+'
+' Creates the BranchBuildsPanel on first call and sets up observers for close and restart events.
+' Makes panel visible but does not auto-focus (user must press right key to focus it).
+Function showBranchBuildsPanel() as Void
+  if m.branchBuildsPanel = invalid
+    m.branchBuildsPanel = createObject("roSGNode", "BranchBuildsPanel")
+    m.branchBuildsPanel.translation = [350, 81]
+    m.branchBuildsPanel.observeFieldScoped("closePanel", "onBranchBuildsPanelClose")
+    m.branchBuildsPanel.observeFieldScoped("appRestartRequested", "onBranchBuildsAppRestart")
+    m.top.appendChild(m.branchBuildsPanel)
+  end if
+
+  m.branchBuildsPanel.visible = true
+End Function
+
+
+' Handle branch builds panel close event
+'
+' Hides the panel and returns focus to the Testing Aid menu.
+Function onBranchBuildsPanelClose() as Void
+  if m.branchBuildsPanel <> invalid
+    m.branchBuildsPanel.visible = false
+    m.Menu.setFocus(true)
+  end if
+End Function
+
+
+' Handle app restart request from branch builds panel
+Function onBranchBuildsAppRestart() as Void
+  m.top.appRestartRequested = true
 End Function

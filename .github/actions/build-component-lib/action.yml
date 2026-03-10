@@ -1,0 +1,78 @@
+name: Build Component Library
+description: Builds and packages a remote component library, uploads as workflow artifact
+
+inputs:
+  pr_number:
+    description: PR number used for the lib provided name
+    required: true
+  pkg_password:
+    description: Roku package signing password
+    required: true
+
+outputs:
+  build_tag:
+    description: The build version tag
+    value: ${{ steps.build-tag.outputs.tag }}
+
+runs:
+  using: composite
+  steps:
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: 18
+
+    - name: Cache node modules
+      id: node-cache
+      uses: actions/cache@v4
+      with:
+        path: node_modules
+        key: ${{ runner.os }}-node-modules-${{ hashFiles('**/package.json') }}
+
+    - name: Install dependencies
+      if: steps.node-cache.outputs.cache-hit != 'true'
+      shell: bash
+      run: npm install
+
+    - name: Resolve Roku device credentials
+      id: roku
+      shell: bash
+      run: |
+        if [ -n "$ROKU_DEVICES" ]; then
+          DEVICE_IP=$(echo "$ROKU_DEVICES" | node -e "const d=JSON.parse(require('fs').readFileSync('/dev/stdin','utf8')); console.log(d[0].host)")
+          DEVICE_PASS=$(echo "$ROKU_DEVICES" | node -e "const d=JSON.parse(require('fs').readFileSync('/dev/stdin','utf8')); console.log(d[0].password)")
+          echo "ip=$DEVICE_IP" >> $GITHUB_OUTPUT
+          echo "password=$DEVICE_PASS" >> $GITHUB_OUTPUT
+          echo "Resolved device from ROKU_DEVICES: $DEVICE_IP"
+        elif [ -n "$ROKU_DEV_TARGET" ]; then
+          echo "ip=$ROKU_DEV_TARGET" >> $GITHUB_OUTPUT
+          echo "password=${DEV_PASSWORD:-$ROKU_DEV_PASSWORD}" >> $GITHUB_OUTPUT
+          echo "Using ROKU_DEV_TARGET: $ROKU_DEV_TARGET"
+        else
+          echo "ERROR: No Roku device configured (set ROKU_DEVICES or ROKU_DEV_TARGET)"
+          exit 1
+        fi
+
+    - name: Build and package remote component library
+      shell: bash
+      run: npx gulp createFeatureBranch --staging
+      env:
+        ROKU_CONFIG: staging
+        ROKU_DEV_TARGET: ${{ steps.roku.outputs.ip }}
+        DEV_PASSWORD: ${{ steps.roku.outputs.password }}
+        PKG_PASSWORD: ${{ inputs.pkg_password }}
+        REMOTE_COMPONENT_LIB_PROVIDED: TubiRemoteLib-${{ inputs.pr_number }}
+
+    - name: Get build tag
+      id: build-tag
+      shell: bash
+      run: |
+        BUILD_TAG=$(node -e "const c = require('./js/config'); console.log(c.getBuildTag('revision'))")
+        echo "tag=$BUILD_TAG" >> $GITHUB_OUTPUT
+
+    - name: Upload pkg as artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: component-lib-pkg-${{ inputs.pr_number }}
+        path: build/tubi_remote_components_${{ steps.build-tag.outputs.tag }}.pkg
+        retention-days: 1

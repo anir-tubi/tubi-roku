@@ -1,0 +1,77 @@
+name: Cleanup Component Libraries
+
+on:
+  schedule:
+    - cron: '0 6 * * 1'  # Every Monday at 6 AM UTC
+
+  workflow_dispatch: {}
+
+permissions: {}
+
+env:
+  S3_BUCKET: tubi-roku-multi-cdn-source-staging-core
+  CDN_DISTRIBUTION_ID: ${{ vars.CDN_DISTRIBUTION_ID }}
+  GITHUB_API: https://api.github.com
+
+jobs:
+  cleanup:
+    runs-on: [self-hosted, staging]
+    timeout-minutes: 15
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Assume staging-core role
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ vars.AWS_ROLE_ARN }}
+          aws-region: us-east-2
+          role-skip-session-tagging: true
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+
+      - name: Find and remove stale entries
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          MANIFEST_URL="s3://${S3_BUCKET}/appFiles/components/branches/manifest.json"
+          aws s3 cp "$MANIFEST_URL" manifest.json 2>/dev/null || echo '[]' > manifest.json
+
+          PR_NUMBERS=$(jq -r '.[].prNumber' manifest.json)
+          REMOVED=0
+
+          for PR in $PR_NUMBERS; do
+            PR_JSON=$(curl -s \
+              -H "Authorization: token $GITHUB_TOKEN" \
+              -H "Accept: application/vnd.github+json" \
+              "${GITHUB_API}/repos/${{ github.repository }}/pulls/${PR}")
+
+            STATE=$(echo "$PR_JSON" | jq -r '.state // "unknown"')
+            MERGED=$(echo "$PR_JSON" | jq -r '.merged // false')
+
+            if [ "$STATE" = "closed" ]; then
+              echo "PR #${PR} is closed (merged=${MERGED}) — removing S3 artifacts and manifest entry"
+
+              aws s3 rm "s3://${S3_BUCKET}/appFiles/components/branches/${PR}/" --recursive || true
+
+              COMMAND=remove PR_NUMBER=$PR S3_BUCKET=$S3_BUCKET node .github/scripts/manageBranchManifest.js
+              REMOVED=$((REMOVED + 1))
+            else
+              echo "PR #${PR} state=${STATE} — keeping"
+            fi
+          done
+
+          echo "Cleanup complete. Removed ${REMOVED} stale entries."
+
+      - name: Invalidate CloudFront cache
+        if: success()
+        continue-on-error: true
+        run: |
+          aws cloudfront create-invalidation \
+            --distribution-id "$CDN_DISTRIBUTION_ID" \
+            --paths "/appFiles/components/branches/*"

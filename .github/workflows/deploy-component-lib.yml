@@ -1,0 +1,280 @@
+name: Deploy Component Library
+
+on:
+  # Trigger via /deploy or /rename comment
+  issue_comment:
+    types: [created]
+
+  # Auto-deploy on PR open for feature/ branches
+  pull_request:
+    types: [opened, reopened]
+
+permissions: {}
+
+concurrency:
+  group: deploy-component-lib-${{ github.event.issue.number || github.event.pull_request.number || github.ref_name }}
+  cancel-in-progress: true
+
+env:
+  S3_BUCKET: tubi-roku-multi-cdn-source-staging-core
+  CDN_BASE_URL: https://mrcdn-staging.tubitv.com
+  CDN_DISTRIBUTION_ID: ${{ vars.CDN_DISTRIBUTION_ID }}
+  DEPLOY_LABEL: deploy-component-lib
+  GITHUB_API: https://api.github.com
+
+jobs:
+  # ──────────────────────────────────────────────────────────
+  # Job 1a: Build when a feature/ PR is opened or manual dispatch (needs Roku device)
+  # ──────────────────────────────────────────────────────────
+  build-pr-open:
+    if: |
+      github.event_name == 'pull_request' &&
+      (github.event.action == 'opened' || github.event.action == 'reopened') &&
+      startsWith(github.event.pull_request.head.ref, 'feature/')
+    runs-on: [self-hosted, roku-pkg-runner]
+    timeout-minutes: 5
+    permissions:
+      contents: read
+      issues: write
+      pull-requests: write
+    outputs:
+      pr_number: ${{ steps.parse.outputs.pr_number }}
+      display_name: ${{ steps.parse.outputs.display_name }}
+      branch: ${{ steps.parse.outputs.branch }}
+      author: ${{ steps.parse.outputs.author }}
+      commit_sha: ${{ steps.parse.outputs.commit_sha }}
+    steps:
+      - name: Set PR info
+        id: parse
+        env:
+          PR_TITLE: ${{ github.event.pull_request.title || '' }}
+        run: |
+          echo "pr_number=${{ github.event.pull_request.number }}" >> $GITHUB_OUTPUT
+          echo "display_name=$PR_TITLE" >> $GITHUB_OUTPUT
+          echo "branch=${{ github.event.pull_request.head.ref }}" >> $GITHUB_OUTPUT
+          echo "author=${{ github.event.pull_request.user.login }}" >> $GITHUB_OUTPUT
+          echo "commit_sha=${{ github.event.pull_request.head.sha }}" >> $GITHUB_OUTPUT
+
+      - name: Add deploy label
+        run: |
+          curl -s -X POST \
+            -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+            -H "Accept: application/vnd.github+json" \
+            "${GITHUB_API}/repos/${{ github.repository }}/issues/${{ github.event.pull_request.number }}/labels" \
+            -d "$(jq -n --arg label "$DEPLOY_LABEL" '{labels: [$label]}')"
+
+      - name: Checkout PR branch
+        uses: actions/checkout@v4
+
+      - name: Build and package
+        uses: ./.github/actions/build-component-lib
+        with:
+          pr_number: ${{ steps.parse.outputs.pr_number }}
+          pkg_password: ${{ secrets.PKG_PASSWORD }}
+
+  # ──────────────────────────────────────────────────────────
+  # Job 1b: Upload to S3 (needs production runner for AWS access)
+  # ──────────────────────────────────────────────────────────
+  upload-pr-open:
+    needs: build-pr-open
+    runs-on: [self-hosted, staging]
+    timeout-minutes: 5
+    permissions:
+      contents: read
+      pull-requests: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Upload to S3 and invalidate CDN
+        uses: ./.github/actions/upload-component-lib
+        with:
+          pr_number: ${{ needs.build-pr-open.outputs.pr_number }}
+          s3_bucket: ${{ env.S3_BUCKET }}
+          cdn_distribution_id: ${{ env.CDN_DISTRIBUTION_ID }}
+          aws_role_arn: ${{ vars.AWS_ROLE_ARN }}
+
+      - name: Update manifest and notify
+        uses: ./.github/actions/update-manifest-and-notify
+        with:
+          pr_number: ${{ needs.build-pr-open.outputs.pr_number }}
+          display_name: ${{ needs.build-pr-open.outputs.display_name }}
+          branch: ${{ needs.build-pr-open.outputs.branch }}
+          commit_sha: ${{ needs.build-pr-open.outputs.commit_sha }}
+          author: ${{ needs.build-pr-open.outputs.author }}
+          s3_bucket: ${{ env.S3_BUCKET }}
+          cdn_base_url: ${{ env.CDN_BASE_URL }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          github_api: ${{ env.GITHUB_API }}
+          repository: ${{ github.repository }}
+
+  # ──────────────────────────────────────────────────────────
+  # Job 2a: Build from /deploy comment (needs Roku device)
+  # ──────────────────────────────────────────────────────────
+  build-comment:
+    if: |
+      github.event_name == 'issue_comment' &&
+      github.event.issue.pull_request &&
+      startsWith(github.event.comment.body, '/deploy')
+    runs-on: [self-hosted, roku-pkg-runner]
+    timeout-minutes: 5
+    permissions:
+      contents: read
+      issues: write
+    outputs:
+      pr_number: ${{ steps.parse.outputs.pr_number }}
+      display_name: ${{ steps.parse.outputs.display_name }}
+    steps:
+      - name: Parse display name from comment
+        id: parse
+        env:
+          COMMENT_BODY: ${{ github.event.comment.body }}
+          ISSUE_TITLE: ${{ github.event.issue.title }}
+        run: |
+          CUSTOM_NAME="${COMMENT_BODY#/deploy}"
+          CUSTOM_NAME=$(echo "$CUSTOM_NAME" | xargs)
+          if [ -z "$CUSTOM_NAME" ]; then
+            CUSTOM_NAME="$ISSUE_TITLE"
+          fi
+          echo "display_name=$CUSTOM_NAME" >> $GITHUB_OUTPUT
+          echo "pr_number=${{ github.event.issue.number }}" >> $GITHUB_OUTPUT
+
+      - name: Add deploy label
+        run: |
+          curl -s -X POST \
+            -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+            -H "Accept: application/vnd.github+json" \
+            "${GITHUB_API}/repos/${{ github.repository }}/issues/${{ github.event.issue.number }}/labels" \
+            -d "$(jq -n --arg label "$DEPLOY_LABEL" '{labels: [$label]}')"
+
+      - name: Checkout PR branch
+        uses: actions/checkout@v4
+        with:
+          ref: refs/pull/${{ github.event.issue.number }}/head
+
+      - name: Build and package
+        uses: ./.github/actions/build-component-lib
+        with:
+          pr_number: ${{ steps.parse.outputs.pr_number }}
+          pkg_password: ${{ secrets.PKG_PASSWORD }}
+
+  # ──────────────────────────────────────────────────────────
+  # Job 2b: Upload to S3 from /deploy comment (needs production runner)
+  # ──────────────────────────────────────────────────────────
+  upload-comment:
+    needs: build-comment
+    runs-on: [self-hosted, staging]
+    timeout-minutes: 5
+    permissions:
+      contents: read
+      issues: write
+      pull-requests: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: refs/pull/${{ needs.build-comment.outputs.pr_number }}/head
+
+      - name: Upload to S3 and invalidate CDN
+        uses: ./.github/actions/upload-component-lib
+        with:
+          pr_number: ${{ needs.build-comment.outputs.pr_number }}
+          s3_bucket: ${{ env.S3_BUCKET }}
+          cdn_distribution_id: ${{ env.CDN_DISTRIBUTION_ID }}
+          aws_role_arn: ${{ vars.AWS_ROLE_ARN }}
+
+      - name: Get PR metadata
+        id: pr-meta
+        run: |
+          PR_JSON=$(curl -s \
+            -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+            -H "Accept: application/vnd.github+json" \
+            "${GITHUB_API}/repos/${{ github.repository }}/pulls/${{ needs.build-comment.outputs.pr_number }}")
+          BRANCH=$(echo "$PR_JSON" | jq -r '.head.ref')
+          AUTHOR=$(echo "$PR_JSON" | jq -r '.user.login')
+          COMMIT_SHA=$(echo "$PR_JSON" | jq -r '.head.sha')
+          echo "branch=$BRANCH" >> $GITHUB_OUTPUT
+          echo "author=$AUTHOR" >> $GITHUB_OUTPUT
+          echo "commit_sha=$COMMIT_SHA" >> $GITHUB_OUTPUT
+
+      - name: Update manifest and notify
+        uses: ./.github/actions/update-manifest-and-notify
+        with:
+          pr_number: ${{ needs.build-comment.outputs.pr_number }}
+          display_name: ${{ needs.build-comment.outputs.display_name }}
+          branch: ${{ steps.pr-meta.outputs.branch }}
+          commit_sha: ${{ steps.pr-meta.outputs.commit_sha }}
+          author: ${{ steps.pr-meta.outputs.author }}
+          s3_bucket: ${{ env.S3_BUCKET }}
+          cdn_base_url: ${{ env.CDN_BASE_URL }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          github_api: ${{ env.GITHUB_API }}
+          repository: ${{ github.repository }}
+
+  # ──────────────────────────────────────────────────────────
+  # Job 3: /rename comment — update display name only (no build needed)
+  # ──────────────────────────────────────────────────────────
+  rename-comment:
+    if: |
+      github.event_name == 'issue_comment' &&
+      github.event.issue.pull_request &&
+      startsWith(github.event.comment.body, '/rename')
+    runs-on: [self-hosted, staging]
+    timeout-minutes: 5
+    permissions:
+      contents: read
+      issues: write
+    steps:
+      - name: Parse new display name
+        id: parse
+        env:
+          COMMENT_BODY: ${{ github.event.comment.body }}
+        run: |
+          NEW_NAME="${COMMENT_BODY#/rename}"
+          NEW_NAME=$(echo "$NEW_NAME" | xargs)
+          if [ -z "$NEW_NAME" ]; then
+            echo "ERROR: Usage: /rename <new display name>"
+            exit 1
+          fi
+          echo "display_name=$NEW_NAME" >> $GITHUB_OUTPUT
+          echo "pr_number=${{ github.event.issue.number }}" >> $GITHUB_OUTPUT
+
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Assume staging-core role
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ vars.AWS_ROLE_ARN }}
+          aws-region: us-east-2
+          role-skip-session-tagging: true
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+
+      - name: Update display name in manifest
+        env:
+          COMMAND: rename
+          PR_NUMBER: ${{ steps.parse.outputs.pr_number }}
+          DISPLAY_NAME: ${{ steps.parse.outputs.display_name }}
+        run: node .github/scripts/manageBranchManifest.js
+
+      - name: Invalidate CloudFront cache
+        continue-on-error: true
+        run: |
+          aws cloudfront create-invalidation \
+            --distribution-id "$CDN_DISTRIBUTION_ID" \
+            --paths "/appFiles/components/branches/manifest.json"
+
+      - name: Post confirmation comment
+        env:
+          DISPLAY_NAME: ${{ steps.parse.outputs.display_name }}
+          ISSUE_NUMBER: ${{ github.event.issue.number }}
+        run: |
+          curl -s -X POST \
+            -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+            -H "Accept: application/vnd.github+json" \
+            "${GITHUB_API}/repos/${{ github.repository }}/issues/${ISSUE_NUMBER}/comments" \
+            -d "$(jq -n --arg body "Display name updated to **${DISPLAY_NAME}**." '{body: $body}')"

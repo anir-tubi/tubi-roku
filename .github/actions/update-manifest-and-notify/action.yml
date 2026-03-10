@@ -1,0 +1,67 @@
+name: Update Manifest and Notify
+description: Updates the branch manifest in S3 and posts a confirmation comment on the PR
+
+inputs:
+  pr_number:
+    description: PR number
+    required: true
+  display_name:
+    description: Display name for the build
+    required: true
+  branch:
+    description: Branch name
+    required: true
+  commit_sha:
+    description: Commit SHA
+    required: true
+  author:
+    description: PR author
+    required: true
+  s3_bucket:
+    description: S3 bucket name for manifest storage
+    required: true
+  cdn_base_url:
+    description: CDN base URL
+    required: true
+  github_token:
+    description: GitHub token for API calls
+    required: true
+  github_api:
+    description: GitHub API base URL
+    required: true
+  repository:
+    description: GitHub repository (owner/repo)
+    required: true
+
+runs:
+  using: composite
+  steps:
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: 18
+
+    - name: Update manifest
+      shell: bash
+      env:
+        COMMAND: upsert
+        S3_BUCKET: ${{ inputs.s3_bucket }}
+        PR_NUMBER: ${{ inputs.pr_number }}
+        DISPLAY_NAME: ${{ inputs.display_name }}
+        BRANCH: ${{ inputs.branch }}
+        COMMIT_SHA: ${{ inputs.commit_sha }}
+        AUTHOR: ${{ inputs.author }}
+        PKG_URL: ${{ inputs.cdn_base_url }}/appFiles/components/branches/${{ inputs.pr_number }}/tubi_remote_components.pkg
+        LIB_PROVIDED: TubiRemoteLib-${{ inputs.pr_number }}
+      run: node .github/scripts/manageBranchManifest.js
+
+    - name: Post comment and update PR description
+      shell: bash
+      env:
+        PR_NUMBER: ${{ inputs.pr_number }}
+        DISPLAY_NAME: ${{ inputs.display_name }}
+        CDN_BASE_URL: ${{ inputs.cdn_base_url }}
+        GITHUB_TOKEN: ${{ inputs.github_token }}
+        GITHUB_API: ${{ inputs.github_api }}
+        REPOSITORY: ${{ inputs.repository }}
+      run: node .github/scripts/notifyPrDeploy.js

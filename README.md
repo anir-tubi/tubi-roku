@@ -967,6 +967,8 @@ In a situation where the currently released version needs to be rolled back to t
 # In app dev tools
   To access dev tools, got to sideNav->settings->TestAid. This menu is available for dev/qa/staging mode.
 
+  For deploying and testing branch-specific component libraries, see the [Branch Component Library Deployment](docs/branch-component-library-deployment.md) guide.
+
 ## To Clear Registry:
   if your app does not respond or has issues, please use settings->clear registry to start clean start of the app.
 

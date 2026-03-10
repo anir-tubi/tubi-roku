@@ -1,7 +1,7 @@
 'use strict';
 const fs = require('fs');
 const fetch = require('node-fetch');
-const {NoStackError} = require('./utilities');
+const { NoStackError } = require('./utilities');
 
 let _request;
 function request() {
@@ -13,12 +13,12 @@ function request() {
 }
 const log = require('fancy-log');
 
-exports.keypress = function(key, address, password) {
+exports.keypress = function (key, address, password) {
   log(`Sending keypress '${key}'`);
   return new Promise((res, rej) => {
-    const url =`http://${address}:8060/keypress/${key}`;
+    const url = `http://${address}:8060/keypress/${key}`;
     const data = {};
-    const options = getRequestOptions({url: url, formData: data});
+    const options = getRequestOptions({ url: url, formData: data });
     request().post(options, (err, response, body) => {
       if (err) {
         rej(err);
@@ -28,7 +28,7 @@ exports.keypress = function(key, address, password) {
   });
 };
 
-exports.deeplink = function(rokuAppId, address) {
+exports.deeplink = function (rokuAppId, address) {
   return new Promise((res, rej) => {
     const url = `http://${address}:8060/launch/${rokuAppId}`;
     const options = getRequestOptions({
@@ -50,7 +50,7 @@ exports.deeplink = function(rokuAppId, address) {
  * @param address roku device IP
  * @param password roku dev user password
  */
-exports.uploadPkg = function(zipPath, deviceIp, password) {
+exports.uploadPkg = function (zipPath, deviceIp, password) {
   return new Promise((res, rej) => {
     const url = `http://${deviceIp}/plugin_install`;
     const auth = {
@@ -103,7 +103,7 @@ exports.uploadPkg = function(zipPath, deviceIp, password) {
 // @zipPath: string, local path to the zip file that will be converted
 // @deviceIp: string, the ip of the roku device
 // @password: string, the dev password for the roku device
-exports.installWithSquashfs = function(zipPath, deviceIp, password) {
+exports.installWithSquashfs = function (zipPath, deviceIp, password) {
   return new Promise((res, rej) => {
     const url = `http://${deviceIp}/plugin_install`;
 
@@ -169,7 +169,7 @@ exports.installWithSquashfs = function(zipPath, deviceIp, password) {
  * @param signPassword genkey password for the developer id
  * @param pkgpath download path for signed pkg file
  */
-exports.signPkg = function(address, devPassword, signPassword, appName, pkgPath) {
+exports.signPkg = function (address, devPassword, signPassword, appName, pkgPath) {
   return new Promise((res, rej) => {
     const url = `http://${address}/plugin_package`;
     const auth = {
@@ -183,7 +183,7 @@ exports.signPkg = function(address, devPassword, signPassword, appName, pkgPath)
       passwd: signPassword,
       pkg_time: '',
     };
-    const options = getRequestOptions({url: url, auth: auth, formData: data});
+    const options = getRequestOptions({ url: url, auth: auth, formData: data });
     request().post(options, (err, response, body) => {
       var packages = body ? body.match(/pkgs\/\/([^"]*)/) : '';
       if (err)
@@ -202,7 +202,7 @@ exports.signPkg = function(address, devPassword, signPassword, appName, pkgPath)
           sendImmediately: false
         };
         var writePath = `${pkgPath}/${appName}.pkg`;
-        const options = getRequestOptions({url: url, auth: auth});
+        const options = getRequestOptions({ url: url, auth: auth });
         request().get(options, (err, response, body) => {
           if (err) {
             rej(err);
@@ -217,7 +217,7 @@ exports.signPkg = function(address, devPassword, signPassword, appName, pkgPath)
 /**
  * Find roku devices
  */
-exports.autoDiscover = function() {
+exports.autoDiscover = function () {
   const Rx = require('rx');
   const SSDPClient = require('node-ssdp').Client;
   return new Rx.Observable.create(observer => {
@@ -257,7 +257,7 @@ async function fetchJSON(url, headers) {
     return data;
   } catch (error) {
     log(`Error: An error occurred while reading the JSON file from the URL: ${url}`);
-    throw(error);
+    throw (error);
   }
 }
 
@@ -273,5 +273,5 @@ function getRequestOptions(options) {
 }
 
 
-module.exports.fetchJSON =  fetchJSON;
-module.exports.fetchJSONFromGithub =  fetchJSONFromGithub;
+module.exports.fetchJSON = fetchJSON;
+module.exports.fetchJSONFromGithub = fetchJSONFromGithub;

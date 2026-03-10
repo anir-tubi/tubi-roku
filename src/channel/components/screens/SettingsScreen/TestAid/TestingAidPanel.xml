@@ -56,6 +56,9 @@
               id="features"
               title="Experiments" />
             <CheckButtonContentNode
+              id="branchBuilds"
+              title="Branch Builds" />
+            <CheckButtonContentNode
               id="changeLanguage"
               title="Change Language" />
             <CheckButtonContentNode

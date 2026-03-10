@@ -1,0 +1,53 @@
+name: Upload Component Library
+description: Downloads built pkg artifact, uploads to S3, and invalidates CloudFront cache
+
+inputs:
+  pr_number:
+    description: PR number used as the S3 path prefix
+    required: true
+  s3_bucket:
+    description: S3 bucket name
+    required: true
+  cdn_distribution_id:
+    description: CloudFront distribution ID for cache invalidation
+    required: true
+  aws_role_arn:
+    description: IAM role ARN to assume for S3 and CloudFront access
+    required: true
+
+runs:
+  using: composite
+  steps:
+    - name: Assume staging-core role
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        role-to-assume: ${{ inputs.aws_role_arn }}
+        aws-region: us-east-2
+        role-skip-session-tagging: true
+
+    - name: Download pkg artifact
+      uses: actions/download-artifact@v4
+      with:
+        name: component-lib-pkg-${{ inputs.pr_number }}
+        path: build/
+
+    - name: Upload pkg to S3
+      shell: bash
+      run: |
+        PKG_FILE=$(ls build/tubi_remote_components_*.pkg 2>/dev/null | head -1)
+        if [ -z "$PKG_FILE" ]; then
+          echo "ERROR: No pkg file found in build/"
+          exit 1
+        fi
+        S3_PATH="appFiles/components/branches/${{ inputs.pr_number }}"
+
+        aws s3 cp "$PKG_FILE" \
+          "s3://${{ inputs.s3_bucket }}/${S3_PATH}/tubi_remote_components.pkg"
+
+    - name: Invalidate CloudFront cache
+      shell: bash
+      continue-on-error: true
+      run: |
+        aws cloudfront create-invalidation \
+          --distribution-id "${{ inputs.cdn_distribution_id }}" \
+          --paths "/appFiles/components/branches/*"

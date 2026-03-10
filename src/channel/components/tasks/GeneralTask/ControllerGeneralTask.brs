@@ -351,6 +351,11 @@ Function registerParsingCallbacks()
     parseError: parseGenericError
     passRawResponse: true
   }
+
+  m.requestTypes[m.constants.reqNames.getBranchManifest] = {
+    parseSuccess: parseGenericSuccess
+    parseError: parseGenericError
+  }
 End Function
 
 

@@ -479,6 +479,8 @@ Function onFadeInContentController()
     m.top.removeStartUpScreens = true
   end if
 
+  showRemoteComponentOverrideToast()
+
   currentScreen = getCurrentScreen()
   'if m.linearScreenAfterFn is set in that case execute linearScreenAfterFn
   if m.linearScreenAfterFn <> invalid
@@ -2828,6 +2830,31 @@ Function showToast(toastInfo, shouldSendTracking = false, dialogEventInfo = {})
       m.trackingLoggingTask.trackEvent = dialogEventInfo
     end if
   end if
+End Function
+
+
+' Shows a toast notification when the app is running with an overridden remote component library.
+' Reads the override details from the configurationOverrides registry.
+Function showRemoteComponentOverrideToast() as Void
+  if m.global.remoteComponentLibraryOverridden <> true then return
+
+  registrySection = createObject("roRegistrySection", "configurationOverrides")
+  overrides = registrySection.ReadMulti(["remoteComponentsUrl", "remoteComponentLibProvided"])
+  libName = ""
+  if overrides <> invalid AND overrides.remoteComponentLibProvided <> invalid
+    libName = overrides.remoteComponentLibProvided
+  end if
+
+  if isNonEmptyString(libName) = false then return
+
+  toastInfo = {
+    message: "Remote components overridden: " + libName + ". Use Test Aid > Branch Builds to reset."
+    headerText: "Branch Build Active"
+    selfDestructTimer: 8
+    backGroundColor: getThemeFromGlobal().focused2Color
+  }
+
+  showToast(toastInfo)
 End Function
 
 

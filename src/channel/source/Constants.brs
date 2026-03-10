@@ -357,6 +357,7 @@ Function getConstants()
   constants.reqNames.validatePin = "validatePin"
   constants.reqNames.getAllPivots = "getAllPivots"
   constants.reqNames.getPivotContainers = "getPivotContainers"
+  constants.reqNames.getBranchManifest = "getBranchManifest"
 
 
   ' a list of reqnames that the general task will inject auth headers and should expect to handle 403 errors for
@@ -822,6 +823,8 @@ Function getConstants()
   else
     constants.urls.foxListingEndpoint = "https://epg-cdn.production-public.tubi.io/api/v1/listing_proxy"
   end if
+
+  constants.urls.branchBuildsManifest = "https://mrcdn-staging.tubitv.com/appFiles/components/branches/manifest.json"
 
   'http request types
   constants.reqTypes = {}

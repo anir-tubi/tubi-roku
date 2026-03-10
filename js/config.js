@@ -97,7 +97,7 @@ function load(options) {
     versionMinorDotted: formatBuildTag(build, 'minor', '.'),
     oneTrustVersionUnderscored: formatOneTrustBuildTag(build['one_trust_library_manifest']),
     foxVideoPlayerVersionUnderscored: formatFoxVideoPlayerBuildTag(build['fox_video_player_library_manifest']),
-    remoteComponentLibProvided: `TubiRemoteLib-${build.component_library_manifest.build_version}`,
+    remoteComponentLibProvided: process.env.REMOTE_COMPONENT_LIB_PROVIDED || `TubiRemoteLib-${build.component_library_manifest.build_version}`,
     fileType: overWrittenDataPre.settings.remoteComponentsExtension,
     bsConst: getBsConstsFromSettings(overWrittenDataPre.settings),
     consoleLoggingLevel: overWrittenDataPre.settings.consoleLoggingLevel,

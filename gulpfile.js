@@ -1134,6 +1134,7 @@ exports.build = series(clean, parallel(buildInstalled, buildStarter, buildRemote
 exports.buildPlusFoxVideoPlayer = series(clean, parallel(buildInstalled, buildStarter, buildRemote, buildFoxVideoPlayer));
 exports.sideload = sideLoad;
 exports['build-downloads'] = series(buildStarter, buildRemote, packageStarter, packageRemote);
+exports.createFeatureBranch = series(buildRemote, packageRemote);
 exports.bump = bumpBuild;
 exports.bumpTen = bumpBuildTen;
 exports.bumpQA = bumpRevision;
