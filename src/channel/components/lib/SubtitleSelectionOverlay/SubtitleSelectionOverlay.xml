@@ -15,13 +15,11 @@
     <field id="globalCaptionMode" type="string" />
     <field id="show" type="boolean" alwaysNotify="true" />
     <field id="hide" type="boolean" alwaysNotify="true" />
-    <field id="populate" type="boolean" alwaysNotify="true" />
 
     <!-- Outputs -->
     <field id="selectedTrack" type="assocarray" alwaysNotify="true" />
-    <field id="wasHidden" type="boolean" alwaysNotify="true" />
-    <field id="isVisible" type="boolean" value="false" />
     <field id="playPressed" type="boolean" alwaysNotify="true" />
+    <field id="backPressed" type="boolean" alwaysNotify="true" />
   </interface>
 
   <children>

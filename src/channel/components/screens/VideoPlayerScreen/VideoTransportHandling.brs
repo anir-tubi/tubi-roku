@@ -1716,10 +1716,11 @@ Function onHudStateChanged(msg)
       slideTo(m.skipCuepointsButton, [skipCuepointsButtonTransLation[0], m.skipCuepointsButtonDownTranslation], 0.6)
     end if
 
-    ' Show pending subtitle overlay after HUD closes
+    ' Show pending subtitle overlay after HUD closes (playback-begin deferred case)
     if m.pendingSubtitleOverlayOnHudClose = true
       m.pendingSubtitleOverlayOnHudClose = false
       showSubtitleSelectionOverlay()
+      m.hasShownSubtitleOverlayForCurrentPlayback = true
     end if
   end if
 End Function

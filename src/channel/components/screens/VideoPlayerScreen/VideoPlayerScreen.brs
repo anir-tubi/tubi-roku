@@ -232,8 +232,8 @@ Function init()
   m.ratingOverlayTimer.observeFieldScoped("fire", "hideRatingOverlay")
 
   m.subtitleSelectionOverlay = m.top.findNode("subtitleSelectionOverlay")
-  m.subtitleSelectionOverlay.observeFieldScoped("selectedTrack", "onSubtitleTrackSelected")
-  m.subtitleSelectionOverlay.observeFieldScoped("wasHidden", "onSubtitleSelectionOverlayHidden")
+  m.subtitleSelectionOverlay.observeFieldScoped("selectedTrack", "onSubtitleSelectionOverlayTrackSelected")
+  m.subtitleSelectionOverlay.observeFieldScoped("backPressed", "onSubtitleSelectionOverlayBackPressed")
   m.subtitleSelectionOverlay.observeFieldScoped("playPressed", "onSubtitleSelectionOverlayPlayPressed")
 
   m.showSubtitleSelection = false
@@ -912,13 +912,14 @@ Function autoHideSkipCuepointsButton()
   ' Show subtitle selection overlay after skip cuepoints button auto-hides
   ' Only show for SkipIntro and SkipRecap, not for SkipEarlyCredits
   isIntroOrRecap = m.lastShownSkipCuepointType = m.constants.player.skipCuepointsButtonTypes.intro OR m.lastShownSkipCuepointType = m.constants.player.skipCuepointsButtonTypes.recap
-  shouldShowSubtitleOverlay = m.showSubtitleSelection = true AND m.subtitleSelectionOverlay.isVisible = false AND isIntroOrRecap = true
+  shouldShowSubtitleOverlay = (m.showSubtitleSelection = true AND isIntroOrRecap = true)
 
   if m.HUD.opacity < 1
     hideSkipCuepointsButton(m.top)
 
     if shouldShowSubtitleOverlay = true
       showSubtitleSelectionOverlay()
+      m.hasShownSubtitleOverlayForCurrentPlayback = true
     end if
   else
     ' HUD is visible - defer showing subtitle overlay until HUD closes
@@ -963,6 +964,8 @@ Function playContent()
   end if
 
   if m.Video.content <> invalid
+
+    m.hasShownSubtitleOverlayForCurrentPlayback = false
 
     ' Always reset ad state when we first start playback.  Preroll fetch will populate midrolls list
     m.midrolls = {}
@@ -1051,12 +1054,12 @@ Function setInitialCCAndAudioTracks()
   ' Determine if subtitle selection overlay should be shown
   ' This also fires the exposure event for both variant and control groups
   m.showSubtitleSelection = shouldShowSubtitleSelectionOverlay()
+
   ' Only populate subtitle selection overlay if we're going to show it
   if m.showSubtitleSelection = true
     m.subtitleSelectionOverlay.availableSubtitleTracks = m.Video.availableSubtitleTracks
     m.subtitleSelectionOverlay.currentSubtitleTrack = m.Video.subtitleTrack
     m.subtitleSelectionOverlay.globalCaptionMode = m.Video.globalCaptionMode
-    m.subtitleSelectionOverlay.populate = true
   end if
   updatePlayerLogLib(m.playerLogLib, "setCaptions", m.Video.availableSubtitleTracks)
   updatePlayerLogLib(m.playerLogLib, "updateCaptionIndex", m.Video.subtitleTrack)
@@ -1514,10 +1517,10 @@ Function onVideoStateChange(msg)
       end if
     end if
 
-    ' Show subtitle selection overlay only if content has no skip cuepoints
-    ' If content has skip cuepoints, show after skip button closes
-    if m.showSubtitleSelection = true AND m.subtitleSelectionOverlay.isVisible = false AND contentHasSkipCuepoints() = false
+    ' Show subtitle selection overlay only when playback begins (first transition to playing), not on every pause/resume
+    if m.hasShownSubtitleOverlayForCurrentPlayback = false AND m.showSubtitleSelection = true AND contentHasSkipCuepoints() = false
       showSubtitleSelectionOverlay()
+      m.hasShownSubtitleOverlayForCurrentPlayback = true
     end if
 
   end if
@@ -3214,67 +3217,39 @@ Function shouldShowSubtitleSelectionOverlay() as Boolean
   ' Check if there's a preferred subtitle track
   preferredSubtitleTrack = m.top.preferredSubtitleTrack
   hasPreferredSubtitleTrack = isAA(preferredSubtitleTrack) = true AND isNonEmptyString(preferredSubtitleTrack.language) = true
+  hasShownOverlay = RegRead("hasShownSubtitleOverlayWithPreference", "subtitleOverlay")
 
-  ' Read registry once - only needed if user has a preferred track
-  hasShownOverlay = false
-  if hasPreferredSubtitleTrack = true
-    hasShownOverlay = (RegRead("hasShownSubtitleOverlayWithPreference", "subtitleOverlay") = "true")
-  end if
-
-  ' Fire exposure event for both variant and control groups
-  ' Fire for: first video (no preference OR preference but not shown yet)
-  ' Don't fire for: subsequent videos with preference (already exposed)
-  if hasPreferredSubtitleTrack = false OR hasShownOverlay = false
-    getStatsigExperimentResource("roku_player_improvement", "roku_player_subtitle_overlay_v1", true)
-  end if
-
-  ' Check if experiment is enabled (after firing exposure so both groups are tracked)
-  ' Return false for control group
-  if m.isSubtitleOverlayExperimentEnabled <> true
+  if hasPreferredSubtitleTrack = false OR hasShownOverlay <> "true"
+    return true ' no preference, show every time
+  else
     return false
   end if
-
-  ' If user has preference and already shown, don't show again
-  if hasPreferredSubtitleTrack = true AND hasShownOverlay = true
-    return false
-  end if
-
-  ' Show the overlay (either no preference, or first time with preference)
-  return true
 End Function
 
 
 ' showSubtitleSelectionOverlay shows the subtitle selection overlay component.
-' Sets focus to the overlay and saves registry flag when shown with a preferred subtitle track.
+' Writes registry for both treatment & control, but show overlay only for treatment.
 Function showSubtitleSelectionOverlay()
-  if m.subtitleSelectionOverlay.isVisible = false
+  hasShownOverlay = RegRead("hasShownSubtitleOverlayWithPreference", "subtitleOverlay")
+
+  if hasShownOverlay <> "true"
+    RegWrite("hasShownSubtitleOverlayWithPreference", "true", "subtitleOverlay")
+    getStatsigExperimentResource("roku_player_improvement", "roku_player_subtitle_overlay_v1", true)
+  end if
+
+  if m.isSubtitleOverlayExperimentEnabled = true
     m.subtitleSelectionOverlay.show = true
     m.focusedNode = m.subtitleSelectionOverlay
-
-    ' Save to registry if user has preferred subtitle track (to prevent showing again)
-    preferredSubtitleTrack = m.top.preferredSubtitleTrack
-    hasPreferredSubtitleTrack = isAA(preferredSubtitleTrack) = true AND isNonEmptyString(preferredSubtitleTrack.language) = true
-
-    if hasPreferredSubtitleTrack = true
-      hasShownOverlay = RegRead("hasShownSubtitleOverlayWithPreference", "subtitleOverlay")
-
-      if hasShownOverlay <> "true"
-        ' First time showing with preference - save to registry
-        RegWrite("hasShownSubtitleOverlayWithPreference", "true", "subtitleOverlay")
-      end if
-    end if
   end if
 End Function
 
 
 ' hideSubtitleSelectionOverlay hides the subtitle selection overlay component.
-' Focus is restored via onSubtitleSelectionOverlayHidden callback.
+' When overlay is dismissed by user (back/key) or auto-hide, focus is restored via onSubtitleSelectionOverlayBackPressed.
 Function hideSubtitleSelectionOverlay()
   m.pendingSubtitleOverlayOnHudClose = false
-  if m.subtitleSelectionOverlay.isVisible = true
-    m.showSubtitleSelection = false
-    m.subtitleSelectionOverlay.hide = true
-  end if
+  m.showSubtitleSelection = false
+  m.subtitleSelectionOverlay.hide = true
 End Function
 
 
@@ -3950,11 +3925,11 @@ Function onAdFetchCooldownTimerFired()
 End Function
 
 
-' onSubtitleTrackSelected handles when a subtitle track is selected from the overlay.
+' onSubtitleSelectionOverlayTrackSelected handles when a subtitle track is selected from the overlay.
 ' Updates the video subtitle track and caption mode.
 ' When "Off" is selected, only globalCaptionMode is updated (subtitleTrack is not modified).
 ' When a track is selected, subtitleTrack is set to the actual id(trackName).
-Function onSubtitleTrackSelected(msg)
+Function onSubtitleSelectionOverlayTrackSelected(msg)
   item = msg.getData()
 
   if item <> invalid
@@ -3967,18 +3942,15 @@ Function onSubtitleTrackSelected(msg)
       setAudioSubtitleTransportBarIcon("On")
     end if
   end if
+
+  setFocusToComponent(m.ProgressBar)
 End Function
 
 
-' onSubtitleSelectionOverlayHidden handles when the subtitle selection overlay is hidden.
-' Restores focus to the play/pause button.
-Function onSubtitleSelectionOverlayHidden(msg)
-  m.showSubtitleSelection = false
-  m.pendingSubtitleOverlayOnHudClose = false
-  ' Set focus back to transport play/pause button
-  if m.PlayPauseButton <> invalid
-    m.PlayPauseButton.setFocus(true)
-    m.focusedNode = m.PlayPauseButton
+' onSubtitleSelectionOverlayBackPressed handles back/dismiss from subtitle overlay; restores focus to progress bar.
+Function onSubtitleSelectionOverlayBackPressed(msg)
+  if msg.getData() = true
+    setFocusToComponent(m.ProgressBar)
   end if
 End Function
 
