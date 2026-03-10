@@ -1105,7 +1105,6 @@ End Function
 Function onContentChange() as Void
   logDebug("VideoPlayer.onContentChange")
   stopVideo()
-  m.isBWWShownForDeeplinkUser = false
 
   if m.top.isTrailer = false AND m.top.appMode <> "KIDS_MODE"
     if m.sendFeedBackButton.hasField("enabled") = true
@@ -1510,11 +1509,7 @@ Function onVideoStateChange(msg)
 
     if m.showRatings = true AND m.ratingOverlay.opacity = 0.0 AND m.AdHeadsUp.visible = false
       m.showRatings = false
-      if isAA(m.top.playbackSource) = true AND m.top.playbackSource.srcForAds = m.constants.player.playbackOrigin.deeplink AND getExperimentResource("roku_bww_deeplinked_content", "roku_bww_deeplinked_content_v1", true).enabled = true AND m.isBWWShownForDeeplinkUser = false
-        showRatingOverlay(deeplinkBWWCallBack)
-      else
-        showRatingOverlay()
-      end if
+      showRatingOverlay()
     end if
 
     ' Show subtitle selection overlay only when playback begins (first transition to playing), not on every pause/resume
@@ -3146,27 +3141,13 @@ Function onDecoderStatsChange(msg)
 End Function
 
 
-' This function can be deleted if roku_bww_deeplinked_content experiment does not graduate.
-Function deeplinkBWWCallBack()
-  showTransport()
-  showBrowseWhileWatching()
-  m.isBWWShownForDeeplinkUser = true
-End Function
-
-
-' showratingOverlay helps to show the rating overlay and start the timer to hide it after certain amount of time.
-' @callback: function, optional callback function to be called after the rating overlay is shown.
-'            this parameter should be deleted if roku_bww_deeplinked_content experiment does not graduate.
-Function showRatingOverlay(callback = invalid)
+Function showRatingOverlay()
 
   content = m.Video.content
 
   if content <> invalid AND isNonEmptyString(content.rating) = true
-    if callback <> invalid
-      fade(m.ratingOverlay, "in", 0.1, 0, -1, callback)
-    else
-      fade(m.ratingOverlay, "in", 0.6)
-    end if
+
+    fade(m.ratingOverlay, "in", 0.6)
 
     if m.TopOverlay.opacity > 0.0
       m.ratingOverlay.translation = [0, m.ratingOverlayAnimatedPositionY]
