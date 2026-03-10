@@ -1478,10 +1478,7 @@ Function setUiModeFromState()
   tubiLog("ContentController.setUiModeFromState")
   modeSet = false
   if isUserInMultiAccount() = false
-    if isKidsProfile() = true 'this is only to ensure that if statsig fails and active user was kids profile, then at least we have kids UI.
-      setUiMode(m.constants.ui.modes.kidsProfile)
-      modeSet = true
-    else if isKidsModeEnabledByParentalControls() = true
+    if isKidsModeEnabledByParentalControls() = true
       setUiMode(m.constants.ui.modes.kidsParental)
       modeSet = true
     else if shouldShowAgeGate() = true then
@@ -2209,13 +2206,31 @@ End Function
 
 
 Function shouldShowAgeGate()
-  if isDeviceInUSorCA() <> true
+  countryCode = UCase(m.constants.deviceInfo.countryCode)
+  allowedCountryCodes = {
+    "US": true,
+    "CA": true,
+    "MX": true,
+    "NZ": true,
+    "AU": true,
+    "EC": true,
+    "GT": true,
+    "PA": true,
+    "CR": true,
+    "SV": true,
+    "UK": false,
+    "GB": false 'just in case
+  }
+
+  if m.constants.settings.mode <> "production" AND m.constants.settings.skipAgeGate = true
     return false
-  else if m.constants.settings.mode <> "production" AND m.constants.settings.skipAgeGate = true
-    return false
+  else if countryCode <> invalid
+    if allowedCountryCodes.doesExist(countryCode)
+      return allowedCountryCodes[countryCode]
+    end if
   end if
 
-  return true
+  return false
 End Function
 
 
