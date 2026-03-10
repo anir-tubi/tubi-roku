@@ -14,7 +14,7 @@ Function init()
   m.linkedAccountsDescription = m.top.findNode("LinkedAccountsDescription")
   m.linkedAccountsGrid = m.top.findNode("LinkedAccountsGrid")
   m.top.observeFieldScoped("linkedAccounts", "onLinkedAccountsChange")
-  m.top.observeFieldScoped("uiMode", "onUiModeChange")
+  m.top.observeFieldScoped("removeKidsSignOutBtn", "onRemoveKidsSignOutBtnChange")
   m.top.observeFieldScoped("focusedChild", "onFocusedChildChange")
   m.parentalRating = m.top.findNode("ParentalRating")
   m.top.observeFieldScoped("parentalRating", "onParentalRatingChange")
@@ -133,9 +133,9 @@ Function isSignOutButtonShown()
 End Function
 
 
-Function onUiModeChange(msg)
-  uiMode = msg.getData()
-  if uiMode = m.constants.ui.modes.kidsParental OR uiMode = m.constants.ui.modes.kidsAgeGate OR uiMode = m.constants.ui.modes.kidsProfile OR uiMode = m.constants.ui.modes.kids
+Function onRemoveKidsSignOutBtnChange(msg)
+  removeSignOutButton = msg.getData()
+  if removeSignOutButton = true
     hideSignOutButton()
   else
     showSignOutButton()

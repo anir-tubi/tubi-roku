@@ -11,6 +11,7 @@ Function showSettingsScreen(sFocusID = "", screenLevel = 0)
   m.settingsScreen.isAutoPlayTimerOn = isAutoPlayTimerOn()
   m.settingsScreen.isAllowedToManageConsent = isUserAllowedToManageConsent()
   m.settingsScreen.consentSettings = m.consentSettings
+  m.settingsScreen.removeKidsSignOutBtn = (isKidsUIOn() = true)
 
   m.pubSub.subscribe("pub_serverPersistentData.isVideoPreviewOn", m.settingsScreen, "isVideoPreviewOn")
   m.pubSub.subscribe("pub_serverPersistentData.isAutoPlayTimerOn", m.settingsScreen, "isAutoPlayTimerOn")
@@ -622,9 +623,7 @@ Function refreshUIAfterParentalControlsChange()
     refreshScreenAfterParentalChanges()
   end if
 
-  if isUserInMultiAccount() = true
-    m.settingsScreen.uiMode = m.uiMode
-  end if
+
 
   dialogEvent = {
     type: "dialog"
@@ -662,6 +661,10 @@ Function refreshUIAfterParentalControlsChange()
 
   message = getTranslation(sMessageID)
   showSimpleInstantResumableModal(title, message, [], dialogEvent, m.trackingLoggingTask)
+
+  if isUserInMultiAccount() = true
+    m.settingsScreen.removeKidsSignOutBtn = (isKidsUIOn() = true)
+  end if
 
 End Function
 

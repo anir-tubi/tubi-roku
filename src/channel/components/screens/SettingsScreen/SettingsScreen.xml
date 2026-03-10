@@ -90,6 +90,7 @@
 
     <!-- Holds the selected experiment and group data  -->
     <field id="experimentGroupSelected" type="assocarray" alwaysNotify="true" />
+    <field id="removeKidsSignOutBtn" type="boolean" value="false" alwaysNotify="true" />
   </interface>
 
   <children>

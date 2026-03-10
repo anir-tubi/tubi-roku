@@ -17,7 +17,8 @@
     <field id="name" alias="Name.text" />
     <field id="description" alias="Description.text" />
     <field id="signOutText" alias="SignOutButton.text" />
-    <field id="uiMode" type="string" />
+
+    <field id="removeKidsSignOutBtn" type="boolean" value="false" alwaysNotify="true" />
     <field id="activationUrl" alias="QRCodeUrlString.text" />
     <field id="manageTitle" alias="ManageTitle.text" />
     <!-- parental rating will tell whether we add sign out button or not -->
