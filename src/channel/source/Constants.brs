@@ -1587,7 +1587,7 @@ Function getConstants()
   ' Size of guest user continue watching container.
   constants.ui.imageSizes.guestContinueWatchingTile = [1613, 378]
 
-  constants.ui.imageSizes.titleArt = [594, 80]
+  constants.ui.imageSizes.titleArt = [594, 224]
 
   constants.ui.imageSizes.billboard = [1209, 681]
 
