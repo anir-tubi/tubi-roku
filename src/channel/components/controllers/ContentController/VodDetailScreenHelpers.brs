@@ -54,6 +54,8 @@ Function showVodDetailScreen(inputContent, playbackSource, successCb = invalid, 
 
     onVodDetailBackgroundUriListChange()
 
+    getYouMayAlsoLikeContent(content)
+
     if content.type = m.constants.ui.contentTypes.series
       screen.wasContentFetchCompleted = false
       getSeasonList(content.id, onGetSeasonListSuccess, onGetSeasonListError)
@@ -65,7 +67,6 @@ Function showVodDetailScreen(inputContent, playbackSource, successCb = invalid, 
       else
         onGetVodContentSuccess(content)
       end if
-      getYouMayAlsoLikeContent(content)
     end if
     if screen.wasContentFetchCompleted = false
       showHideSpinner(true)
@@ -90,7 +91,7 @@ End Function
 ' @param content - Content node containing backgrounds array
 Function updateVodDetailBackground(content)
   if isNode(content) AND isNonEmptyArray(content.backgrounds) = true
-    backgroundType = m.constants.ui.backgroundTypes.spotlight
+    backgroundType = m.constants.ui.backgroundTypes.topright
     m.backgroundGroup.backgroundInfo = {
       type: backgroundType
       uriList: content.backgrounds
@@ -202,7 +203,10 @@ Function onVodDetailSelectedRelatedContentTriggerChange(msg) as Void
       stopVideoPreview()
       successCb = invalid
       if pressedKey = "play"
+        sendButtonComponentInteractionEvent("PLAY", "IMAGE", "CONFIRM", screen)
         successCb = skipDetailScreen
+      else
+        sendButtonComponentInteractionEvent("OK", "IMAGE", "CONFIRM", screen)
       end if
       showVodDetailScreen(content, playbackSource, successCb)
     end if
@@ -245,6 +249,21 @@ Function getContentHistory(content as Object) as Object
   end if
 
   return history
+End Function
+
+' Success callback for episodes content fetch
+Function onVodEpisodesContentSuccess(content)
+  showHideSpinner(false)
+  screen = getDetailScreenFromStackWithId(m.constants.ui.screenIds.vodDetailScreen, content.id)
+  if screen <> invalid
+    showEpisodeScreenWithNavigationTracking(content, screen.playbackSource)
+  end if
+End Function
+
+' Error callback for episodes content fetch
+Function onVodEpisodesContentError(error)
+  tubiLog("VodDetailScreenHelpers.onVodEpisodesContentError: " + formatJson(error))
+  showHideSpinner(false)
 End Function
 
 
@@ -315,6 +334,9 @@ Function onVodDetailCtaSelectedButtonIdChange(msg) as Void
       showChannelDetailsScreen(screenContent.channelId)
     else if id = "removeFromHistory"
       removeHistoryFromVodDetailScreen(screenContent)
+    else if id = "episodes"
+      showHideSpinner(true)
+      getSingleContentFromServer(screenContent, onVodEpisodesContentSuccess, onVodEpisodesContentError)
     end if
   end if
 End Function

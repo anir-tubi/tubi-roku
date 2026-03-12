@@ -102,6 +102,7 @@
           showInactiveFocusState="true"
           buttonBackgroundUri="pkg:/images/tabs-bg-$$RES$$.9.png"
           layoutDirection="horiz"
+          visible="false"
           buttonSpacing="[15]" />
 
         <FocusControlGroup
@@ -110,7 +111,7 @@
           <RelatedContentContainer
             id="relatedContentContainer"
             visible="false"
-            variant="portraitWithMetadata" />
+            variant="portraitWithTitle" />
           <VideoDetailsPanel
             visible="false"
             id="videoDetailsPanel" />

@@ -24,6 +24,9 @@ Function initAnalytics() as Void
     removeFromHistory: "REMOVE_FROM_HISTORY"
     likeRemoveRating: "LIKE_REMOVE_RATING"
     dislikeRemoveRating: "DISLIKE_REMOVE_RATING"
+    ratings: "LIKE_DISLIKE"
+    ratingsLiked: "LIKE_REMOVE_RATING"
+    ratingsDisliked: "DISLIKE_REMOVE_RATING"
     episodes: "EPISODES_LIST"
     moreLikeThis: "YOU_MAY_ALSO_LIKE"
     details: "INFORMATION"
@@ -65,6 +68,10 @@ End Function
 Function onButtonListNavigateWithinPageEventInfoChange(msg) as Void
   eventInfo = msg.getData()
   if eventInfo <> invalid
+    ' TODO: Remove this once we have a proper way to track vertical location for roku_content_details_v3
+    if msg.getRoSGNode().isSameNode(m.actionButtonList)
+      eventInfo.vertical_location = 1
+    end if
     m.top.navigateWithinPageInfo = eventInfo
   end if
 End Function

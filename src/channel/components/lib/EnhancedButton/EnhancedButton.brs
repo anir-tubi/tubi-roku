@@ -8,6 +8,7 @@ Function init() as Void
   topRef.observeFieldScoped("hideFocusFootprint", "onHideFocusFootprintChange")
   topRef.observeFieldScoped("backgroundUri", "onBackgroundUriChange")
   topRef.observeFieldScoped("backgroundBlendColor", "onBackgroundBlendColorChange")
+  topRef.observeFieldScoped("dynamicIsPrimaryButton", "onDynamicIsPrimaryButtonChange")
 
   ' Cache all node references
   m.icon = topRef.findNode("icon")
@@ -166,7 +167,9 @@ Function updateButtonState(itemHasFocus as Boolean) as Void
   item = m.top.itemContent
   if item = invalid then return
 
-  if (item.isPrimaryButton <> true OR item.displayOnlyIconTileWhenNotFocused = true)
+  if m.dynamicIsPrimaryButtonSet = true
+    renderButton(item, m.top.dynamicIsPrimaryButton, itemHasFocus)
+  else if (item.isPrimaryButton <> true OR item.displayOnlyIconTileWhenNotFocused = true)
     ' Treat as primary button if focused OR if already marked as primary
     isPrimaryButton = (itemHasFocus OR (item.isPrimaryButton = true))
     renderButton(item, isPrimaryButton, itemHasFocus)
@@ -320,6 +323,15 @@ Function renderButton(item as Object, isPrimaryButton as Dynamic, itemHasFocus a
 
     m.elementsGroup.translation = [33, m.top.height / 2]
   end if
+End Function
+
+
+' Handles dynamicIsPrimaryButton field changes
+' Re-renders the button with the new primary button state
+Function onDynamicIsPrimaryButtonChange(msg as Object) as Void
+  if m.top.itemContent = invalid then return
+  m.dynamicIsPrimaryButtonSet = true
+  renderButton(m.top.itemContent, msg.getData(), m.top.hasFocus())
 End Function
 
 

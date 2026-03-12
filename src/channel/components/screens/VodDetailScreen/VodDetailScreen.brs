@@ -25,6 +25,16 @@ Function init()
   m.gradient = topRef.findNode("gradient")
   m.belowFoldGradient = topRef.findNode("belowFoldGradient")
   m.leftChevron = topRef.findNode("leftChevron")
+  ratingsOverlayResult = createRatingsOverlay()
+  m.ratingsOverlay = ratingsOverlayResult.overlay
+  m.ratingsOverlayButtonList = ratingsOverlayResult.buttonList
+  m.ratingsOverlayButtonList.observeFieldScoped("buttonSelected", "onRatingsOverlayButtonSelected")
+  m.top.appendChild(m.ratingsOverlay)
+
+  m.ratingsOverlayFocusTimer = CreateObject("roSGNode", "Timer")
+  m.ratingsOverlayFocusTimer.duration = 0.01
+  m.ratingsOverlayFocusTimer.repeat = false
+  m.ratingsOverlayFocusTimer.observeFieldScoped("fire", "onRatingsOverlayFocusTimer")
 
   m.aboveFoldGradientTranslation = [193, 360]
   m.contentContainer.translation = m.aboveFoldGradientTranslation
@@ -60,10 +70,21 @@ Function init()
 
   m.isComingSoon = false ' Initialize coming soon flag
 
-  experiment = getStatsigExperimentResource("roku_content_details", "roku_content_details_v2", false)
-  m.isLeftBackExitEnabled = experiment <> invalid AND experiment.enable_left_button_exit = true
+  experiment = getStatsigExperimentResource("roku_content_details", "roku_content_details_v3", false)
+  ' TODO: This experiment has left exit always enabled. Remove if left exit will be disabled or dynamic
+  ' m.isLeftBackExitEnabled = experiment <> invalid AND experiment.enable_left_button_exit = true
+  m.isLeftBackExitEnabled = true
+  m.v3ExperimentEnabled = experiment <> invalid AND experiment.enabled = true
+  m.isAlwaysPrimaryButtons = experiment <> invalid AND experiment.enable_always_primary_buttons = true
 
   m.leftChevron.visible = m.isLeftBackExitEnabled
+  ' TODO: Temporary fix for section tabs spaciing in roku_content_details_v3 experiment. Remove if sectionTabs will be visible
+  if m.sectionTabs.visible = false
+    m.sectionTabsSpacing = 0
+  else
+    m.sectionTabsSpacing = 63
+  end if
+  m.contentContainer.itemSpacings = [60, m.sectionTabsSpacing, 24]
 
   if m.global <> invalid
     m.global.observeFieldScoped("theme", "onThemeChange")
@@ -128,9 +149,11 @@ Function onContentChange()
     m.isComingSoon = isComingSoonContent(content)
 
     refreshButtonList()
-    if m.sectionTabs = invalid OR isNonEmptyArray(m.sectionTabs.buttons) = false
-      renderSectionTabs()
-    end if
+    ' if m.sectionTabs = invalid OR isNonEmptyArray(m.sectionTabs.buttons) = false
+    '   renderSectionTabs()
+    ' end if
+    m.relatedContentContainer.visible = true
+    m.additionalContentContainer.focusable = true
 
     if m.top.isInKidsMode = true
       m.gradient.uri = "pkg:/images/details_kids_above_fold_gradient_$$RES$$.webp"
@@ -140,12 +163,13 @@ Function onContentChange()
     ' Set title image or text label based on availability
     updateContentTitle(content)
 
-    if content.type <> "series"
-      m.relatedContentContainer.visible = true
-    else
-      m.episodesContainer.seriesId = content.id.toStr()
-      m.episodesContainer.visible = true
-    end if
+    ' TODO: Uncomment this once we start rendering sectionTabs again.
+    ' if content.type <> "series"
+    '   m.relatedContentContainer.visible = true
+    ' else
+    '   m.episodesContainer.seriesId = content.id.toStr()
+    '   m.episodesContainer.visible = true
+    ' end if
 
     height = m.videoMetadataPanel.boundingRect().height
     m.contentGroup.translation = [0, 312 - height]
@@ -186,7 +210,9 @@ End Function
 Function refreshButtonList()
   itemContent = m.top.content
   buttons = []
-  isButtonsListInFocusChain = m.actionButtonList.isInFocusChain() = true
+  isRatingsOverlayFocused = m.ratingsOverlay.visible = true AND m.ratingsOverlayButtonList.isInFocusChain() = true
+  isButtonsListInFocusChain = m.actionButtonList.isInFocusChain() = true OR isRatingsOverlayFocused
+  hideRatingsOverlay()
 
   if itemContent <> invalid
     contentId = itemContent.id
@@ -194,27 +220,37 @@ Function refreshButtonList()
     history = getHistory(contentId)
     like = getLike(contentId)
 
-    ' Build button list using helper functions
     if m.isComingSoon = false
       addPlayOrResumeButtons(buttons, itemContent, history)
       addSignInButton(buttons)
       addRemoveHistoryButton(buttons, history)
 
       if m.top.isInKidsMode = false
-        addLikeDislikeButtons(buttons, like)
+        addRatingsButton(buttons, like)
 
         if isNonEmptyString(itemContent.channelId)
           addChannelButton(buttons, itemContent)
         end if
       end if
+      if itemContent.type = "series"
+        buttons.push({
+          id: "episodes"
+          title: getTranslation("screenDetails_button_episodes")
+          iconUrl: "pkg:/images/icon-all-episodes.webp"
+          trackingContext: createButtonAnalytics("episodes")
+        })
+      end if
     end if
 
     addTrailerButton(buttons, itemContent)
     addQueueButton(buttons, bookmark)
-
   end if
 
-  ' Pass buttons array to the button list component
+  if m.isAlwaysPrimaryButtons = true
+    for each button in buttons
+      button.isPrimaryButton = true
+    end for
+  end if
   m.actionButtonList.buttons = buttons
   m.actionButtonList.visible = isNonEmptyArray(buttons)
 
@@ -224,16 +260,119 @@ Function refreshButtonList()
 End Function
 
 
-' Handles CTA button selection events
-' Propagates the selected button ID to parent
-' @param msg - Message object containing button ID
-Function onCtaButtonSelected(msg)
-  buttonId = msg.getData()
-  if buttonId <> invalid
-    m.top.ctaButtonSelectedId = buttonId
+' Creates the ratings overlay containing a background poster and a vertical
+' EnhancedButtonList with dislike/like buttons. Floats above the button row.
+Function createRatingsOverlay() as Object
+  overlay = CreateObject("roSGNode", "Group")
+  overlay.id = "ratingsOverlay"
+  overlay.visible = false
+
+  background = CreateObject("roSGNode", "Poster")
+  background.uri = "pkg:/images/ratings-background-$$RES$$.9.png"
+  background.width = 260
+  background.height = 256
+  background.translation = [-14, -16]
+  overlay.appendChild(background)
+
+  buttonList = CreateObject("roSGNode", "EnhancedButtonList")
+  buttonList.id = "ratingsOverlayButtonList"
+  buttonList.layoutDirection = "vert"
+  buttonList.buttonSpacing = [12]
+  buttonList.buttons = [
+    {
+      id: "dislike"
+      title: getTranslation("screenDetails_button_dislike")
+      isPrimaryButton: true
+      iconUrl: "pkg:/images/icon-dislike.webp"
+      trackingContext: createButtonAnalytics("dislike")
+    }
+    {
+      id: "like"
+      title: getTranslation("screenDetails_button_like")
+      isPrimaryButton: true
+      padding: 66
+      iconUrl: "pkg:/images/icon-like.webp"
+      trackingContext: createButtonAnalytics("like")
+    }
+  ]
+  overlay.appendChild(buttonList)
+
+  return { overlay: overlay, buttonList: buttonList }
+End Function
+
+
+' Handles ratings overlay button selection (like or dislike)
+Function onRatingsOverlayButtonSelected(msg) as Void
+  buttonData = msg.getData()
+  if buttonData = invalid then return
+  setComponentInteractionEventForButton("CONFIRM", buttonData)
+  hideRatingsOverlay()
+  m.actionButtonList.setFocus(true)
+  m.top.ctaSelectedButtonId = buttonData.id
+End Function
+
+
+' Shows the ratings overlay (dislike/like) above the focused ratings button.
+' Uses fade with 0 duration as a deferred callback to set focus after the
+' actionButtonList finishes its internal focus handling.
+Function showRatingsOverlay() as Void
+  focusedButton = m.actionButtonList.buttonFocused
+  if focusedButton = invalid OR focusedButton.button = invalid then return
+
+  m.ratingsButtonNode = focusedButton.button
+  m.ratingsButtonNode.padding = 66
+  if m.isAlwaysPrimaryButtons = false
+    m.ratingsButtonNode.dynamicIsPrimaryButton = true
+  end if
+  m.ratingsButtonNode.observeFieldScoped("translation", "onRatingsButtonTranslationChange")
+  m.contentContainer.observeFieldScoped("translation", "onRatingsButtonTranslationChange")
+  updateRatingsOverlayPosition()
+  m.ratingsOverlayButtonList.jumpToIndex = 1
+  m.ratingsOverlay.visible = true
+  m.ratingsOverlayFocusTimer.control = "start"
+End Function
+
+
+Function onRatingsOverlayFocusTimer() as Void
+  if m.ratingsOverlay.visible = true
+    m.ratingsOverlayButtonList.setFocus(true)
   end if
 End Function
 
+
+Function onRatingsButtonTranslationChange(msg) as Void
+  if m.ratingsOverlay.visible = true
+    updateRatingsOverlayPosition()
+  end if
+End Function
+
+
+' Positions the ratings overlay relative to the ratings button in the action button list.
+' The overlay is placed so the like button aligns with the ratings button,
+' and the dislike button sits above it.
+Function updateRatingsOverlayPosition() as Void
+  if m.ratingsButtonNode = invalid then return
+  buttonRect = m.ratingsButtonNode.sceneBoundingRect()
+  m.ratingsOverlay.translation = [buttonRect.x, buttonRect.y - 117]
+End Function
+
+
+Function hideRatingsOverlay() as Void
+  m.ratingsOverlay.visible = false
+  if m.ratingsButtonNode <> invalid
+    m.ratingsButtonNode.padding = 33
+    if m.isAlwaysPrimaryButtons = false
+      m.ratingsButtonNode.dynamicIsPrimaryButton = false
+    end if
+    m.ratingsButtonNode.unobserveFieldScoped("translation")
+    m.contentContainer.unobserveFieldScoped("translation")
+    m.ratingsButtonNode = invalid
+  end if
+End Function
+
+
+' Handles Dislike button selection
+' Hides the overlay and propagates the dislike action
 
 ' Handles user sign-in state changes
 ' Refreshes button list to show/hide sign-in dependent buttons
@@ -338,9 +477,9 @@ Function onSectionTabFocused(msg)
 
     ' Set spacing: episodes tab has different bottom spacing (0) vs other tabs (42)
     if tabId = "episodes"
-      m.contentContainer.itemSpacings = [60, 63, 0]
+      m.contentContainer.itemSpacings = [60, m.sectionTabsSpacing, 0]
     else
-      m.contentContainer.itemSpacings = [60, 63, 42]
+      m.contentContainer.itemSpacings = [60, m.sectionTabsSpacing, 42]
     end if
 
     m.top.selectedSection = tabId
@@ -358,6 +497,11 @@ Function onActionButtonSelected(msg)
     setComponentInteractionEventForButton("CONFIRM", buttonSelected)
 
     buttonId = buttonSelected.id
+    if buttonId = "ratingsLiked"
+      buttonId = "like"
+    else if buttonId = "ratingsDisliked"
+      buttonId = "dislike"
+    end if
     m.top.ctaSelectedButtonId = buttonId
   end if
 End Function
@@ -369,6 +513,9 @@ End Function
 Function onContentContainerFocusIndexChange(msg)
   focusedIndex = msg.getData()
   if focusedIndex <> invalid
+    if focusedIndex <> 1 AND m.ratingsOverlay.visible = true
+      hideRatingsOverlay()
+    end if
     m.top.shouldPauseVideoPreview = focusedIndex > 1
     componentGainingFocus = m.contentContainer.componentGainingFocus
     m.leftChevron.visible = (m.isLeftBackExitEnabled = true AND focusedIndex = 1)
@@ -398,7 +545,7 @@ Function onContentContainerFocusIndexChange(msg)
       if focusedIndex = 1
         ' User is on action buttons - slide down to show buttons area
         slideTo(m.contentContainer, m.aboveFoldGradientTranslation, 0.3)
-        m.contentContainer.itemSpacings = [60, 63, 24]
+        m.contentContainer.itemSpacings = [60, m.sectionTabsSpacing, 24]
         fade(m.actionButtonList, "in", 0.3)
         ' Use foreground-10 when action buttons are focused
         m.sectionTabs.buttonBackgroundBlendColor = m.neutralColor2
@@ -417,7 +564,7 @@ Function onContentContainerFocusIndexChange(msg)
         bottomSpacing = 0 ' For episodes section
         if isEpisodesSection = false then bottomSpacing = 42 ' For other sections
 
-        m.contentContainer.itemSpacings = [60, 63, bottomSpacing]
+        m.contentContainer.itemSpacings = [60, m.sectionTabsSpacing, bottomSpacing]
       end if
     end if
   end if
@@ -431,6 +578,12 @@ Function onActionButtonFocused(msg) as Void
   focusedButton = msg.getData()
   if focusedButton <> invalid AND m.top.shouldPauseVideoPreview = true
     m.top.shouldPauseVideoPreview = false
+  end if
+  if focusedButton <> invalid AND focusedButton.id = "like"
+    showRatingsOverlay()
+  end if
+  if focusedButton <> invalid AND focusedButton.id <> "like" AND m.ratingsOverlay.visible = true
+    hideRatingsOverlay()
   end if
 End Function
 
@@ -705,6 +858,45 @@ Function addLikeDislikeButtons(buttons, like) as Void
   })
 End Function
 
+' Adds a single Ratings button that triggers an overlay for like/dislike                                                                                                                                       │
+' When already rated, shows the rated state and allows removal on OK press                                                                                                                                     │
+' @param buttons - Array, the buttons list to append to                                                                                                                                                        │
+' @param like - Object, the like object or invalid                                                                                                                                                             │
+Function addRatingsButton(buttons, like) as Void
+  if like <> invalid AND like.state = "liked"
+    buttons.push({
+      id: "ratingsLiked"
+      title: getTranslation("screenDetails_button_liked")
+      iconUrl: "pkg:/images/icon-liked.webp"
+      trackingContext: createButtonAnalytics("ratingsLiked")
+    })
+  else if like <> invalid AND like.state = "disliked"
+    buttons.push({
+      id: "ratingsDisliked"
+      title: getTranslation("screenDetails_button_disliked")
+      iconUrl: "pkg:/images/icon-disliked.webp"
+      trackingContext: createButtonAnalytics("ratingsDisliked")
+    })
+  else
+    if m.v3ExperimentEnabled = true
+      buttons.push({
+        id: "like"
+        title: getTranslation("screenDetails_button_like")
+        iconUrl: "pkg:/images/icon-like.webp"
+        padding: 66
+        trackingContext: createButtonAnalytics("like")
+      })
+    else
+      buttons.push({
+        id: "ratings"
+        title: getTranslation("screenDetails_button_likeDislike")
+        iconUrl: "pkg:/images/icon-like.webp"
+        trackingContext: createButtonAnalytics("ratings")
+      })
+    end if
+  end if
+End Function
+
 
 ' Adds remove from history button if content has history
 ' @param buttons - Array, the buttons list to append to
@@ -774,6 +966,31 @@ End Function
 ' @return Boolean - True if event was handled, false otherwise
 Function onKeyEvent(key as String, press as Boolean) as Boolean
   if press = true
+    ' Handle navigation when ratings overlay is active
+    if m.ratingsOverlay.visible = true
+      if key = "left"
+        hideRatingsOverlay()
+        targetIndex = m.actionButtonList.focusedIndex - 1
+        if targetIndex >= 0
+          m.actionButtonList.jumpToIndex = targetIndex
+        end if
+        m.actionButtonList.setFocus(true)
+        return true
+      else if key = "right"
+        hideRatingsOverlay()
+        targetIndex = m.actionButtonList.focusedIndex + 1
+        if targetIndex < m.actionButtonList.getChildCount()
+          m.actionButtonList.jumpToIndex = targetIndex
+        end if
+        m.actionButtonList.setFocus(true)
+        return true
+      else if key = "down"
+        hideRatingsOverlay()
+        m.contentContainer.jumpToIndex = 3
+        return true
+      end if
+    end if
+
     if key = "back"
       if m.contentContainer.focusedIndex <> 1
         m.actionButtonList.jumpToIndex = 0
@@ -788,8 +1005,12 @@ Function onKeyEvent(key as String, press as Boolean) as Boolean
     else if key = "left" AND m.contentContainer.focusedIndex = 1 AND m.isLeftBackExitEnabled = true
       m.top.shouldPauseVideoPreview = true
       fireButtonComponentInteractionEvent("LEFT", "IMAGE", "CONFIRM")
-      fireNavigateToSideNavEvent()
-      setSideNavState(true)
+      if m.v3ExperimentEnabled = true
+        m.top.backButtonPressed = true
+      else
+        fireNavigateToSideNavEvent()
+        setSideNavState(true)
+      end if
       return true
     end if
   end if
