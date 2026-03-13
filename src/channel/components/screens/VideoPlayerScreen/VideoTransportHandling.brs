@@ -2307,6 +2307,9 @@ End Function
 Function showBrowseWhileWatching()
   if m.top.appMode <> "KIDS_MODE" AND m.top.isTrailer = false
 
+    '//fire the roku_bww_landscape_v2 exposure event
+    getStatsigExperimentResource("roku_player_improvement", "roku_bww_landscape_v2")
+
     content = m.top.relatedContent
 
     if content <> invalid AND content.getChildCount() > 0

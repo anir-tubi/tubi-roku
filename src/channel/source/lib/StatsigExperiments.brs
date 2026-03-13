@@ -60,7 +60,7 @@ Function StatsigExperimentsInterface(statsigExperimentsInfo) as Object
           default: { countdown: 15, simplifiedUI: false, automaticSkipRecap: false }
         }
         ' Testing the BWW posters with landscape layout instead of portrait
-        roku_bww_landscape_v1: {
+        roku_bww_landscape_v2: {
           default: { enabled: false }
         }
       }

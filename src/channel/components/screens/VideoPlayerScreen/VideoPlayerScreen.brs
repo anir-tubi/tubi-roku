@@ -647,7 +647,7 @@ Function initExperiments()
   m.isSubtitleOverlayExperimentEnabled = getStatsigExperimentResource("roku_player_improvement", "roku_player_subtitle_overlay_v1", false).enabled
 
   ' BWW Landscape experiment
-  m.isBWWLandscapeEnabled = getStatsigExperimentResource("roku_player_improvement", "roku_bww_landscape_v1", false).enabled
+  m.isBWWLandscapeEnabled = getStatsigExperimentResource("roku_player_improvement", "roku_bww_landscape_v2", false).enabled
 
 End Function
 
