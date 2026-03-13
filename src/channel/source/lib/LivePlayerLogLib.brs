@@ -617,7 +617,7 @@ Function playerLogLib_fireLiveQualityOfServiceEvent()
 
   ' Add manifest URL length to message_map for debugging/analytics
   qualityOfServiceInfo["message_map"] = {
-    "media_url_length": m.manifestUrlLength
+    "media_url_length": m.manifestUrlLength.toStr()
   }
 
   m.sendEvent(qualityOfServiceInfo, "live_quality_of_services", eventBase)
