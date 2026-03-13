@@ -251,10 +251,15 @@ Function tubiMetadataTranslate_processSotStaticConfig(contentFromServer as Objec
   if isAA(m.soTStaticConfig) = true AND m.soTStaticConfig.count() > 0 AND isAA(m.soTStaticConfig.customizations) = true
     contentId = contentFromServer.id
     newEpisodesMatch = false
+    onlyOnTubiMatch = false
     tubiPresentsMatch = false
 
     if m.soTStaticConfig.newEpisode <> invalid AND m.soTStaticConfig.newEpisode[contentId] = true
       newEpisodesMatch = true
+    end if
+
+    if m.soTStaticConfig.onlyOnTubi <> invalid AND m.soTStaticConfig.onlyOnTubi[contentId] = true
+      onlyOnTubiMatch = true
     end if
 
     if m.soTStaticConfig.tubiPresents <> invalid AND m.soTStaticConfig.tubiPresents[contentId] = true
@@ -279,6 +284,23 @@ Function tubiMetadataTranslate_processSotStaticConfig(contentFromServer as Objec
       topLabel = {}
       topLabel.sotIcon = ""
       topLabel.sotLabelText = newEpisodeTemplate
+      sotMetaDatatoplabels.push(topLabel)
+      sotInfo.sotMetaDatatoplabels = sotMetaDatatoplabels
+    else if onlyOnTubiMatch = true AND isAA(customizations.only_on_tubi) = true AND isNonEmptyString(customizations.only_on_tubi.template) = true
+      onlyOnTubiTemplate = customizations.only_on_tubi.template
+      if isAA(sotInfo) = false
+        sotInfo = {}
+      end if
+
+      sotInfo.sotPosterLabels = {
+        sotIcon: ""
+        sotLabelText: onlyOnTubiTemplate
+      }
+
+      sotMetaDatatoplabels = []
+      topLabel = {}
+      topLabel.sotIcon = ""
+      topLabel.sotLabelText = onlyOnTubiTemplate
       sotMetaDatatoplabels.push(topLabel)
       sotInfo.sotMetaDatatoplabels = sotMetaDatatoplabels
     end if
@@ -1733,8 +1755,8 @@ Function tubiMetadataTranslate_buildCategoryChildrenInfo(container, contents, co
 
           end if
 
-          ' New Episode and Tubi Presents content IDs are sourced directly from the SotStatic response.
-          ' When comparing with other ui_customization children from the homescreen response, New Episode takes priority.
+          ' New Episode, Only On Tubi, and Tubi Presents content IDs are sourced directly from the SotStatic response.
+          ' Priority order: New Episode > Only On Tubi > Rest of SOT labels (including Tubi Presents).
           sotInfo = m.processSotStaticConfig(fullChild, sotInfo)
 
           ' Use the updated sotPosterLabels from sotInfo if available, otherwise use the original sotPosterLabels

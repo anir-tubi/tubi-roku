@@ -551,6 +551,7 @@ Function parseSoTStaticConfigSuccess(fullResponse, reqInfo)
   response = fullResponse.data
   parsedResponse = {}
   newEpisode = {}
+  onlyOnTubi = {}
   tubiPresents = {}
 
   if response <> invalid
@@ -566,6 +567,16 @@ Function parseSoTStaticConfigSuccess(fullResponse, reqInfo)
       end for
     end if
 
+    onlyOnTubiContentIds = response.only_on_tubi
+    if onlyOnTubiContentIds <> invalid then
+      for each id in onlyOnTubiContentIds
+        if isString(id) = false
+          id = id.toStr()
+        end if
+        onlyOnTubi[id] = true
+      end for
+    end if
+
     tpContentIds = response.tubi_presents
     if tpContentIds <> invalid then
       for each id in tpContentIds
@@ -577,6 +588,7 @@ Function parseSoTStaticConfigSuccess(fullResponse, reqInfo)
     end if
 
     parsedResponse.newEpisode = newEpisode
+    parsedResponse.onlyOnTubi = onlyOnTubi
     parsedResponse.tubiPresents = tubiPresents
     return parsedResponse
   end if
