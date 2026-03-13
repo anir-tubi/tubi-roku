@@ -144,6 +144,27 @@ Function PerformanceMetricsTracker() as Object
     End Function
 
     '**
+    ' * Tracks base channel startup time metric
+    ' *
+    ' * Measures and stores the base channel startup time from app start to load time.
+    ' *
+    ' * @param {Integer} baseChannelStartupTime - Startup time in milliseconds from roAppManager
+    ' * @return {Void}
+    ' * @example tracker.trackBaseChannelStartupTime()
+    '**
+    ' Track base channel startup time from app start to load time.
+    trackBaseChannelStartupTime: Function() as Void
+      baseChannelStartupTime = 0
+      appManager = createObject("roAppManager")
+
+      if appManager <> invalid
+        baseChannelStartupTime = appManager.getUpTime().totalMilliseconds()
+      end if
+
+      m.appLaunchMetrics["base_channel_startup_time"] = baseChannelStartupTime
+    End Function
+
+    '**
     ' * Logs all app launch metrics to the tracking system
     ' *
     ' * Sends all collected app launch metrics to the analytics/logging system

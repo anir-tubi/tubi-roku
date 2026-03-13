@@ -42,6 +42,8 @@ Function init()
 
   m.top.observeFieldScoped("startupArgs", "onStartupArgs")
 
+  m.performanceMetricsTracker.trackBaseChannelStartupTime()
+
   m.isExternalConfigReady = false ' Used to know when external config has been loaded so we know if we can proceed
   ' TODO: CLEAN UP THE CODE LATER. REMOVING POPPER FOR SUBMISSION.
   m.isExperimentsConfigReady = true ' Used to know when experiments have been loaded so we know if we can proceed
