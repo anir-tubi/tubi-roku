@@ -214,6 +214,8 @@ Function tubiMetadataTranslate_translateBackendTypeToClientSideType(sBackendType
     sReturn = m.contentTypes.sportsEvent
   else if sBackendType = "n"
     sReturn = m.contentTypes.navigate
+  else if sBackendType = "app"
+    sReturn = m.contentTypes.app
   end if
 
   return sReturn
@@ -613,6 +615,12 @@ Function tubiMetadataTranslate_translateRecursive(contentFromServer as Object, t
   if sPortraitURL <> ""
     translatedContent.portrait = sPortraitURL
     translatedContent.HDGRIDPOSTERURL = sPortraitURL
+  end if
+
+  if contentFromServer.type = "app" AND isAA(contentFromServer.images) = true AND isNonEmptyArray(contentFromServer.images.logo) = true
+    translatedContent.logo = m.getRoundedCornersURL(contentFromServer.images.logo[0], 999)
+  else
+    translatedContent.logo = ""
   end if
 
   if (translatedContent.HDGRIDPOSTERURL = invalid OR translatedContent.HDGRIDPOSTERURL = "") AND contentFromServer.HDGRIDPOSTERURL <> invalid
@@ -1840,7 +1848,11 @@ Function tubiMetadataTranslate_buildCategoryChildrenInfo(container, contents, co
 
           if childAA.type <> "ContentNode"
             '//if the subtype is not the default ContentNode, then set the gridItemType field
-            childAA.gridItemType = gridType
+            if childAA.type = m.constants.ui.contentTypes.app
+              childAA.gridItemType = gridItemTypes.appItem
+            else
+              childAA.gridItemType = gridType
+            end if
           end if
 
           sHDGridPosterURL = m.getThumbnailImage(fullChild, gridType)
@@ -3083,6 +3095,33 @@ End Function
 Function tubiMetadataTranslate_translateSearchResults(contentToTranslate, isSignedInUser)
   containers = contentToTranslate.containers
   contents = contentToTranslate.contents
+
+  ' V3 search API returns apps as a separate top-level key; merge into contents
+  ' so app-type items can be resolved the same way as content items
+  apps = contentToTranslate.apps
+  if isNonEmptyAA(apps) = true
+    if isAA(contents) = true
+      contents.append(apps)
+    else
+      contents = apps
+    end if
+  end if
+
+  ' V3 search API uses "items" (array of {id, type} objects) instead of
+  ' "children" (flat array of ID strings). Normalize to V2 format so
+  ' downstream buildCategoryAA/buildCategoryChildrenInfo work unchanged.
+  if isNonEmptyArray(containers) = true
+    container = containers[0]
+    if container.children = invalid AND isNonEmptyArray(container.items) = true
+      childrenIds = []
+      for each item in container.items
+        if isAA(item) = true AND isNonEmptyString(item.id) = true
+          childrenIds.push(item.id)
+        end if
+      end for
+      container.children = childrenIds
+    end if
+  end if
 
   translated = CreateObject("roSGNode", "ContentNode")
   if isNonEmptyArray(containers) = true AND isAA(contents) = true

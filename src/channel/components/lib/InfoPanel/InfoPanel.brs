@@ -11,11 +11,15 @@ Function init()
   m.channelNameHeader = m.top.findNode("channelNameHeader")
   m.leftHeaderImage = m.top.findNode("LeftHeaderImage")
 
+  m.titleGroup = m.top.findNode("TitleGroup")
   m.title = m.top.findNode("Title")
   m.titleImage = m.top.findNode("TitleImage")
   ' We are only limiting the height since title logo is displayed on it's own row we are good to let the width flow.
   m.titleImage.loadHeight = m.constants.ui.imageSizes.title[1]
   m.titleImage.loadWidth = m.constants.ui.imageSizes.title[0]
+  m.titleLogo = m.top.findNode("TitleLogo")
+  m.titleLogo.width = m.constants.ui.imageSizes.titleLogo[0]
+  m.titleLogo.height = m.constants.ui.imageSizes.titleLogo[1]
   m.episode = m.top.findNode("Episode")
   m.twoLineInfo = m.top.findNode("TwoLineInfo")
 
@@ -73,6 +77,7 @@ Function init()
   m.top.observeFieldScoped("leftHeaderImageUri", "onLeftHeaderImageUriChange")
   m.top.observeFieldScoped("sotTopLabelSignals", "onSotTopLabelSignalsChange")
   m.top.observeFieldScoped("titleImageUri", "onTitleImageChange")
+  m.top.observeFieldScoped("titleLogoUri", "onTitleLogoChange")
   m.top.observeFieldScoped("description", "onDescriptionChange")
   m.top.observeFieldScoped("lineOneData", "onLineOneDataChange")
   m.top.observeFieldScoped("lineTwoData", "onLineTwoDataChange")
@@ -252,7 +257,13 @@ Function onWidthChange()
 
   if m.title.width <> 0
     '//if the title is set to 0, then we do not want to make changes to the width of the title
-    m.title.width = topWidth - m.title.translation[0]
+    titleWidth = topWidth - m.titleGroup.translation[0]
+    ' When the TitleLogo is present inside TitleGroup, subtract its width plus
+    ' the LayoutGroup itemSpacing so the label does not overflow the panel edge.
+    if m.titleLogo <> invalid AND m.nodeHelpers.getChildIndex(m.titleGroup, m.titleLogo) >= 0
+      titleWidth = titleWidth - m.titleLogo.width - m.titleGroup.itemSpacings[0]
+    end if
+    m.title.width = titleWidth
   end if
 
   m.episode.width = topWidth - m.episode.translation[0]
@@ -260,10 +271,16 @@ Function onWidthChange()
   ' The description text needs a right margin which matches its left margin
   m.description.width = topWidth - 2 * m.description.translation[0]
   ' Reduce the director width based on "Direct by..." prefix
-  directorPrefixBoundingRect = m.top.findNode("DirectorPrefix").boundingRect()
-  m.director.width = topWidth - directorPrefixBoundingRect.width + m.directorGroup.itemSpacings[0] - m.directorGroup.translation[0]
-  starringPrefixBoundingRect = m.top.findNode("StarringPrefix").boundingRect()
-  m.starring.width = topWidth - starringPrefixBoundingRect.width + m.starringGroup.itemSpacings[0] - m.starringGroup.translation[0]
+  directorPrefix = m.top.findNode("DirectorPrefix")
+  if directorPrefix <> invalid
+    directorPrefixBoundingRect = directorPrefix.boundingRect()
+    m.director.width = topWidth - directorPrefixBoundingRect.width + m.directorGroup.itemSpacings[0] - m.directorGroup.translation[0]
+  end if
+  starringPrefix = m.top.findNode("StarringPrefix")
+  if starringPrefix <> invalid
+    starringPrefixBoundingRect = starringPrefix.boundingRect()
+    m.starring.width = topWidth - starringPrefixBoundingRect.width + m.starringGroup.itemSpacings[0] - m.starringGroup.translation[0]
+  end if
   m.descriptionFocusButton.width = topWidth + -m.descriptionGroup.translation[0]
 End Function
 
@@ -294,8 +311,8 @@ Function onEpisodeTitleChange(msg)
 
   if isNonEmptyString(episodeTitle) = true
     if episodeIsPresent = false
-      parent = m.title.getParent()
-      programEpisodeIndex = m.nodeHelpers.getChildIndex(parent, m.title) + 1
+      parent = m.titleGroup.getParent()
+      programEpisodeIndex = m.nodeHelpers.getChildIndex(parent, m.titleGroup) + 1
       m.offset.insertChild(m.episode, programEpisodeIndex)
     end if
     m.episode.text = episodeTitle
@@ -315,8 +332,8 @@ Function onEpisodeTitleChange(msg)
     ' Reposition sotMarker to be below title if marker exists
     if m.sotMarker <> invalid AND m.sotMarker.getParent() <> invalid
       m.offset.removeChild(m.sotMarker)
-      if m.title <> invalid
-        titleIndex = m.nodeHelpers.getChildIndex(m.offset, m.title)
+      if m.titleGroup <> invalid
+        titleIndex = m.nodeHelpers.getChildIndex(m.offset, m.titleGroup)
         if titleIndex <> -1
           m.offset.insertChild(m.sotMarker, titleIndex + 1)
         end if
@@ -404,8 +421,8 @@ Function insertSotMarkerAtCorrectPosition() as Void
   if m.sotMarker = invalid then return
 
   insertIndex = -1
-  if m.title <> invalid
-    titleIndex = m.nodeHelpers.getChildIndex(m.offset, m.title)
+  if m.titleGroup <> invalid
+    titleIndex = m.nodeHelpers.getChildIndex(m.offset, m.titleGroup)
     if titleIndex <> -1
       ' Check if episode title exists and is positioned after title
       if m.episode <> invalid AND m.episode.getParent() <> invalid
@@ -1013,11 +1030,11 @@ Function onTitleImageChange(msg)
   titleImageUri = msg.getData()
   ' Since we are controlling when this value set from within info panel mixin we do not have to provide additional mode checks here.
   if isNonEmptyString(titleImageUri) = true
-    parent = m.title.getParent()
-    index = m.nodeHelpers.getChildIndex(parent, m.title)
+    parent = m.titleGroup.getParent()
+    index = m.nodeHelpers.getChildIndex(parent, m.titleGroup)
     if index >= 0
       m.offset.insertChild(m.titleImage, index)
-      m.offset.removeChild(m.title)
+      m.offset.removeChild(m.titleGroup)
     end if
 
     m.titleImage.uri = titleImageUri
@@ -1025,12 +1042,35 @@ Function onTitleImageChange(msg)
     parent = m.titleImage.getParent()
     index = m.nodeHelpers.getChildIndex(parent, m.titleImage)
     if index >= 0
-      m.offset.insertChild(m.title, index)
+      m.offset.insertChild(m.titleGroup, index)
       m.offset.removeChild(m.titleImage)
     end if
 
     m.titleImage.uri = ""
   end if
+  shouldCalculateHeight()
+End Function
+
+
+Function onTitleLogoChange(msg)
+  tubiLog("InfoPanel.onTitleLogoChange")
+  titleLogoUri = msg.getData()
+  if isNonEmptyString(titleLogoUri) = true
+    index = m.nodeHelpers.getChildIndex(m.titleGroup, m.titleLogo)
+    if index = -1
+      m.titleGroup.insertChild(m.titleLogo, 0)
+    end if
+
+    m.titleLogo.uri = titleLogoUri
+  else
+    index = m.nodeHelpers.getChildIndex(m.titleGroup, m.titleLogo)
+    if index >= 0
+      m.titleGroup.removeChild(m.titleLogo)
+    end if
+
+    m.titleLogo.uri = ""
+  end if
+  onWidthChange()
   shouldCalculateHeight()
 End Function
 
@@ -1069,8 +1109,8 @@ Function onDirectorsChange(msg)
       insertIndex = m.nodeHelpers.getChildIndex(top, m.twoLineInfo)
     else if m.episode.getParent() <> invalid
       insertIndex = m.nodeHelpers.getChildIndex(top, m.episode)
-    else if m.title.getParent() <> invalid
-      insertIndex = m.nodeHelpers.getChildIndex(top, m.title)
+    else if m.titleGroup.getParent() <> invalid
+      insertIndex = m.nodeHelpers.getChildIndex(top, m.titleGroup)
     end if
 
     m.offset.insertChild(m.directorGroup, insertIndex)
@@ -1114,8 +1154,8 @@ Function onStarringChange(msg)
       insertIndex = m.nodeHelpers.getChildIndex(top, m.twoLineInfo)
     else if m.episode.getParent() <> invalid
       insertIndex = m.nodeHelpers.getChildIndex(top, m.episode)
-    else if m.title.getParent() <> invalid
-      insertIndex = m.nodeHelpers.getChildIndex(top, m.title)
+    else if m.titleGroup.getParent() <> invalid
+      insertIndex = m.nodeHelpers.getChildIndex(top, m.titleGroup)
     end if
 
     m.offset.insertChild(m.starringGroup, insertIndex)
@@ -1231,6 +1271,7 @@ Function resetDefaultState()
   m.top.needsLogin = false
   m.top.reminderIsSet = false
   m.top.airDateTime = ""
+  m.top.titleLogoUri = ""
 
 End Function
 
@@ -1269,7 +1310,7 @@ Function onModeChange()
     m.infoPanelGroup.appendChild(m.offset)
     offsetChildrenArray = [
       m.sotTopLabelGroup,
-      m.title,
+      m.titleGroup,
       m.twoLineInfo,
       m.descriptionGroup
     ]
@@ -1298,7 +1339,7 @@ Function onModeChange()
     m.infoPanelGroup.appendChild(m.offset)
     offsetChildrenArray = [
       m.sotTopLabelGroup,
-      m.title,
+      m.titleGroup,
       m.twoLineInfo,
       m.descriptionGroup
     ]
@@ -1332,7 +1373,7 @@ Function onModeChange()
     m.infoPanelGroup.appendChild(m.offset)
     offsetChildrenArray = [
       m.sotTopLabelGroup,
-      m.title,
+      m.titleGroup,
       m.episode,
       m.twoLineInfo,
       m.descriptionGroup
@@ -1369,7 +1410,7 @@ Function onModeChange()
     ' used for episodes on the episode list screen
     m.infoPanelGroup.appendChild(m.offset)
     offsetChildrenArray = [
-      m.title,
+      m.titleGroup,
       m.episode,
       m.twoLineInfo,
       m.descriptionGroup
@@ -1406,7 +1447,7 @@ Function onModeChange()
     m.infoPanelGroup.appendChild(m.offset)
 
     offsetChildrenArray = [
-      m.title,
+      m.titleGroup,
       m.twoLineInfo,
       m.descriptionGroup
     ]
@@ -1424,7 +1465,7 @@ Function onModeChange()
     m.infoPanelGroup.appendChild(m.offset)
 
     offsetChildrenArray = [
-      m.title,
+      m.titleGroup,
       m.descriptionGroup
     ]
 
@@ -1436,7 +1477,7 @@ Function onModeChange()
     m.infoPanelGroup.appendChild(m.offset)
     offsetChildrenArray = [
       m.topHeaderGroup,
-      m.title,
+      m.titleGroup,
       m.descriptionGroup,
       m.playerCountdownGroup
     ]
@@ -1451,7 +1492,7 @@ Function onModeChange()
     m.infoPanelGroup.appendChild(m.offset)
 
     offsetChildrenArray = [
-      m.title,
+      m.titleGroup,
       m.twoLineInfo,
       m.descriptionGroup,
     ]
@@ -1478,7 +1519,7 @@ Function onModeChange()
     ' when linear content is focused on the search screen
     m.infoPanelGroup.appendChild(m.offset)
     offsetChildrenArray = [
-      m.title,
+      m.titleGroup,
       m.twoLineInfo,
       m.descriptionGroup,
     ]
@@ -1499,7 +1540,7 @@ Function onModeChange()
     m.infoPanelGroup.appendChild(m.offset)
 
     offsetChildrenArray = [
-      m.title,
+      m.titleGroup,
       m.twoLineInfo
     ]
 
@@ -1523,7 +1564,7 @@ Function onModeChange()
     m.infoPanelGroup.appendChild(m.offset)
 
     offsetChildrenArray = [
-      m.title
+      m.titleGroup
     ]
 
     if isNonEmptyString(m.episode.text)
@@ -1540,6 +1581,16 @@ Function onModeChange()
     m.secondLineGroup.appendChild(m.line2)
 
     m.offset.itemSpacings = [13, 16, 13]
+  else if m.top.mode = m.constants.ui.infoPanelModes.app
+    m.infoPanelGroup.appendChild(m.offset)
+
+    offsetChildrenArray = [
+      m.titleGroup,
+      m.descriptionGroup
+    ]
+
+    appendChildrenToParent(offsetChildrenArray, m.offset)
+    m.offset.itemSpacings = [16]
   end if
 End Function
 

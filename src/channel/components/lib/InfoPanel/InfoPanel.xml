@@ -51,6 +51,7 @@
 
     <field id="title" alias="Title.text" />
     <field id="titleImageUri" type="string" alwaysNotify="true" />
+    <field id="titleLogoUri" type="string" alwaysNotify="true" />
     <field id="titleTypography" type="string" alwaysNotify="true" />
     <field id="leftHeaderImageUri" type="string" />
     <field id="liveBadgeHeaderText" type="string" />
@@ -180,12 +181,16 @@
         <Poster
           id="TitleImage"
           loadDisplayMode="limitSize"/>
+        
+        <Poster
+          id="TitleLogo"
+          loadDisplayMode="limitSize" />
 
         <LayoutGroup
           id="TitleGroup"
           layoutDirection="horiz"
           vertAlignment="center"
-          itemSpacings="[20]"
+          itemSpacings="[16]"
           addItemSpacingAfterChild="true">
           <Label
             id="Title"

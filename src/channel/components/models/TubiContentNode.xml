@@ -12,6 +12,7 @@
     <field id="playerType" type="string" />
     <field id="landscape" type="string" />
     <field id="portrait" type="string" />
+    <field id="logo" type="string" />
     <field id="genres" type="stringarray" />
     <field id="hasSubtitles" type="boolean" />
     <field id="hasAudioDescription" type="boolean" />

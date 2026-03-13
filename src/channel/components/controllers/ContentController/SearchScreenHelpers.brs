@@ -107,11 +107,12 @@ Function searchFromScreen(searchText, personalizationID = invalid, inputDevice =
 
   if bSearchNonDefaultResults = true
     includeLinear = isUserInAdultsMode() = true AND isKidsUIOn() = false
+    includeApps = getStatsigExperimentResource("roku_search_creator_tile", "roku_search_creator_tile_v1", true).enabled = true
     if isNonEmptyString(inputDevice) = false
       ' assume the input device is remote unless specified otherwise.
       inputDevice = m.constants.inputDevices.remote
     end if
-    searchReqInfo = m.CmsApi.createSearchReqInfo(searchText, kidsMode, personalizationID, includeLinear)
+    searchReqInfo = m.CmsApi.createSearchReqInfo(searchText, kidsMode, personalizationID, includeLinear, includeApps)
     m.currentSearchScreenRequestInfo = m.makeRequest({
       url: searchReqInfo.url
       requestType: m.constants.reqNames.getSearchScreen

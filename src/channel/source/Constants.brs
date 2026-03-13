@@ -621,6 +621,10 @@ Function getConstants()
   if constants.settings.mode <> "production" AND constants.settings.stagingApis = true
     constants.urls.search = "https://search.staging-public.tubi.io/api/v2/search"
   end if
+  constants.urls.searchV3 = "https://search.production-public.tubi.io/api/v3/search"
+  if constants.settings.mode <> "production" AND constants.settings.stagingApis = true
+    constants.urls.searchV3 = "https://search.staging-public.tubi.io/api/v3/search"
+  end if
 
   'autocomplete search url
   constants.urls.autocomplete = "https://search.production-public.tubi.io/api/v1/autocomplete"
@@ -1325,6 +1329,7 @@ Function getConstants()
   constants.ui.infoPanelModes.linearSearch = "linearSearch"
   constants.ui.infoPanelModes.linearProgramHomescreen = "linearProgramHomescreen" 'v4 api
   constants.ui.infoPanelModes.sportsEvent = "sportsEvent"
+  constants.ui.infoPanelModes.app = "app"
 
   constants.ui.contentMode = {}
   ' these are also used for the content experience choices but are the value that is sent to the back end in our api requests
@@ -1350,6 +1355,10 @@ Function getConstants()
   constants.ui.contentTypes.adRowlistSpotlight = "adRowlistSpotlight"
   constants.ui.contentTypes.adRowlistCarousel = "adRowlistCarousel"
   constants.ui.contentTypes.movie = "movie"
+  constants.ui.contentTypes.app = "app"
+
+  constants.ui.appTypes = {}
+  constants.ui.appTypes.creator = "CREATOR"
 
   constants.ui.playerTypes = {}
   constants.ui.playerTypes.fox = "fox"
@@ -1531,6 +1540,9 @@ Function getConstants()
   'Sizes of video title image (if available) that need to sent to the backend so Tupian, the dynamic image sizer tool, can provide the correct sized images. The video title image is an image representation of the title metadata of the video. Not all videos may have this image.
   constants.ui.imageSizes.title = [600, 201]
 
+  'Size of the title logo displayed on the info panel.
+  constants.ui.imageSizes.titleLogo = [64, 64]
+
   'Size of the network logo.
   constants.ui.imageSizes.networkLogo = [178, 90]
 
@@ -1596,6 +1608,7 @@ Function getConstants()
   constants.ui.imageSizes.creatorDetailScreenLogo = [36, 36]
   constants.ui.imageSizes.creatorScreenLogo = [64, 64]
   constants.ui.imageSizes.creatorScreenBackground = [1161, 651]
+  constants.ui.imageSizes.creatorTileLogo = [195, 195]
 
   ' Size for the background image.
   if limitedUi = true
@@ -1705,6 +1718,7 @@ Function getConstants()
   constants.ui.gridItemTypes.liveEventBanner = "liveEventBanner"
   constants.ui.gridItemTypes.controlLandscape = "controlLandscape"
   constants.ui.gridItemTypes.episodeItem = "episodeItem"
+  constants.ui.gridItemTypes.appItem = "appItem"
   constants.ui.gridItemTypes.episodeItemLatestEpisodes = "episodeItemLatestEpisodes"
 
   ' Holds the container ids which are not video tile containers.

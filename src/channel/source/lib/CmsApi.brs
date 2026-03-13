@@ -33,6 +33,7 @@ Function CmsApi(constants, apiUtilsLib, experiments = invalid, experimentsInterf
 
     ' private
     setImageParams: cmsApi_setImageParams
+    setAppImageParams: cmsApi_setAppImageParams
     setTupianPosterParam: cmsApi_setTupianPosterParam
     setTupianLandscapeParam: cmsApi_setTupianLandscapeParam
     setTupianBackgroundParam: cmsApi_setTupianBackgroundParam
@@ -654,7 +655,8 @@ End Function
 ' @sAutoCompleteSessionID: string, If this is a search requesting stemming from an autocomplete suggestion, then
 '       send the personalization_id that was sent back from the autocomplete request
 ' @includeLinear: boolean, should linear content be included in the search results
-Function cmsApi_createSearchReqInfo(searchText, bKidsMode = false, sAutoCompleteSessionID = invalid, includeLinear = true)
+' @includeApps: boolean, should creator apps be included in the search results
+Function cmsApi_createSearchReqInfo(searchText, bKidsMode = false, sAutoCompleteSessionID = invalid, includeLinear = true, includeApps = false)
   url = m.constants.urls.search
   options = m.getCommonOptions()
   options.params["search"] = searchText
@@ -677,10 +679,36 @@ Function cmsApi_createSearchReqInfo(searchText, bKidsMode = false, sAutoComplete
     options.params["include_linear"] = true
   end if
 
+  if includeApps = true
+    url = m.constants.urls.searchV3
+    options.params["include_creator_apps"] = true
+    options.params = m.setAppImageParams(options.params)
+  end if
+
   return {
     url: url
     options: options
   }
+End Function
+
+
+' Adds app_images query parameters for V3 search requests (background, logo, etc)
+' Similar to cmsApi_setImageParams() but for creator app image sizes
+' @existingParams: assocArray, any parameters that have already been defined
+Function cmsApi_setAppImageParams(existingParams = {})
+  imageSizes = m.constants.ui.imageSizes
+  background = imageSizes.background
+  tileLogo = imageSizes.creatorTileLogo
+
+  if m.constants.ui.imageSizeMultiplier < 1 then
+    background = m.convertImageSizeFor720p(background)
+    tileLogo = m.convertImageSizeFor720p(tileLogo)
+  end if
+
+  existingParams["app_images[background_tb]"] = "w" + background[0].toStr() + "h" + background[1].toStr() + "_background"
+  existingParams["app_images[logo]"] = "w" + tileLogo[0].toStr() + "h" + tileLogo[1].toStr() + "_logo"
+
+  return existingParams
 End Function
 
 

@@ -214,6 +214,8 @@ Function onItemContentChange(msg)
       childGridItemComponent = "LiveEventsContainer"
     else if gridItemType = "liveEventBanner"
       childGridItemComponent = "Banner"
+    else if gridItemType = "appItem"
+      childGridItemComponent = "AppItem"
     else if itemContent.needsLogin = true
       childGridItemComponent = "CategoryGridPoster"
     else

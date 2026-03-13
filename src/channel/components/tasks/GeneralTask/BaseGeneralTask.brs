@@ -507,6 +507,13 @@ Function processSuccessResponse(result, callbackTypes, job)
           end if
 
           if outputTypeMatches = true then
+            if isAA(job.reqInfo.responseContext) = true
+              if isAA(output) = true
+                output.responseContext = job.reqInfo.responseContext
+              else if isNode(output) = true
+                output.update({ "responseContext": job.reqInfo.responseContext }, true)
+              end if
+            end if
             ' If the output matches the expected type then we can set it as the response
             job.reqInfo.callbackNode.response = output
           else
@@ -673,6 +680,14 @@ Function processErrorResponse(result, callbackTypes, job)
   ' some requests might not require error handling, and therefore may not have a parseError callback
   if parserCallback <> invalid then
     output = parserCallback(result.response, job.reqInfo)
+
+    if isAA(job.reqInfo.responseContext) = true
+      if isAA(output) = true
+        output.responseContext = job.reqInfo.responseContext
+      else if isNode(output) = true
+        output.update({ "responseContext": job.reqInfo.responseContext }, true)
+      end if
+    end if
 
     ' this block will execute only for batch responses
     if job.batchInfo <> invalid AND job.batchInfo.id <> invalid

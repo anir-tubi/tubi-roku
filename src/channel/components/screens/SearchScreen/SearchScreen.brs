@@ -734,6 +734,10 @@ Function onItemFocused(msg)
         m.searchScreenInfoPanel.needsLogin = false
       end if
 
+    else if focusedContent.type = m.constants.ui.contentTypes.app
+      m.searchScreenInfoPanel.mode = m.constants.ui.infoPanelModes.app
+      m.searchScreenInfoPanel.titleLogoUri = focusedContent.logo
+
     else
       m.searchScreenInfoPanel.mode = m.constants.ui.infoPanelModes.item
       lineOneData = {

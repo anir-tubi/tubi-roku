@@ -154,6 +154,12 @@ Function StatsigExperimentsInterface(statsigExperimentsInfo) as Object
         }
       }
 
+      roku_search_creator_tile: {
+        roku_search_creator_tile_v1: {
+          default: { "enabled": false }
+        }
+      }
+
       roku_pivots: {
         roku_pivots_v1: {
           ' Possible values: control, ml-popularity, hard-coded

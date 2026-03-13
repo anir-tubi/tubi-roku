@@ -1,6 +1,7 @@
 Function init()
   m.constants = getConstantsFromGlobal()
   m.top.id = m.constants.ui.screenIds.collectionScreen
+  m.top.screenLevel = m.constants.ui.screenLevels.collectionScreen
 
   m.backgroundPosterOpacityOnSubsequentRows = 0.3
 

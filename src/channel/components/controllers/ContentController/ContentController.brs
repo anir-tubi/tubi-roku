@@ -3831,6 +3831,8 @@ Function processUserContentSelection(content, screen, playbackSource = {}) as Vo
     playAdContent(content)
   else if content.scheduleData <> invalid
     showLinearDetailScreen(content, playbackSource)
+  else if contentType = m.constants.ui.contentTypes.app
+    fetchAppContentTypeAndNavigate(content)
   else
     showDetailScreen(content, true, invalid, invalid, playbackSource)
   end if
@@ -3959,6 +3961,8 @@ Function processUserPlayAction(content, screen, playbackSource = {}) as Void
     showLinearDetailScreen(content, playbackSource)
   else if contentType = m.constants.ui.contentTypes.linear
     selectLinearContent(content)
+  else if contentType = m.constants.ui.contentTypes.app
+    return
   else
     showDetailScreen(content, false, skipDetailScreen, invalid, playbackSource)
   end if

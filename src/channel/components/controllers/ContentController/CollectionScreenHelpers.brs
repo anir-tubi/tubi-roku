@@ -8,7 +8,7 @@ Function showCollectionScreen(appId)
     pageType: "collection_page"
     pageValues: {
       id: appId
-      section: "CREATOR"
+      section: m.constants.ui.appTypes.creator
     }
   }
 
