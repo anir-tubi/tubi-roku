@@ -3985,14 +3985,20 @@ Function processUserContentSelectionAfterSignIn()
     end if
 
     if contentFocused <> invalid AND contentFocused.actionId <> "signInWatch" AND contentFocused.actionId <> "reminder"
-      playerType = contentFocused.playerType
-      if isAA(contentFocused.scheduleData)
-        playerType = contentFocused.scheduleData.playerType
-      end if
-      if playerType = m.constants.ui.playerTypes.fox
-        playLinearVideoWithFoxPlayer(contentFocused)
+      if contentFocused.type = m.constants.ui.contentTypes.sportsEvent AND isUserInAdultsMode() = false
+        if screen.id <> m.constants.ui.screenIds.homeScreen
+          popScreen(true, true)
+        end if
       else
-        playerLinearChannel(contentFocused)
+        playerType = contentFocused.playerType
+        if isAA(contentFocused.scheduleData)
+          playerType = contentFocused.scheduleData.playerType
+        end if
+        if playerType = m.constants.ui.playerTypes.fox
+          playLinearVideoWithFoxPlayer(contentFocused)
+        else
+          playerLinearChannel(contentFocused)
+        end if
       end if
     end if
   end if
