@@ -21,35 +21,15 @@ Function setBrazeUserData(authInfo)
         ' Email no longer comes from authInfo so must be pulled in
         m.braze.setEmail(m.pub_serverPersistentData.email)
       end if
-    else
-      ' Setting device id as the unique id.
-      m.braze.setUserId(m.constants.deviceInfo.deviceId)
+    else if authInfo <> invalid AND authInfo.accessToken <> invalid
+      parsedToken = parseJWTToken(authInfo.accessToken)
+      if parsedToken <> invalid AND parsedToken.tubi_id <> invalid
+        m.braze.addUserAlias(parsedToken.tubi_id, "guest_tubi_id")
+      end if
     end if
     ' Doing it as per recommendation from the braze sdk documentation.
     m.brazeTask.BrazeInAppMessage = invalid
   end if
-End Function
-
-
-' @userId: string: user id of the logged in user.
-Function brazeMergeUsers(userId)
-  restApi = ThirdPartyApi(m.constants)
-  requestInfo = restApi.createBrazeMergeUsersReqInfo(m.constants.deviceInfo.deviceId, userId)
-  m.makeRequest({
-    url: requestInfo.url
-    options: requestInfo.options
-    requestType: m.constants.reqNames.postBrazeMergeUsers
-    responseType: "assocarray"
-    silenceCallbackWarnings: true
-    errorCallback: onBrazeMergeUsersError
-  })
-End Function
-
-
-' @error: assocarray: {code: 401} contains the status code.
-Function onBrazeMergeUsersError(error)
-  ' Logging braze error so that we can monitor if we are noticing any unexpected errors.
-  logError(FormatJSON(error), "apiError", "braze-merge-users-error")
 End Function
 
 

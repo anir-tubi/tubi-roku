@@ -1389,3 +1389,35 @@ Function tubiAuth_saveAuthInfoBackup(authInfo, authSectionName = "authbackup")
     sec.flush()
   end if
 End Function
+
+
+' @param token: string, jwt token.
+' @returns: assoc array, returns a assocarray which will contains info related to token ex: {"exp": 1701458827,"platform": "roku","type": 1,"user_id": 1}
+Function parseJWTToken(token)
+  parsedToken = invalid
+  jwtTokenSplit = token.split(".")
+  if jwtTokenSplit.count() = 3
+    jwtBody = CreateObject("roByteArray")
+    jwtBody.FromBase64String(base64UrlToBase64(jwtTokenSplit[1]))
+    parsedToken = parseJSON(jwtBody.ToAsciiString())
+  end if
+
+  return parsedToken
+End Function
+
+
+' Converts base64Url to base64.
+'
+' @param base64Url: string, base64Url to convert to base64
+Function base64UrlToBase64(base64Url)
+  base64 = base64Url.replace("-", "+").replace("_", "/")
+  length = base64.len() mod 4
+
+  if length < 3 then
+    base64 = base64 + "=="
+  else if length < 4 then
+    base64 = base64 + "="
+  end if
+
+  return base64
+End Function

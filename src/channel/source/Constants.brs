@@ -342,7 +342,6 @@ Function getConstants()
   constants.reqNames.clearRokuContinueWatching = "clearRokuContinueWatching"
   constants.reqNames.getUserSettings = "getUserSettings"
   constants.reqNames.postAnalytics = "postAnalytics"
-  constants.reqNames.postBrazeMergeUsers = "postBrazeMergeUsers"
   constants.reqNames.postLogout = "postLogout"
   constants.reqNames.postViewableImpression = "postViewableImpression"
   constants.reqNames.getSoTStaticConfig = "getSoTStaticConfig"

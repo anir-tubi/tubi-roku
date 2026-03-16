@@ -271,12 +271,6 @@ Function registerParsingCallbacks()
     parseError: parseGenericError
   }
 
-  ' posts braze merge users request.
-  m.requestTypes[m.constants.reqNames.postBrazeMergeUsers] = {
-    parseSuccess: parseGenericSuccess
-    parseError: parseGenericError
-  }
-
   ' posts tracking request.
   m.requestTypes[m.constants.reqNames.postAnalytics] = {
     parseSuccess: parseGenericSuccess

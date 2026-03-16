@@ -819,10 +819,6 @@ Function onPostSignInAuthInfoUpdated()
   end if
 
   setBrazeUserData(authInfo)
-
-  if authInfo <> invalid AND authInfo.userId <> invalid
-    brazeMergeUsers(authInfo.userId)
-  end if
 End Function
 
 
