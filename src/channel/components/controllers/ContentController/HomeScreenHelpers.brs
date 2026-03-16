@@ -331,7 +331,7 @@ Function fetchHomeScreen(homeScreen, useCache = false)
   homeScreen.enableVideoTiles = isVideoTileEnabledScreen(screenId)
   isPivotExperimentEnabled = false
   if UCase(m.constants.deviceInfo.countryCode) = "US"
-    isPivotExperimentEnabled = getStatsigExperimentResource("roku_pivots", "roku_pivots_v1", true).enabled = true
+    isPivotExperimentEnabled = getStatsigExperimentResource("", "roku_pivots_v1_2", true).enabled = true
   end if
   homeScreen.showPivots = (isPivotExperimentEnabled AND screenId = m.constants.ui.screenIds.homeScreen AND isKidsUIOn() = false AND isParentalControlsTeensLevel() = false)
 

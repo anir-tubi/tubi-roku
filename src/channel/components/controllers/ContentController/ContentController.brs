@@ -2316,6 +2316,19 @@ Function onCustomSuspend(msg)
       popScreen(false, false)
     end if
 
+    ' Pop PivotDetailScreen on suspend when background_enabled is false
+    ' Reset focus to CategoryGridList on the HomeScreen
+    if currentScreen <> invalid AND currentScreen.id = m.constants.ui.screenIds.pivotDetailScreen
+      pivotExperiment = getStatsigExperimentResource("", "roku_pivots_v1_2", false)
+      if pivotExperiment <> invalid AND pivotExperiment.background_enabled = false
+        popScreen(false, false)
+        homeScreen = getCurrentScreen()
+        if homeScreen <> invalid
+          homeScreen.focusCategoryGridList = true
+        end if
+      end if
+    end if
+
     ' When resuming from suspending the app, Roku force restores the currFocus row back to the state that existed at the time of suspending the app.
     ' This force restore happens after we set the focus appropriately using jumpToItem which rendering our jumpToItem action useless.
     ' To work around this firmware behavior, we set the focus to the home menu item at the time of suspend so that when the app resumes, the Roku behavior will focus the correct side nav menu item. (Refreshing of home screen content will happen during resume that is inside onCustomResume method.)

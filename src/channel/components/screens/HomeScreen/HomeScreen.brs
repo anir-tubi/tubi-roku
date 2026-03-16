@@ -29,6 +29,7 @@ Function init()
   m.pivotList.observeFieldScoped("navigateWithinPageInfo", "onPivotNavigateWithinPageInfo")
   m.pivotList.observeFieldScoped("trackingComponentInfo", "onPivotTrackingComponentInfo")
   topRef.observeFieldScoped("showPivots", "onShowPivotsChange")
+  topRef.observeFieldScoped("focusCategoryGridList", "onFocusCategoryGridList")
 
   topRef.observeField("focusedChild", "onScreenFocusChange")
   topRef.observeFieldScoped("signedIn", "onSignedInChange")
@@ -1421,6 +1422,14 @@ Function onShowPivotsChange(msg) as Void
   if msg.getData() = false
     m.pivotList.content = invalid
   end if
+End Function
+
+
+' Resets focus from PivotList to CategoryGridList
+' Part of roku_pivots_v1_2 experiment - remove if experiment is not positive
+Function onFocusCategoryGridList(_msg = invalid) as Void
+  m.top.lastFocusedList = ""
+  m.CategoryGridList.setFocus(true)
 End Function
 
 

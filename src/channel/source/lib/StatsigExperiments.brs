@@ -160,11 +160,8 @@ Function StatsigExperimentsInterface(statsigExperimentsInfo) as Object
         }
       }
 
-      roku_pivots: {
-        roku_pivots_v1: {
-          ' Possible values: control, ml-popularity, hard-coded
-          default: { "enabled": false, "treatment_group": "control" }
-        }
+      roku_pivots_v1_2: {
+        default: { "enabled": false, "treatment_group": "control", "background_enabled": false, "remove_pivots": [] }
       }
     }
     statsigExperimentsInfo: statsigExperimentsInfo
