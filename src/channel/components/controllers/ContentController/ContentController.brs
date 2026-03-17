@@ -1038,7 +1038,7 @@ Function handleStartUpArgs()
   ' Overriding deeplinkContent for external control source to invalid to avoid error dialog.
   ' This specifically covers a use case where roku uses it during automation testing for certification.
   ' The main purpose of this deep-linking is launching the application.
-  if m.deeplinkContent <> invalid AND m.deeplinkContent.source = "deeplink-test" AND isNonEmptyString(m.deeplinkContent.type) = false AND isNonEmptyString(m.deeplinkContent.deeplinkType) = false
+  if m.deeplinkContent <> invalid AND m.deeplinkContent.source = m.constants.deeplinks["external-control"] AND isNonEmptyString(m.deeplinkContent.type) = false AND isNonEmptyString(m.deeplinkContent.deeplinkType) = false
     m.deeplinkContent = invalid
   end if
 

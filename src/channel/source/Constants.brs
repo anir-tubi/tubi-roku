@@ -358,6 +358,13 @@ Function getConstants()
   constants.reqNames.getPivotContainers = "getPivotContainers"
   constants.reqNames.getBranchManifest = "getBranchManifest"
 
+  ' Long-polling request names
+  constants.reqNames.voyagerEstablishSession = "voyagerEstablishSession"
+  constants.reqNames.voyagerJoinRoom = "voyagerJoinRoom"
+  constants.reqNames.voyagerPoll = "voyagerPoll"
+  constants.reqNames.voyagerLeaveRoom = "voyagerLeaveRoom"
+  constants.reqNames.voyagerSendMessage = "voyagerSendMessage"
+
 
   ' a list of reqnames that the general task will inject auth headers and should expect to handle 403 errors for
   constants.reqNames.acceptsTubiAuth = {}
@@ -778,6 +785,13 @@ Function getConstants()
   constants.urls.realtime.distribution = constants.urls.realtime.urlBase + "/metric/distribution"
   constants.urls.realtime.log = constants.urls.realtime.urlBase + "/log"
 
+  ' Voyager cross-device communication (long-polling)
+  constants.urls.voyager = {}
+  constants.urls.voyager.longpoll = "https://voyager.production-public.tubi.io/socket/longpoll"
+  if mode <> "production" AND constants.settings.stagingApis = true
+    constants.urls.voyager.longpoll = "https://voyager.staging-public.tubi.io/socket/longpoll"
+  end if
+
   constants.urls.impressionEvents = {}
   constants.urls.impressionEvents.urlBase = "https://user-signals.staging-public.tubi.io/user-signals"
   ' QA analytics proxy server
@@ -1162,6 +1176,26 @@ Function getConstants()
   constants.player.videoPreviewDelayTimes.videoTiles = 1
   constants.player.videoPreviewDelayTimes.adCarousel = 3
   constants.player.videoPreviewDelayTimes.adSpotlight = 1
+
+  'Constants used for cross-device casting sessions
+  constants.player.casting = {}
+  constants.player.casting.messageTypes = {}
+  constants.player.casting.messageTypes.play = "play"
+  constants.player.casting.messageTypes.pause = "pause"
+  constants.player.casting.messageTypes.resume = "resume"
+  constants.player.casting.messageTypes.seek = "seek"
+  constants.player.casting.messageTypes.skipForward = "skipForward"
+  constants.player.casting.messageTypes.skipBackward = "skipBackward"
+  constants.player.casting.messageTypes.toggleMute = "toggleMute"
+  constants.player.casting.messageTypes.getMetadata = "getMetadata"
+  constants.player.casting.messageTypes.setSubtitles = "setSubtitles"
+  constants.player.casting.messageTypes.stopCasting = "stopCasting"
+  constants.player.casting.payloadTypes = {}
+  constants.player.casting.payloadTypes.metadata = "metadata"
+  constants.player.casting.requestTypes = {}
+  constants.player.casting.requestTypes.joinRoom = "phx_join"
+  constants.player.casting.requestTypes.leaveRoom = "phx_leave"
+  constants.player.casting.requestTypes.message = "message"
 
   ' constants used for EPG
   constants.EPGChannelPlayMode = {}
@@ -2043,7 +2077,7 @@ Function getConstants()
   constants.deeplinks["hs-search"] = "search"
   constants.deeplinks["ad"] = "ad"
   constants.deeplinks["my-feed"] = "my-feed"
-  constants.deeplinks["external-control"] = "deeplink-test"
+  constants.deeplinks["external-control"] = "external-control"
   constants.deeplinks["partner-button"] = "remote-partner-button"
   constants.deeplinks["other-channel"] = "other-channel"
   constants.deeplinks["auto-run-dev"] = "sideload"

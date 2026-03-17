@@ -155,6 +155,12 @@
     time/double based and value specified should be in seconds -->
     <field id="seekTo" type="time" />
 
+    <!-- Used to toggle the mute state of the video player -->
+    <field id="muteAudio" type="boolean" alias="VideoNode.mute" />
+
+    <!-- Used to set the global caption mode of the video player -->
+    <field id="globalCaptionMode" type="string" alias="VideoNode.globalCaptionMode" />
+
     <!-- time taken to load player screen in milliseconds -->
     <field id="loadTime" type="integer" />
 
@@ -189,6 +195,9 @@
 
     <!-- Video position for updates to history. This is only updated at historyFrequency interval -->
     <field id="historyPosition" type="integer" value="0" />
+
+    <!-- Current ad playback position in seconds, updated every second by RAF per-second callback -->
+    <field id="adPlaybackPosition" type="float" value="0" alwaysNotify="true" />
 
     <!-- field for communicating playback position to the ad shim -->
     <field id="adPosition" type="float" />

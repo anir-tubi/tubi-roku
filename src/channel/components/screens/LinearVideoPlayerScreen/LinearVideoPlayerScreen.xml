@@ -168,6 +168,7 @@
     <field id="timestampOfLastVideoPlayback" type="integer" value="0" />
     <field id="isDisplayingOverlay" alias="VideoOverlay.isDisplaying" />
     <field id="globalCaptionMode" alias="VideoNode.globalCaptionMode" />
+    <field id="muteAudio" type="boolean" alias="VideoNode.mute" />
 
     <!-- This field is used to expose the task to allow us to be able to communicate directly with
     the task from the contentController context regarding auth -->

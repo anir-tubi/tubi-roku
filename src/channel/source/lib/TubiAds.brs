@@ -1149,6 +1149,9 @@ Function tubiAds_adTrackingCallback(eventType, ctx)
       ' eventType is invalid when an event fires signaling that one second of ad playback has ocurred
       if ctx.time <> invalid then
         m.adPlaybackPos = ctx.time
+        if m.controlNode <> invalid
+          m.controlNode.adPlaybackPosition = ctx.time
+        end if
       end if
     end if
   end if

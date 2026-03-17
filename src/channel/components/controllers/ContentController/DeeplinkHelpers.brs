@@ -135,7 +135,12 @@ Function createDeeplinkContentFromStartupArgs(args)
     else if page = "kids"
       content.deeplinkType = "kids"
     else if page = "home"
-      content.deeplinkType = "homePage"
+      if args.source = m.constants.deeplinks["external-control"] AND isNonEmptyString(args.roomId) = true
+        content.deeplinkType = "casting"
+        content.roomId = args.roomId
+      else
+        content.deeplinkType = "homePage"
+      end if
     end if
   end if
 
@@ -314,6 +319,11 @@ Function handleDeeplinkContentByType()
       getSingleContentFromServer(m.deeplinkContent, onDeeplinkShortFormContentSuccess, handleSingleContentDeeplinkError)
     else if m.deepLinkContent.deeplinkType = "fox" then
       playLinearVideoWithFoxPlayer()
+    else if m.deepLinkContent.deeplinkType = "casting"
+      startCastingSession(m.deeplinkContent.roomId)
+      resetDeeplinkValues()
+      showDefaultHomeScreen()
+      focusSideNavOption(m.constants.ui.sideNavIds.home)
     else
       message = getTranslation("error_deeplink_page")
       showDeeplinkErrorModal(invalid, message)

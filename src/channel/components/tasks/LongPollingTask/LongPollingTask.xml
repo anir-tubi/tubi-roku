@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!--
+ - LongPollingTask
+ -
+ - Background task for Voyager long-polling cross-device communication.
+ - Handles establishing session, joining/leaving rooms, and polling for messages.
+ -
+ -->
+<component name="LongPollingTask" extends="Task">
+    <script type="text/brightscript" uri="LongPollingTask.brs" />
+    <script type="text/brightscript" uri="../../lib/GlobalMixin.brs" />
+    <script type="text/brightscript" uri="../../../source/lib/Auth.brs" />
+    <script type="text/brightscript" uri="../../../source/lib/Log.brs" />
+    <script type="text/brightscript" uri="../../../source/lib/Request.brs" />
+    <script type="text/brightscript" uri="../../../source/lib/RequestQueue.brs" />
+    <script type="text/brightscript" uri="../../../source/lib/StringUtils.brs" />
+    <script type="text/brightscript" uri="../../../source/3rdparty/roku/generalUtils.brs" />
+    <script type="text/brightscript" uri="../../../source/3rdparty/rta/typeUtils.brs" />
+
+    <interface>
+      <!-- INPUT -->
+        <!-- Room ID to join (from deeplink). Setting this to a non-empty string triggers the session flow. -->
+        <field id="roomId" type="string" value="" alwaysNotify="true" />
+
+        <!-- Signal to stop polling and leave room -->
+        <field id="stopSession" type="boolean" alwaysNotify="true" />
+
+        <!-- Metadata update to be sent to Voyager -->
+        <field id="metadata" type="assocarray" alwaysNotify="true" />
+
+      <!-- OUTPUT -->
+        <!-- Current connection state: "disconnected", "connecting", "connected", "polling", "error" -->
+        <field id="connectionState" type="string" value="disconnected" />
+
+        <!-- Batch of received messages from other devices in the room -->
+        <field id="receivedMessages" type="array" alwaysNotify="true" />
+    </interface>
+</component>

@@ -520,7 +520,7 @@ End Function
 '@content: roSGNode, a TubiContentNode
 '@successCallback: roFunction, a callback to be run when the response is successfully returned from the backend
 '@errorCallback: roFunction, a callback to be run when an error occurs while fetching the content from the backend
-Function getSingleContentFromServer(content, successCallback, errorCallback)
+Function getSingleContentFromServer(content, successCallback, errorCallback, responseContext = invalid)
   tubiLog("DetailScreenHelpers.getSingleContentFromServer")
   if content <> invalid
     isComingSoon = isComingSoonContent(content)
@@ -534,6 +534,7 @@ Function getSingleContentFromServer(content, successCallback, errorCallback)
         successCallback: successCallback
         errorCallback: errorCallback
         responseType: "node"
+        responseContext: responseContext
         isSignedInUser: isLoggedInUser()
       })
     else

@@ -26,5 +26,8 @@
 
     <!-- the device id of the source device in the case of "casting" from iOS -->
     <field id="sourceDeviceId" type="string" />
+
+    <!-- the room id of the room in the case of "casting" from iOS -->
+    <field id="roomId" type="string" />
   </interface>
 </component>

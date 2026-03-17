@@ -115,6 +115,19 @@ Function maxVal(a as Dynamic, b as Dynamic) as Dynamic
 End Function
 
 
+' getNumber is used to get a number from the value, or a fallback
+' @value : dynamic, the value we want to get the number from
+' @fallback : integer, the fallback value if the value is not a number
+' returns value as dynamic
+Function getNumber(value as Dynamic, fallback = 0) as Dynamic
+  if isNumber(value) = true
+    return value
+  else
+    return fallback
+  end if
+End Function
+
+
 ' Returns the same width if already divisible by 3,
 ' otherwise rounds up to the next multiple of 3.
 Function ensureDivisibleBy3(width as Integer) as Integer
