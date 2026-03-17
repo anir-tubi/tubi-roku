@@ -2316,16 +2316,17 @@ Function onCustomSuspend(msg)
       popScreen(false, false)
     end if
 
-    ' Pop PivotDetailScreen on suspend when background_enabled is false
-    ' Reset focus to CategoryGridList on the HomeScreen
-    if currentScreen <> invalid AND currentScreen.id = m.constants.ui.screenIds.pivotDetailScreen
+    ' Pop all screens above HomeScreen when PivotDetailScreen is in stack and background_enabled is false
+    ' Handles the case where user navigated deeper (e.g. to a details screen) from the pivot
+    pivotScreen = getScreenFromStackById(m.constants.ui.screenIds.pivotDetailScreen)
+    if pivotScreen <> invalid
       pivotExperiment = getStatsigExperimentResource("", "roku_pivots_v1_2", false)
       if pivotExperiment <> invalid AND pivotExperiment.background_enabled = false
-        popScreen(false, false)
-        homeScreen = getCurrentScreen()
-        if homeScreen <> invalid
-          homeScreen.focusCategoryGridList = true
-        end if
+        currentScreen = getCurrentScreen()
+        while currentScreen <> invalid AND currentScreen.id <> m.constants.ui.screenIds.homeScreen
+          popScreen(false, false)
+          currentScreen = getCurrentScreen()
+        end while
       end if
     end if
 
@@ -2461,6 +2462,14 @@ Function onCustomResume(msg)
     ' We are force updating the content on resume since doing it during suspend was resulting in roku not showing images.
     if currentScreen <> invalid AND currentScreen.id = m.constants.ui.screenIds.episodeScreen
       currentScreen.updateContent = true
+    end if
+
+    ' Reset focus from pivot list to CategoryGridList when background_enabled is false
+    if currentScreen <> invalid AND currentScreen.id = m.constants.ui.screenIds.homeScreen AND currentScreen.lastFocusedList = "pivotList"
+      pivotExperiment = getStatsigExperimentResource("", "roku_pivots_v1_2", false)
+      if pivotExperiment <> invalid AND pivotExperiment.background_enabled = false
+        currentScreen.focusCategoryGridList = true
+      end if
     end if
 
   end if
