@@ -44,6 +44,11 @@ Function updateVideoTileOverlayVisibility(screen = invalid, isVideoTileEnabled =
     isVideoTileEnabled = isVideoTileEnabledScreen() AND screen.content <> invalid
   end if
 
+  ' Check if the focused content is a video tile enabled container
+  if isVideoTileEnabled = true AND screen.contentFocused <> invalid
+    isVideoTileEnabled = isVideoTileEnabledContainer(screen.contentFocused.gridItemType)
+  end if
+
   ' Set visibility based on video tiles enabled and lastFocusedList
   ' Only show overlay if video tiles are enabled AND the rowList has focus
   if screen.hasField("lastFocusedList")
