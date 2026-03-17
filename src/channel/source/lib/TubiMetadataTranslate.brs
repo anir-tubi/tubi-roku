@@ -30,7 +30,6 @@ Function TubiMetadataTranslate(constants, experiments = invalid, soTStaticConfig
 
     dedupeBackgrounds: tubiMetadataTranslate_dedupeBackgrounds
     setTotalCount: tubiMetadataTranslate_setTotalCount
-    setSponsorshipInfo: tubiMetadataTranslate_setSponsorshipInfo
     getContentsJson: tubiMetadataTranslate_getContentsJson
     buildCategoryAA: tubiMetadataTranslate_buildCategoryAA
     buildCategoryAAWithInsert: tubiMetadataTranslate_buildCategoryAAWithInsert
@@ -1611,8 +1610,6 @@ Function tubiMetadataTranslate_buildCategoryParentInfo(container, sOrientation =
       updateMetadata.gridItemType = m.getGridItemType(container, sOrientation, m.constants, "", contentMode)
     end if
 
-    updateMetadata = m.setSponsorshipInfo(updateMetadata, container.sponsorship)
-
     if container.thumbnail <> invalid
       updateMetadata.thumbnail = container.thumbnail
     end if
@@ -2165,29 +2162,6 @@ Function tubiMetadataTranslate_buildEmptyMyStuffCategoryAA(container)
   end if
 
   return updateMetadata
-End Function
-
-' add sponsorship info, if it exists, to the metadata
-' @metadata: object, The metadata associative array or CategoryContentNode that needs to add the sponsorship info
-' @sponsorshipInfo: assocArray, The associative array that contains the raw data of the sponsor info
-Function tubiMetadataTranslate_setSponsorshipInfo(metadata, sponsorshipInfo)
-  if metadata <> invalid AND sponsorshipInfo <> invalid AND sponsorshipInfo.spon_exp <> invalid AND sponsorshipInfo.image_urls <> invalid then
-    images = sponsorshipInfo.image_urls
-    ' The info AA later becomes of type "TubiSponsorImagesNode" when the update() function is called on the parent contentNode
-    info = {}
-    info.subtype = "TubiSponsorImagesNode" '//when the update() function is called, subtype will ensure this AA is typed to the TubiSponsorImagesNode type
-    info.brandBackground = images.brand_background
-    info.brandColor = images.brand_color
-    info.brandLogo = images.brand_logo
-    info.brandGraphic = images.brand_graphic
-    info.tileBackground = images.tile_background
-    info.pixels = sponsorshipInfo.pixels
-
-    metadata.sponsorImages = info
-    metadata.sponsorExp = sponsorshipInfo.spon_exp
-  end if
-
-  return metadata
 End Function
 
 

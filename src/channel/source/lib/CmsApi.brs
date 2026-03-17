@@ -339,6 +339,15 @@ Function cmsApi_generateAdUnitFromAdType(sAdType, aaAdUnits)
         }
       }
     end if
+  else if sAdType = m.constants.adTypes.thematicTakeover
+    nThematicTakeoverAdUnits = 7 ' this is the max number of different thematic takeover ad units that the backend supports currently
+    for i = 1 to nThematicTakeoverAdUnits
+      aaAdUnits["thematic_takeover_" + i.toStr()] = {
+        sizes: {
+          rendering_codes: ["thematic_takeover_row"]
+        }
+      }
+    end for
   end if
 
   return aaAdUnits

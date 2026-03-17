@@ -992,6 +992,7 @@ End Function
 
 Function handleStartUpArgs()
   startupArgs = m.top.getScene().startupArgs
+
   if startupArgs <> invalid then
     m.deeplinkContent = createDeeplinkContentFromStartupArgs(startupArgs)
     utmCampaignConfig = generateUtmCampaignConfig(startupArgs)

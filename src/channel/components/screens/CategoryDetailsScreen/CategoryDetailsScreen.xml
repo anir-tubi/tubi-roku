@@ -35,6 +35,15 @@
       <!-- hides or shows the loading spinner -->
       <field id="isLoading" type="boolean" alias="ChannelDetailSpinner.visible" />
 
+      <!-- Thematic takeover ad content for this category -->
+      <field id="adContent" type="array" />
+
+      <!-- Flag indicating ad content fetch has completed -->
+      <field id="adContentFetchCompleted" type="boolean" value="false" />
+
+      <!-- Flag indicating content fetch has completed -->
+      <field id="contentFetchCompleted" type="boolean" value="false" />
+
        <!-- tells which item should focus on categoryDetail screen -->
       <field id="jumpToItemFocused" type="integer" value="-1" />
 

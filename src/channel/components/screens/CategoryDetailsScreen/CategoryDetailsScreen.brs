@@ -90,18 +90,8 @@ Function onLoadContent()
     m.contentLoadedAndFocused = false
     if category.getChildCount() > 0
       if category.sponsorImages <> invalid
-        '//check in photoshop and re-adjust postions
         m.PageTitleAndCounter.translation = [m.PageTitleAndCounter.translation[0], 518]
         m.VideoGrid.translation = [m.VideoGrid.translation[0], 627]
-
-        '//if a channel is sponsored, then display a background artwork related to the sponsor
-        sSponsorBackgroundURL = ""
-        if m.constants.deviceInfo.limitedUi = false AND category.sponsorImages.brandBackground <> ""
-          sSponsorBackgroundURL = category.sponsorImages.brandBackground
-        else if category.sponsorImages.brandColor <> ""
-          sSponsorBackgroundURL = category.sponsorImages.brandColor
-        end if
-        m.top.sponsorshipBackground = sSponsorBackgroundURL
       end if
 
       m.PageTitleAndCounter.content = category

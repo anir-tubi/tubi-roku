@@ -50,6 +50,9 @@
     changed. -->
     <field id="repopulateContent" type="boolean" alwaysNotify="true" />
 
+    <!-- Triggers row height recalculation (e.g., after sponsorship applied to containers) -->
+    <field id="recalculateRowHeights" type="boolean" alwaysNotify="true" />
+
     <!-- expected to be category ids(continue_watching/queue) if new continue_watching/queue got
     added, helps to set focus to correct row -->
     <field id="rowAdded" type="string" />

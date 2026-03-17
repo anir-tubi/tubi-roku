@@ -276,9 +276,6 @@ Function setRowHeights()
     else if isVideoTileEnabledContainer(gridItemType) = true
       ' Video tiles row - use featured row height with metadata section
       featuredRowHeight = getVideoTileRowHeight(category.sponsorImages)
-      if category.sponsorImages <> invalid
-        rowHeightAdjustment = rowHeightAdjustment + 32
-      end if
       rowItemSize.push(m.gridItemSize)
       rowHeight = featuredRowHeight - rowHeightAdjustment
     else

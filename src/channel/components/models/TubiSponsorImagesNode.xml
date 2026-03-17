@@ -2,12 +2,11 @@
 <!-- Extend the ContentNode so we can add some custom fields -->
 <component name = "TubiSponsorImagesNode" extends="ContentNode">
   <interface>
-    <field id="brandBackground" type="string" />
-    <field id="brandColor" type="string" />
     <field id="brandLogo" type="string" />
     <field id="brandGraphic" type="string" />
-    <field id="tileBackground" type="string" />
-    <!-- An array of pixel images that need to be called when the sponsor is display -->
-    <field id="pixels" type="assocarray" />
+    <!-- Thematic takeover ad ID for pixel tracking -->
+    <field id="thematicTakeoverId" type="string" />
+    <!-- An array of impression pixels -->
+    <field id="pixels" type="array" />
   </interface>
 </component>

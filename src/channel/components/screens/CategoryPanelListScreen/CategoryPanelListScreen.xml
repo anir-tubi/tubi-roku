@@ -44,6 +44,15 @@
       <!-- hides or shows the loading spinner -->
       <field id="isLoading" type="boolean" alias="spinner.visible" />
 
+      <!-- Thematic takeover ad content for this category -->
+      <field id="adContent" type="array" />
+
+      <!-- Flag indicating ad content fetch has completed -->
+      <field id="adContentFetchCompleted" type="boolean" value="false" />
+
+      <!-- Flag indicating category content fetch has completed -->
+      <field id="categoryContentFetchCompleted" type="boolean" value="false" />
+
       <!-- hides or shows the loading spinner for the category Right panel -->
       <field id="isCategoryLoading" type="boolean" alwaysNotify="true" />
 

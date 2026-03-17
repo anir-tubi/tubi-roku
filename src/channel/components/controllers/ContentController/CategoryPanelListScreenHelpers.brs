@@ -87,6 +87,24 @@ Function fetchCategoryPanelDetails(categoryId, index = 0)
   tubiLog("CategoryPanelListScreenHelpers.fetchCategoryPanelDetails")
   isKidsMode = shouldKidsModeBeSentToServer()
 
+  ' Reset fetch completed flags for initial load only
+  screen = getCurrentScreen()
+  if screen <> invalid AND screen.id = m.constants.ui.screenIds.categoryPanelListScreen AND index = 0
+    screen.categoryContentFetchCompleted = false
+    screen.adContentFetchCompleted = false
+    screen.adContent = []
+
+    ' Request thematic takeover ads (only for initial load, not lazy loading)
+    if isKidsUIOn() = false AND isParentalControlsAdultLevel() = true
+      aAdTypes = [m.constants.adTypes.thematicTakeover]
+      createHomescreenAdRequest(m.constants.ui.screenIds.categoryPanelListScreen, onCategoryPanelAdSuccess, aAdTypes, onCategoryPanelAdError)
+    else
+      ' In kids mode, skip ad request
+      screen.adContent = []
+      screen.adContentFetchCompleted = true
+    end if
+  end if
+
   options = {}
   params = {}
   params["content_mode"] = ""
@@ -161,16 +179,14 @@ Function onCategoryDetailPanelResponse(categoryContent)
 
         screen.isCategoryLoading = false
 
-        if categoryContent.sponsorImages <> invalid AND categoryContent.sponsorImages.pixels <> invalid AND categoryContent.sponsorImages.pixels["container_details"] <> invalid
-          '//When a sponsored container is made visible, then call the pixels
-          sponsorPixels = categoryContent.sponsorImages.pixels["container_details"]
-          sendAdPixels(sponsorPixels)
-        end if
-
-        if screen.categoryContent = invalid 'first time
+        ' For initial load (first time), wait for both content and ads to be ready
+        if screen.categoryContent = invalid
+          ' Set content on screen but don't trigger load until ads are ready
           screen.categoryContent = categoryContent
-          screen.shouldLoadCategoryContent = true
+          screen.categoryContentFetchCompleted = true
+          checkIfCategoryPanelContentIsReady(screen)
         else
+          ' Lazy loading - append directly (no need to wait for ads)
           responseChildren = categoryContent.getChildren(-1, 0)
           screen.categoryContent.appendChildren(responseChildren)
         end if
@@ -323,8 +339,10 @@ Function refreshCategoryPanelListDetailScreen(screen)
   if focusedItem <> invalid
     screen.isCategoryLoading = true
     categoryContent = getFromContentCache(focusedItem.id)
-    if categoryContent <> invalid AND categoryContent.getChildCount() > 0 AND shouldRefresh(categoryContent) <> true
-      '//If the content already exists in the cache and is still fresh, then no need to fetch the content
+    ' Always fetch fresh data if content has sponsorship (to refresh pixels)
+    bHasSponsorship = (categoryContent <> invalid AND categoryContent.sponsorImages <> invalid)
+    if categoryContent <> invalid AND categoryContent.getChildCount() > 0 AND shouldRefresh(categoryContent) <> true AND bHasSponsorship = false
+      '//If the content already exists in the cache and is still fresh and has no sponsorship, then no need to fetch the content
       onCategoryDetailPanelResponse(categoryContent)
     else
       fetchCategoryPanelDetails(focusedItem.id)
@@ -538,5 +556,69 @@ Function onContentGridHasFocusChange(msg)
 
   if msg.getData() = false AND currentScreen.subtype() = "CategoryPanelListScreen"
     currentScreen.isBackPressedFromCategoryDetailPanel = true
+  end if
+End Function
+
+
+' Handles successful thematic takeover ad response for CategoryPanelListScreen
+' @param response: assocarray with screenId and data array
+Function onCategoryPanelAdSuccess(response)
+  tubiLog("CategoryPanelListScreenHelpers.onCategoryPanelAdSuccess")
+
+  screen = getCurrentScreen()
+  if screen <> invalid AND screen.id = m.constants.ui.screenIds.categoryPanelListScreen
+    screen.adContent = filterThematicTakeovers(response)
+    screen.adContentFetchCompleted = true
+    checkIfCategoryPanelContentIsReady(screen)
+  end if
+End Function
+
+
+' Handles thematic takeover ad error response for CategoryPanelListScreen
+' @param response: error response
+Function onCategoryPanelAdError(response)
+  tubiLog("CategoryPanelListScreenHelpers.onCategoryPanelAdError")
+
+  screen = getCurrentScreen()
+  if screen <> invalid AND screen.id = m.constants.ui.screenIds.categoryPanelListScreen
+    ' On error, proceed without ads
+    screen.adContent = []
+    screen.adContentFetchCompleted = true
+    checkIfCategoryPanelContentIsReady(screen)
+  end if
+End Function
+
+
+' Checks if both content and ad fetches are complete for CategoryPanelListScreen
+' If both complete, applies thematic theme and sets screen categoryContent
+' @param screen: CategoryPanelListScreen node
+Function checkIfCategoryPanelContentIsReady(screen) as Void
+  tubiLog("CategoryPanelListScreenHelpers.checkIfCategoryPanelContentIsReady")
+
+  if screen = invalid OR screen.id <> m.constants.ui.screenIds.categoryPanelListScreen
+    return
+  end if
+
+  bContentLoaded = (screen.categoryContentFetchCompleted = true)
+  bAdContentLoaded = (screen.adContentFetchCompleted = true)
+
+  if bContentLoaded = true AND bAdContentLoaded = true
+    categoryContent = screen.categoryContent
+    if categoryContent <> invalid
+      ' Apply thematic takeover theme if applicable
+      applyThematicThemeToContent(categoryContent, screen.adContent)
+
+      ' Fire sponsor pixels if present (original behavior)
+      if categoryContent.sponsorImages <> invalid AND isNonEmptyArray(categoryContent.sponsorImages.pixels) = true
+        sponsorPixels = categoryContent.sponsorImages.pixels
+        sendAdPixels(sponsorPixels)
+
+        ' Clear pixels after sending
+        categoryContent.sponsorImages.pixels = invalid
+      end if
+
+      ' Trigger content load
+      screen.shouldLoadCategoryContent = true
+    end if
   end if
 End Function

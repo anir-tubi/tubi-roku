@@ -167,9 +167,30 @@ Function parseHomeScreenAdsSuccess(fullResponse, reqInfo) as Object
         aParsedAds.push(content)
       end if
     end if
+    ' Process thematic takeover ad units (thematic_takeover1 through thematic_takeover7)
+    if arrayIncludes(aRequestedAdTypes, m.constants.adTypes.thematicTakeover) = true
+      for i = 1 to 7
+        sAdUnitKey = "thematic_takeover_" + i.toStr()
+        adUnit = adUnits[sAdUnitKey]
+        if adUnit <> invalid AND adUnit.rendering_code = "thematic_takeover_row"
+          thematicContent = processThematicTakeoverContent(adUnit)
+          if thematicContent <> invalid
+            aParsedAds.push(thematicContent)
+          end if
+        end if
+      end for
+    end if
   end if
 
-  return aParsedAds
+  screenId = ""
+  if reqInfo.screenId <> invalid
+    screenId = reqInfo.screenId
+  end if
+
+  return {
+    screenId: screenId
+    data: aParsedAds
+  }
 End Function
 
 
@@ -594,6 +615,98 @@ Function parseSoTStaticConfigSuccess(fullResponse, reqInfo)
   end if
 
   return response
+End Function
+
+
+' Processes thematic takeover ad content from response.
+' Thematic takeovers apply theme styling TO existing containers (not inserting new rows).
+' @param adUnit: assocArray, The thematic takeover ad unit from response
+' @returns: assocArray, Processed thematic takeover info or invalid.
+'   {
+'     id: string - unique ad id
+'     containerId: string - the container this theme applies to
+'     type: string - contentTypes.thematicTakeover
+'     validUntil: integer - timestamp when this ad expires
+'     imageImpTracking: array - impression tracking pixels
+'     sponsorshipInfo: AA - info formatted for setSponsorshipInfo
+'   }
+Function processThematicTakeoverContent(adUnit) as Object
+  tubiLog("HomeScreenParsers.processThematicTakeoverContent")
+
+  if adUnit = invalid OR adUnit.ad = invalid
+    return invalid
+  end if
+
+  assets = adUnit.ad.assets
+  if assets = invalid
+    return invalid
+  end if
+
+  adID = ""
+  if adUnit.ad.id <> invalid
+    adID = getAdID(adUnit.ad.id)
+  end if
+
+  containerId = ""
+  if assets.container_id <> invalid AND isNonEmptyString(assets.container_id.text) = true
+    containerId = assets.container_id.text
+  end if
+
+  ' container_id is required - without it we don't know which container to apply the theme to
+  if containerId = ""
+    return invalid
+  end if
+
+  iValidUntil = UpTime(0) + m.constants.cacheTimes.homescreenAd
+  if adUnit.valid_duration <> invalid AND adUnit.valid_duration > 0
+    iValidUntil = UpTime(0) + adUnit.valid_duration
+  end if
+
+  aImageTracking = []
+  if adUnit.trackers <> invalid AND isNonEmptyArray(adUnit.trackers.imp) = true
+    aImageTracking = adUnit.trackers.imp
+  end if
+
+  ' Build sponsorship info in same format as homescreen endpoint
+  ' This will be applied to containers via setSponsorshipInfo
+  sponsorshipInfo = {
+    spon_exp: adID
+    image_urls: {
+      brand_logo: invalid
+      brand_graphic: invalid
+    }
+    pixels: aImageTracking
+  }
+
+  if assets.brand_logo <> invalid AND isNonEmptyString(assets.brand_logo.url) = true
+    sponsorshipInfo.image_urls.brand_logo = assets.brand_logo.url
+  end if
+
+  if assets.brand_graphic <> invalid AND isNonEmptyString(assets.brand_graphic.url) = true
+    sponsorshipInfo.image_urls.brand_graphic = assets.brand_graphic.url
+  end if
+
+  thematicTakeoverNode = CreateObject("roSGNode", "AdContentNode")
+  thematicTakeoverNode.id = adID
+  thematicTakeoverNode.type = m.constants.ui.contentTypes.thematicTakeover
+  thematicTakeoverNode.validUntil = iValidUntil
+  thematicTakeoverNode.imageImpTracking = aImageTracking
+
+  ' Store container_id and sponsorship info as custom fields
+  thematicTakeoverNode.addFields({
+    containerId: containerId
+    sponsorshipInfo: sponsorshipInfo
+  })
+
+  ' Store adInfo for pixel refresh tracking (same pattern as carousel/spotlight)
+  thematicTakeoverNode.adInfo = {
+    ad_id: adID
+    id: adID
+    impTracking: aImageTracking
+    type: "thematic_takeover"
+  }
+
+  return thematicTakeoverNode
 End Function
 
 

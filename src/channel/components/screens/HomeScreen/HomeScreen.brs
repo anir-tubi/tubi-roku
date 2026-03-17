@@ -41,6 +41,7 @@ Function init()
   topRef.observeFieldScoped("transportVoiceRequest", "onTransportVoiceRequest")
   topRef.observeFieldScoped("personalizationId", "onPersonalizationIdChanged")
   topRef.observeFieldScoped("contentUpdated", "onContentUpdated")
+  topRef.observeFieldScoped("batchResponse", "onBatchResponseChanged")
   topRef.observeFieldScoped("batchAdResponse", "onBatchAdResponseChanged")
   topRef.observeFieldScoped("adImpressionUpdates", "onAdImpressionUpdatesChanged")
   topRef.observeFieldScoped("allowCarouselAutoRotate", "onAllowCarouselAutoRotateChange")
@@ -243,6 +244,12 @@ Function onContentUpdated()
       end for
     end if
 
+    ' Apply thematic takeover themes to matching containers
+    applyThematicTakeoverThemes(content)
+
+    ' Recalculate row heights after themes applied (must happen after both content and ads ready)
+    m.CategoryGridList.recalculateRowHeights = true
+
     '//the presence or absence of a 1st-Row will dictate the starting point of the peek row mask
     if m.top.kidsMode = false AND (m.top.skinAdContent <> invalid AND m.top.skinAdContent.getChildCount() > 0) AND (m.top.lastFocusedList = "skinAdRow" OR m.top.lastFocusedList = "")
       moveContentAreaMask(-1)
@@ -254,6 +261,53 @@ Function onContentUpdated()
 End Function
 
 
+' Handles batch container response from tensor API
+' Applies thematic takeover themes from adContent before passing to CategoryGridList
+' This ensures refreshed containers retain their themed styling
+' @param msg - Message containing node with container data
+Function onBatchResponseChanged(msg)
+  tubiLog("HomeScreen.onBatchResponseChanged")
+  response = msg.getData()
+
+  if response <> invalid
+    ' Apply thematic takeover themes from adContent to the refreshed containers
+    ' This re-applies themes that were originally set when adContent was first received
+    applyThematicTakeoverThemesToBatchResponse(response)
+  end if
+
+  ' Pass the themed response to CategoryGridList for rendering
+  m.CategoryGridList.categoryResponseInBatch = response
+
+  ' Recalculate row heights after batch container update
+  m.CategoryGridList.recalculateRowHeights = true
+End Function
+
+
+' Applies thematic takeover themes from adContent to batch container response
+' Applies thematic takeover themes from adContent cache to batch response containers
+' Used when tensor API sends container updates that need themed styling
+' @param batchResponse: roSGNode, the batch response node containing updated containers
+Function applyThematicTakeoverThemesToBatchResponse(batchResponse) as Void
+  tubiLog("HomeScreen.applyThematicTakeoverThemesToBatchResponse")
+
+  adContent = m.top.adContent
+  if isNonEmptyArray(adContent) = false OR batchResponse = invalid
+    return
+  end if
+
+  ' Collect thematic takeovers from adContent
+  aThematicTakeovers = []
+  for each adItem in adContent
+    if adItem <> invalid AND adItem.type = m.constants.ui.contentTypes.thematicTakeover
+      aThematicTakeovers.push(adItem)
+    end if
+  end for
+
+  ' Delegate to the consolidated helper (row heights recalculated by caller)
+  applyThematicTakeoverThemesToContainers(batchResponse, aThematicTakeovers)
+End Function
+
+
 ' Handles batch ad response changes and creates/updates ad carousel components
 ' Processes skin ad impression tracking updates
 ' @param msg - Message containing array of ad response data
@@ -261,12 +315,15 @@ Function onBatchAdResponseChanged(msg)
   tubiLog("HomeScreen.onBatchAdResponseChanged")
   aResponse = msg.getData()
   if isNonEmptyArray(aResponse) = true
+    aThematicTakeovers = []
+    aAllRefreshedAds = [] '// Collect all refreshed ads to update adContent cache
     for i = aResponse.Count() - 1 to 0 step -1
       adContent = aResponse[i]
       if adContent <> invalid
         sContentType = adContent.type
         if sContentType = m.constants.ui.contentTypes.adRowlistCarousel
           createAdDisplayCarouselComponent(adContent)
+          aAllRefreshedAds.push(adContent)
         else if sContentType = m.constants.ui.contentTypes.skinAd
           if m.CategoryGridList.skinAdContent <> invalid AND m.CategoryGridList.skinAdContent.id = adContent.id AND adContent.getChild(0) <> invalid AND m.CategoryGridList.skinAdContent.getChild(0) <> invalid
             '// If the updated skinAd wrapper is the same as the existing one, then just update the impression tracking info.
@@ -276,11 +333,110 @@ Function onBatchAdResponseChanged(msg)
             '//Once the skin ad is processed, remove it from the array so that it is not processed with the other ads when adResponseInBatch is set below.
             aResponse.delete(i)
           end if
+          aAllRefreshedAds.push(adContent)
+        else if sContentType = m.constants.ui.contentTypes.thematicTakeover
+          '// Collect thematic takeover ads to be applied to containers
+          aThematicTakeovers.push(adContent)
+          '// Remove from array so it's not processed by CategoryGridList (it's applied to existing containers, not inserted as rows)
+          aResponse.delete(i)
+          aAllRefreshedAds.push(adContent)
+        else if sContentType = m.constants.ui.contentTypes.adRowlistSpotlight
+          aAllRefreshedAds.push(adContent)
         end if
       end if
     end for
+
+    '// Apply thematic takeover themes to containers if any were received
+    '// and trigger UI update by passing affected containers through categoryResponseInBatch
+    if isNonEmptyArray(aThematicTakeovers) = true
+      affectedContainers = applyThematicTakeoverThemesToContainers(m.top.content, aThematicTakeovers)
+
+      '// If containers were themed, create a batch response to trigger UI update
+      '// The containers need to go through categoryResponseInBatch so CategoryGridList
+      '// calls replaceChild which triggers a re-render of those rows
+      if isNonEmptyArray(affectedContainers) = true
+        batchResponseForThemedContainers = CreateObject("roSGNode", "ContentNode")
+        for each container in affectedContainers
+          '// Clone container to batch response (keeps original in m.top.content)
+          '// mergeMetadata finds original by ID and replaces with themed clone, triggering re-render
+          clonedContainer = container.clone(true)
+          batchResponseForThemedContainers.appendChild(clonedContainer)
+        end for
+        m.CategoryGridList.categoryResponseInBatch = batchResponseForThemedContainers
+      end if
+    end if
+
+    '// Update adContent cache with all refreshed ads so that onContentUpdated
+    '// doesn't revert to stale cached data
+    if isNonEmptyArray(aAllRefreshedAds) = true
+      updateAdContent(aAllRefreshedAds)
+    end if
   end if
   m.CategoryGridList.adResponseInBatch = aResponse
+
+  ' Recalculate row heights after batch ad update
+  m.CategoryGridList.recalculateRowHeights = true
+End Function
+
+
+' Updates m.top.adContent with new ads, replacing old ads of the same type
+' For thematic takeovers: matches by containerId (multiple per type)
+' For other ad types: replaces all items of that type (one per type)
+' @param aNewAds: array, array of new ad items to add/update
+Function updateAdContent(aNewAds) as Void
+  tubiLog("HomeScreen.updateAdContent")
+
+  if isNonEmptyArray(aNewAds) = false
+    return
+  end if
+
+  ' Get current adContent or create empty array
+  currentAdContent = m.top.adContent
+  if isNonEmptyArray(currentAdContent) = false
+    currentAdContent = []
+  end if
+
+  ' Collect types and containerIds from incoming ads for matching
+  newAdTypes = {}
+  newThematicContainerIds = {}
+  for each newAd in aNewAds
+    if newAd <> invalid AND newAd.type <> invalid
+      newAdTypes[newAd.type] = true
+      ' For thematic takeovers, also track containerIds for granular matching
+      if newAd.type = m.constants.ui.contentTypes.thematicTakeover AND newAd.containerId <> invalid
+        newThematicContainerIds[newAd.containerId] = true
+      end if
+    end if
+  end for
+
+  ' Filter out old ads that will be replaced
+  updatedAdContent = []
+  for each adItem in currentAdContent
+    if adItem <> invalid AND adItem.type <> invalid
+      shouldKeep = true
+
+      if adItem.type = m.constants.ui.contentTypes.thematicTakeover
+        ' For thematic takeovers, remove only if containerId is being replaced
+        if adItem.containerId <> invalid AND newThematicContainerIds[adItem.containerId] = true
+          shouldKeep = false
+        end if
+      else
+        ' For other ad types (carousel, spotlight, etc.), remove if type is being replaced
+        if newAdTypes[adItem.type] = true
+          shouldKeep = false
+        end if
+      end if
+
+      if shouldKeep = true
+        updatedAdContent.push(adItem)
+      end if
+    end if
+  end for
+
+  ' Add new ads
+  updatedAdContent.append(aNewAds)
+
+  m.top.adContent = updatedAdContent
 End Function
 
 
@@ -446,19 +602,19 @@ Function onRowFocused(msg)
   oldRow = m.CategoryGridList.oldRowFocused
   isRowAdContainerContainer = false
   if row <> invalid
+    '//Check if we need to refresh impression pixels for the old row
+    '//For skin ads, refresh immediately when losing focus as they hide themselves
+    if isAdSkinRow(oldRow) = true AND oldRow.id <> row.id
+      '//Skin ad loses visibility immediately when focus changes
+      m.top.requestAdPixelRefresh = true
+    end if
+
     if isSponsoredRow(row) = true
       m.top.sponsoredRowFocused = true
     else if oldRow = invalid OR row.id <> oldRow.id '//If the oldRow is the same as the new row, then do not check if the adFocusTimer should be started. This is to prevent sending too many pixel impressions.
       if (isAdDisplayContainerRow(row) = true OR isAdDisplayCarouselRow(row) = true OR isAdSkinRow(row) = true) AND isNonEmptyArray(row.imageImpTracking) = true
         isRowAdContainerContainer = true
       end if
-    end if
-
-    '//Check if we need to refresh impression pixels for the old row
-    '//For skin ads, refresh immediately when losing focus as they hide themselves
-    if isAdSkinRow(oldRow) = true AND oldRow.id <> row.id
-      '//Skin ad loses visibility immediately when focus changes
-      m.top.requestAdPixelRefresh = true
     end if
 
     if isAdDisplayCarouselRow(row) = true OR isAdDisplayContainerRow(row) = true
@@ -544,7 +700,7 @@ End Function
 ' @param row - CategoryContentNode to check
 ' @return Boolean - True if row has sponsor images and pixels
 Function isSponsoredRow(row)
-  if row.sponsorImages <> invalid AND row.sponsorImages.pixels <> invalid AND row.sponsorImages.pixels["homescreen"] <> invalid
+  if row.sponsorImages <> invalid AND isNonEmptyArray(row.sponsorImages.pixels) = true
     return true
   end if
 
@@ -1637,4 +1793,62 @@ Function fireNavigateFromCategoryToPivotEvent(sourceComponentInfo as Object, piv
     vertical_location: pivotRow
     horizontal_location: pivotCol
   }
+End Function
+
+
+' Applies thematic takeover themes from adContent cache to homescreen containers
+' Used during initial content load
+' @param homescreenContent: roSGNode, the homescreen content with containers
+Function applyThematicTakeoverThemes(homescreenContent) as Void
+  tubiLog("HomeScreen.applyThematicTakeoverThemes")
+
+  adContent = m.top.adContent
+  if isNonEmptyArray(adContent) = false OR homescreenContent = invalid
+    return
+  end if
+
+  ' Collect thematic takeovers from adContent
+  aThematicTakeovers = []
+  for each adItem in adContent
+    if adItem <> invalid AND adItem.type = m.constants.ui.contentTypes.thematicTakeover
+      aThematicTakeovers.push(adItem)
+    end if
+  end for
+
+  ' Delegate to the consolidated helper (row heights handled by onContentUpdated)
+  applyThematicTakeoverThemesToContainers(homescreenContent, aThematicTakeovers)
+End Function
+
+
+' Applies thematic takeover themes to containers and returns affected containers
+' Core helper used by all theme application scenarios
+' @param containers: roSGNode, parent node containing containers as children
+' @param aThematicTakeovers: array, array of thematic takeover ads to apply
+' @return array - Array of container nodes that had themes applied
+Function applyThematicTakeoverThemesToContainers(containers, aThematicTakeovers) as Object
+  tubiLog("HomeScreen.applyThematicTakeoverThemesToContainers")
+
+  affectedContainers = []
+
+  if isNonEmptyArray(aThematicTakeovers) = false OR containers = invalid
+    return affectedContainers
+  end if
+
+  for each thematicAd in aThematicTakeovers
+    if thematicAd <> invalid AND thematicAd.type = m.constants.ui.contentTypes.thematicTakeover AND thematicAd.containerId <> invalid
+      targetContainerId = thematicAd.containerId
+
+      ' Find the container with matching ID and apply theme
+      for i = 0 to containers.getChildCount() - 1
+        container = containers.getChild(i)
+        if container <> invalid AND container.id = targetContainerId
+          applyThemeToContainer(container, thematicAd)
+          affectedContainers.push(container)
+          exit for
+        end if
+      end for
+    end if
+  end for
+
+  return affectedContainers
 End Function

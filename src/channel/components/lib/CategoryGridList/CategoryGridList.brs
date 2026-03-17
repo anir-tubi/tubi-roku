@@ -17,6 +17,7 @@ Function init()
   m.top.observeFieldScoped("requestFocusXOffsetUpdate", "onRequestFocusXOffsetUpdate")
   m.top.observeFieldScoped("requestRowHeightReset", "onRequestRowHeightReset")
   m.top.observeFieldScoped("resetCategoryGridState", "onResetCategoryGridState")
+  m.top.observeFieldScoped("recalculateRowHeights", "onRecalculateRowHeights")
 
   m.rowList = m.top.findNode("rowList")
   m.rowList.observeFieldScoped("rowItemFocused", "onRowItemFocused")
@@ -63,6 +64,13 @@ Function init()
   m.expandedTileFocusXOffset = m.featuredRowPoster[0] - m.gridItemSize[0] + 4
 
   m.ignoreCurrColumnChange = false
+
+  ' Timer to debounce recalculateRowHeights calls
+  ' Coalesces multiple rapid triggers (e.g., batchResponse + batchAdResponse) into one setRowHeights call
+  m.recalculateRowHeightsTimer = CreateObject("roSGNode", "Timer")
+  m.recalculateRowHeightsTimer.duration = 0.05 ' 50ms debounce
+  m.recalculateRowHeightsTimer.repeat = false
+  m.recalculateRowHeightsTimer.observeFieldScoped("fire", "onRecalculateRowHeightsTimerFire")
 End Function
 
 
@@ -270,7 +278,8 @@ Function onContentChange()
   end if
 
   if m.top.content <> invalid
-    setRowHeights()
+    ' Note: setRowHeights() is NOT called here - HomeScreen triggers it via
+    ' recalculateRowHeights after both content and ads are ready and themes applied
     setRowListFocus()
   end if
 
@@ -369,6 +378,11 @@ Function onRepopulateContent()
         m.itemToJumpTo = [m.itemToJumpTo[0] - 1, m.itemToJumpTo[1]]
       end if
     end if
+  end if
+
+  ' Recalculate row heights when rows are added/removed (e.g., ads removed)
+  if m.top.content <> invalid
+    setRowHeights()
   end if
 
   ' We need to make sure the focused item is updated to account for cases where container content is updated.
@@ -1214,6 +1228,27 @@ Function onRequestRowHeightReset(msg) as Void
     updateRowHeight(rowIndex, resetHeight)
     m.resetRowHeights = true
     m.modifiedRowIndex = rowIndex
+  end if
+End Function
+
+
+' Handles request to recalculate all row heights
+' Debounces rapid triggers to coalesce multiple calls into one setRowHeights execution
+' @param _msg - Message (unused)
+Function onRecalculateRowHeights(_msg) as Void
+  if m.top.content <> invalid
+    ' Restart timer to debounce - only fires after a short delay of no new triggers
+    m.recalculateRowHeightsTimer.control = "stop"
+    m.recalculateRowHeightsTimer.control = "start"
+  end if
+End Function
+
+
+' Timer callback for debounced row height recalculation
+' Called after a short delay of no new recalculateRowHeights triggers
+Function onRecalculateRowHeightsTimerFire(_msg) as Void
+  if m.top.content <> invalid
+    setRowHeights()
   end if
 End Function
 

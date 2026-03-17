@@ -847,6 +847,7 @@ Function getConstants()
   constants.adTypes.adRowlistSpotlight = "adRowlistSpotlight"
   constants.adTypes.adRowlistCarousel = "adRowlistCarousel"
   constants.adTypes.skinAd = "skinAd"
+  constants.adTypes.thematicTakeover = "thematicTakeover"
 
   'common http request headers
   constants.headers = {}
@@ -1353,6 +1354,7 @@ Function getConstants()
   constants.ui.contentTypes.skinAd = "skinAd"
   constants.ui.contentTypes.adRowlistSpotlight = "adRowlistSpotlight"
   constants.ui.contentTypes.adRowlistCarousel = "adRowlistCarousel"
+  constants.ui.contentTypes.thematicTakeover = "thematicTakeover"
   constants.ui.contentTypes.movie = "movie"
   constants.ui.contentTypes.app = "app"
 

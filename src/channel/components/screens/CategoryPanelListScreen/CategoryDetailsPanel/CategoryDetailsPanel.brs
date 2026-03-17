@@ -154,8 +154,14 @@ Function onLoadContent()
       setUIBasedOnFocus(false)
     else if category.getChildCount() > 0
       showContentState()
+
+      ' Reset positions to XML defaults first to prevent accumulation on reload
+      m.PageTitleAndCounter.translation = [m.PageTitleAndCounter.translation[0], 540]
+      m.InfoPanel.translation = [m.InfoPanel.translation[0], 130]
+
       m.nSponsorshipYDelta = 0
       if category.sponsorImages <> invalid
+        ' Adjust positions for taller sponsored header (108px sponsor graphic)
         m.nSponsorshipYDelta = -45
         m.PageTitleAndCounter.translation = [m.PageTitleAndCounter.translation[0], m.PageTitleAndCounter.translation[1] + m.nSponsorshipYDelta]
         m.InfoPanel.translation = [m.InfoPanel.translation[0], m.InfoPanel.translation[1] + m.nSponsorshipYDelta]

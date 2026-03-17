@@ -18,6 +18,7 @@
   <script type="text/brightscript" uri="../../../source/3rdparty/rodash/rodash.cat.brs" />
   <script type="text/brightscript" uri="pkg:/source/lib/MathUtils.brs" />
   <script type="text/brightscript" uri="pkg:/components/lib/TypographyMixin.brs" />
+  <script type="text/brightscript" uri="../../lib/ThematicTakeoverMixin.brs" />
 
   <interface>
     <!-- INPUTS -->
@@ -116,9 +117,9 @@
 
     <!-- incoming metadata from GeneralTask
            type is node, so that it takes less time to send data from one file to another file when comparing
-    to assocarray
+    to assocarray. HomeScreen processes this to apply thematic takeover themes before passing to CategoryGridList.
        -->
-    <field id="batchResponse" type="node" alias="CategoryGridList.categoryResponseInBatch" />
+    <field id="batchResponse" type="node" />
 
     <!-- incoming response to show/update ads on the homescreen. Currently the array will contain at
     most 1 child/ad campaign.  -->
