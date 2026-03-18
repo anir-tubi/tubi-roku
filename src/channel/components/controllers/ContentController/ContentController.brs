@@ -2443,7 +2443,7 @@ Function onCustomResume(msg)
     ' The app will resume as normal for the screensaver.
   end if
 
-  ' If the current screen has a purple carpet container, initiate a request to refresh the container data.
+  ' initiate a request to refresh the container data upon resume if the content has expired.
   if currentScreen <> invalid AND isCurrentScreenHomeScreen() = true
     if currentScreen.content <> invalid AND shouldRefresh(currentScreen.content) = true
       bRestartApp = true

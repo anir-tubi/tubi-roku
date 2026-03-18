@@ -65,12 +65,6 @@ Function init()
 
   m.ignoreCurrColumnChange = false
 
-  ' Timer to debounce recalculateRowHeights calls
-  ' Coalesces multiple rapid triggers (e.g., batchResponse + batchAdResponse) into one setRowHeights call
-  m.recalculateRowHeightsTimer = CreateObject("roSGNode", "Timer")
-  m.recalculateRowHeightsTimer.duration = 0.05 ' 50ms debounce
-  m.recalculateRowHeightsTimer.repeat = false
-  m.recalculateRowHeightsTimer.observeFieldScoped("fire", "onRecalculateRowHeightsTimerFire")
 End Function
 
 
@@ -1233,20 +1227,8 @@ End Function
 
 
 ' Handles request to recalculate all row heights
-' Debounces rapid triggers to coalesce multiple calls into one setRowHeights execution
 ' @param _msg - Message (unused)
 Function onRecalculateRowHeights(_msg) as Void
-  if m.top.content <> invalid
-    ' Restart timer to debounce - only fires after a short delay of no new triggers
-    m.recalculateRowHeightsTimer.control = "stop"
-    m.recalculateRowHeightsTimer.control = "start"
-  end if
-End Function
-
-
-' Timer callback for debounced row height recalculation
-' Called after a short delay of no new recalculateRowHeights triggers
-Function onRecalculateRowHeightsTimerFire(_msg) as Void
   if m.top.content <> invalid
     setRowHeights()
   end if

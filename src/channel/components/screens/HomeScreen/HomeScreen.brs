@@ -32,6 +32,7 @@ Function init()
   topRef.observeFieldScoped("focusCategoryGridList", "onFocusCategoryGridList")
 
   topRef.observeField("focusedChild", "onScreenFocusChange")
+  topRef.observeField("visible", "onScreenVisibleChange")
   topRef.observeFieldScoped("signedIn", "onSignedInChange")
   topRef.observeFieldScoped("categoryMenuVisible", "onCategoryMenuVisible")
   topRef.observeFieldScoped("isLoading", "onLoadingChange")
@@ -539,21 +540,30 @@ Function onLoadingChange()
 End Function
 
 
-' Handles screen focus changes
-' Refreshes content if needed when screen gains focus
-Function onScreenFocusChange()
-  tubiLog("HomeScreen.onScreenFocusChange " + focusState(m.top))
-  if m.top.hasFocus() = true
+Function onScreenVisibleChange()
+  if m.top.visible = false
+    tubiLog("HomeScreen.onScreenVisibleChange() - not visible")
+
     'TODO: Revisit this if we ever use both.
     content = m.CategoryGridList.content
     if content <> invalid
+      ' Once the screen is not visible, check if the content needs to be refreshed.
+      ' This is so the UI is refreshed when the screen is not visible so there are no visible hiccups for the user. We check if the content needs to be refreshed here because this is triggered when navigating away from the screen, and we want to make sure the content is fresh when coming back to the screen.
       if shouldRefresh(content) = true
         m.top.loadAllCategories = true
       else 'check if any containers has expired
         refreshHomeScreenContainers()
       end if
     end if
+  end if
+End Function
 
+
+' Handles screen focus changes
+' Refreshes content if needed when screen gains focus
+Function onScreenFocusChange()
+  tubiLog("HomeScreen.onScreenFocusChange " + focusState(m.top))
+  if m.top.hasFocus() = true
     if m.pivotList.content <> invalid AND (m.top.lastFocusedList = "pivotList" OR m.top.sideNavFocusedPosition = 0)
       focusedContent = m.CategoryGridList.rowFocusedItem
       if focusedContent <> invalid AND focusedContent.gridItemType = m.constants.ui.gridItemTypes.skinAd
