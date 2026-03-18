@@ -1026,19 +1026,32 @@ End Function
 ' @param episodes - Optional episodes list for series content (used when skipping detail screen)
 Function executeVodDetailSuccessCallback(content, playbackSource, episodes = invalid) as Void
   tubiLog("VodDetailScreenHelpers.executeVodDetailSuccessCallback")
-  ' send deep-link analytics if the content was deep-linked to this screen.
-  if m.enteredFromDeepLink = true AND m.deeplinkContent <> invalid
-    sendDeeplinkAnalytics(m.deeplinkContent, content, m.constants.deeplinks.entryPoints.video, m.Tracking, m.trackingLoggingTask, m.constants)
-  end if
 
-  successCb = m.showVodDetailScreenCallback.success
-  if successCb = skipDetailScreen
-    isComingSoon = isComingSoonContent(content)
-    if isComingSoon = false
-      playSelectedVodContent(content, playbackSource, episodes)
+  if m.top.fadeInContentController = true
+    ' send deep-link analytics if the content was deep-linked to this screen.
+    if m.enteredFromDeepLink = true AND m.deeplinkContent <> invalid
+      sendDeeplinkAnalytics(m.deeplinkContent, content, m.constants.deeplinks.entryPoints.video, m.Tracking, m.trackingLoggingTask, m.constants)
     end if
-  else if successCb <> invalid
-    successCb(content)
+
+    successCb = m.showVodDetailScreenCallback.success
+    if successCb = skipDetailScreen
+      isComingSoon = isComingSoonContent(content)
+      if isComingSoon = false
+        playSelectedVodContent(content, playbackSource, episodes)
+      end if
+    else if successCb <> invalid
+      successCb(content)
+    end if
+  else
+    m.detailScreenAfterFn = startPlaybackAfterAnimationComplete
+  end if
+End Function
+
+
+Function startPlaybackAfterAnimationComplete(screen)
+  tubiLog("VodDetailScreenHelpers.startPlaybackAfterAnimationComplete")
+  if screen <> invalid AND screen.content <> invalid
+    executeVodDetailSuccessCallback(screen.content, screen.playbackSource, screen.episodes)
   end if
 End Function
 

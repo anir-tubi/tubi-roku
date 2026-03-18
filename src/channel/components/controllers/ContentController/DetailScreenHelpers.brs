@@ -823,8 +823,9 @@ Function findNextEpisode2dIndex(currentItemFocused, contentNode)
   if contentNode <> invalid AND currentItemFocused <> invalid AND currentItemFocused.count() = 2
     seasonIndex = currentItemFocused[0]
     episodeIndex = currentItemFocused[1]
+    seasonChild = contentNode.getChild(seasonIndex)
 
-    if (episodeIndex + 1) < contentNode.getChild(seasonIndex).getChildCount()
+    if seasonChild <> invalid AND (episodeIndex + 1) < seasonChild.getChildCount()
       return [seasonIndex, episodeIndex + 1]
     else if (seasonIndex + 1) < contentNode.getChildCount()
       return [seasonIndex + 1, 0]

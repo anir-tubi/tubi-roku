@@ -1556,9 +1556,14 @@ Function updateRokuContinueWatchingInfo(content, position)
 
             ' Checking to make sure we are not at the end of the available episodes.
             if nextEpisode2DIndex[0] > 0 OR nextEpisode2DIndex[1] > 0
-              ' Adding the next episode to the continue watching.
-              nextEpisode = detailContent.getChild(nextEpisode2DIndex[0]).getChild(nextEpisode2DIndex[1])
-              addOrUpdateRokuContinueWatchingInfo(nextEpisode, 0)
+              seasonChild = detailContent.getChild(nextEpisode2DIndex[0])
+              nextEpisode = invalid
+              if seasonChild <> invalid then nextEpisode = seasonChild.getChild(nextEpisode2DIndex[1])
+              if nextEpisode <> invalid
+                addOrUpdateRokuContinueWatchingInfo(nextEpisode, 0)
+              else
+                deleteFromRokuContinueWatching(content)
+              end if
             else
               deleteFromRokuContinueWatching(content)
             end if

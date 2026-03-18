@@ -508,7 +508,7 @@ Function onFadeInContentController()
       currentScreen.setFocus(true)
     end if
 
-    if currentScreen.id = "detailScreen" AND m.detailScreenAfterFn <> invalid
+    if (currentScreen.id = m.constants.ui.screenIds.detailScreen OR currentScreen.id = m.constants.ui.screenIds.vodDetailScreen) AND m.detailScreenAfterFn <> invalid
       m.detailScreenAfterFn(currentScreen)
       m.detailScreenAfterFn = invalid
     end if
