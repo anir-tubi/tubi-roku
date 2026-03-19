@@ -688,6 +688,12 @@ Function cmsApi_createSearchReqInfo(searchText, bKidsMode = false, sAutoComplete
     options.params["include_linear"] = true
   end if
 
+  ' Request coming soon content alongside normal results so the client can apply experiment gating.
+  ' Bracket notation is used because the request builder serializes params as flat key=value pairs
+  ' (see Request.brs) — passing an AA directly would cause a runtime error on .toStr().
+  ' Server frameworks parse feature_flags[include_coming_soon]=true as { feature_flags: { include_coming_soon: "true" } }.
+  options.params["feature_flags[include_coming_soon]"] = "true"
+
   if includeApps = true
     url = m.constants.urls.searchV3
     options.params["include_creator_apps"] = true

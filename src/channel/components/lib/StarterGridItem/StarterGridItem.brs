@@ -304,6 +304,13 @@ Function onItemContentChange(msg)
 
     'Adding the Badge info on the poster. Currently we are not adding the badge for linear content. It might be added in future.
     sotPosterLabels = itemContent.sotPosterLabels
+    ' Coming soon supersedes all other poster labels
+    if isComingSoonContent(itemContent) = true
+      sotPosterLabels = {
+        sotLabelText: getComingSoonText(itemContent.availabilityStarts)
+        sotIcon: ""
+      }
+    end if
     ' this is to avoid rowlist reusing the same badge without adjusting to the new text.
     if m.sotBadge <> invalid
       m.top.removeChild(m.sotBadge)

@@ -761,16 +761,7 @@ Function appendComingSoonToMetadataGroup(itemContent) as Void
     return
   end if
 
-  startDateTime = CreateObject("roDateTime")
-  startDateTime.FromISO8601String(itemContent.availabilityStarts)
-  startDateTime.ToLocalTime()
-
-  month = startDateTime.GetMonth()
-  day = startDateTime.GetDayOfMonth().toStr()
-  sComingSoonDate = getTranslation("short_version_date_wo_year_format_" + month.toStr(), { day: day })
-  sComingSoonText = getTranslation("info_panel_coming_soon", { date: sComingSoonDate })
-  '::TODO:: Use localized full month day format when available: version Roku OS 12.0
-  ' sComingSoonDate = startDateTime.asDateStringLoc("MMMM d")
+  sComingSoonText = getComingSoonText(itemContent.availabilityStarts)
 
   setTextOfComingSoonButton(sComingSoonText)
   m.metadataGroup.insertChild(m.comingSoonBadge, 0)

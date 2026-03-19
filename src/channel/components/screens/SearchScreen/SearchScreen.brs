@@ -773,12 +773,18 @@ Function onItemFocused(msg)
         lineTwoData.sotMetaData = []
         m.searchScreenInfoPanel.sotMarkers = {}
       end if
+
     end if
 
     if focusedContent.scheduleData = invalid
       m.searchScreenInfoPanel.lineOneData = lineOneData
       m.searchScreenInfoPanel.lineTwoData = lineTwoData
     end if
+
+    ' Always reset availabilityStarts from the current focused content so the InfoPanel's
+    ' coming soon tag is cleared when navigating away from a coming soon tile.
+    ' For linear/sportsEvent/liveEvent content this will be invalid, suppressing the tag.
+    m.searchScreenInfoPanel.availabilityStarts = focusedContent.availabilityStarts
 
     m.searchScreenInfoPanel.calculateHeight = true
 

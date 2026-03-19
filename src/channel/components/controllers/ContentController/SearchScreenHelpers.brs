@@ -180,6 +180,7 @@ Function onSearchSuccessResponse(response)
   tubiLog("SearchScreenHelpers.onSearchSuccessResponse")
   searchScreen = getSearchScreen()
   if searchScreen <> invalid AND response <> invalid
+    filterComingSoonFromSearchResults(response)
     searchScreen.content = response
 
     pageValues = {
@@ -210,6 +211,32 @@ Function onSearchDefaultSuccessResponse(response)
     searchScreen.content = response
     searchScreen.contentUpdated = true
   end if
+End Function
+
+
+' Removes coming soon tiles from search results when the user is not in the coming soon experiment.
+' The experiment tracking event fires automatically via getStatsigExperimentResource.
+' @param response - SearchContentNode returned by the search API parser
+Function filterComingSoonFromSearchResults(response) as Void
+  results = response.results
+  if results = invalid
+    return
+  end if
+
+  for i = results.getChildCount() - 1 to 0 step -1
+    child = results.getChild(i)
+    bIsComingSoon = isComingSoonContent(child)
+    if bIsComingSoon = true
+      ' Passing true explicitly to fire the Statsig exposure event only when we know that the search results include coming soon content.
+      experiment = getStatsigExperimentResource("roku_search_coming_soon", "roku_search_coming_soon_v1", true)
+      if experiment.enabled = true
+        ' Once we know that the search results include coming soon content and the experiment is enabled, we can return early.
+        return
+      end if
+
+      results.removeChild(child)
+    end if
+  end for
 End Function
 
 

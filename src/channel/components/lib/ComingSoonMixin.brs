@@ -10,6 +10,24 @@ Function isComingSoonContent(content) as Boolean
 End Function
 
 
+' Returns the formatted "Coming {date}" label string for a given availability start date.
+' Centralizes the date-formatting logic shared by InfoPanel, ExpandedTileMetadata, and video tiles.
+' @param {string} availabilityStarts - The date in ISO 8601 format: eg. "2019-03-31T00:00:00Z"
+' @returns {string} Translated label, e.g. "Coming Mar 31"
+Function getComingSoonText(availabilityStarts as String) as String
+  startDateTime = CreateObject("roDateTime")
+  startDateTime.FromISO8601String(availabilityStarts)
+  startDateTime.ToLocalTime()
+
+  month = startDateTime.GetMonth()
+  day = startDateTime.GetDayOfMonth().toStr()
+  '::TODO:: Use localized full month day format when available: version Roku OS 12.0
+  ' sComingSoonDate = startDateTime.asDateStringLoc("MMMM d")
+  sComingSoonDate = getTranslation("short_version_date_wo_year_format_" + month.toStr(), { day: day })
+  return getTranslation("info_panel_coming_soon", { date: sComingSoonDate })
+End Function
+
+
 ' Based on the passed date, is the content not available yet? Is it coming soon?
 ' @param {string} availabilityStarts - The date in string ISO 8601 format: eg. "2019-03-31T00:00:00Z"
 Function isComingSoonBasedOnDate(availabilityStarts) as Boolean

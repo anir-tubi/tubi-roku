@@ -86,6 +86,15 @@ Function StatsigExperimentsInterface(statsigExperimentsInfo) as Object
         }
       }
 
+      ' Controls whether coming soon content is shown in search results.
+      ' When enabled, coming soon tiles appear in search with a Coming Date tag.
+      ' When disabled, coming soon tiles are filtered out of search results client-side.
+      roku_search_coming_soon: {
+        roku_search_coming_soon_v1: {
+          default: { "enabled": false }
+        }
+      }
+
       ' Video tiles experiment: Controls which screens show video previews in tiles
       ' enabled_screens: AA mapping screen IDs to boolean (true = enabled for that screen)
       ' Possible screen ID values: movieScreen, tvScreen, espanolScreen, myStuffScreen

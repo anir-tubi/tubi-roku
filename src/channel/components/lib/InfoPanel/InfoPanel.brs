@@ -559,16 +559,7 @@ Function setSotTopLabels()
   availabilityStarts = m.top.availabilityStarts
   isComingSoon = isComingSoonBasedOnDate(availabilityStarts)
   if isComingSoon = true
-    startDateTime = CreateObject("roDateTime")
-    startDateTime.FromISO8601String(availabilityStarts)
-    startDateTime.ToLocalTime()
-
-    month = startDateTime.GetMonth()
-    day = startDateTime.GetDayOfMonth().toStr()
-    sComingSoonDate = getTranslation("short_version_date_wo_year_format_" + month.toStr(), { day: day })
-    sComingSoonText = getTranslation("info_panel_coming_soon", { date: sComingSoonDate })
-    '::TODO:: Use localized full month day format when available: version Roku OS 12.0
-    ' sComingSoonDate = startDateTime.asDateStringLoc("MMMM d")
+    sComingSoonText = getComingSoonText(availabilityStarts)
 
     sotComingSoon = {}
     sotComingSoon.sotLabelText = sComingSoonText
