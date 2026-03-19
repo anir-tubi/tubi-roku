@@ -553,22 +553,34 @@ Function applyDeepLinkExperimentOverrides(statSigExperimentsInfo as Object) as V
   ' Create Statsig interface to access hash method
   experimentInterface = StatsigExperimentsInterface(statSigExperimentsInfo)
 
-  ' Loop through namespaces and experiments to populate statsigExperimentsInfo
-  for each namespace in experimentOverridesConfig
-    namespaceConfig = experimentOverridesConfig[namespace]
-    if not isAA(namespaceConfig) then continue for
+  ' Loop through each key in the overrides config
+  ' Supports both 2-level (experimentName → { default: value }) and
+  ' 3-level (namespace → experimentName → { default: value }) structures
+  for each key in experimentOverridesConfig
+    keyConfig = experimentOverridesConfig[key]
+    if not isAA(keyConfig) then continue for
 
-    for each experimentName in namespaceConfig
-      experimentConfig = namespaceConfig[experimentName]
-      if not isAA(experimentConfig) OR experimentConfig.default = invalid then continue for
-
-      ' Hash the experiment name and set the config
-      hashedExperimentId = experimentInterface.getHashValue(experimentName)
+    if keyConfig.default <> invalid
+      ' 2-level: key is the experiment name, keyConfig.default is the value
+      hashedExperimentId = experimentInterface.getHashValue(key)
       statSigExperimentsInfo[hashedExperimentId] = {
         config: {
-          value: experimentConfig.default
+          value: keyConfig.default
         }
       }
-    end for
+    else
+      ' 3-level: key is the namespace, iterate inner experiments
+      for each experimentName in keyConfig
+        experimentConfig = keyConfig[experimentName]
+        if not isAA(experimentConfig) OR experimentConfig.default = invalid then continue for
+
+        hashedExperimentId = experimentInterface.getHashValue(experimentName)
+        statSigExperimentsInfo[hashedExperimentId] = {
+          config: {
+            value: experimentConfig.default
+          }
+        }
+      end for
+    end if
   end for
 End Function
