@@ -172,6 +172,10 @@ Function StatsigExperimentsInterface(statsigExperimentsInfo) as Object
       roku_pivots_v1_2: {
         default: { "enabled": false, "treatment_group": "control", "background_enabled": false, "remove_pivots": [] }
       }
+
+      roku_content_v3_endpoints: {
+        default: { "enabled": false }
+      }
     }
     statsigExperimentsInfo: statsigExperimentsInfo
     getExperimentResource: statsigExperiments_getExperimentResource

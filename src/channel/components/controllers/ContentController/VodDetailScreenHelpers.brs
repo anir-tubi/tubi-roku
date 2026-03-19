@@ -496,6 +496,8 @@ Function getSeriesEpisodes(seriesId, season = 1, pageInSeason = 1, pageSizeInSea
   tubiLog("VodDetailScreenHelpers.getSeriesEpisodes")
   if seriesId <> invalid AND seriesId <> ""
     episodesRequestInfo = m.CmsApi.createSeriesEpisodesBySeasonReqInfo(seriesId, season, pageInSeason, pageSizeInSeason, true, shouldKidsModeBeSentToServer())
+    getStatsigExperimentResource("", "roku_content_v3_endpoints", true)
+
     m.makeRequest({
       url: episodesRequestInfo.url
       requestType: m.constants.reqNames.getSeriesEpisodesBySeason
