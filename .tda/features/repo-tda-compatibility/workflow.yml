@@ -1,0 +1,19 @@
+name: init
+description: Initialize project to make it TDA-compatible
+stages:
+- name: init
+  description: Analyze codebase and initialize TDA configuration
+  worker: init
+  approvalRequired: false
+  maxRetries: 2
+  inputs: []
+  outputs:
+  - specs/init-results.md
+- name: pr
+  description: Create pull request with initialization changes
+  worker: pr
+  approvalRequired: false
+  maxRetries: 2
+  inputs:
+  - specs/init-results.md
+  outputs: []

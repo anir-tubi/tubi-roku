@@ -1,0 +1,12 @@
+name: repo-tda-compatibility
+jira: null
+createdAt: 2026-03-19T03:33:31.421752862Z
+worktree:
+  branch: feature/repo-tda-compatibility
+  baseBranch: master
+workflow: init
+variables:
+  featureName: repo-tda-compatibility
+  coAuthorEmail: pshetty@tubi.tv
+  branchName: feature/repo-tda-compatibility
+  coAuthorName: pshetty

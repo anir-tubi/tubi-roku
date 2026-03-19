@@ -1,0 +1,47 @@
+status: completed
+currentStageIndex: 1
+stages:
+- name: init
+  status: completed
+  retryCount: 0
+  durationMs: 479762
+  numTurns: 95
+  totalCostUsd: 2.54775525
+  startedAt: 2026-03-19T03:33:58.053690399Z
+  endedAt: 2026-03-19T03:41:59.951343739Z
+  error: null
+  attemptMetrics:
+  - attemptNumber: 1
+    turns: 95
+    costUsd: 2.54775525
+    durationMs: 479762
+    startedAt: 2026-03-19T03:33:58.053690399Z
+    endedAt: 2026-03-19T03:41:59.951343319Z
+  sessionId: ef7e3d4a-c469-4c7d-9f23-e81232636e3d
+- name: pr
+  status: completed
+  retryCount: 0
+  durationMs: 376143
+  numTurns: 26
+  totalCostUsd: 0.5088404999999999
+  startedAt: 2026-03-19T03:42:00.140375094Z
+  endedAt: 2026-03-19T03:48:18.324368070Z
+  error: null
+  attemptMetrics:
+  - attemptNumber: 1
+    turns: 26
+    costUsd: 0.5088404999999999
+    durationMs: 376143
+    startedAt: 2026-03-19T03:42:00.140375094Z
+    endedAt: 2026-03-19T03:48:18.324367400Z
+  sessionId: d4e7d436-5587-4f66-9640-ce2efe6f4e74
+metrics:
+  totalDurationMs: 855905
+  totalCostUsd: 3.0565957499999996
+  totalTurns: 121
+pr:
+  number: 5918
+  url: https://github.com/adRise/tubi-roku/pull/5918
+  state: open
+  hasNewComments: false
+  hasConflicts: false

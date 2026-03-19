@@ -16,3 +16,9 @@ allure-report/
 .test-bucket-id
 .test-bucket-data.json
 .test-run-summary.json
+
+# TDA
+.tda-worktrees/
+.tda/**/logs/
+tda.yml
+project-detection.yaml
