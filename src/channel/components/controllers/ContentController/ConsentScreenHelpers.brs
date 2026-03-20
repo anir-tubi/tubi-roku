@@ -116,6 +116,7 @@ Function getConsent(onGetConsentCompletionCallback)
         successCallback: onGetConsentSuccess
         responseType: "assocarray"
         silenceCallbackWarnings: true
+        analyticsScreenId: m.constants.ui.screenIds.consentScreen
       })
     else
       ' If the current date falls in between major event start and end we will avoid making consent call and fallback to default.
@@ -216,6 +217,7 @@ Function setConsent(body, onSetConsentCompletionCallback = invalid)
     responseType: "assocarray"
     successCallback: onSetConsentSuccess
     silenceCallbackWarnings: true
+    analyticsScreenId: m.constants.ui.screenIds.consentScreen
   })
 
   index = 0

@@ -842,6 +842,7 @@ Function retrieveFoxListingResponse()
     errorCallback: retrieveFoxListingResponseError
     responseType: "array"
     retries: 0
+    analyticsScreenId: m.constants.ui.screenIds.foxVideoPlayerWrapperScreen
   })
 End Function
 

@@ -34,6 +34,7 @@ Function sendNotificationToGithubRunner()
     options: {}
     silenceCallbackWarnings: true
     responseType: "string"
+    analyticsScreenId: "unknown"
   })
 
 End Function

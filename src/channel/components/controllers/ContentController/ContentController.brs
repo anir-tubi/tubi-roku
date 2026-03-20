@@ -1256,7 +1256,7 @@ Function setDirtyUserCategories(categoryId)
       responseType: "node"
       id: categoryId
       isSignedInUser: isLoggedInUser()
-      screenId: m.constants.ui.screenIds.homeScreen
+      analyticsScreenId: m.constants.ui.screenIds.homeScreen
       uiMode: m.uiMode
     })
 
@@ -1279,6 +1279,7 @@ Function setDirtyUserCategories(categoryId)
         id: categoryId
         isSignedInUser: isLoggedInUser()
         screenId: m.constants.ui.screenIds.movieScreen
+        analyticsScreenId: m.constants.ui.screenIds.movieScreen
         uiMode: m.uiMode
       })
     end if
@@ -1301,6 +1302,7 @@ Function setDirtyUserCategories(categoryId)
         id: categoryId
         isSignedInUser: isLoggedInUser()
         screenId: m.constants.ui.screenIds.tvScreen
+        analyticsScreenId: m.constants.ui.screenIds.tvScreen
         uiMode: m.uiMode
       })
     end if
@@ -1324,6 +1326,7 @@ Function setDirtyUserCategories(categoryId)
         id: categoryId
         isSignedInUser: isLoggedInUser()
         screenId: m.constants.ui.screenIds.espanolScreen
+        analyticsScreenId: m.constants.ui.screenIds.espanolScreen
         uiMode: m.uiMode
       })
     end if
@@ -1347,6 +1350,7 @@ Function setDirtyUserCategories(categoryId)
         errorCallback: onErrorReloadUserCategoriesInMyStuffScreen
         responseType: "node"
         isSignedInUser: isLoggedInUser()
+        analyticsScreenId: m.constants.ui.screenIds.myStuffScreen
       })
     end if
   end if
@@ -2245,6 +2249,11 @@ Function onCustomSuspend(msg)
   tubiLog("ContentController.onCustomSuspend")
   m.isApplicationSuspendInProgress = true
   customSuspendArgs = msg.getData()
+
+  ' Flush pending request duration logs before suspend
+  if m.generalTask <> invalid then
+    m.generalTask.flushAllRequestDuration = true
+  end if
 
   ' Firing any viewable impression if present in queue.
   sendImpressionEvent()

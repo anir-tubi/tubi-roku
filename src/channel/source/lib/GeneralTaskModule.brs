@@ -105,7 +105,7 @@ Function generalTask_verifyRequestInfo(reqInfo = {})
 End Function
 
 
-' Adds default values that were not passed in the reqInfo and returns it
+' Adds default values that were not passed in the reqInfo and returns it.
 Function generalTask_addDefaultRequestValues(reqInfo = {})
   if isInteger(reqInfo.retries) = false then
     reqInfo.retries = 3
@@ -123,7 +123,6 @@ Function generalTask_addDefaultRequestValues(reqInfo = {})
   if isNumber(reqInfo.timeoutInMilliSec) = false OR reqInfo.timeoutInMilliSec < 1000 then
     reqInfo.timeoutInMilliSec = 30000 'keeping Roku timeout is 30000 as baseline
   end if
-
 
   return reqInfo
 End Function
@@ -196,6 +195,10 @@ End Function
 '   Additional custom fields can be added to @reqInfo. The GeneralTask parser functions will have access to the reqInfo, allowing
 '   information to be passed from the original makeRequest call, all the way through to callbacks.
 '   In this way, the callbacks can have some context about what happened to trigger them.
+'
+'   Optional field for request duration client logging (content/tensor/autopilot/search only):
+'   screenId: string - maps via constants.ui.screenIdToLogPage to tags.page; unmapped ids use screenId as page.
+'   If omitted, defaults to the current top screen id (m.getCurrentScreen().id) when screenStack is available.
 '
 Function generalTask_makeRequest(reqInfo)
   if m.verifyRequestInfo(reqInfo) = false then

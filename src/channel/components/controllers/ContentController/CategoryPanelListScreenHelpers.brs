@@ -129,6 +129,7 @@ Function fetchCategoryPanelDetails(categoryId, index = 0)
       responseType: "node"
       isSignedInUser: isLoggedInUser()
       uiMode: m.uiMode
+      analyticsScreenId: m.constants.ui.screenIds.categoryPanelListScreen
     })
   else
     categoryReqInfo = m.cmsApi.createCategoriesListReqInfo(isKidsMode)
@@ -141,6 +142,7 @@ Function fetchCategoryPanelDetails(categoryId, index = 0)
       errorCallback: onCategoryDetailPanelError
       responseType: "node"
       screenId: m.constants.ui.screenIds.channelListScreen
+      analyticsScreenId: m.constants.ui.screenIds.categoryPanelListScreen
     })
   end if
 End Function
@@ -437,6 +439,7 @@ Function getCategoryPanelListDataFromServer(screen)
       errorCallback: onCategoriesPanelListError
       responseType: "node"
       screenId: screen.id
+      analyticsScreenId: screen.id
     })
   end if
 End Function

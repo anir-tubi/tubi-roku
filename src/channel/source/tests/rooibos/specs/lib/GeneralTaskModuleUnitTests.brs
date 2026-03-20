@@ -37,6 +37,7 @@ Function generalTaskModule_makeRequest_test()
     successCallback: successCallback
     errorCallback: errorCallback
     responseType: responseType
+    analyticsScreenId: "unknown"
   })
 
   m.assertNotInvalid(reqInfo)

@@ -124,6 +124,7 @@ Function searchFromScreen(searchText, personalizationID = invalid, inputDevice =
       isSignedInUser: isLoggedInUser()
       searchText: searchText
       inputDevice: inputDevice
+      analyticsScreenId: m.constants.ui.screenIds.searchScreen
     })
 
     if isKidsUIOn() = false AND getExperimentResource("roku_search_autocomplete", "roku_search_autocomplete_v3", true).enabled = true
@@ -135,6 +136,7 @@ Function searchFromScreen(searchText, personalizationID = invalid, inputDevice =
         successCallback: onAutocompleteSuccessResponse
         silenceCallbackWarnings: true
         responseType: "assocarray"
+        analyticsScreenId: m.constants.ui.screenIds.searchScreen
       })
     end if
 
@@ -156,6 +158,7 @@ Function searchFromScreen(searchText, personalizationID = invalid, inputDevice =
       responseType: "node"
       screenId: m.constants.ui.screenIds.searchScreen
       isSignedInUser: isLoggedInUser()
+      analyticsScreenId: m.constants.ui.screenIds.searchScreen
     })
 
   end if

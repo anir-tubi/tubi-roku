@@ -349,6 +349,7 @@ Function getLiveStreamManifest(streamUrl)
     successCallback: onLiveStreamManifestResponse
     errorCallback: onManifestError
     responseType: "assocarray"
+    analyticsScreenId: m.constants.ui.screenIds.linearVideoPlayerScreen
   })
 End Function
 

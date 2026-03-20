@@ -153,7 +153,7 @@ Function getCurrentScreen()
 End Function
 
 
-' 'tracking for navigating to a screen
+' Tracking for navigating to a screen
 ' @param oldTrackingPageInfo - Page info of the screen being navigated from
 ' @param newTrackingPageInfo - Page info of the screen being navigated to
 ' @param trackingComponentInfo - Source component info (componentOneof)

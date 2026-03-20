@@ -309,6 +309,7 @@ Function verifyAgeAtSignup(signInInfo, birthdate)
       responseType: "assocarray"
       signInInfo: signInInfo
       birthdate: birthdate
+      analyticsScreenId: m.constants.ui.screenIds.signUpAgeVerificationScreen
     })
   else
     ' not expected to ever happen, so punt and start the app normally if it does
@@ -773,6 +774,7 @@ Function verifyAge(birthdate, successCallback, errorCallback)
       errorCallback: errorCallback
       responseType: "integer"
       birthdate: birthdate ' custom field to pass through to the callback
+      analyticsScreenId: m.constants.ui.screenIds.signUpAgeVerificationScreen
     })
 
   else
@@ -967,6 +969,7 @@ Function patchSignedInUserAge()
         options: patchSettingsInfo.options
         responseType: "assocarray"
         silenceCallbackWarnings: true
+        analyticsScreenId: m.constants.ui.screenIds.signUpAgeVerificationScreen
       })
     end if
   end if

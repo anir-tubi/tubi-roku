@@ -198,6 +198,7 @@ Function onSignOutModalSelected()
     options: requestInfo.options
     requestType: m.constants.reqNames.postLogout
     silenceCallbackWarnings: true
+    analyticsScreenId: m.constants.ui.screenIds.settingsScreen
   })
   setSettingsScreenSignInInfo()
 
@@ -219,6 +220,7 @@ Function onSignOutProfileSelected()
     options: requestInfo.options
     requestType: m.constants.reqNames.postLogout
     silenceCallbackWarnings: true
+    analyticsScreenId: m.constants.ui.screenIds.settingsScreen
   })
   setSettingsScreenSignInInfo()
 
@@ -371,6 +373,7 @@ Function onPinCreateOrEditForKidsAccount(msg)
         options: pinSettingsInfo.options
         responseType: "assocarray"
         errorCallback: onPinUpdateError
+        analyticsScreenId: m.constants.ui.screenIds.settingsScreen
       })
 
     end if
@@ -545,6 +548,7 @@ Function onPasswordConfirm(msg = invalid)
         errorCallback: updateParentalSettingsErrorResponse
         responseType: "assocarray"
         password: sPassword
+        analyticsScreenId: m.constants.ui.screenIds.settingsScreen
       })
 
     else
@@ -557,6 +561,7 @@ Function onPasswordConfirm(msg = invalid)
         errorCallback: updateParentalSettingsErrorResponse
         responseType: "assocarray"
         password: sPassword
+        analyticsScreenId: m.constants.ui.screenIds.settingsScreen
       })
     end if
 
@@ -953,6 +958,7 @@ End Function
 Function onFetchUserSettingsChanged()
   isMultiAccount = isUserInMultiAccount()
   getUserSettingsRequest = m.userDeviceApi.createUserSettingsGeneralTaskReqInfo(onSettingsScreenGetUserSettingsSuccess, onSettingsScreenGetUserSettingsError, isMultiAccount)
+  getUserSettingsRequest.analyticsScreenId = m.constants.ui.screenIds.settingsScreen
   m.makeRequest(getUserSettingsRequest)
 End Function
 

@@ -104,6 +104,7 @@ Function fetchEPGChannels(screen, mode = "tubitv_us_linear")
     responseType: "node"
     requestorID: screen.ID
     isSignedInUser: isSignedIn
+    analyticsScreenId: screen.ID
   })
 
   ' Store the unique ID associated with channel request to identify the program requests created using response from above api call.
@@ -168,6 +169,7 @@ Function fetchEPGChannel(screenId, channelID, successCallback, errorCallback)
       storeInCacheUponSuccess: true
       requestorID: screenId
       isSignedInUser: isSignedIn
+      analyticsScreenId: screenId
     })
   end if
 
@@ -291,6 +293,7 @@ Function makeEPGProgramCalls(requestorID, nFetchInBatch = 10)
       requestorID: requestorID
       fetchId: m.epgFetchUniqueId
       isSignedInUser: isSignedIn
+      analyticsScreenId: m.constants.ui.screenIds.epgScreen
     })
   end if
 

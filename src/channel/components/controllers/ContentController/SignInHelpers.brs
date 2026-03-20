@@ -278,6 +278,7 @@ Function checkEmailExists(input)
     errorCallback: onEmailExistsError
     responseType: "assocarray"
     rawInput: input
+    analyticsScreenId: m.constants.ui.screenIds.signInScreen
   })
 
 End Function
@@ -631,6 +632,7 @@ Function signUserIn(email, password, rfiSignInInfo = invalid, successCallback = 
     responseType: "assocarray"
     email: email
     rfiSignInInfo: rfiSignInInfo
+    analyticsScreenId: m.constants.ui.screenIds.signInScreen
   })
 End Function
 
@@ -694,6 +696,7 @@ Function onSignInResponse(response)
         options: patchSettingsInfo.options
         responseType: "assocarray"
         silenceCallbackWarnings: true
+        analyticsScreenId: m.constants.ui.screenIds.signInScreen
       })
     end if
   end if
@@ -1366,6 +1369,7 @@ Function onEmailVerificationTimerFired()
       successCallback: onQueryStatusOfMagicLinkResponse
       errorCallback: onQueryStatusOfMagicLinkError
       responseType: "assocarray"
+      analyticsScreenId: m.constants.ui.screenIds.signInScreen
     })
   end if
 End Function
@@ -1509,6 +1513,7 @@ Function createMagicLinkRequest(email)
     successCallback: onMagicLinkResponse
     errorCallback: onMagicLinkError
     responseType: "assocarray"
+    analyticsScreenId: m.constants.ui.screenIds.signInScreen
   })
 End Function
 

@@ -15,6 +15,7 @@ Function retrieveClientErrorConfig(successCallback = retrieveClientErrorConfigSu
     errorCallback: errorCallback
     responseType: "assocarray"
     retries: 0
+    analyticsScreenId: m.constants.ui.screenIds.homeScreen
   })
 End Function
 
@@ -94,6 +95,7 @@ Function sendRequestForExperiments()
       experimentsRequestInfo.successCallback = onExperimentsRequestSuccess
       experimentsRequestInfo.errorCallback = onExperimentsRequestFailure
       experimentsRequestInfo.timeoutInMilliSec = 5000
+      experimentsRequestInfo.analyticsScreenId = m.constants.ui.screenIds.homeScreen
       m.makeRequest(experimentsRequestInfo)
     else
       ' If there are no namespaces then skip the request.
@@ -122,6 +124,7 @@ Function sendRequestForExternalConfig()
     externalConfigRequestInfo.successCallback = onExternalConfigRequestSuccess
     externalConfigRequestInfo.errorCallback = onExternalConfigRequestFailure
     externalConfigRequestInfo.timeoutInMilliSec = 5000
+    externalConfigRequestInfo.analyticsScreenId = m.constants.ui.screenIds.homeScreen
     m.makeRequest(externalConfigRequestInfo)
   end if
 End Function
@@ -378,6 +381,7 @@ Function retrieveSoTStaticConfig()
     errorCallback: retrieveSoTStaticConfigErrorCallback
     responseType: "assocarray"
     timeoutInMilliSec: 5000
+    analyticsScreenId: m.constants.ui.screenIds.homeScreen
   })
 End Function
 

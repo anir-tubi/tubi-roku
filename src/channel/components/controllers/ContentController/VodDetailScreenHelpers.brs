@@ -407,6 +407,7 @@ Function getSeasonList(contentId, successCallback, errorCallback)
     responseType: "assocarray"
     isSignedInUser: isLoggedInUser()
     seasonLabel: getTranslation("screenDetails_season_label")
+    analyticsScreenId: getLogPageScreenIdForContentType(m.constants, m.constants.ui.contentTypes.series)
   })
 End Function
 
@@ -506,6 +507,7 @@ Function getSeriesEpisodes(seriesId, season = 1, pageInSeason = 1, pageSizeInSea
       errorCallback: onGetSeriesEpisodesError
       responseType: "assocarray"
       isSignedInUser: isLoggedInUser()
+      analyticsScreenId: getLogPageScreenIdForContentType(m.constants, m.constants.ui.contentTypes.series)
     })
   end if
 End Function
@@ -629,6 +631,7 @@ Function addContentToMyList(content) as Void
       successCallback: onAddContentToMyListSuccess
       errorCallback: onAddContentToMyListError
       responseType: "assocarray"
+      analyticsScreenId: getLogPageScreenIdForContentType(m.constants, content.type)
     })
   end if
 End Function
@@ -705,6 +708,7 @@ Function removeContentFromMyList(content)
       successCallback: onRemoveContentFromMyListSuccess
       errorCallback: onRemoveContentFromMyListError
       responseType: "assocarray"
+      analyticsScreenId: getLogPageScreenIdForContentType(m.constants, content.type)
     })
   end if
 End Function
@@ -785,6 +789,7 @@ Function likeDislikeContent(content, action, trackingPageInfo)
     successCallback: onContentLikeDislikeChangedSuccess
     errorCallback: onContentLikeDislikeChangedError
     responseType: "assocarray"
+    analyticsScreenId: getLogPageScreenIdForContentType(m.constants, content.type)
   })
 End Function
 
@@ -1177,6 +1182,7 @@ Function removeHistoryFromVodDetailScreen(content)
       successCallback: onHistoryRemovedFromVodDetail
       errorCallback: onHistoryRemovedFromVodDetailError
       responseType: "boolean"
+      analyticsScreenId: getLogPageScreenIdForContentType(m.constants, content.type)
     })
   end if
 End Function
@@ -1323,6 +1329,7 @@ Function getYouMayAlsoLikeContent(content, limit = 0)
       silenceCallbackWarnings: true
       contentId: content.id
       isSignedInUser: isLoggedInUser()
+      analyticsScreenId: getLogPageScreenIdForContentType(m.constants, content.type)
     })
   end if
 End Function

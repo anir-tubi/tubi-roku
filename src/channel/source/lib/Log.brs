@@ -69,6 +69,7 @@ Function TubiLogger(constants, requestInstance, auth, sentryInstance = invalid)
     isLoggingAllowed: tubiLog_isLoggingAllowed
     isSampled: tubiLog_isSampled
     getClientLogEvent: tubiLog_getClientLogEvent
+    normalizeMessageMapForBatch: tubiLog_normalizeMessageMapForBatch
     populateMessage: tubiLog_populateMessage
 
     ' private methods to delete after purple carpet event
@@ -360,6 +361,15 @@ Function tubiLog_getClientLogEvent(eventValues) as Object
     message_map = eventValues.message_map
   end if
 
+  ' Extract batch event_payloads for batch path; message_map is left intact
+  batchPayloads = invalid
+  if message_map["event_payloads"] <> invalid AND type(message_map["event_payloads"]) = "roArray"
+    arr = message_map["event_payloads"]
+    if arr.count() > 0
+      batchPayloads = arr
+    end if
+  end if
+
   deviceInfo = m.constants.deviceInfo
 
   message_map.append({
@@ -382,8 +392,11 @@ Function tubiLog_getClientLogEvent(eventValues) as Object
 
     valueType = type(value)
     if (valueType <> "String") AND (valueType <> "roString") then
-      ' Not an a string so we either need to convert or remove it.
-      if getInterface(value, "ifToStr") <> invalid then
+      ' Preserve roAssociativeArray/roArray only for batch path (message_map not sent; we use normalizeMessageMapForBatch per payload).
+      ' Non-batch: backend MessageMapEntry expects string values only, so remove or convert non-strings.
+      if batchPayloads <> invalid AND (valueType = "roAssociativeArray" OR valueType = "roArray") then
+        ' Leave as-is; batch path uses extracted batchPayloads and normalized payloads, not this message_map
+      else if getInterface(value, "ifToStr") <> invalid then
         message_map[key] = value.toStr()
       else
         propertiesToDelete.push(key)
@@ -402,13 +415,49 @@ Function tubiLog_getClientLogEvent(eventValues) as Object
 
   eventValues.message_map = message_map
 
-  eventInfo = m.populateMessage("client_logs", eventValues, eventBase)
-
   authInfo = m.auth.getAuthInfo()
   userId = 0
   if authInfo <> invalid AND authInfo.userId <> invalid
     userId = authInfo.userId.toInt()
   end if
+
+  ' Batch path: combine multiple payloads into one request with full envelope per payload
+  ' Backend MessageMapEntry expects string values only; nested objects (e.g. tags) are serialized to JSON string
+  if batchPayloads <> invalid
+    eventPayloads = []
+    for each payload in batchPayloads
+      if type(payload) = "roAssociativeArray"
+        messageMapForPayload = m.normalizeMessageMapForBatch(payload)
+        eventId = CreateObject("roDeviceInfo").GetRandomUUID()
+        time = CreateObject("roDateTime")
+        timestamp = time.ToISOString("milliseconds")
+        clientLogEvent = {
+          device_id: m.constants.deviceInfo.deviceId
+          platform: m.constants.analyticsPlatform
+          user_id: userId
+          client_common: {
+            event_id: eventId
+            event_timestamp: timestamp
+          }
+          version: m.constants.deviceInfo.clientVersion
+          app_id: m.constants.appName
+          log_type: eventValues.log_type
+          log_subtype: eventValues.log_subtype
+          level: eventValues.level
+          message_map: messageMapForPayload
+        }
+        eventPayloads.push(clientLogEvent)
+      end if
+    end for
+    if eventPayloads.count() > 0
+      return {
+        "event_name": "client_logs"
+        "event_payloads": eventPayloads
+      }
+    end if
+  end if
+
+  eventInfo = m.populateMessage("client_logs", eventValues, eventBase)
 
   eventId = CreateObject("roDeviceInfo").GetRandomUUID()
   time = CreateObject("roDateTime")
@@ -435,6 +484,26 @@ Function tubiLog_getClientLogEvent(eventValues) as Object
     "event_name": "client_logs"
     "event_payloads": [clientLogEvent]
   }
+End Function
+
+
+' Returns a copy of payload with all values as strings for backend MessageMapEntry (no nested objects).
+' Nested roAssociativeArray/roArray are serialized via FormatJson.
+Function tubiLog_normalizeMessageMapForBatch(payload as Object) as Object
+  result = {}
+  for each key in payload
+    value = payload[key]
+    if value = invalid
+      ' skip invalid
+    else if type(value) = "String" OR type(value) = "roString"
+      result[key] = value
+    else if type(value) = "roAssociativeArray" OR type(value) = "roArray"
+      result[key] = FormatJson(value)
+    else if getInterface(value, "ifToStr") <> invalid
+      result[key] = value.toStr()
+    end if
+  end for
+  return result
 End Function
 
 

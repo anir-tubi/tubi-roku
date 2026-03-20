@@ -184,6 +184,7 @@ Function fetchCategoryDetails(content, index = 0, contentMode = "")
       responseType: "node"
       isSignedInUser: isLoggedInUser()
       uiMode: m.uiMode
+      analyticsScreenId: m.constants.ui.screenIds.categoryDetailsScreen
     })
   end if
 End Function

@@ -5,6 +5,7 @@ Function init()
   m.top.observeField("request", m.port)
   m.top.observeField("batchRequest", m.port)
   m.top.observeField("cancel", m.port)
+  m.top.observeField("flushAllRequestDuration", m.port)
   m.top.observeField("newClientErrorConfig", m.port)
   m.top.observeField("newConstants", m.port)
   m.top.observeField("newExperimentsInfo", m.port)
@@ -63,6 +64,7 @@ Function listen()
   m.jobStore = {}
   m.backedOffJobs = {}
   m.requestTypes = {}
+  m.pendingRequestDurationPayloads = []
 
   instantiateLibs()
 
@@ -139,6 +141,11 @@ Function listen()
         end for
 
         m.statSigExperimentsInfo.append(newStatSigExperiments)
+      else if field = "flushAllRequestDuration" then
+        if msg.getData() = true
+          flushAllRequestDurationLogs()
+          m.top.flushAllRequestDuration = false
+        end if
       else
         conditionallyProcessAuthUpdatedMessage(msg)
       end if
@@ -291,6 +298,8 @@ Function makeApiRequest(reqInfo, batchInfo = invalid) as Boolean
       handleBackoff(invalid, job, 0)
       return true
     else
+      ' Time for this attempt only (used for request duration logging). Ensures we log round-trip time of the successful attempt, not total time including retries.
+      job.attemptStartTime = createObject("roTimespan")
       reqSent = tubiReq.start(m.port)
 
       urlTransfer = tubiReq.urlTransfer
@@ -336,6 +345,140 @@ Function makeBatchApiRequests(batchInfo)
 End Function
 
 
+' Returns the service name for request duration logging, or invalid if not one of content/tensor/autopilot/search.
+' @param url: string, full request URL
+' @return: string or invalid
+Function getServerFromUrl(url) as Dynamic
+  if isNonEmptyString(url) <> true then
+    return invalid
+  end if
+  urlLower = Lcase(url)
+  if Instr(1, urlLower, "content-cdn") > 0 then
+    return "content"
+  else if Instr(1, urlLower, "tensor-cdn") > 0 then
+    return "tensor"
+  else if Instr(1, urlLower, "autopilot-cdn") > 0 then
+    return "autopilot"
+  else if Instr(1, urlLower, "search.") > 0 then
+    return "search"
+  end if
+  return invalid
+End Function
+
+
+' Returns the path portion of the URL without query string (e.g. "/api/v2/content").
+' Strips query parameters to avoid leaking sensitive data in logs and to allow aggregation by endpoint path.
+' @param url: string, full request URL
+' @return: string
+Function getPathFromUrl(url) as String
+  if isNonEmptyString(url) <> true then
+    return ""
+  end if
+  position = Instr(1, url, "//")
+  if position > 0 then
+    pathStart = Instr(position + 2, url, "/")
+    if pathStart > 0 then
+      pathWithQuery = Mid(url, pathStart)
+      queryStart = Instr(1, pathWithQuery, "?")
+      if queryStart > 0 then
+        return Left(pathWithQuery, queryStart - 1)
+      end if
+      return pathWithQuery
+    end if
+  end if
+  return ""
+End Function
+
+
+' Builds a single request duration payload from a job (for batching). Does not send; caller adds to pendingRequestDurationPayloads.
+' message_map.tags.page comes only from reqInfo.analyticsScreenId: mapped via constants.ui.screenIdToLogPage, else raw analyticsScreenId.
+' Uses attemptStartTime when present so duration is the successful attempt's round-trip time only (excludes retry delays and failed attempts).
+' @param job: assocarray, job from m.jobStore with reqInfo, startTime, and optionally attemptStartTime
+' @return AA with duration, server, url, tags or invalid if not applicable
+Function buildRequestDurationPayload(job) as Object
+  if job = invalid OR job.reqInfo = invalid then
+    return invalid
+  end if
+
+  reqInfo = job.reqInfo
+  server = getServerFromUrl(reqInfo.url)
+
+  if server = invalid then
+    return invalid
+  end if
+
+  ' Prefer attemptStartTime (set when this attempt was sent) so duration excludes retries; fallback to startTime for backward compatibility.
+  timespan = job.attemptStartTime
+  if timespan = invalid then
+    timespan = job.startTime
+  end if
+  duration = timespan.totalMilliseconds().toStr()
+  path = getPathFromUrl(reqInfo.url)
+
+  tags = {}
+  if isNonEmptyString(reqInfo.analyticsScreenId) = true then
+    pageForTags = invalid
+
+    if m.constants.ui.screenIdToLogPage <> invalid then
+      mappedPage = m.constants.ui.screenIdToLogPage[reqInfo.analyticsScreenId]
+      if isNonEmptyString(mappedPage) = true then
+        pageForTags = mappedPage
+      end if
+    end if
+
+    if pageForTags = invalid then
+      pageForTags = reqInfo.analyticsScreenId
+    end if
+
+    tags = { page: pageForTags }
+  else
+    tags = { page: "unknown" }
+  end if
+
+  return {
+    duration: duration
+    server: server
+    url: path
+    tags: tags
+  }
+End Function
+
+
+' Appends one request duration payload to the buffer. Flushed when buffer reaches 5 or when flushRequestDurationForPage is set.
+' @param job: assocarray, job from m.jobStore with reqInfo and startTime
+Function addRequestDurationPayload(job) as Void
+  payload = buildRequestDurationPayload(job)
+
+  if payload = invalid then
+    return
+  end if
+
+  if m.pendingRequestDurationPayloads = invalid then
+    m.pendingRequestDurationPayloads = []
+  end if
+
+  m.pendingRequestDurationPayloads.push(payload)
+
+  ' Flush all when buffer reaches 5 (avoids unbounded growth)
+  if m.pendingRequestDurationPayloads.count() >= 5 then
+    flushAllRequestDurationLogs()
+  end if
+End Function
+
+
+' Flushes all accumulated request duration payloads as one client log with event_payloads array.
+Function flushAllRequestDurationLogs() as Void
+  if m.pendingRequestDurationPayloads = invalid OR m.pendingRequestDurationPayloads.count() = 0 then
+    return
+  end if
+
+  payloads = m.pendingRequestDurationPayloads
+  m.pendingRequestDurationPayloads = []
+  messageMap = { event_payloads: payloads }
+  logInfo(messageMap, "clientInfo", "requestDuration", 0.1)
+End Function
+
+
 ' processResponse
 '
 ' it does basic parsing the api response and send to appropriate parsing callbacks for further parsing, and send back the parsed data to the response field.
@@ -360,6 +503,7 @@ Function processResponse(msg)
         code = result.response.code
 
         if code >= 200 AND code < 400
+          addRequestDurationPayload(job) 'to track requestDuration in client logs
           processSuccessResponse(result, callbackTypes, job)
         else
           if reqInfo.retriesAttempted = invalid then

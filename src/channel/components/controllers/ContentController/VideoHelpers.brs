@@ -227,7 +227,7 @@ Function setupVideoPlayer(content, playbackSource = { "srcForAnalytic": "unknown
 
       'Do not Fetch/Show BrowseWhileWatching row for kids mode & limited UI models
       if isKidsUIOn() = false AND m.constants.deviceInfo.limitedUi = false
-        getRelatedContent(content, handleRelatedResponseInVideoPlayer, 20)
+        getRelatedContent(content, handleRelatedResponseInVideoPlayer, 20, m.constants.ui.screenIds.videoPlayerScreen)
       else
         videoPlayer.relatedContent = invalid
         videoPlayer.updateRelatedContent = true
@@ -348,6 +348,7 @@ Function updateHistory(content, nowPos, isFireAndForget = true, ignoreMinimumPos
         responseType: "node"
         content: inputContent
         nowPos: inputNowPos
+        analyticsScreenId: m.constants.ui.screenIds.videoPlayerScreen
       })
     end if
   end if
@@ -714,6 +715,7 @@ Function onGetPauseAd(msg)
         successCallback: onPauseAdResponse
         silenceCallbackWarnings: true
         responseType: "node"
+        analyticsScreenId: m.constants.ui.screenIds.videoPlayerScreen
       })
     end if
   end if
@@ -1182,6 +1184,7 @@ Function getSprites(content)
       successCallback: onSpritesResponse
       responseType: "node"
       silenceCallbackWarnings: true
+      analyticsScreenId: m.constants.ui.screenIds.videoPlayerScreen
     })
   end if
 End Function
@@ -1365,6 +1368,7 @@ Function fetchUpNextContent(videoPlayer)
       errorCallback: onUpNextError
       responseType: "node"
       isSignedInUser: isLoggedInUser()
+      analyticsScreenId: m.constants.ui.screenIds.videoPlayerScreen
     })
   end if
   return invalid
@@ -1524,6 +1528,7 @@ Function sendPauseAdPixel(pixelUrl)
       requestType: m.constants.reqNames.postPauseAdPixel
       responseType: "string"
       silenceCallbackWarnings: true
+      analyticsScreenId: m.constants.ui.screenIds.videoPlayerScreen
     })
   end if
 End Function

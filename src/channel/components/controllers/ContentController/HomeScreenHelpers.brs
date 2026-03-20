@@ -422,6 +422,7 @@ Function fetchHomeScreen(homeScreen, useCache = false)
     isSignedInUser: isLoggedInUser()
     uiMode: m.uiMode
     screenId: screenId
+    analyticsScreenId: screenId
   })
 
   if useCache = false
@@ -467,6 +468,7 @@ Function createHomescreenAdRequest(homescreenId, successCallback, aAdTypes = [],
     adTypes: aAdTypes
     timeoutInMilliSec: adDisplayReqInfo.timeoutInMilliSec
     isUserInVideoTilesExperiment: isVideoTileEnabledScreen(homescreenId)
+    analyticsScreenId: homescreenId
   })
 End Function
 
@@ -918,6 +920,7 @@ Function makeContainerRequest(category, columnFocused, homeScreen, successCallba
         category.state = "containerPaginationRequestPending"
         m.makeRequest({
           screenId: homeScreen.id
+          analyticsScreenId: homeScreen.id
           url: categoryReqInfo.url
           requestType: categoryReqInfo.requestType
           options: categoryReqInfo.options
@@ -2375,6 +2378,7 @@ Function makeAdditionalContainersRequestConditionally(currFocusRow, screen) as V
       isSignedInUser: isLoggedInUser()
       uiMode: m.uiMode
       screenId: screen.id
+      analyticsScreenId: screen.id
     })
   end if
 End Function

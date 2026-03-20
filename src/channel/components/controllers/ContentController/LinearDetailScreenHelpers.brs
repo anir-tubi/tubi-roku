@@ -60,6 +60,7 @@ Function getLinearRelatedContent(content)
       silenceCallbackWarnings: true
       contentId: content.id
       isSignedInUser: isLoggedInUser()
+      analyticsScreenId: getLogPageScreenIdForContentType(m.constants, content.type)
     })
   end if
 End Function
@@ -101,6 +102,7 @@ Function updateLiveEventsContainerWithEpgListingInfo(scheduleId)
     errorCallback: updateHomeScreenContainersWithEpgListingInfo
     responseType: "assocarray"
     retries: 0
+    analyticsScreenId: m.constants.ui.screenIds.homeScreen
   })
 End Function
 
@@ -146,6 +148,7 @@ Function addOrRemoveReminderForEventContent(content)
       successCallback: onSetReminderSuccess
       silenceCallbackWarnings: true
       responseType: "assocarray"
+      analyticsScreenId: getLogPageScreenIdForContentType(m.constants, content.type)
     })
   else
     removeFromQueueReq = m.userDeviceApi.removeFromQueueReqInfo(bookmark.bookmarkId, contentId, contentType)
@@ -156,6 +159,7 @@ Function addOrRemoveReminderForEventContent(content)
       successCallback: onRemoveReminderSuccess
       silenceCallbackWarnings: true
       responseType: "assocarray"
+      analyticsScreenId: getLogPageScreenIdForContentType(m.constants, content.type)
     })
   end if
 End Function

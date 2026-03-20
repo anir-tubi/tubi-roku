@@ -538,6 +538,7 @@ Function getSingleContentFromServer(content, successCallback, errorCallback, res
         responseType: "node"
         responseContext: responseContext
         isSignedInUser: isLoggedInUser()
+        analyticsScreenId: getLogPageScreenIdForContentType(m.constants, content.type)
       })
     else
       tubiLog("DetailScreenHelpers.getSingleContentFromServer, display Coming Soon content")
@@ -748,7 +749,16 @@ Function handleSingleContentError(error, onRetrySuccessCallback, onRetryErrorCal
 End Function
 
 
-Function getRelatedContent(content, callback = handleRelatedResponse, limit = 0)
+' Returns screenId for request duration: content-type-based page when caller is a detail screen, else passed screenId.
+Function getRelatedContentLogScreenId(screenId, contentType) as String
+  if screenId = m.constants.ui.screenIds.detailScreen OR screenId = m.constants.ui.screenIds.vodDetailScreen OR screenId = m.constants.ui.screenIds.linearDetailScreen then
+    return getLogPageScreenIdForContentType(m.constants, contentType)
+  end if
+  return screenId
+End Function
+
+
+Function getRelatedContent(content, callback = handleRelatedResponse, limit = 0, screenId = m.constants.ui.screenIds.detailScreen)
   ' get related (You May Also Like) content along with metadata for the content
   ' (but not if in any of the kids modes, since it won't be displayed)
 
@@ -766,6 +776,7 @@ Function getRelatedContent(content, callback = handleRelatedResponse, limit = 0)
       silenceCallbackWarnings: true
       contentId: content.id
       isSignedInUser: isLoggedInUser()
+      analyticsScreenId: getRelatedContentLogScreenId(screenId, content.type)
     })
   end if
 
@@ -1061,6 +1072,7 @@ Function onAddToQueue(detailScreen, callBackAfterSignIn = invalid)
         successCallback: callBackSuccessFunction
         errorCallback: addToQueueErrorResponse
         responseType: "assocarray"
+        analyticsScreenId: getLogPageScreenIdForContentType(m.constants, content.type)
       })
       detailScreen.isWaitingForServerResponse = true
 
@@ -1334,6 +1346,7 @@ Function onRemoveFromQueue(detailScreen)
         successCallback: removeFromQueueSuccessResponse
         errorCallback: removeFromQueueErrorResponse
         responseType: "assocarray"
+        analyticsScreenId: getLogPageScreenIdForContentType(m.constants, content.type)
       })
 
       detailScreen.isWaitingForServerResponse = true
@@ -1469,6 +1482,7 @@ Function updateLikeDislike(detailScreen, sRatingChange)
       successCallback: onLikeChangedSuccess
       errorCallback: onLIkeChangedError
       responseType: "assocarray"
+      analyticsScreenId: getLogPageScreenIdForContentType(m.constants, detailScreen.content.type)
     })
   end if
 End Function
@@ -1675,6 +1689,7 @@ Function onRemoveFromHistory(detailScreen)
         successCallback: onHistoryRemovedSuccess
         errorCallback: onHistoryRemovedError
         responseType: "boolean"
+        analyticsScreenId: getLogPageScreenIdForContentType(m.constants, detailScreen.content.type)
       })
     else if isLoggedInUser(authInfo) = false
       removeHistoryLocally(contentId)

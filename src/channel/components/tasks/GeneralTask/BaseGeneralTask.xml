@@ -37,5 +37,9 @@
 
     <!-- We use the GeneralTask to make our statsigExperiments network requests. This means the statsigExperiments is not available at that time and we need to update it once loaded. This is only used for updating m.statSigExperiments and should not be accessed outside of the observer -->
     <field id="newStatSigExperiments" type="assocarray" />
+
+    <!-- Set to true from render thread (e.g. onCustomSuspend) to flush all pending request duration payloads. -->
+    <field id="flushAllRequestDuration" type="boolean" alwaysNotify="true"/>
+
   </interface>
 </component>

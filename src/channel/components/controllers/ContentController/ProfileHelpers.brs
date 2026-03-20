@@ -389,6 +389,7 @@ Function verifyKidsAtSignup(signInInfo)
       errorCallback: onAgeNotVerifiedAtSignup 'TODO Check For 422, 451, 400, and GDPR etc
       responseType: "assocarray"
       signInInfo: signInInfo
+      analyticsScreenId: m.constants.ui.screenIds.signUpAgeVerificationScreen
     })
   else
     ' not expected to ever happen, so punt and start the app normally if it does

@@ -358,6 +358,19 @@ Function getConstants()
   constants.reqNames.getPivotContainers = "getPivotContainers"
   constants.reqNames.getBranchManifest = "getBranchManifest"
 
+  ' Page names for request duration logging (messageMap.tags.page). Align with TRANSITION_PAGE_NAMES on web.
+  constants.transitionPageNames = {}
+  constants.transitionPageNames.home = "home"
+  constants.transitionPageNames.series = "series"
+  constants.transitionPageNames.episodesList = "episodesList"
+  constants.transitionPageNames.playback = "playback"
+  constants.transitionPageNames.search = "search"
+  constants.transitionPageNames.activate = "activate"
+  constants.transitionPageNames.categories = "categories"
+  constants.transitionPageNames.networks = "networks"
+  constants.transitionPageNames.espanol = "espanol"
+  constants.transitionPageNames.movie = "movie"
+  constants.transitionPageNames.video = "video"
   ' Long-polling request names
   constants.reqNames.voyagerEstablishSession = "voyagerEstablishSession"
   constants.reqNames.voyagerJoinRoom = "voyagerJoinRoom"
@@ -1504,6 +1517,31 @@ Function getConstants()
   constants.ui.screenIds.kidsAgeSelectionScreen = "kidsAgeSelectionScreen"
   constants.ui.screenIds.nameInputScreen = "nameInputScreen"
   constants.ui.screenIds.pivotDetailScreen = "pivotDetailScreen"
+  ' Screen IDs used only for request duration log page (movie/series/video); pass from detail helpers based on content.type.
+  constants.ui.screenIds.movieDetailScreen = "movieDetailScreen"
+  constants.ui.screenIds.seriesDetailScreen = "seriesDetailScreen"
+  constants.ui.screenIds.videoDetailScreen = "videoDetailScreen"
+
+  ' Maps screen id to log page for request duration logging; used when makeRequest passes reqInfo.screenId.
+  constants.ui.screenIdToLogPage = {}
+  constants.ui.screenIdToLogPage[constants.ui.screenIds.homeScreen] = constants.transitionPageNames.home
+  constants.ui.screenIdToLogPage[constants.ui.screenIds.movieScreen] = constants.transitionPageNames.home
+  constants.ui.screenIdToLogPage[constants.ui.screenIds.tvScreen] = constants.transitionPageNames.home
+  constants.ui.screenIdToLogPage[constants.ui.screenIds.espanolScreen] = constants.transitionPageNames.espanol
+  constants.ui.screenIdToLogPage[constants.ui.screenIds.searchScreen] = constants.transitionPageNames.search
+  constants.ui.screenIdToLogPage[constants.ui.screenIds.movieDetailScreen] = constants.transitionPageNames.movie
+  constants.ui.screenIdToLogPage[constants.ui.screenIds.seriesDetailScreen] = constants.transitionPageNames.series
+  constants.ui.screenIdToLogPage[constants.ui.screenIds.videoDetailScreen] = constants.transitionPageNames.video
+  constants.ui.screenIdToLogPage[constants.ui.screenIds.episodeScreen] = constants.transitionPageNames.episodesList
+  constants.ui.screenIdToLogPage[constants.ui.screenIds.videoPlayerScreen] = constants.transitionPageNames.playback
+  constants.ui.screenIdToLogPage[constants.ui.screenIds.adPlayerScreen] = constants.transitionPageNames.playback
+  constants.ui.screenIdToLogPage[constants.ui.screenIds.linearVideoPlayerScreen] = constants.transitionPageNames.playback
+  constants.ui.screenIdToLogPage[constants.ui.screenIds.foxVideoPlayerWrapperScreen] = constants.transitionPageNames.playback
+  constants.ui.screenIdToLogPage[constants.ui.screenIds.categoryPanelListScreen] = constants.transitionPageNames.categories
+  constants.ui.screenIdToLogPage[constants.ui.screenIds.categoryDetailsScreen] = constants.transitionPageNames.categories
+  constants.ui.screenIdToLogPage[constants.ui.screenIds.channelListScreen] = constants.transitionPageNames.networks
+  constants.ui.screenIdToLogPage[constants.ui.screenIds.signInScreen] = constants.transitionPageNames.activate
+  constants.ui.screenIdToLogPage[constants.ui.screenIds.emailInputScreen] = constants.transitionPageNames.activate
 
   ' notAllowedContainerIds are the containers which are not allowed to be displayed on category screen,
   ' because currently we support only portrait style in category detail screen
@@ -2149,4 +2187,16 @@ Function getConstants()
   constants.serverPersistentRegistryKeys.parentalRating = "parental_rating_v2" ' we are blindly using V2 here because we are using registry only for treatment of MA
 
   return constants
+End Function
+
+
+' Returns screen ID for request duration log page based on content type (movie -> "movie", series -> "series", else -> "video").
+' Use when making requests from detail screens so tags.page reflects content type.
+Function getLogPageScreenIdForContentType(constants, contentType) as String
+  if contentType = constants.ui.contentTypes.movie then
+    return constants.ui.screenIds.movieDetailScreen
+  else if contentType = constants.ui.contentTypes.series then
+    return constants.ui.screenIds.seriesDetailScreen
+  end if
+  return constants.ui.screenIds.videoDetailScreen
 End Function
