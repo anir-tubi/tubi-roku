@@ -73,15 +73,17 @@ jobs:
           pkg_password: ${{ secrets.PKG_PASSWORD }}
 
   # ──────────────────────────────────────────────────────────
-  # Job 1b: Upload to S3 (needs production runner for AWS access)
+  # Job 1b: Upload to S3 (runs on pkg-build-server with AWS_PROFILE)
   # ──────────────────────────────────────────────────────────
   upload-pr-open:
     needs: build-pr-open
-    runs-on: [self-hosted, staging]
+    runs-on: [self-hosted, roku-pkg-runner]
     timeout-minutes: 5
     permissions:
       contents: read
       pull-requests: write
+    env:
+      AWS_PROFILE: ${{ vars.AWS_PROFILE }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -92,7 +94,6 @@ jobs:
           pr_number: ${{ needs.build-pr-open.outputs.pr_number }}
           s3_bucket: ${{ env.S3_BUCKET }}
           cdn_distribution_id: ${{ env.CDN_DISTRIBUTION_ID }}
-          aws_role_arn: ${{ vars.AWS_ROLE_ARN }}
 
       - name: Update manifest and notify
         uses: ./.github/actions/update-manifest-and-notify
@@ -159,16 +160,18 @@ jobs:
           pkg_password: ${{ secrets.PKG_PASSWORD }}
 
   # ──────────────────────────────────────────────────────────
-  # Job 2b: Upload to S3 from /deploy comment (needs production runner)
+  # Job 2b: Upload to S3 from /deploy comment (runs on pkg-build-server with AWS_PROFILE)
   # ──────────────────────────────────────────────────────────
   upload-comment:
     needs: build-comment
-    runs-on: [self-hosted, staging]
+    runs-on: [self-hosted, roku-pkg-runner]
     timeout-minutes: 5
     permissions:
       contents: read
       issues: write
       pull-requests: write
+    env:
+      AWS_PROFILE: ${{ vars.AWS_PROFILE }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -181,7 +184,6 @@ jobs:
           pr_number: ${{ needs.build-comment.outputs.pr_number }}
           s3_bucket: ${{ env.S3_BUCKET }}
           cdn_distribution_id: ${{ env.CDN_DISTRIBUTION_ID }}
-          aws_role_arn: ${{ vars.AWS_ROLE_ARN }}
 
       - name: Get PR metadata
         id: pr-meta
@@ -219,11 +221,13 @@ jobs:
       github.event_name == 'issue_comment' &&
       github.event.issue.pull_request &&
       startsWith(github.event.comment.body, '/rename')
-    runs-on: [self-hosted, staging]
+    runs-on: [self-hosted, roku-pkg-runner]
     timeout-minutes: 5
     permissions:
       contents: read
       issues: write
+    env:
+      AWS_PROFILE: ${{ vars.AWS_PROFILE }}
     steps:
       - name: Parse new display name
         id: parse
@@ -241,13 +245,6 @@ jobs:
 
       - name: Checkout
         uses: actions/checkout@v4
-
-      - name: Assume staging-core role
-        uses: aws-actions/configure-aws-credentials@v4
-        with:
-          role-to-assume: ${{ vars.AWS_ROLE_ARN }}
-          aws-region: us-east-2
-          role-skip-session-tagging: true
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -278,3 +275,4 @@ jobs:
             -H "Accept: application/vnd.github+json" \
             "${GITHUB_API}/repos/${{ github.repository }}/issues/${ISSUE_NUMBER}/comments" \
             -d "$(jq -n --arg body "Display name updated to **${DISPLAY_NAME}**." '{body: $body}')"
+

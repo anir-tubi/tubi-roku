@@ -11,20 +11,10 @@ inputs:
   cdn_distribution_id:
     description: CloudFront distribution ID for cache invalidation
     required: true
-  aws_role_arn:
-    description: IAM role ARN to assume for S3 and CloudFront access
-    required: true
 
 runs:
   using: composite
   steps:
-    - name: Assume staging-core role
-      uses: aws-actions/configure-aws-credentials@v4
-      with:
-        role-to-assume: ${{ inputs.aws_role_arn }}
-        aws-region: us-east-2
-        role-skip-session-tagging: true
-
     - name: Download pkg artifact
       uses: actions/download-artifact@v4
       with:
