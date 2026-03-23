@@ -45,8 +45,10 @@ Function updateVideoTileOverlayVisibility(screen = invalid, isVideoTileEnabled =
   end if
 
   ' Check if the focused content is a video tile enabled container
+  ' Also disable overlay for spotlight and carousel ad containers
   if isVideoTileEnabled = true AND screen.contentFocused <> invalid
-    isVideoTileEnabled = isVideoTileEnabledContainer(screen.contentFocused.gridItemType)
+    gridItemType = screen.contentFocused.gridItemType
+    isVideoTileEnabled = isVideoTileEnabledContainer(gridItemType) OR gridItemType = m.constants.ui.gridItemTypes.adRowlistSpotlight OR gridItemType = m.constants.ui.gridItemTypes.adRowlistCarousel
   end if
 
   ' Set visibility based on video tiles enabled and lastFocusedList
