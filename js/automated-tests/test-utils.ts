@@ -1860,7 +1860,7 @@ class Auth {
 
     const user = await testUtils.sendNetworkRequest({
       method: 'post',
-      url: this.baseAccountUrl + '/user/login',
+      url: this.baseAccountUrl + '/api/v2/user/login',
       headers: headers,
       body: body
     });

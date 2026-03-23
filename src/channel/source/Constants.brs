@@ -703,7 +703,7 @@ Function getConstants()
     constants.urls.account.urlBase = "https://account.staging-public.tubi.io"
   end if
   constants.urls.account.emailExists = constants.urls.account.urlBase + "/user/email_available"
-  constants.urls.account.login = constants.urls.account.urlBase + "/user/login"
+  constants.urls.account.login = constants.urls.account.urlBase + "/api/v2/user/login" ' /api/v2/user/login
   constants.urls.account.checkBirthday = constants.urls.account.urlBase + "/user/check_birthday_info"
   constants.urls.account.deviceRegister = constants.urls.account.urlBase + "/device/register"
   constants.urls.account.userSettings = constants.urls.account.urlBase + "/user/settings"
