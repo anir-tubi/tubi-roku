@@ -30,13 +30,13 @@ Function init()
   m.originalOffsetY = m.offset.translation[1]
 
   m.typographyConstants = getTypographyConstants()
-  setTypographyOfLabel(m.title, m.typographyConstants.ids.headerSmall)
+  setTypographyOfLabel(m.title, m.typographyConstants.ids.headerSmall, { fontSize: 48 })
   setTypographyOfLabel(m.name, m.typographyConstants.ids.subheaderMedium)
   setTypographyOfLabel(m.email, m.typographyConstants.ids.bodyMedium)
-  setTypographyOfLabel(m.manageTitle, m.typographyConstants.ids.subheaderMedium)
+  setTypographyOfLabel(m.manageTitle, m.typographyConstants.ids.headerSmall, { fontSize: 48 })
   setTypographyOfLabel(m.description, m.typographyConstants.ids.bodyMedium)
   setTypographyOfLabel(m.QRCodeUrlString, m.typographyConstants.ids.subheaderLarge)
-  setTypographyOfLabel(m.linkedAccountsLabel, m.typographyConstants.ids.subheaderMedium)
+  setTypographyOfLabel(m.linkedAccountsLabel, m.typographyConstants.ids.headerSmall, { fontSize: 48 })
   setTypographyOfLabel(m.linkedAccountsDescription, m.typographyConstants.ids.bodyMedium)
   m.avatar.textFont = m.typographyConstants.ids.displayMedium
 
@@ -149,13 +149,14 @@ Function onLinkedAccountsChange(msg)
     linkedKids = CreateObject("roSGNode", "ContentNode")
     for each accountId in linkedAccounts
       profile = linkedAccounts[accountId]
-      menuItem = CreateObject("roSGNode", "SideNavContentNode")
-      menuItem.title = profile.name
-      menuItem.secondaryTitle = UCase(profile.name.left(1))
-      menuItem.iconUrl = profile.avatarUrl
-      menuItem.isKidsAccount = true
-      menuItem.addField("setFocus", "boolean", false)
-      menuItem.setFocus = false
+      menuItem = CreateObject("roSGNode", "ContentNode")
+      if isNonEmptyString(profile.name) = true
+        menuItem.title = profile.name
+      else if isNonEmptyString(profile.firstName) = true
+        menuItem.title = profile.firstName
+      end if
+
+      menuItem.HDPosterUrl = profile.avatarUrl
       linkedKids.appendChild(menuItem)
     end for
 

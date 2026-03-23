@@ -185,7 +185,16 @@ Function onKeyEvent(key as String, press as Boolean) as Boolean
     end if
   else if key = "back"
     if m.backButtonPoster.visible = true
-      handled = false
+      if m.top.mode = "confirm_pin"
+        m.pinConfirmed = false
+        m.pinNeedsConfirmation = invalid
+        m.top.mode = "edit_pin"
+        clearNumberPad()
+        showPinErrorMessage(false)
+        handled = true
+      else
+        handled = false
+      end if
     end if
   end if
 
@@ -206,7 +215,7 @@ Function onContinueButtonSelected(msg)
       if m.getPinConfirmed = true AND m.pinConfirmed = false
         if m.pinNeedsConfirmation = invalid
           m.pinNeedsConfirmation = pinSubmitted
-          setMode("confirm_pin")
+          m.top.mode = "confirm_pin"
           clearNumberPad()
         else
           comparePin(m.pinNeedsConfirmation, pinSubmitted)
@@ -247,7 +256,7 @@ Function comparePin(pin1, pin2)
     showPinErrorMessage(false)
   else
     m.pinConfirmed = false
-    setMode("confirm_pin")
+    m.top.mode = "confirm_pin"
     showPinErrorMessage(true)
   end if
 End Function
@@ -264,6 +273,7 @@ End Function
 Function setMode(mode)
   if mode = "edit_pin"
     m.header.text = getTranslation("screenSettings_parentalPassword_create_new_pin")
+    m.continueButton.text = getTranslation("dialog_button_continue")
     m.top.screenLevel = m.constants.ui.screenLevels.confirmpasswordscreen
     m.multiPurposeButton.visible = false
     m.buttonLayout.removeChild(m.skipButtonLegalText)
@@ -271,6 +281,7 @@ Function setMode(mode)
     m.getPinConfirmed = true
   else if mode = "confirm_pin"
     m.header.text = getTranslation("screenSettings_parentalPassword_confirm_pin")
+    m.continueButton.text = getTranslation("button_text_updatePin")
     m.top.screenLevel = m.constants.ui.screenLevels.confirmpasswordscreen
     m.multiPurposeButton.visible = false
     m.buttonLayout.removeChild(m.skipButtonLegalText)
@@ -278,6 +289,7 @@ Function setMode(mode)
     m.getPinConfirmed = true
   else if mode = "enter_pin"
     m.header.text = getTranslation("ParentalControlPinInputScreen_enter_pin_header")
+    m.continueButton.text = getTranslation("dialog_button_continue")
     m.top.screenLevel = m.constants.ui.screenLevels.confirmpasswordscreen
     m.multiPurposeButton.text = getTranslation("ParentalControlPinInputScreen_forgot_pin_button_label")
     m.multiPurposeButton.visible = true
@@ -286,6 +298,7 @@ Function setMode(mode)
     m.getPinConfirmed = false
   else
     m.header.text = getTranslation("screenSettings_parentalPassword_create_new_pin")
+    m.continueButton.text = getTranslation("dialog_button_continue")
     m.top.screenLevel = m.constants.ui.screenLevels.ageGateScreen
     if m.skipButtonLegalText.getParent() = invalid
       m.buttonLayout.insertChild(m.skipButtonLegalText, 1)

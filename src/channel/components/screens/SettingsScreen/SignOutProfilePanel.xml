@@ -6,6 +6,8 @@
   <script type="text/brightscript" uri="pkg:/components/lib/ExperimentMixin.brs" />
   <script type="text/brightscript" uri="pkg:/source/lib/TubiExperiments.brs" />
   <script type="text/brightscript" uri="pkg:/components/lib/TypographyMixin.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/StringUtils.brs" />
+  <script type="text/brightscript" uri="pkg:/source/3rdparty/rta/typeUtils.brs" />
 
   <interface>
     <field id="email" type="string" alias="Email.text" />
@@ -38,7 +40,7 @@
       <LayoutGroup
         layoutDirection="vert"
         horizAlignment="left"
-        itemSpacings="[48,48,96,12,48,48]">
+        itemSpacings="[48,48,96,96,48,48]">
         <Label
           id="Title">
           <Font
@@ -118,11 +120,11 @@
           <MarkupGrid
             id="LinkedAccountsGrid"
             drawFocusFeedback="false"
-            itemComponentName="profileSideNavItem"
-            itemSize="[200,84]"
+            itemComponentName="ProfileSettingMenuItem"
+            itemSize="[200,164]"
             itemSpacing="[6,6]"
-            numRows="2"
-            numColumns="3">
+            numRows="1"
+            numColumns="7">
           </MarkupGrid>
 
         </LayoutGroup>

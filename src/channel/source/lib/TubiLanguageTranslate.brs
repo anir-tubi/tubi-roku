@@ -2597,7 +2597,11 @@ Function getTranslation_en_US()
     },
     "ParentalControlPinInputScreen_forgot_pin_button_label": {
       "description": "Label of the forgot pin button in the parental control pin input screen",
-      "message": "Forgot PIN"
+      "message": "Forgot your Pin?"
+    },
+    "button_text_updatePin": {
+      "description": "Label of the update pin button",
+      "message": "Update PIN"
     },
     "screenSettings_pinPassword_title": {
       "description": "Title of the pin password screen",

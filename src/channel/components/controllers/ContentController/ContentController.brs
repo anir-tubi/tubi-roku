@@ -2852,9 +2852,9 @@ End Function
 ' @backGroundColor : toast background color
 ' @imageWidth: interger, width of the image if imageUri is provided.
 ' @imageHeight: interger, height of the image if imageUri is provided.
-'}
 ' @shouldSendTracking: boolean, true if we are sending an event for toast message, otherwise false
 ' @dialogEventInfo: assocArray, contains the info necessary to send a dialog analytics event, has keys: "type" and "values"
+'}
 Function showToast(toastInfo, shouldSendTracking = false, dialogEventInfo = {})
   m.tubiToast = m.top.findNode("tubiToast")
   if isAA(toastInfo) = true
