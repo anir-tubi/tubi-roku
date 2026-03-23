@@ -63,6 +63,16 @@ Function StatsigExperimentsInterface(statsigExperimentsInfo) as Object
         roku_bww_landscape_v2: {
           default: { enabled: false }
         }
+        ' resume_playback_preroll_strategy_v1 — preroll ad break request when resuming VOD with watch history.
+        ' Applies only when: enableAds, content has a preroll cue (Int(cuepoint)=0 in cuepoints), and nowPos > 0.
+        ' Statsig config: { "strategy": "<value>" }. Values must match VideoPlayerScreen playContent() exactly.
+        '   resume_ad_break_at_now_pos (default): no override; ad break uses resume position (m.top.adPosition from reset).
+        '   resume_ad_break_previous_cue_or_zero: Rainmaker now_pos at previous cuepoint < nowPos, or 0 if none.
+        '   resume_ad_break_at_zero: Rainmaker now_pos at preroll (ad break cue at 0).
+        '   resume_skip_preroll: do not request preroll; start playback without preroll fetch.
+        resume_playback_preroll_strategy_v1: {
+          default: { "strategy": "resume_ad_break_at_now_pos" }
+        }
       }
 
       roku_linear_reg_gate: {

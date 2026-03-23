@@ -974,15 +974,21 @@ Function playContent()
     ' reset the seekReferenceQueue
     m.seekReferenceQueue = []
 
-    if m.Video.content.nowPos <> invalid AND m.Video.content.nowPos >= 0
-      m.playerPosition = m.Video.content.nowPos
-      m.lastSavedPosition = m.Video.content.nowPos
-      updateLastPingTime(m.Video.content.nowPos)
-      m.lastButtonPressPos = m.Video.content.nowPos
-      m.seekReferenceQueue.push(m.Video.content.nowPos)
-      seekToPosition(m.Video.content.nowPos)
+    ' Do not use getNumber() alone: it maps invalid to 0, which would incorrectly run the resume/seek path.
+    playNowPos = -1
+    if m.Video.content.nowPos <> invalid
+      playNowPos = getNumber(m.Video.content.nowPos)
+    end if
 
-      if m.Video.content.nowPos = 0
+    if playNowPos >= 0
+      m.playerPosition = playNowPos
+      m.lastSavedPosition = playNowPos
+      updateLastPingTime(playNowPos)
+      m.lastButtonPressPos = playNowPos
+      m.seekReferenceQueue.push(playNowPos)
+      seekToPosition(playNowPos)
+
+      if playNowPos = 0
         ' At this point seekReferenceQueue will have value 0. But the player position callback starts from 1
         ' and the play progress event does not fire as per logic written in onVideoPositionChange() in 10 seconds because m.isSeeking is not setting to false.
         ' If the video is seeked to 0, set the m.isSeeking to false, so that play progress event fires correctly.
@@ -1017,6 +1023,19 @@ Function playContent()
         end for
       end if
 
+      ' Below block is needed for resume_playback_preroll_strategy_v1 experiment.
+      if fetchPreroll = true AND playNowPos > 0
+        prerollFetchStrategy = getStatsigExperimentResource("roku_player_improvement", "resume_playback_preroll_strategy_v1", true).strategy
+
+        if prerollFetchStrategy = "resume_ad_break_previous_cue_or_zero"
+          m.top.adPosition = getPreviousCuepointBeforeNowPos(cuepoints, playNowPos)
+        else if prerollFetchStrategy = "resume_ad_break_at_zero"
+          m.top.adPosition = 0
+        else if prerollFetchStrategy = "resume_skip_preroll"
+          fetchPreroll = false
+        end if
+      end if
+
       if fetchPreroll = true
         updatePlayerLogLib(m.playerLogLib, "setAdType", "preroll")
 
@@ -1035,6 +1054,29 @@ Function playContent()
     m.shouldFireStartVideoEvent = true
   end if
 
+End Function
+
+
+Function getPreviousCuepointBeforeNowPos(cuepoints, nowPos) as Float
+  best = invalid
+
+  if cuepoints = invalid OR type(cuepoints) <> "roArray"
+    return 0
+  end if
+
+  for each cuepoint in cuepoints
+    if isNumber(cuepoint) = true AND cuepoint < nowPos
+      if best = invalid OR cuepoint > best
+        best = cuepoint
+      end if
+    end if
+  end for
+
+  if best = invalid
+    return 0
+  end if
+
+  return best
 End Function
 
 
