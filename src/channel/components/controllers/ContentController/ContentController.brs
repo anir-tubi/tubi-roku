@@ -3199,6 +3199,7 @@ Function getUserInfo(callback)
   m.getUserPreferencesRateTitleDislikedResponseReceived = false
 
   authInfo = m.tubiAuthUpdate.getAuthInfo()
+
   if isLoggedInUser(authInfo) = true AND isMajorEventDay() = false
     getHistoryIds(getHistoryIdsSuccess, getHistoryIdsError)
     getQueueIds(getQueueIdsSuccess, getQueueIdsError)

@@ -121,6 +121,7 @@ Function onRfiUserData(msg)
     input.birth = billing.userData.birth
     input.state = billing.userData.state
     input.email = billing.userData.email
+    m.RFIProvidedEmail = billing.userData.email
     input.emailType = "pre_fill"
 
     checkEmailExists(input)
@@ -754,13 +755,18 @@ End Function
 '
 ' The sign-in flow has ended, do what comes next
 Function onActivationSuccess()
-
-  'Saving hasPreviouslyRegistered to server once the device is registered with tubi. so that next time when user tries to signIn, it uses magic link to signIn
-  saveServerPersistentData({
-    "hasPreviouslyRegistered": true
-  }, "device")
-
   tubiLog("SignInHelpers.onActivationSuccess")
+
+  if m.RFIProvidedEmail <> invalid
+    authInfo = m.tubiAuthUpdate.getAuthInfo()
+    if authInfo <> invalid AND authInfo.email = m.RFIProvidedEmail
+      m.RFIProvidedEmail = invalid 'clear the variable after we consumed it.
+      saveServerPersistentData({
+        "hasPreviouslyRegistered": true
+      }, "device")
+    end if
+  end if
+
   getUserInfo(refreshConsent)
 
   m.spinner.visible = true
