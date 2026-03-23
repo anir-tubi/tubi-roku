@@ -87,10 +87,14 @@ Function getPosterUri(itemContent) as String
     if isNonEmptyString(currentProgram.landscapePosterUrl) = true
       posterUri = currentProgram.landscapePosterUrl
     end if
-  else if isNonEmptyString(itemContent.featuredLandscape) = true
-    posterUri = itemContent.featuredLandscape
-  else if isNonEmptyString(itemContent.landscape) = true
-    posterUri = itemContent.landscape
+  end if
+
+  if isNonEmptyString(posterUri) = false
+    if isNonEmptyString(itemContent.featuredLandscape) = true
+      posterUri = itemContent.featuredLandscape
+    else if isNonEmptyString(itemContent.landscape) = true
+      posterUri = itemContent.landscape
+    end if
   end if
 
   return posterUri

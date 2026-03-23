@@ -82,7 +82,8 @@ End Function
 ' @contentFromServer: assocArray, AA representation of content metadata JSON as returned from server
 ' @gridType: value from Enum gridItemTypes
 ' @useSeriesImages: boolean, Linear programs of type 'Episode' are expected to use Series_images instead of images. Series_images follows the same structure as images.
-Function tubiMetadataTranslate_getThumbnailImage(contentFromServer, gridType = "", useSeriesImages = false)
+' @isLinearProgram: boolean, If true, applies linear-specific image fallback logic (landscape_images > hero_images). Default false.
+Function tubiMetadataTranslate_getThumbnailImage(contentFromServer, gridType = "", useSeriesImages = false, isLinearProgram = false)
   if useSeriesImages = true
     canvasImages = contentFromServer.series_images
   else
@@ -123,7 +124,9 @@ Function tubiMetadataTranslate_getThumbnailImage(contentFromServer, gridType = "
       sThumbnailURL = contentFromServer.thumbnails[0]
     end if
   else if gridType = gridItemTypes.landscapeWithMetadata
-    if canvasImages <> invalid AND type(canvasImages.hero_tb) = "roArray" AND isNonEmptyString(canvasImages.hero_tb[0])
+    if isLinearProgram = true AND contentFromServer <> invalid AND isNonEmptyArray(contentFromServer.landscape_images) = true
+      sThumbnailURL = contentFromServer.landscape_images[0]
+    else if canvasImages <> invalid AND type(canvasImages.hero_tb) = "roArray" AND isNonEmptyString(canvasImages.hero_tb[0])
       sThumbnailURL = canvasImages.hero_tb[0]
     else if contentFromServer <> invalid AND isNonEmptyArray(contentFromServer.hero_images) = true
       sThumbnailURL = contentFromServer.hero_images[0]
@@ -1762,7 +1765,8 @@ Function tubiMetadataTranslate_buildCategoryChildrenInfo(container, contents, co
           end if
 
           if isUserInVideoTilesExp = true
-            featuredLandscape = m.getRoundedCornersURL(m.getThumbnailImage(fullChild, m.constants.ui.gridItemTypes.landscapeWithMetadata))
+            isLinearContent = (sContentType = m.contentTypes.linear)
+            featuredLandscape = m.getRoundedCornersURL(m.getThumbnailImage(fullChild, m.constants.ui.gridItemTypes.landscapeWithMetadata, false, isLinearContent))
             rating = ""
             if isNonEmptyArray(fullChild.ratings) = true AND isAA(fullChild.ratings[0]) = true
               rating = fullChild.ratings[0].value
@@ -2782,10 +2786,10 @@ Function tubiMetadataTranslate_translateProgram(channelFromServer, programFromSe
 
     if gridItemType = m.constants.ui.gridItemTypes.videoTile
       useSeriesImage = (programFromServer.series_id <> invalid AND programFromServer.series_images <> invalid)
-      landscapePosterUrl = m.getRoundedCornersURL(m.getThumbnailImage(programFromServer, m.constants.ui.gridItemTypes.landscapeWithMetadata, useSeriesImage))
+      landscapePosterUrl = m.getRoundedCornersURL(m.getThumbnailImage(programFromServer, m.constants.ui.gridItemTypes.landscapeWithMetadata, useSeriesImage, true))
 
       if isNonEmptyString(landscapePosterUrl) = false
-        landscapePosterUrl = m.getRoundedCornersURL(m.getThumbnailImage(channelFromServer, m.constants.ui.gridItemTypes.landscapeWithMetadata))
+        landscapePosterUrl = m.getRoundedCornersURL(m.getThumbnailImage(channelFromServer, m.constants.ui.gridItemTypes.landscapeWithMetadata, false, true))
       end if
 
       translatedProgram.landscapePosterUrl = landscapePosterUrl
