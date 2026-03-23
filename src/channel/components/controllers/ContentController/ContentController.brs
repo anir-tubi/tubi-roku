@@ -837,7 +837,8 @@ Function runControllerStartSequence()
   else if m.profileMigrationComplete <> true
     performProfileMigration()
     ' wait till we trasfer the user to the new profile
-  else if m.isConsentCheckComplete <> true
+  else if m.isConsentCheckComplete <> true AND m.isConsentCheckInProgress <> true
+    m.isConsentCheckInProgress = true
     ' Below logic handles the use case where in the previous session if the user entered a age less than 18.
     ' and the user is in gdpr country. During the start up flow we are checking if the user is in gdpr country.
     ' then we are checking the if user hasage is false which means the age entered is not adult and he received a age gate error in previous session.
@@ -911,7 +912,7 @@ Function runControllerStartSequence()
     else
       runControllerStartSequence()
     end if
-  else
+  else if m.isConsentCheckComplete = true
     m.performanceMetricsTracker.endAppLaunchMetricTiming("start_app_ui_load_after_configs")
     ' All of the above checked values are true, so we are ready to start the channel UI
     ' initSideNav must run after m.global.trackingLoggingTask is set in case there are any experiments
@@ -3842,7 +3843,11 @@ Function processUserContentSelection(content, screen, playbackSource = {}) as Vo
         playerLinearChannel(content)
       end if
     else if content.actionId = "reminder"
-      addOrRemoveReminderForEventContent(content)
+      if isLoggedInUser() = true
+        addOrRemoveReminderForEventContent(content)
+      else
+        startSignIn(processUserContentSelectionAfterSignIn)
+      end if
     else if content.actionId <> "contentUnavailable"
       showLinearDetailScreen(content, playbackSource)
     end if
@@ -4016,7 +4021,9 @@ Function processUserContentSelectionAfterSignIn()
       contentFocused = screen.contentFocused
     end if
 
-    if contentFocused <> invalid AND contentFocused.actionId <> "signInWatch" AND contentFocused.actionId <> "reminder"
+    if contentFocused <> invalid AND contentFocused.actionId = "reminder"
+      addOrRemoveReminderForEventContent(contentFocused)
+    else if contentFocused <> invalid AND contentFocused.actionId <> "signInWatch"
       if contentFocused.type = m.constants.ui.contentTypes.sportsEvent AND isUserInAdultsMode() = false
         if screen.id <> m.constants.ui.screenIds.homeScreen
           popScreen(true, true)

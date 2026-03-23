@@ -98,11 +98,15 @@ Function getConsent(onGetConsentCompletionCallback)
   ' We are using One trust sdk only in GDPR countries.
   ' If the user is in gdpr country then we will fetch the partner token and proceed with One trust sdk initialization.
   if isOneTrustConsentEnabled() = true
-    oneTrustViews = m.top.createChild("Group")
-    oneTrustViews.id = "oneTrustViews"
-    m.oneTrustLib = m.top.createChild("ComponentLibrary")
-    m.oneTrustLib.observeField("loadStatus", "onOneTrustCompLibLoadStatusChanged")
-    m.oneTrustLib.uri = m.constants.settings.oneTrustComponentsUrl
+    if m.oneTrustLib = invalid then
+      oneTrustViews = m.top.createChild("Group")
+      oneTrustViews.id = "oneTrustViews"
+      m.oneTrustLib = m.top.createChild("ComponentLibrary")
+      m.oneTrustLib.observeField("loadStatus", "onOneTrustCompLibLoadStatusChanged")
+      m.oneTrustLib.uri = m.constants.settings.oneTrustComponentsUrl
+    else
+      onOneTrustSDKInitializeComplete()
+    end if
   else
 
     if isMajorEventDay() = false
@@ -114,8 +118,8 @@ Function getConsent(onGetConsentCompletionCallback)
         options: requestInfo.options
         requestType: m.constants.reqNames.getConsent
         successCallback: onGetConsentSuccess
+        errorCallback: onGetConsentFailure
         responseType: "assocarray"
-        silenceCallbackWarnings: true
         analyticsScreenId: m.constants.ui.screenIds.consentScreen
       })
     else
@@ -126,6 +130,15 @@ Function getConsent(onGetConsentCompletionCallback)
         getConsentCompletionCallback()
       end if
     end if
+  end if
+End Function
+
+
+Function onGetConsentFailure(error)
+  if m.onGetConsentCompletionCallback <> invalid
+    getConsentCompletionCallback = m.onGetConsentCompletionCallback
+    m.onGetConsentCompletionCallback = invalid
+    getConsentCompletionCallback()
   end if
 End Function
 
@@ -170,17 +183,7 @@ Function initializeOneTrustSDK()
   if oneTrustViewsGroup <> invalid
     m.oneTrust.callFunc("setupUI", { "view": oneTrustViewsGroup })
   end if
-  tcfString = getTCFString()
-
-  ' For performance reasons so that we can quickly show the homescreen.
-  ' Since for guest user consent if we have locally stored consent we do not have to wait until one trust syncs the data from backend
-  ' because we need to refresh registry consent with server data only for logged in user because there is a possibility of data been updated from other devices.
-  if isNonEmptyString(tcfString)
-    onOneTrustSDKInitializeComplete()
-  else
-    m.oneTrust.eventlistener.observeField("dataDownloadSucess", "onOneTrustSDKInitializeComplete")
-    ' Attaching a error callback so that for any reason OT SDK failed to initialize we still continue with app load with assumption that user did not grant access.
-  end if
+  m.oneTrust.eventlistener.observeFieldScoped("dataDownloadSucess", "onOneTrustSDKInitializeComplete")
 End Function
 
 
@@ -191,7 +194,9 @@ Function onOneTrustSDKInitializeComplete()
     m.onGetConsentCompletionCallback = invalid
     getConsentCompletionCallback()
   end if
-  m.oneTrust.eventlistener.unobserveFieldScoped("dataDownloadSucess")
+  if m.oneTrust <> invalid
+    m.oneTrust.eventlistener.unobserveFieldScoped("dataDownloadSucess")
+  end if
 End Function
 
 
@@ -350,6 +355,7 @@ Function onInitialGetConsentRequestComplete()
     ' Calling getConsents api so that we have the data ready whenever we are ready to calling startUserExperience or showConsentScreen method.
     showConsentScreen()
   else
+    m.isConsentCheckInProgress = false
     m.isConsentCheckComplete = true
     runControllerStartSequence()
   end if
@@ -357,6 +363,7 @@ End Function
 
 
 Function proceedAfterConsentUpdated()
+  m.isConsentCheckInProgress = false
   m.oneTrust.eventlistener.unObserveFieldScoped("AcceptAll")
   m.oneTrust.eventlistener.unObserveFieldScoped("RejectAll")
   m.oneTrust.eventlistener.unObserveFieldScoped("onHideBanner")
@@ -482,6 +489,7 @@ Function onOneTrustSDKInitializeFailure(msg)
     ' Since it is a critical for working in GDPR countries setting sampling rate to 1 and also given the fact users are very less.
     tubiException(error, "error", 1)
   end if
+  m.oneTrustLib = invalid
   m.trackingLoggingTask.userConsentsOptOutStatus = getConsentsOptOutStatus()
   if m.onGetConsentCompletionCallback <> invalid
     getConsentCompletionCallback = m.onGetConsentCompletionCallback
