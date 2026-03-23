@@ -135,13 +135,13 @@ Function createDeeplinkContentFromStartupArgs(args)
     else if page = "kids"
       content.deeplinkType = "kids"
     else if page = "home"
-      if args.source = m.constants.deeplinks["external-control"] AND isNonEmptyString(args.roomId) = true
-        content.deeplinkType = "casting"
-        content.roomId = args.roomId
-      else
-        content.deeplinkType = "homePage"
-      end if
+      content.deeplinkType = "homePage"
     end if
+  end if
+
+  if sourceArg = m.constants.deeplinks["external-control"] AND isNonEmptyString(args.roomId) = true
+    content.deeplinkType = "cast"
+    content.roomId = args.roomId
   end if
 
   ' remove any 0s that might be prepended to the content id
@@ -262,7 +262,11 @@ End Function
 Function handleDeeplinkContentByType()
   tubilog("deeplinkHelpers.handleDeeplinkContentByType")
   if m.deepLinkContent <> invalid
-    if m.deepLinkContent.deeplinkType = "linear" OR m.deepLinkContent.deeplinkType = "liveTV"
+    if m.deepLinkContent.deeplinkType = "cast"
+      showDefaultHomeScreen()
+      focusSideNavOption(m.constants.ui.sideNavIds.home)
+      startCastingSession()
+    else if m.deepLinkContent.deeplinkType = "linear" OR m.deepLinkContent.deeplinkType = "liveTV"
       'if fadeInContentController has not be set true, then linear content can not play.
       'in that case, we are setting a callback to call handleLinearDeeplinkContent after fadeInContentController is triggered
       callback = handleLiveEventDeeplinkContent
@@ -319,11 +323,6 @@ Function handleDeeplinkContentByType()
       getSingleContentFromServer(m.deeplinkContent, onDeeplinkShortFormContentSuccess, handleSingleContentDeeplinkError)
     else if m.deepLinkContent.deeplinkType = "fox" then
       playLinearVideoWithFoxPlayer()
-    else if m.deepLinkContent.deeplinkType = "casting"
-      startCastingSession(m.deeplinkContent.roomId)
-      resetDeeplinkValues()
-      showDefaultHomeScreen()
-      focusSideNavOption(m.constants.ui.sideNavIds.home)
     else
       message = getTranslation("error_deeplink_page")
       showDeeplinkErrorModal(invalid, message)

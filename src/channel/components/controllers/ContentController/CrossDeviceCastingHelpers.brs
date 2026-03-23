@@ -30,9 +30,15 @@ Function destroyLongPollingTask() as Void
 End Function
 
 
-' Start a Voyager session with the given room ID
-' @param roomId: string - The room ID to join
-Function startCastingSession(roomId as String) as Void
+' Start a Voyager session using room ID from m.deeplinkContent
+Function startCastingSession() as Void
+  if isNonEmptyString(m.deeplinkContent.roomId) = false
+    logWarn("CrossDeviceCastingHelpers.startCastingSession - No room ID")
+    resetDeeplinkValues()
+    return
+  end if
+
+  roomId = m.deeplinkContent.roomId
   isActive = false
   if m.longPollingTask <> invalid
     connectionState = m.longPollingTask.connectionState
@@ -42,11 +48,14 @@ Function startCastingSession(roomId as String) as Void
   if isActive = true
     currentRoomId = m.longPollingTask.roomId
     if currentRoomId = roomId
+      if m.longPollingTask.connectionState = "polling"
+        processCastingDeeplinkPlayAndReset()
+      end if
+      ' If not yet polling, leave m.deeplinkContent intact so onCastingConnectionStateChanged can process it when polling is reached.
       return
     end if
 
     logDebug("CrossDeviceCastingHelpers.startCastingSession: Already in room " + currentRoomId + "; tearing down session before joining new room " + roomId)
-    m.pendingCastingRoomId = roomId
     sendCastingSessionMetadata()
     stopCurrentCastingPlayback()
     stopCastingSession()
@@ -56,6 +65,20 @@ Function startCastingSession(roomId as String) as Void
     logDebug("CrossDeviceCastingHelpers.startCastingSession: Starting session for room: " + roomId)
     m.longPollingTask.roomId = roomId
   end if
+End Function
+
+
+' When the Voyager session is ready (polling), apply optional cast deeplink play and clear deeplink state
+Function processCastingDeeplinkPlayAndReset() as Void
+  if isNonEmptyString(m.deeplinkContent.id) = true
+    playPayload = { contentId: m.deeplinkContent.id }
+    if m.deeplinkContent.nowPos >= 0
+      playPayload.position = m.deeplinkContent.nowPos
+    end if
+    handleCastingPlayContentCommand(playPayload)
+  end if
+
+  resetDeeplinkValues()
 End Function
 
 
@@ -71,7 +94,16 @@ End Function
 Function onCastingConnectionStateChanged(msg)
   state = msg.getData()
   logDebug("CrossDeviceCastingHelpers.onCastingConnectionStateChanged - state: " + state)
-  if state = "disconnected"
+
+  if state = "polling"
+    if isDeeplinkRoomSameAsCurrentSessionRoom() = true
+      processCastingDeeplinkPlayAndReset()
+    end if
+  else if state = "error"
+    if isDeeplinkRoomSameAsCurrentSessionRoom() = true
+      resetDeeplinkValues()
+    end if
+  else if state = "disconnected"
     m.castingPlayPosition = invalid
     m.castingAdPlaybackPosition = invalid
   end if
@@ -87,11 +119,10 @@ Function onLongPollingTaskStateChanged(msg)
   if state = "stop"
     destroyLongPollingTask()
 
-    if isNonEmptyString(m.pendingCastingRoomId) = true
+    if m.deeplinkContent <> invalid AND isNonEmptyString(m.deeplinkContent.roomId) = true
       initLongPollingTask()
-      logDebug("CrossDeviceCastingHelpers.onLongPollingTaskStateChanged - Creating new session in room: " + m.pendingCastingRoomId)
-      m.longPollingTask.roomId = m.pendingCastingRoomId
-      m.pendingCastingRoomId = invalid
+      logDebug("CrossDeviceCastingHelpers.onLongPollingTaskStateChanged - Creating new session in room: " + m.deeplinkContent.roomId)
+      m.longPollingTask.roomId = m.deeplinkContent.roomId
     end if
   end if
 End Function
@@ -373,7 +404,6 @@ End Function
 ' This signals the end of the cross-device session
 Function handleCastingStopCastingCommand()
   logDebug("CrossDeviceCastingHelpers.handleCastingStopCastingCommand")
-  m.pendingCastingRoomId = invalid
   sendCastingSessionMetadata()
   stopCurrentCastingPlayback()
   stopCastingSession()
@@ -451,4 +481,19 @@ Function getCurrentVideoPlayerScreen() as Object
   end if
 
   return invalid
+End Function
+
+
+' True when cast deeplink room matches the current session room
+' @return: boolean
+Function isDeeplinkRoomSameAsCurrentSessionRoom() as Boolean
+  if m.deeplinkContent = invalid OR m.longPollingTask = invalid
+    return false
+  end if
+
+  if isNonEmptyString(m.deeplinkContent.roomId) = false OR isNonEmptyString(m.longPollingTask.roomId) = false
+    return false
+  end if
+
+  return m.deeplinkContent.roomId = m.longPollingTask.roomId
 End Function
