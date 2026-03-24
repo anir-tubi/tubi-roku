@@ -224,6 +224,14 @@ Function parseSeriesEpisodesBySeasonSuccess(fullResponse, reqInfo)
     content.delete("change")
     content.delete("focusedChild")
   end if
+  app = parsedResponse.creator_tensor_app
+  if isAA(app) AND isNonEmptyString(app.id) AND isNonEmptyString(app.title) AND isAA(app.images) AND isNonEmptyArray(app.images.logo) then
+    ' Go ahead and round the logo
+    app.images.logo[0] = m.metadataTranslate.getRoundedCornersURL(app.images.logo[0], 999)
+    content.append({
+      "creatorTensorApp": app
+    })
+  end if
   return {
     "seasonNode": seasonNode
     "content": content

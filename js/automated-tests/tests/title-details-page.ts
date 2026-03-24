@@ -13,8 +13,8 @@ describe('Title Details Page', function () {
       ...args,
       experimentOverrides: {
         roku_content_details: {
-          roku_content_details_v3: {
-            default: { "enabled": true, "enable_always_primary_buttons": true }
+          roku_content_details_v3_1: {
+            default: { "enabled": true, "enable_always_primary_buttons": false }
           }
         }
       }
@@ -1127,8 +1127,8 @@ describe('Title Details Page', function () {
     }, {
       user, experimentOverrides: {
         roku_content_details: {
-          roku_content_details_v3: {
-            default: { "enabled": true, "enable_always_primary_buttons": true }
+          roku_content_details_v3_1: {
+            default: { "enabled": true, "enable_always_primary_buttons": false }
           }
         }
       }

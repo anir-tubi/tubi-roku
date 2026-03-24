@@ -336,6 +336,10 @@ Function onVodDetailCtaSelectedButtonIdChange(msg) as Void
       end if
     else if id = "gotoChannel"
       showChannelDetailsScreen(screenContent.channelId)
+    else if id = "creator"
+      if screenContent.creatorTensorApp <> invalid
+        showCollectionScreen(screenContent.creatorTensorApp.id)
+      end if
     else if id = "removeFromHistory"
       removeHistoryFromVodDetailScreen(screenContent)
     else if id = "episodes"

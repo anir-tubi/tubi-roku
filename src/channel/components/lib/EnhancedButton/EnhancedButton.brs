@@ -75,9 +75,11 @@ Function onThemeChange(msg = invalid) as Void
     m.backgroundColor = theme.backgroundColor
     m.secondaryTextColor = theme.secondaryTextColor
 
-    ' Icon colors
-    m.icon.blendColor = theme.primaryTextColor
-    m.iconFocused.blendColor = theme.backgroundColor
+    ' Icon colors (skip when disableIconBlend is set, e.g. creator logos)
+    if m.top.itemContent = invalid OR m.top.itemContent.disableIconBlend <> true
+      m.icon.blendColor = theme.primaryTextColor
+      m.iconFocused.blendColor = theme.backgroundColor
+    end if
 
     ' Label colors
     m.label.color = theme.primaryTextColor
@@ -222,12 +224,24 @@ End Function
 ' @param isPrimaryButton - Boolean, whether to render as primary button (full width) or icon-only
 ' @param itemHasFocus - Boolean, whether button currently has focus
 Function renderButton(item as Object, isPrimaryButton as Dynamic, itemHasFocus as Boolean) as Void
+  disableIconBlend = (item.disableIconBlend = true)
+
   if isNonEmptyString(item.iconUrl)
     if m.iconGroup.getParent() = invalid
       m.elementsGroup.insertChild(m.iconGroup, 0)
     end if
     m.icon.uri = item.iconUrl
     m.iconFocused.uri = item.iconUrl
+    if item.iconWidth <> invalid AND item.iconHeight <> invalid
+      m.icon.width = item.iconWidth
+      m.icon.height = item.iconHeight
+      m.iconFocused.width = item.iconWidth
+      m.iconFocused.height = item.iconHeight
+    end if
+    if disableIconBlend = true
+      m.icon.blendColor = "0xFFFFFFFF"
+      m.iconFocused.blendColor = "0xFFFFFFFF"
+    end if
     m.iconGroup.visible = true
   else
     m.elementsGroup.removeChild(m.iconGroup)
@@ -318,10 +332,14 @@ Function renderButton(item as Object, isPrimaryButton as Dynamic, itemHasFocus a
     m.elementsGroup.removeChild(m.labelGroup)
     m.elementsGroup.removeChild(m.badgeGroup)
 
+    iconWidth = m.icon.width
+    if iconWidth = 0 then iconWidth = 36
+
     m.buttonBackground.width = 105
     m.buttonBackgroundFocused.width = m.buttonBackground.width
 
-    m.elementsGroup.translation = [33, m.top.height / 2]
+    iconPadding = Int((105 - iconWidth) / 2)
+    m.elementsGroup.translation = [iconPadding, m.top.height / 2]
   end if
 End Function
 

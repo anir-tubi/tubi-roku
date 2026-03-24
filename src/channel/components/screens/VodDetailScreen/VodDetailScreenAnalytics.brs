@@ -20,6 +20,7 @@ Function initAnalytics() as Void
     like: "LIKE"
     dislike: "DISLIKE"
     signIn: "SIGNUP_TO_SAVE_PROGRESS"
+    creator: "COLLECTION"
     gotoChannel: "GO_TO_NETWORK"
     removeFromHistory: "REMOVE_FROM_HISTORY"
     likeRemoveRating: "LIKE_REMOVE_RATING"

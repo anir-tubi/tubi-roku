@@ -237,6 +237,7 @@ Function refreshButtonList()
     if m.isComingSoon = false
       addPlayOrResumeButtons(buttons, itemContent, history)
       addSignInButton(buttons)
+      addCreatorButton(buttons, itemContent)
       addRemoveHistoryButton(buttons, history)
 
       if m.top.isInKidsMode = false
@@ -781,6 +782,34 @@ Function addSignInButton(buttons) as Void
       displayOnlyIconTileWhenNotFocused: true
       trackingContext: createButtonAnalytics("signIn")
     })
+  end if
+End Function
+
+
+' Adds creator button if content has a creator tensor app and experiment is enabled
+' @param buttons - Array, the buttons list to append to
+' @param content - Object, the content item
+Function addCreatorButton(buttons, content) as Void
+  creator = content.creatorTensorApp
+  if creator <> invalid
+    if getStatsigExperimentResource("roku_creator_m2", "roku_creator_m2_v1", true).enabled = true
+      iconUrl = ""
+      if creator.images <> invalid AND isNonEmptyArray(creator.images.logo)
+        iconUrl = creator.images.logo[0]
+      end if
+
+      buttons.push({
+        id: "creator"
+        title: creator.title
+        iconUrl: iconUrl
+        iconWidth: 81
+        iconHeight: 81
+        padding: 12
+        disableIconBlend: true
+        displayOnlyIconTileWhenNotFocused: true
+        trackingContext: createButtonAnalytics("creator")
+      })
+    end if
   end if
 End Function
 

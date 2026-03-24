@@ -1682,6 +1682,7 @@ Function getConstants()
   constants.ui.imageSizes.categoryLargePoster = [291, 417]
 
   constants.ui.imageSizes.creatorDetailScreenLogo = [36, 36]
+  constants.ui.imageSizes.creatorVodDetailScreenLogo = [81, 81]
   constants.ui.imageSizes.creatorScreenLogo = [64, 64]
   constants.ui.imageSizes.creatorScreenBackground = [1161, 651]
   constants.ui.imageSizes.creatorTileLogo = [195, 195]
