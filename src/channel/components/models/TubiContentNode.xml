@@ -104,6 +104,9 @@
 
     <field id="isRecurring" type="boolean" />
 
+    <!-- episode number within a season, from the content API episode_number field -->
+    <field id="episodeNumber" type="integer" />
+
     <!-- the current drm type -->
     <field id="drmType" type="string" />
 

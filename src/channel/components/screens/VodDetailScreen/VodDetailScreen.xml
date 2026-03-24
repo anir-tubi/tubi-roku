@@ -39,6 +39,7 @@
          Separating these fields prevents unnecessary metapanel refreshes when only buttons need updating -->
     <field id="shouldRefreshButtonList" type="boolean" value="false" alwaysNotify="true" />
     <field id="shouldRefreshScreen" type="boolean" value="false" alwaysNotify="true" />
+    <field id="focusRelatedContent" type="boolean" value="false" />
 
     <!-- OUTPUTS -->
 

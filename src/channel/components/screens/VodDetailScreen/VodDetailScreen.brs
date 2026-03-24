@@ -61,6 +61,7 @@ Function init()
   m.actionButtonList.observeFieldScoped("buttonFocused", "onActionButtonFocused")
   topRef.observeFieldScoped("episodes", "onEpisodesChange")
   topRef.observeFieldScoped("shouldRefreshScreen", "refreshScreen")
+  topRef.observeFieldScoped("focusRelatedContent", "onFocusRelatedContent")
   topRef.observeFieldScoped("wasContentFetchCompleted", "onWasContentFetchCompletedChange")
 
   typographyConstants = getTypographyConstants()
@@ -70,7 +71,7 @@ Function init()
 
   m.isComingSoon = false ' Initialize coming soon flag
 
-  experiment = getStatsigExperimentResource("roku_content_details", "roku_content_details_v3", false)
+  experiment = getStatsigExperimentResource("roku_content_details", "roku_content_details_v3_1", false)
   ' TODO: This experiment has left exit always enabled. Remove if left exit will be disabled or dynamic
   ' m.isLeftBackExitEnabled = experiment <> invalid AND experiment.enable_left_button_exit = true
   m.isLeftBackExitEnabled = true
@@ -131,6 +132,19 @@ Function onScreenFocusChange()
       m.top.backgroundUriList = m.top.content.backgrounds
     end if
   end if
+End Function
+
+
+' Focuses the "More Like This" section when user returns from a deeplink video.
+' Switches to the YMAL tab and jumps focus to the additional content area via
+' contentContainer.jumpToIndex, which properly updates focusedIndex and triggers
+' onContentContainerFocusIndexChange for the slide-up animation.
+Function onFocusRelatedContent() as Void
+  if m.top.focusRelatedContent <> true then return
+
+  ymalIndex = getYmalTabIndex()
+  m.sectionTabs.focusedIndex = ymalIndex
+  m.contentContainer.jumpToIndex = 3
 End Function
 
 
@@ -326,6 +340,7 @@ Function showRatingsOverlay() as Void
   end if
   m.ratingsButtonNode.observeFieldScoped("translation", "onRatingsButtonTranslationChange")
   m.contentContainer.observeFieldScoped("translation", "onRatingsButtonTranslationChange")
+  m.actionButtonList.observeFieldScoped("translation", "onRatingsButtonTranslationChange")
   updateRatingsOverlayPosition()
   m.ratingsOverlayButtonList.jumpToIndex = 1
   m.ratingsOverlay.visible = true
@@ -366,6 +381,7 @@ Function hideRatingsOverlay() as Void
     end if
     m.ratingsButtonNode.unobserveFieldScoped("translation")
     m.contentContainer.unobserveFieldScoped("translation")
+    m.actionButtonList.unobserveFieldScoped("translation")
     m.ratingsButtonNode = invalid
   end if
 End Function

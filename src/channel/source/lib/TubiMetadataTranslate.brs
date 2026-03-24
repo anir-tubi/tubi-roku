@@ -457,6 +457,7 @@ Function tubiMetadataTranslate_translateRecursive(contentFromServer as Object, t
   if contentFromServer.currentEpisodeId <> invalid then translatedContent.currentEpisodeId = contentFromServer.currentEpisodeId
   if contentFromServer.nowPos <> invalid then translatedContent.nowPos = contentFromServer.nowPos
   if contentFromServer.series_id <> invalid then translatedContent.seriesId = "0" + contentFromServer.series_id
+  if contentFromServer.episode_number <> invalid then translatedContent.episodeNumber = contentFromServer.episode_number
 
   if contentFromServer.needs_login = true AND isSignedInUser = false AND m.checkIfUserIsInRegistrationByPassMode() = false
     translatedContent.needsLogin = true

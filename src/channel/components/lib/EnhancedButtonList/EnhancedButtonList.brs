@@ -11,6 +11,7 @@ Function init() as Void
   topRef.observeFieldScoped("buttonBackgroundBlendColor", "onButtonBackgroundBlendColorChange")
   topRef.observeFieldScoped("focusedChild", "onButtonListFocusChange")
   topRef.observeFieldScoped("focusedIndex", "onFocusedIndexChange")
+  topRef.observeFieldScoped("jumpToIndex", "onListJumpToIndexChange")
   m.originalTranslation = topRef.translation
 
   if m.global <> invalid
@@ -44,6 +45,10 @@ End Function
 Function onButtonListFocusChange(_msg as Object) as Void
   if m.top.showInactiveFocusState = true
     updateInactiveFocusState()
+  end if
+
+  if m.top.isInFocusChain() = false then
+    m.top.pressedKey = ""
   end if
 End Function
 
@@ -243,4 +248,55 @@ Function adjustTranslationForComponent(component as Object, direction as Integer
   offset = component.boundingRect().width + (topRef.buttonSpacing[0] * 2)
   destination = [translation[0] + (direction * offset), translation[1]]
   slideTo(topRef, destination, 0.15, 0.0, callback)
+End Function
+
+
+' Handles jumpToIndex changes
+' Sets focusedIndex and scrolls the list to show the target button
+' @param msg - Message object containing the target index
+Function onListJumpToIndexChange(msg as Object) as Void
+  index = msg.getData()
+  if index < 0 then return
+
+  scrollToIndex(index)
+End Function
+
+
+' Scrolls the list so the button at the given index is visible
+' Calculates the cumulative offset of preceding buttons and spacings
+' @param index - The target button index to scroll to
+Function scrollToIndex(index as Integer) as Void
+  topRef = m.top
+
+  ' Only support horizontal scrolling for now
+  if topRef.layoutDirection <> "horiz" then return
+
+  if index <= 0
+    topRef.translation = m.originalTranslation
+    return
+  end if
+
+  targetChild = topRef.getChild(index)
+  if targetChild = invalid
+    topRef.translation = m.originalTranslation
+    return
+  end if
+
+  ' If the target button is already fully visible, no scroll needed
+  if targetChild.renderTracking = "full" then return
+
+  spacing = 0
+  if isNonEmptyArray(topRef.buttonSpacing)
+    spacing = topRef.buttonSpacing[0]
+  end if
+
+  offset = 0
+  for i = 0 to index - 1
+    child = topRef.getChild(i)
+    if child <> invalid
+      offset = offset + child.boundingRect().width + spacing
+    end if
+  end for
+
+  topRef.translation = [m.originalTranslation[0] - offset, m.originalTranslation[1]]
 End Function

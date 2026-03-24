@@ -3,11 +3,15 @@
 ' @playbackSource, associative array, the playback source for the content.
 ' @successCb, roFunction, callback to be run on success
 ' @errorCb, roFunction, callback to be run on error
-Function showVodDetailScreen(inputContent, playbackSource, successCb = invalid, errorCb = invalid)
+Function showVodDetailScreen(inputContent, playbackSource, successCb = invalid, errorCb = invalid) as Void
   tubiLog("VodDetailScreenHelpers.showVodDetailScreen")
   showHideLogoBasedOnUiMode()
 
   if inputContent <> invalid
+    ' Prevent creating a duplicate VodDetailScreen if one already exists for this content
+    existingScreen = getDetailScreenFromStackWithId(m.constants.ui.screenIds.vodDetailScreen, inputContent.id)
+    if existingScreen <> invalid then return
+
     ' we make changes to the content from this point forward. If we don't clone, changes will be propagated to the original content in home or search screen.
     content = inputContent.clone(true)
     screen = CreateObject("roSGNode", "VodDetailScreen")
@@ -365,10 +369,10 @@ End Function
 Function getPlayableEpisode(content, history = invalid)
   if content <> invalid
     if history <> invalid AND isNonEmptyString(history.currentEpisodeId)
-      return m.nodeHelpers.getChildById(content, history.currentEpisodeId)
-    else
-      return content.getChild(0)
+      episode = m.nodeHelpers.getChildById(content, history.currentEpisodeId)
+      if episode <> invalid then return episode
     end if
+    return content.getChild(0)
   end if
 
   return invalid
@@ -420,35 +424,11 @@ Function onGetSeasonListSuccess(seasonData)
     seriesId = seasonData.seriesId
     screen = getDetailScreenFromStackWithId(m.constants.ui.screenIds.vodDetailScreen, seriesId)
     if screen <> invalid
-      ' Try to get season number from history first
-      seasonNum = invalid
-      history = getHistory(seriesId)
+      seasonNum = resolveSeasonNum(seriesId, seasonData)
 
-      if history <> invalid AND history.currentEpisodeId <> invalid
-        currentEpisodeId = history.currentEpisodeId.toStr()
-        currentEpisodeSeasonMap = seasonData.episodeSeasonMap[currentEpisodeId]
-
-        if currentEpisodeSeasonMap <> invalid
-          seasonNum = currentEpisodeSeasonMap.seasonNum.toStr()
-        end if
-      end if
-
-      ' Fall back to first season if not found in history
-      if seasonNum = invalid
-        seasonNode = seasonData.seasonSelectorContent.getChild(0)
-        if seasonNode <> invalid
-          firstSeasonItem = seasonNode.getChild(0)
-          if firstSeasonItem <> invalid
-            seasonNum = firstSeasonItem.seasonNumber
-          end if
-        end if
-      end if
-
-      ' Validate seasonNum before accessing seasons
       if seasonNum <> invalid
         episodeList = seasonData.seasons[seasonNum]
         if episodeList <> invalid
-          ' Finding the position of the current episode in the season and adding the page size to get the next page
           pageSizeInSeason = episodeList.count()
           screen.defaultSelectedSeason = seasonNum
           screen.seasonList = seasonData
@@ -460,15 +440,63 @@ Function onGetSeasonListSuccess(seasonData)
 End Function
 
 
+' Resolves the season number to display for a series
+' Priority: deeplink episode -> history episode -> first available season
+' @param seriesId - The series content ID
+' @param seasonData - AA with episodeSeasonMap and seasonSelectorContent
+' @return String season number or invalid if none found
+Function resolveSeasonNum(seriesId, seasonData) as Object
+  if seasonData = invalid then return invalid
+
+  history = getHistory(seriesId)
+
+  ' 1. Deeplink episode takes priority
+  if m.deepLinkContent <> invalid AND m.deepLinkContent.deeplinkType = "episode"
+    deeplinkEpisodeId = m.deepLinkContent.id
+    if deeplinkEpisodeId <> invalid AND seasonData.episodeSeasonMap <> invalid
+      deeplinkSeasonMap = seasonData.episodeSeasonMap[deeplinkEpisodeId.toStr()]
+      if deeplinkSeasonMap <> invalid
+        return deeplinkSeasonMap.seasonNum.toStr()
+      end if
+    end if
+  end if
+
+  ' 2. Fall back to history-based season selection
+  if history <> invalid AND history.currentEpisodeId <> invalid AND seasonData.episodeSeasonMap <> invalid
+    currentEpisodeId = history.currentEpisodeId.toStr()
+    currentEpisodeSeasonMap = seasonData.episodeSeasonMap[currentEpisodeId]
+    if currentEpisodeSeasonMap <> invalid
+      return currentEpisodeSeasonMap.seasonNum.toStr()
+    end if
+  end if
+
+  ' 3. Fall back to first season
+  if isNode(seasonData.seasonSelectorContent)
+    seasonNode = seasonData.seasonSelectorContent.getChild(0)
+    if seasonNode <> invalid
+      firstSeasonItem = seasonNode.getChild(0)
+      if firstSeasonItem <> invalid
+        return firstSeasonItem.seasonNumber
+      end if
+    end if
+  end if
+
+  return invalid
+End Function
+
+
 ' Error callback for season list request
+' Falls back to content API to fetch series with all episodes
 ' @error: object, error information
 Function onGetSeasonListError(error)
-  tubiLog("VodDetailScreenHelpers.onGetSeasonListError: " + formatJson(error))
+  logError(formatJson(error), "vodDetail", "season-list-error", 0.1)
+
   screen = getDetailScreenFromStackWithId(m.constants.ui.screenIds.vodDetailScreen)
-  if screen <> invalid
-    screen.wasContentFetchCompleted = true
+  if screen <> invalid AND screen.content <> invalid
+    getSingleContentFromServer(screen.content, onGetSeasonListFallbackSuccess, onGetSeasonListFallbackError)
+  else
+    showHideSpinner(false)
   end if
-  showHideSpinner(false)
 End Function
 
 
@@ -1001,13 +1029,31 @@ Function playSelectedVodContent(content, playbackSource, episodes = invalid)
   isComingSoon = isComingSoonContent(content)
   '//Ensure content is not coming soon; otherwise do not play
   if isComingSoon = false
-    ' Handle resume action
     history = getHistory(content.id)
     if content.type = m.constants.ui.contentTypes.series
-      content = getPlayableEpisode(episodes, history)
+      episode = invalid
+      deeplinkEpisodeId = invalid
 
-      if history <> invalid AND isNonEmptyString(history.currentEpisodeId)
-        history = m.nodeHelpers.getChildById(history, history.currentEpisodeId)
+      ' Honor a specific episode ID (e.g. from episode deeplink) before falling back to history
+      if isNonEmptyString(content.currentEpisodeId)
+        deeplinkEpisodeId = content.currentEpisodeId
+        episode = m.nodeHelpers.getChildById(episodes, deeplinkEpisodeId)
+      end if
+
+      if episode = invalid
+        episode = getPlayableEpisode(episodes, history)
+      end if
+
+      content = episode
+
+      if history <> invalid
+        episodeIdForHistory = deeplinkEpisodeId
+        if episodeIdForHistory = invalid AND isNonEmptyString(history.currentEpisodeId)
+          episodeIdForHistory = history.currentEpisodeId
+        end if
+        if isNonEmptyString(episodeIdForHistory)
+          history = m.nodeHelpers.getChildById(history, episodeIdForHistory)
+        end if
       end if
     end if
 
@@ -1041,7 +1087,7 @@ Function executeVodDetailSuccessCallback(content, playbackSource, episodes = inv
     end if
 
     successCb = m.showVodDetailScreenCallback.success
-    if successCb = skipDetailScreen
+    if successCb = skipDetailScreen OR successCb = skipDetailScreenDeeplinkWrapper
       isComingSoon = isComingSoonContent(content)
       if isComingSoon = false
         playSelectedVodContent(content, playbackSource, episodes)
@@ -1308,6 +1354,10 @@ Function refreshVodDetailScreenAfterPlayback(shouldSendAnalyticsEvent, reason) a
       showVodDetailScreen(videoContent, videoPlayer.playbackSource)
       removeScreenFromStack(screen)
     end if
+
+    if isAA(screen.playbackSource) = true AND screen.playbackSource.srcForAds = "deeplink"
+      screen.focusRelatedContent = true
+    end if
   end if
 End Function
 
@@ -1344,4 +1394,162 @@ Function onVodDetailShouldPauseVideoPreviewChange(msg)
   else
     resumeVideoPreview()
   end if
+End Function
+
+
+' ============================================================================
+' Season List API Fallback
+'
+' The following functions are used exclusively as a fallback when the
+' getSeasonList API fails. In that scenario, we fetch the full series content
+' via getSingleContentFromServer and reconstruct the seasonList, episode map,
+' and season selector from the content API response.
+'
+' Flow: onGetSeasonListError -> getSingleContentFromServer
+'       -> onGetSeasonListFallbackSuccess / onGetSeasonListFallbackError
+' ============================================================================
+
+
+' Success callback for content API fallback when season list request fails
+' Builds seasonList from content children, determines the correct season via
+' deeplink or history, and sets screen.episodes to the resolved season node
+' @param content - Content node returned from content API with season/episode children
+Function onGetSeasonListFallbackSuccess(content)
+  tubiLog("VodDetailScreenHelpers.onGetSeasonListFallbackSuccess")
+  if content <> invalid
+    screen = getDetailScreenFromStackWithId(m.constants.ui.screenIds.vodDetailScreen, content.id)
+    if screen <> invalid AND screen.content <> invalid
+      content.sotInfo = screen.content.sotInfo
+      screen.content.update(content, true)
+
+      seasonData = buildSeasonListFromContent(content)
+      if seasonData <> invalid
+        screen.seasonList = seasonData
+        seasonNum = resolveSeasonNum(content.id, seasonData)
+
+        if seasonNum <> invalid
+          screen.defaultSelectedSeason = seasonNum
+
+          firstSeasonEpisodes = buildSeasonEpisodesNode(content, seasonNum, seasonData.seasonChildIndexMap)
+          if firstSeasonEpisodes <> invalid
+            screen.episodes = firstSeasonEpisodes
+          end if
+        end if
+      end if
+
+      screen.contentUpdated = true
+      screen.wasContentFetchCompleted = true
+      updateVodDetailBackground(screen.content)
+      executeVodDetailSuccessCallback(screen.content, screen.playbackSource, screen.episodes)
+    end if
+  end if
+  showHideSpinner(false)
+End Function
+
+
+' Error callback when the content API fallback also fails
+' Marks fetch as complete and hides spinner so the screen is not left loading
+' @param error - Error response from API
+Function onGetSeasonListFallbackError(error)
+  tubiLog("VodDetailScreenHelpers.onGetSeasonListFallbackError: " + formatJson(error))
+  screen = getDetailScreenFromStackWithId(m.constants.ui.screenIds.vodDetailScreen)
+  if screen <> invalid
+    screen.wasContentFetchCompleted = true
+  end if
+  showHideSpinner(false)
+End Function
+
+
+' Builds a seasonList structure from the content API response
+' Uses seasonChild.id for the season number (strip "0" prefix added by translateRecursive)
+' and episode.episodeNumber (mapped from episode_number in the content API response)
+' @param content - Series content node with season children from content API
+' @return AA with seriesId, seasons, episodeSeasonMap, seasonSelectorContent, seasonChildIndexMap
+Function buildSeasonListFromContent(content) as Object
+  if content = invalid OR content.getChildCount() = 0 then return invalid
+
+  seasonLabel = getTranslation("screenDetails_season_label")
+  seasons = {}
+  episodeSeasonMap = {}
+  seasonSelectorContent = CreateObject("roSGNode", "ContentNode")
+  seasonNumbers = []
+  seasonChildIndexMap = {}
+
+  for i = 0 to content.getChildCount() - 1
+    seasonChild = content.getChild(i)
+
+    ' Season nodes get a "0" prefix in translateRecursive, strip it to get the actual season number
+    seasonNum = seasonChild.id.mid(1)
+    if seasonNum = "" then seasonNum = (i + 1).toStr()
+
+    episodes = []
+
+    episodeChildren = seasonChild.getChildren(-1, 0)
+    epIndex = 1
+    for each episode in episodeChildren
+      if isNonEmptyString(episode.id)
+        epNum = episode.episodeNumber
+        if epNum = 0 then epNum = epIndex
+
+        episodes.push({
+          id: episode.id
+          num: epNum
+        })
+        episodeSeasonMap[episode.id.toStr()] = {
+          seasonNum: seasonNum
+          episodeNum: epNum
+        }
+      end if
+      epIndex = epIndex + 1
+    end for
+
+    seasonChildIndexMap[seasonNum] = i
+
+    seasonNumbers.push({
+      id: "season_" + seasonNum
+      title: seasonLabel.replace("{seasonNumber}", seasonNum)
+      seasonNumber: seasonNum
+    })
+
+    seasons[seasonNum] = episodes
+  end for
+
+  seasonSelectorContent.update({
+    children: [{
+      type: "ContentNode"
+      children: seasonNumbers
+    }]
+  }, true)
+
+  return {
+    seriesId: content.id
+    seasons: seasons
+    episodeSeasonMap: episodeSeasonMap
+    seasonSelectorContent: seasonSelectorContent
+    seasonChildIndexMap: seasonChildIndexMap
+  }
+End Function
+
+
+' Builds a season episodes ContentNode for a specific season from the content API response
+' Uses seasonChildIndexMap to find the correct season child by actual season number
+' @param content - Series content node with season children
+' @param seasonNum - Season number string (actual, not index-based)
+' @param seasonChildIndexMap - AA mapping season number to child index
+' @return ContentNode with titleSeason set and episode children
+Function buildSeasonEpisodesNode(content, seasonNum, seasonChildIndexMap) as Object
+  if seasonChildIndexMap = invalid OR seasonChildIndexMap[seasonNum] = invalid then return invalid
+
+  seasonIndex = seasonChildIndexMap[seasonNum]
+  if seasonIndex < 0 OR seasonIndex >= content.getChildCount() then return invalid
+
+  seasonChild = content.getChild(seasonIndex)
+  if seasonChild = invalid OR seasonChild.getChildCount() = 0 then return invalid
+
+  seasonNode = CreateObject("roSGNode", "ContentNode")
+  seasonNode.id = content.id
+  seasonNode.titleSeason = seasonNum
+  seasonNode.appendChildren(seasonChild.getChildren(-1, 0))
+
+  return seasonNode
 End Function
