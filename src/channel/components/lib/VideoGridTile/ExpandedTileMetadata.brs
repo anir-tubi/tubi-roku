@@ -163,7 +163,6 @@ Function setupTitleAndConfig(itemContent) as Void
   if (variant = "portraitWithMetadata" OR variant = "detailScreenInfoPanel") AND m.title = invalid
     appendTitleToMetadataGroup()
   end if
-  appendComingSoonToMetadataGroup(itemContent)
 
   ' Resetting the visibility of the rating and sot badge.
   m.rating.visible = true
@@ -282,7 +281,48 @@ Function handleSOTBadgesAndLayout(itemContent) as Void
       backgroundUri: backgroundUri
     }
 
-    sotBadges = createSOTBadges(itemContent.sotInfo, config)
+    '// Add Coming Soon label (if applicable) to sotInfo for badge creation
+    sotInfo = itemContent.sotInfo
+    if isComingSoonContent(itemContent) = true
+      startDateTime = CreateObject("roDateTime")
+      startDateTime.FromISO8601String(itemContent.availabilityStarts)
+      startDateTime.ToLocalTime()
+
+      month = startDateTime.GetMonth()
+      day = startDateTime.GetDayOfMonth().toStr()
+      sComingSoonDate = getTranslation("short_version_date_wo_year_format_" + month.toStr(), { day: day })
+      sComingSoonText = getTranslation("info_panel_coming_soon", { date: sComingSoonDate })
+
+      sotComingSoon = {}
+      sotComingSoon.sotLabelText = sComingSoonText
+      sotComingSoon.sotIcon = ""
+
+      ' Create a deep copy of sotInfo to avoid mutating original content node data
+      modifiedSotInfo = {}
+      if isNonEmptyAA(sotInfo) = true
+        modifiedSotInfo.append(sotInfo)
+      end if
+
+      ' Add coming soon label to the beginning of sotMetaDataTopLabels or sotMetaData
+      ' Deep copy arrays before mutation to avoid modifying original content node
+      if isNonEmptyAA(sotInfo) = true AND isNonEmptyArray(sotInfo.sotMetaDataTopLabels) = true
+        copiedTopLabels = []
+        copiedTopLabels.append(sotInfo.sotMetaDataTopLabels)
+        copiedTopLabels.unshift(sotComingSoon)
+        modifiedSotInfo.sotMetaDataTopLabels = copiedTopLabels
+      else if isNonEmptyAA(sotInfo) = true AND isNonEmptyArray(sotInfo.sotMetaData) = true
+        copiedMetaData = []
+        copiedMetaData.append(sotInfo.sotMetaData)
+        copiedMetaData.unshift(sotComingSoon)
+        modifiedSotInfo.sotMetaData = copiedMetaData
+      else
+        modifiedSotInfo.sotMetaDataTopLabels = [sotComingSoon]
+      end if
+
+      sotInfo = modifiedSotInfo
+    end if
+
+    sotBadges = createSOTBadges(sotInfo, config)
 
     marker = sotBadges.marker
     ' Insert sotMarker below the title if title exists
@@ -745,50 +785,6 @@ Function appendTitleToMetadataGroup()
   setTypographyOfLabel(m.description, m.bodyMediumFont)
 End Function
 
-
-' Appends comingSoon badge to metadata group and configures spacing based on variant
-' @param itemContent - Content node with title
-Function appendComingSoonToMetadataGroup(itemContent) as Void
-  isDetailScreenInfoPanel = (m.top.variant = "detailScreenInfoPanel")
-
-  isComingSoon = isComingSoonContent(itemContent)
-
-  if m.comingSoonBadge <> invalid
-    m.metadataGroup.removeChild(m.comingSoonBadge)
-  end if
-
-  if isDetailScreenInfoPanel = false OR isComingSoon = false
-    return
-  end if
-
-  sComingSoonText = getComingSoonText(itemContent.availabilityStarts)
-
-  setTextOfComingSoonButton(sComingSoonText)
-  m.metadataGroup.insertChild(m.comingSoonBadge, 0)
-
-End Function
-
-
-' Sets the text of the coming soon button, creating the (m.comingSoonBadge) button if it doesn't exist
-Function setTextOfComingSoonButton(sText)
-  buttonContent = {
-    title: sText
-    isPrimaryButton: true
-  }
-  content = CreateObject("roSGNode", "ContentNode")
-  content.update(buttonContent, true)
-
-  if m.comingSoonBadge = invalid
-    button = CreateObject("roSGNode", "EnhancedButton")
-    button.height = 62
-    button.padding = 33
-
-    m.comingSoonBadge = button
-  end if
-
-  m.comingSoonBadge.itemContent = content
-  m.comingSoonBadge.itemHasFocus = true
-End Function
 
 
 ' Displays rating descriptor codes (D, L, S, V, FV) with descriptions
