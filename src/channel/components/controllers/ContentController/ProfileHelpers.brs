@@ -100,18 +100,15 @@ Function onProfileSelected(msg)
   profileSelected = msg.getData()
   parentScreen = msg.getRoSGNode()
   parentScreenType = ""
-  trackingPage = ""
 
   if parentScreen <> invalid
     parentScreenType = parentScreen.getSubtype()
-    if parentScreenType = "ProfileSelectorScreen"
-      trackingPage = "account_selection_page"
-    else
-      trackingPage = "home_page"
-    end if
   end if
 
   handleBeforeProfileSelection(parentScreenType)
+
+  sendAccountSelectionEvent(profileSelected, parentScreenType)
+
   if profileSelected = "add_profile"
     showAddProfileScreen()
   else if profileSelected = "guest"
@@ -131,16 +128,40 @@ Function onProfileSelected(msg)
 
   end if
 
-  ' send account_selection_event
-  if isNonEmptyString(trackingPage) = true AND profileSelected <> "add_profile"
-    trackingEvent = {
-      type: "account_selection"
-      values: {
-        pageOneof: m.Tracking.getAnalyticsPage(trackingPage, {})
+End Function
+
+
+Function sendAccountSelectionEvent(profileSelected, parentScreenType)
+  trackingPage = ""
+
+  if isNonEmptyString(parentScreenType) = true AND isNonEmptyString(profileSelected) = true
+    if parentScreenType = "ProfileSelectorScreen"
+      trackingPage = "account_selection_page"
+    else
+      trackingPage = "home_page"
+    end if
+
+    ' send account_selection_event
+    if isNonEmptyString(trackingPage) = true AND profileSelected <> "add_profile"
+
+      profileAuthInfo = m.tubiAuthUpdate.getProfileAuthInfo(profileSelected)
+      if isNonEmptyString(profileAuthInfo.userId) = true
+        selectedUserId = profileAuthInfo.userId.toInt()
+      else
+        selectedUserId = 0
+      end if
+
+      trackingEvent = {
+        type: "account_selection"
+        values: {
+          pageOneof: m.Tracking.getAnalyticsPage(trackingPage, {})
+          selected_user_id: selectedUserId
+        }
       }
-    }
-    m.trackingLoggingTask.trackEvent = trackingEvent
+      m.trackingLoggingTask.trackEvent = trackingEvent
+    end if
   end if
+
 End Function
 
 

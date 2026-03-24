@@ -315,6 +315,7 @@ End Function
 ' See protos.analytics.events.protos -> ClientEvent
 ' See protos.analytics.client.protos -> User
 Function tubiTracking_getAnalyticsUser()
+
   authInfo = m.auth.getAuthInfo()
   if authInfo <> invalid AND m.isString(authInfo.userId) = true
     userId = authInfo.userId.toInt()
@@ -328,6 +329,7 @@ Function tubiTracking_getAnalyticsUser()
     user_id: userId
     auth_type: authType
   }
+
   return user
 End Function
 
@@ -646,6 +648,7 @@ Function tubiTracking_getAnalyticsEvent(eventType, eventValues = {})
 
     account_selection: {
       pageOneof: {}
+      selected_user_id: -1
     }
 
     pin_page: {
