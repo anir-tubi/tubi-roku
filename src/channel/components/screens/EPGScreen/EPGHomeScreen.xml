@@ -44,6 +44,9 @@
 
     <field id="contentIdToFocusOnLoadComplete" type="string" />
 
+    <!-- Containers list for side navigation MarkupGrid -->
+    <field id="containersList" type="node" alwaysNotify="true" />
+
     <!-- OUTPUTS -->
 
     <field id="epgScreenOkPressed" type="boolean" alwaysNotify="true"/>
@@ -57,11 +60,20 @@
     <!-- content on the EPG Screen is loaded and spinner can be turned off -->
     <field id="contentReady" type="boolean" value="false" alwaysNotify="true" />
 
+    <!-- Pass through Program Guide component events to EpgScreen helper -->
+    <field id="channelIdSelected" alias="programGuide.channelIdSelected" alwaysNotify="true"/>
+
     <!-- Trigger the content to be loaded.   -->
     <field id="loadAllChannels" type="boolean" value="false" alwaysNotify="true"/>
 
     <!--observe the scrolling status of program Grid to stop/start count down timer-->
     <field id="scrollingStatus" type="boolean" alias="programGuide.scrollingStatus" />
+    
+    <!-- Combined scrolling status: true if program grid OR channel grid is scrolling -->
+    <field id="channelGridScrollingStatus" type="boolean" alias="programGuide.channelGridScrollingStatus" />
+
+    <!-- Scrolling status for category grid (containerMarkupGrid) -->
+    <field id="categoryGridScrollingStatus" type="boolean" value="false" alwaysNotify="true"/>
 
     <!-- Pass through Program Guide component events to EpgScreen helper -->
     <field id="programGuideNavigateWithinPageInfo" alias="programGuide.navigateWithinPageInfo" />
@@ -83,11 +95,24 @@
           maxTitleLines="2"
           visible="false"/>
       </Group>
+      <MarkupGrid
+        id="containerMarkupGrid"
+        translation="[0,606]"
+        numRows="10"
+        numColumns="1"
+        itemSize="[278,56]"
+        itemSpacing="[0,12]"
+        drawFocusFeedback="false"
+        drawFocusFeedbackOnTop="false"
+        focusBitmapUri="pkg:/images/menu-focus-$$RES$$.9.png"
+        focusFootprintBitmapUri="pkg:/images/menu-disabled-focus-$$RES$$.9.png"
+        itemComponentName="LabelItem"
+        vertFocusAnimationStyle="fixedFocus"
+        fadeFocusFeedbackWhenAutoScrolling="true"
+        visible="false"/>
       <ProgramGuide
         id="programGuide"
         translation="[0,510]"/>
-
-
     </Group>
 
     <Clock

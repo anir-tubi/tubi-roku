@@ -20,10 +20,15 @@ Function init()
   m.programGrid.observeFieldScoped("rowScrollFocused", "onProgramGridRowFocused")
   m.programGrid.observeFieldScoped("okPressed", "onProgramGridOkPressed")
 
+  m.channelsGrid.observeFieldScoped("itemSelected", "onChannelItemSelected")
+  m.channelsGrid.observeFieldScoped("itemFocused", "onChannelGridItemFocused")
+
   m.top.observeFieldScoped("contentUpdated", "onContentChanged")
   m.top.observeField("focusedChild", "onTimeGridFocusChange")
   m.top.observeField("EPGChannelPlayMode", "onEPGChannelPlayModeChange")
   m.top.observeField("setFocusedToPlay", "onSetFocusedToPlay")
+  m.top.observeFieldScoped("channelGridFocusable", "onChannelGridFocusableChange")
+  m.top.observeFieldScoped("categoriesMenuVisible", "onCategoriesMenuVisibleChange")
   m.updateMinsLeftTimer = m.top.findNode("updateMinsLeftTimer")
   m.updateMinsLeftTimer.observeField("fire", "onUpdateMinsLeftTimer")
 
@@ -35,7 +40,34 @@ Function init()
     m.global.observeFieldScoped("theme", "onThemeChange")
   end if
   onThemeChange()
+  onCategoriesMenuVisibleChange()
 
+End Function
+
+
+Function onChannelGridFocusableChange(msg = invalid)
+  if m.top.channelGridFocusable = false
+    m.top.isChannelGridFocused = false
+  end if
+End Function
+
+
+Function onCategoriesMenuVisibleChange(msg = invalid)
+  ' Layout shift: when categories menu is hidden, shift content left by 278px (container width)
+  categoriesMenuVisible = true
+  if m.top.categoriesMenuVisible <> invalid
+    categoriesMenuVisible = m.top.categoriesMenuVisible
+  end if
+
+  if categoriesMenuVisible = true
+    m.headerText.translation = [300, 51]
+    m.channelsGrid.translation = [300, 96]
+    m.programGrid.translation = [498, 96]
+  else
+    m.headerText.translation = [22, 51]
+    m.channelsGrid.translation = [22, 96]
+    m.programGrid.translation = [220, 96]
+  end if
 End Function
 
 
@@ -48,6 +80,7 @@ Function onThemeChange(msg = invalid)
 
   if theme <> invalid
     m.programGrid.focusBitmapBlendColor = theme.focusedColor
+    m.channelsGrid.focusBitmapBlendColor = theme.focusedColor
     m.channelsGrid.focusFootPrintBlendColor = theme.backgroundColorLight2
     m.headerText.color = theme.primaryTextColor
     m.backToLiveText.color = theme.primaryTextColor
@@ -63,6 +96,12 @@ Function onEPGChannelPlayModeChange()
   else if m.top.EPGChannelPlayMode = m.constants.EPGChannelPlayMode.playItemOnSelect
     m.playOnFocusMode = false
   end if
+End Function
+
+
+Function onChannelItemSelected(msg)
+  itemSelected = msg.getData()
+  m.top.channelIdSelected = m.channelsGrid.Content.getChild(itemSelected).id
 End Function
 
 
@@ -86,13 +125,17 @@ Function programGridContentFocused(channelItem, itemPosition)
     if m.playOnFocusMode = true OR m.top.linearChannelToPlay = invalid 'anytime linearChannelToPlay is invalid, assign focused channel to play?
 
       if channel <> invalid AND channel.videoResources <> invalid
-        epgTrackingComponentInfo = getEPGTrackingComponentInfo(itemPosition)
-        m.top.epgTrackingComponentInfo = {
-          componentType: "epg_component"
-          componentValues: epgTrackingComponentInfo
-        }
-        m.top.linearChannelToPlay = channel
-        m.top.linearChannelToPlayUpdated = true
+        ' Only trigger observer when channel actually changes to avoid unwanted firing on every focus change
+        channelChanged = (m.top.linearChannelToPlay = invalid) OR (m.top.linearChannelToPlay.id <> channel.id)
+        if channelChanged = true
+          epgTrackingComponentInfo = getEPGTrackingComponentInfo(itemPosition)
+          m.top.epgTrackingComponentInfo = {
+            componentType: "epg_component"
+            componentValues: epgTrackingComponentInfo
+          }
+          m.top.linearChannelToPlay = channel
+          m.top.linearChannelToPlayUpdated = true
+        end if
       end if
 
     end if
@@ -172,7 +215,11 @@ Function onTimeGridFocusChange()
   tubiLog("ProgramGrid.onTimeGridFocusChange")
 
   if m.top.hasFocus() = true
-    m.ProgramGrid.setFocus(true)
+    if m.top.channelGridFocusable = true AND m.top.isChannelGridFocused = true
+      m.channelsGrid.setFocus(true)
+    else
+      m.ProgramGrid.setFocus(true)
+    end if
 
     if m.updateMinsLeftTimer.control <> "start"
       m.updateMinsLeftTimer.control = "start"
@@ -200,6 +247,49 @@ Function onProgramGridRowFocused(_msg)
     end if
   end if
 
+End Function
+
+
+Function onChannelGridItemFocused(msg)
+  channelFocusedIndex = msg.getData()
+
+  if channelFocusedIndex <> invalid AND channelFocusedIndex >= 0
+    ' Set scrolling status when channel grid is being scrolled (stops timer)
+    ' Similar to program grid's scrollingStatus - set true when scrolling
+    m.top.channelGridScrollingStatus = true
+
+    ' Cancel existing timer if any
+    if m.channelGridScrollingTimer <> invalid
+      m.channelGridScrollingTimer.control = "stop"
+      m.channelGridScrollingTimer.unobserveFieldScoped("fire")
+      m.channelGridScrollingTimer = invalid
+    end if
+
+    ' Create timer to reset scrolling status after scrolling stops (similar to program grid)
+    timer = CreateObject("roSGNode", "Timer")
+    timer.duration = 0.3
+    timer.repeat = false
+    timer.observeFieldScoped("fire", "onChannelGridScrollingComplete")
+    timer.control = "start"
+    m.channelGridScrollingTimer = timer
+
+    tubiLog("ProgramGuide.onChannelGridItemFocused - syncing program grid to row: " + channelFocusedIndex.toStr())
+    m.programGrid.jumpToRowItem = [channelFocusedIndex, 0]
+    if m.channelsGrid.content.getchild(channelFocusedIndex) <> invalid
+      m.headerText.text = m.channelsGrid.content.getchild(channelFocusedIndex).parentTitle
+    end if
+  end if
+End Function
+
+
+Function onChannelGridScrollingComplete(msg)
+  ' Reset scrolling status when channel grid scrolling stops (similar to program grid)
+  m.top.channelGridScrollingStatus = false
+  if m.channelGridScrollingTimer <> invalid
+    m.channelGridScrollingTimer.control = "stop"
+    m.channelGridScrollingTimer.unobserveFieldScoped("fire")
+    m.channelGridScrollingTimer = invalid
+  end if
 End Function
 
 
@@ -409,6 +499,24 @@ Function sendNavigationWithinPageEvent(rowItemFocused)
 
   end if
 
+End Function
+
+
+Function onKeyEvent(key as String, press as Boolean) as Boolean
+  tubiLog("ProgramGuide.onKeyEvent")
+  handled = false
+
+  if press = true AND m.top.channelGridFocusable = true
+    if key = "left" AND m.programGrid.hasFocus() = true
+      m.channelsGrid.setFocus(true)
+      handled = true
+    else if key = "right" AND m.channelsGrid.hasFocus() = true
+      m.programGrid.setFocus(true)
+      handled = true
+    end if
+  end if
+
+  return handled
 End Function
 
 

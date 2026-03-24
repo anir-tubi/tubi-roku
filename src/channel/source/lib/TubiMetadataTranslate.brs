@@ -2482,12 +2482,71 @@ Function tubiMetadataTranslate_translateEPGChannelIds(contentToTranslate, reques
   translated.addField("fetchId", "string", false)
   translated.fetchId = fetchId
   translated.id = m.constants.ui.contentIds.timeGridContent
+  containersList = CreateObject("roSGNode", "ContentNode")
+  featuredAA = invalid
+  recommendedAA = invalid
+  featuredIndex = 0
+
 
   if contentToTranslate <> invalid AND contentToTranslate.contents <> invalid AND contentToTranslate.containers <> invalid
-    containers = contentToTranslate.containers
+    containersArray = contentToTranslate.containers
+
+    recommmendedIndex = 0
+    for i = 0 to containersArray.count() - 1
+      if containersArray[i].container_id = "favorite_channels"
+        recommmendedIndex = 1
+      end if
+
+      if containersArray[i].container_id = "featured_channels"
+        featuredAA = containersArray[i]
+        featuredIndex = i + 1
+      end if
+
+      if containersArray[i].container_id = "recommended_linear_channels"
+        recommendedAA = containersArray[i]
+      end if
+
+      if featuredAA <> invalid AND recommendedAA <> invalid
+        containersArray[recommmendedIndex] = recommendedAA
+        containersArray[featuredIndex] = featuredAA
+        exit for
+      end if
+
+    end for
+
+    containers = containersArray
+
+    epgCategoriesVariant = "none"
+    if m.statSigExperiments <> invalid
+      epgCategoriesExperiment = m.statSigExperiments.getExperimentResource("roku_linear_epg_categories", "roku_linear_epg_categories_v1")
+      if epgCategoriesExperiment <> invalid AND epgCategoriesExperiment.variant <> invalid
+        epgCategoriesVariant = epgCategoriesExperiment.variant
+      end if
+    end if
+
     for i = 0 to containers.count() - 1
+      containerId = containers[i].container_id
+
+      if containerId <> invalid
+        if epgCategoriesVariant = "none"
+          if containerId <> "featured_channels" AND containerId <> "recommended_linear_channels"
+            continue for
+          end if
+        else if epgCategoriesVariant = "categories" AND containerId = "favorite_channels"
+          continue for
+        end if
+      end if
+
+      ' Create a child node for each container instead of overwriting title
+      containerNode = containersList.createChild("ContentNode")
+      containerNode.title = containers[i].name
+      if containers[i].container_id <> invalid
+        containerNode.addField("containerId", "string", false)
+        containerNode.containerId = containers[i].container_id
+      end if
       container = containers[i]
       containerContents = container.contents
+
 
       for j = 0 to containerContents.count() - 1
         channelFromServer = contentToTranslate.contents[containerContents[j]]
@@ -2502,6 +2561,14 @@ Function tubiMetadataTranslate_translateEPGChannelIds(contentToTranslate, reques
 
           if container.container_id <> invalid
             channelContentNode.parentId = container.container_id
+          end if
+
+          ' Set isFavorite field if channel is in favorites container
+          if container.container_id = "favorite_channels"
+            if channelContentNode.hasField("isFavorite") = false
+              channelContentNode.addField("isFavorite", "bool", false)
+            end if
+            channelContentNode.isFavorite = true
           end if
 
           channelContentNode.title = channelFromServer.title
@@ -2595,6 +2662,13 @@ Function tubiMetadataTranslate_translateEPGChannelIds(contentToTranslate, reques
       end for
     end for
   end if
+
+  ' Add containersList as a field on translated, not as children
+  if containersList.getChildCount() > 0
+    translated.addField("containersList", "node", false)
+    translated.containersList = containersList
+  end if
+
   return translated
 End Function
 

@@ -11,6 +11,8 @@ Function init()
   m.global.constants = m.constants
   m.global.theme = m.constants.ui.themes.default
 
+  m.likedContainer = {}
+
   m.performanceMetricsTracker = PerformanceMetricsTracker()
   m.performanceMetricsTracker.startAppLaunchMetricTiming("time_to_first_tile_focus")
 

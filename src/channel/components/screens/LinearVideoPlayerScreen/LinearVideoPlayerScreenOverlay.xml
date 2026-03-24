@@ -9,6 +9,9 @@
   <script type="text/brightscript" uri="../../../source/lib/TubiTracking.brs" />
   <script type="text/brightscript" uri="pkg:/source/lib/StringUtils.brs" />
   <script type="text/brightscript" uri="pkg:/source/3rdparty/rta/typeUtils.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/StatsigLib.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/StatsigExperiments.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/StatsigExperimentMixin.brs" />
   <script type="text/brightscript" uri="pkg:/components/lib/TypographyMixin.brs"/>
 
   <interface>
@@ -41,6 +44,9 @@
       <!-- The items to be displayed in the the closed captioning menu -->
       <field id="closedCaptioningItems" type="node"/>
 
+      <!-- Containers list for side navigation MarkupGrid -->
+      <field id="containersList" type="node" alwaysNotify="true" />
+
     <!-- OUTPUT -->
       <!-- The state of the overlay being visible or not. -->
       <field id="isDisplaying" type="boolean" value="false"/>
@@ -65,6 +71,8 @@
 
       <field id="okPressed" alias="EPG.okPressed" />
 
+      <field id="channelIdSelected" alias="EPG.channelIdSelected" alwaysNotify="true" />
+
       <field id="rowItemFocused" alias="EPG.rowItemFocused" />
 
       <field id="epgScrollingStatus" alias="EPG.scrollingStatus" />
@@ -74,6 +82,8 @@
            which will be responsible for sending navigate_within_page events.
       -->
       <field id="programGuideNavigateWithinPageInfo" alias="EPG.navigateWithinPageInfo" />
+
+      <field id="linearOverlayCategoryNavigateWithinPageInfo" type="assocarray" alwaysNotify="true"/>
 
       <!-- Holds the information needed to populate a component_interaction event. This will
            be observed by the contentController via LinearVideoPlayerScreenHelper
@@ -134,6 +144,23 @@
             maxHeight="355"
             translation="[0,390]"
             maxTitleLines="2"/>
+
+          <MarkupGrid
+            id="containerMarkupGrid"
+            translation="[0,740]"
+            numRows="10"
+            numColumns="1"
+            itemSize="[278,72]"
+            itemSpacing="[0,12]"
+            drawFocusFeedback="false"
+            drawFocusFeedbackOnTop="false"
+            focusBitmapUri="pkg:/images/menu-focus-$$RES$$.9.png"
+            focusFootprintBitmapUri="pkg:/images/menu-disabled-focus-$$RES$$.9.png"
+            focusFootprintBlendColor="#00000000"
+            itemComponentName="LabelItem"
+            vertFocusAnimationStyle="fixedFocus"
+            fadeFocusFeedbackWhenAutoScrolling="true"
+            visible="false"/>
 
           <ProgramGuide
             id="EPG"

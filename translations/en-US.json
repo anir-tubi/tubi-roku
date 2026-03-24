@@ -47,6 +47,10 @@
     "description": "Program time Title for live program.",
     "message": "Started at"
   },
+  "epg_favorites": {
+    "description": "Label for the EPG / linear favorites category.",
+    "message": "Favorites"
+  },
   "circular_counter_starts_in": {
     "description": "Text displayed in circular counter component to indicate countdown starting.",
     "message": "Fullscreen In"

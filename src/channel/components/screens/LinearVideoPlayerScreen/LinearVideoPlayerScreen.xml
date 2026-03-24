@@ -39,6 +39,9 @@
     content updated in batches-->
     <field id="timeGridContent" type="node" alias="VideoOverlay.timeGridContent" />
 
+    <!-- Containers list for side navigation MarkupGrid -->
+    <field id="containersList" type="node" alias="VideoOverlay.containersList" />
+
     <!-- Content might be loading in batch. So render only when timeGridContent is set -->
     <field id="updateTimeGridContent" type="boolean" alwaysNotify="true"
       alias="VideoOverlay.updateTimeGridContent" />
@@ -109,6 +112,9 @@
     <!-- When this is called, then the helper should display the EPGScreen-->
     <field id="navigateToEPGScreen" alias="VideoOverlay.navigateToEPGScreen" />
 
+    <!-- Channel selected from EPG overlay (for add/remove favorites in categories_with_favorites) -->
+    <field id="channelIdSelected" type="string" alias="VideoOverlay.channelIdSelected" alwaysNotify="true" />
+
     <field id="state" type="string" />
 
     <!-- Used to store the loading state. It should not be used as an observed field. -->
@@ -147,6 +153,9 @@
     <!-- Pass through LinearVideoPlayerOverlay component events to LinearVideoPlayerScreen helper -->
     <field id="linearOverlayNavigateWithinPageInfo"
       alias="VideoOverlay.programGuideNavigateWithinPageInfo" />
+
+    <field id="linearOverlayCategoryNavigateWithinPageInfo"
+      alias="VideoOverlay.linearOverlayCategoryNavigateWithinPageInfo" />
 
     <!-- Pass through LinearVideoPlayerOverlay component events to LinearVideoPlayerScreen helper -->
     <field id="linearOverlayComponentInteractionInfo"

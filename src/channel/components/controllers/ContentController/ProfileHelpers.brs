@@ -185,6 +185,7 @@ Function handleGuestProfileSelection()
       m.tubiAuthUpdate.initOrUpdateAuthInfo(onUpdatedAuthRetrieved, false)
       setUiModeForProfileSelected(guestProfileAuth)
       clearGlobalUserData()
+      removeEPGFavoritesOnSignOut()
       resetUserServerPersistentData()
       updateConsentAndServerPersistentData()
     end if
@@ -234,6 +235,7 @@ Function onSwitchProfileSuccess(authInfo)
   end if
 
   clearglobalUserData()
+  removeEPGFavoritesOnSignOut()
   getUserInfo(callback)
   showWelcomeProfileToast(authInfo)
 

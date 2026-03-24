@@ -46,6 +46,8 @@ Function playLinearVideoContent(content, bMinimized = true, sAssociatedScreenID 
         videoPlayer.observeFieldScoped("fullscreen", "onLinearVideoPlayerVisibleFullscreenChange")
         videoPlayer.observeFieldScoped("channelSelectedUpdated", "onLinearChannelSelectedFromGuide")
         videoPlayer.observeFieldScoped("linearOverlayNavigateWithinPageInfo", "onNavigateWithinPageInfoChange")
+        videoPlayer.observeFieldScoped("linearOverlayCategoryNavigateWithinPageInfo", "onNavigateWithinPageInfoChange")
+        videoPlayer.observeFieldScoped("channelIdSelected", "onLinearOverlayChannelIdSelected")
         videoPlayer.observeFieldScoped("linearOverlayComponentInteractionInfo", "onComponentInteractionInfoChange")
         videoPlayer.observeFieldScoped("navigateWithinPageInfo", "onNavigateWithinPageInfoChange")
         videoPlayer.observeFieldScoped("trackingLoggingEvent", "onTrackingLoggingEvent")
@@ -295,6 +297,10 @@ Function getDataForVideoPlayerTimeGrid()
       videoPlayer.timeGridContent = epgChannelList
       videoPlayer.updateTimeGridContent = true
       videoPlayer.timeGridContentLoading = false
+      ' Set containersList if available in the cached content
+      if epgChannelList.containersList <> invalid
+        videoPlayer.containersList = epgChannelList.containersList
+      end if
     end if
   end if
 End Function
@@ -909,6 +915,16 @@ Function onLinearChannelSelectedFromGuide()
       '//Incorrect data, display an error
       reactToLinearVideoPlayerErrorState()
     end if
+  end if
+End Function
+
+
+' Channel selected in EPG overlay for add/remove favorites (categories_with_favorites)
+Function onLinearOverlayChannelIdSelected(msg)
+  videoPlayer = msg.getRoSGNode()
+  contentId = msg.getData()
+  if videoPlayer <> invalid AND contentId <> invalid
+    handleChannelSelectedForFavorites(videoPlayer, contentId)
   end if
 End Function
 

@@ -27,8 +27,11 @@ Function showEPGScreen(constants, screenID = "")
     epgScreen.observeFieldScoped("transportVoiceResponse", "onTransportVoiceResponse")
     epgScreen.observeFieldScoped("loadAllChannels", "onLoadAllEPGChannels")
     epgScreen.observeFieldScoped("scrollingStatus", "onEPGScrollingStatusChange")
+    epgScreen.observeFieldScoped("channelGridScrollingStatus", "onEPGScrollingStatusChange")
+    epgScreen.observeFieldScoped("categoryGridScrollingStatus", "onEPGScrollingStatusChange")
     epgScreen.observeFieldScoped("refreshEPGScreenVideoPlay", "onRefreshEPGScreenVideoPlay")
     epgScreen.observeFieldScoped("epgScreenOkPressed", "onEPGScreenOKPressed")
+    epgScreen.observeFieldScoped("channelIdSelected", "onChannelSelected")
     epgScreen.signedIn = isLoggedInUser()
 
     m.playerFullscreenCountdownTimer.unobserveFieldScoped("fire") '//Stop listening to timer before listing to it in case a previous screen started the timer
@@ -62,17 +65,205 @@ End Function
 '//Refresh the content and the enabling of the top nav of the epg screen
 Function refreshEPGScreen(epgScreen)
   tubiLog("EPGScreenHelpers.refreshEPGscreen")
-  mode = m.constants.ui.contentMode.epgScreen
-  epgScreen.signedIn = isLoggedInUser()
-  epgChannelList = getFromContentCache(m.constants.ui.contentIds.timeGridContent)
+  if epgScreen <> invalid
+    epgScreen.signedIn = isLoggedInUser()
+
+    epgChannelList = getFromContentCache(m.constants.ui.contentIds.timeGridContent)
+    needsFetch = (epgChannelList = invalid OR (epgChannelList <> invalid AND shouldRefresh(epgChannelList.getChild(0)) = true))
+
+    if needsFetch = true
+      setEPGScreenLoading(epgScreen)
+      if isLoggedInUser() = true
+        fetchEPGScreenChannelsWithBatch(epgScreen)
+      else
+        fetchEPGScreenChannels(epgScreen, m.constants.ui.contentMode.epgScreen)
+      end if
+    else if epgChannelList <> invalid
+      epgScreen.timeGridContent = epgChannelList
+      setTimeGridContentLoadingToComplete(epgScreen)
+    end if
+  end if
+End Function
 
 
-  if epgChannelList = invalid OR (epgChannelList <> invalid AND shouldRefresh(epgChannelList.getChild(0)) = true)'There is no cached contents
-    setEPGScreenLoading(epgScreen)
-    fetchEPGScreenChannels(epgScreen, mode)
-  else if epgChannelList <> invalid
-    epgScreen.timeGridContent = epgChannelList
-    setTimeGridContentLoadingToComplete(epgScreen)
+' Fire EPG + getContentRating as batch; single callback merges when both are back (no race/merge-state)
+Function fetchEPGScreenChannelsWithBatch(epgScreen)
+  tubiLog("EPGScreenHelpers.fetchEPGScreenChannelsWithBatch")
+
+  epgScreen.unobserveFieldScoped("contentReady")
+  epgScreen.observeFieldScoped("contentReady", "onEPGscreenContentReady")
+
+  m.epgBatchRequestorId = epgScreen.id
+  m.epgFetchUniqueId = "epgLikedBatch_epg"
+
+  likedReqInfo = m.userDeviceApi.getContentRating("linear", m.constants.ui.likeDislikeStates.liked)
+  likedReqInfo.append({
+    id: "epgLikedBatch_liked"
+    requestType: m.constants.reqNames.getContentRating
+    responseType: "assocarray"
+  })
+
+  epgContainerInfo = m.tensorapi.getEPGChannelidsReqInfo(m.constants.ui.contentMode.epgScreen)
+  epgReqInfo = {
+    id: m.epgFetchUniqueId
+    url: epgContainerInfo.url
+    options: epgContainerInfo.options
+    requestType: m.constants.reqNames.getEPGChannelIds
+    responseType: "node"
+    requestorID: epgScreen.id
+    isSignedInUser: isLoggedInUser()
+    analyticsScreenId: epgScreen.id
+  }
+
+  epgScreen.timeGridContentLoading = true
+  epgScreen.timeGridContent = invalid
+
+  m.makeBatchRequest({
+    requests: [likedReqInfo, epgReqInfo]
+    successCallback: onEPGAndLikedBatchComplete
+    errorCallback: onEPGAndLikedBatchError
+    responseType: "assocarray"
+  })
+End Function
+
+
+' Batch success: both EPG and getContentRating returned; merge liked into EPG and apply
+Function onEPGAndLikedBatchComplete(batchResponse)
+  tubiLog("EPGScreenHelpers.onEPGAndLikedBatchComplete")
+
+  likedResponse = invalid
+  if batchResponse <> invalid AND batchResponse["epgLikedBatch_liked"] <> invalid
+    likedResponse = batchResponse["epgLikedBatch_liked"]
+  end if
+
+  epgResponse = invalid
+  if batchResponse <> invalid AND batchResponse["epgLikedBatch_epg"] <> invalid
+    epgResponse = batchResponse["epgLikedBatch_epg"]
+  end if
+
+  if likedResponse <> invalid AND likedResponse.nodes <> invalid AND likedResponse.nodes.count() > 0
+    m.likedContainer = {
+      "name": getTranslation("epg_favorites"),
+      "contents": [],
+      "container_id": "favorite_channels",
+      "container_slug": "favorite_channels"
+    }
+    for each item in likedResponse.nodes
+      m.likedContainer.contents.push(item.id)
+    end for
+  end if
+
+  if epgResponse <> invalid AND isNode(epgResponse) = false
+    onEpgError(epgResponse)
+  else if epgResponse = invalid
+    onEpgError({ requestorID: m.epgBatchRequestorId })
+  else
+    applyEpgChannelListToScreen(epgResponse)
+  end if
+End Function
+
+
+Function onEPGAndLikedBatchError(_error)
+  tubiLog("EPGScreenHelpers.onEPGAndLikedBatchError")
+  onEpgError({ requestorID: m.epgBatchRequestorId })
+End Function
+
+
+Function mergeLikedChannelsIntoEpgResponse(response)
+  if m.likedContainer <> invalid AND m.likedContainer.contents <> invalid AND m.likedContainer.contents.count() > 0
+    insertPosition = 0
+    favoritesTitle = getTranslation("epg_favorites")
+
+    for i = m.likedContainer.contents.count() - 1 to 0 step -1
+      likedId = m.likedContainer.contents[i]
+      channel = findChannelInContentById(response, likedId)
+      if channel <> invalid
+        if channel.hasField("isFavorite") = false
+          channel.addField("isFavorite", "bool", false)
+        end if
+        channel.isFavorite = true
+        favoriteChannel = channel.clone(true)
+        favoriteChannel.parentTitle = favoritesTitle
+        favoriteChannel.parentId = "favorite_channels"
+        favoriteChannel.isFavorite = true
+        response.insertChild(favoriteChannel, 0)
+        insertPosition = insertPosition + 1
+      end if
+    end for
+
+    if insertPosition > 0
+      if response.containersList = invalid
+        response.addField("containersList", "node", false)
+        response.containersList = CreateObject("roSGNode", "ContentNode")
+      end if
+
+      containerNode = CreateObject("roSGNode", "ContentNode")
+      containerNode.title = favoritesTitle
+      containerNode.addField("containerId", "string", false)
+      containerNode.containerId = "favorite_channels"
+      response.containersList.insertChild(containerNode, 0)
+    end if
+  end if
+End Function
+
+
+Function findChannelInContentById(contentNode, channelId)
+  if contentNode = invalid
+    return invalid
+  end if
+
+  idStr = channelId.toStr()
+  for i = 0 to contentNode.getChildCount() - 1
+    ch = contentNode.getChild(i)
+    if ch <> invalid AND ch.id <> invalid AND ch.id.toStr() = idStr
+      return ch
+    end if
+  end for
+
+  return invalid
+End Function
+
+
+Function isLinearChannelLiked(channelId) as Boolean
+  if channelId = invalid OR m.likedContainer = invalid OR m.likedContainer.contents = invalid
+    return false
+  end if
+  idStr = channelId.toStr()
+  for each likedId in m.likedContainer.contents
+    if likedId <> invalid AND likedId.toStr() = idStr
+      return true
+    end if
+  end for
+  return false
+End Function
+
+
+' Add or remove channel from likedContainer when user adds/removes favorite (API persists)
+Function updateLikedContainerForLinear(channelId, action)
+  if m.likedContainer <> invalid AND m.likedContainer.contents <> invalid AND channelId <> invalid
+    idStr = channelId.toStr()
+    if action = m.constants.ui.likeDislikeActions.like
+      isLikedContent = false
+      for each likedId in m.likedContainer.contents
+        if likedId <> invalid AND likedId.toStr() = idStr
+          isLikedContent = true
+          exit for
+        end if
+      end for
+      if isLikedContent = false
+        m.likedContainer.contents.push(channelId)
+      end if
+    else if action = m.constants.ui.likeDislikeActions.removeLike
+      likedContentCount = m.likedContainer.contents.count() - 1
+      while likedContentCount >= 0
+        lid = m.likedContainer.contents[likedContentCount]
+        if lid <> invalid AND lid.toStr() = idStr
+          m.likedContainer.contents.delete(likedContentCount)
+          exit while
+        end if
+        likedContentCount = likedContentCount - 1
+      end while
+    end if
   end if
 End Function
 
@@ -87,7 +278,7 @@ End Function
 
 
 ' @param screen: roSGNode, Screen that is fetching and is hosting the EPG Channels: i.e. epgScreen, Linear Video Player Screen
-' @param mode: String, The mode that will dictate that what kind of channels will be gathered for the EPG: i.e. all, sports, news, entertainment
+' @param mode: String, The mode that will dictate that what kind of channels will be gathered for the EPG
 Function fetchEPGChannels(screen, mode = "tubitv_us_linear")
   epgContainerInfo = m.tensorapi.getEPGChannelidsReqInfo(mode)
 
@@ -176,10 +367,8 @@ Function fetchEPGChannel(screenId, channelID, successCallback, errorCallback)
 End Function
 
 
-
 Function onEpgChannelListResponse(response)
   tubiLog("EPGScreenHelpers.onEpgChannelListResponse")
-  'check if this is the epgScreen for which response was meant to be.
   if response <> invalid AND response.requestorID <> invalid
     screen = getFromScreenCache(response.requestorID)
     if screen = invalid
@@ -187,79 +376,94 @@ Function onEpgChannelListResponse(response)
     end if
 
     if screen.id = response.requestorID AND m.epgFetchUniqueId = response.fetchId
+      applyEpgChannelListToScreen(response)
+    end if
+  end if
+End Function
 
-      screen.timeGridContent = response
-      ' Storing it under linear video player screen so that we clear it when we remove linear player screen from cache.
-      setInContentCache(screen.timeGridContent, m.constants.ui.screenIds.linearVideoPlayerScreen)
-      nFetchInBatch = 10
-      ' If jump_to certain channel(contentIdToFocusOnLoadComplete) has been requested after the load is complete, then start with fetching that channel + 5 up + 5 down channels from v2/epg API response.
-      ' This way, we can render the epg as soon as the first batch is in and then load the rest of the epg.
-      ' This happens on deeplink and epg overlay on the channel selected from the home-screen.
-      ' If no jump_to channel(contentIdToFocusOnLoadComplete) has been specified, then just load from the first to last channel(else part)
 
-      ' uniqueChannelIdsList: array of channelIds that are unique and are in the order by which the channels need to be fetched from the epg/programming API.
-      ' ChannelListAA: a temporary AA, is used to remove the duplicate channel IDs so that we do not have to fetch the same channel twice.
-      ' using both channelListAA and uniqueChannelIdsList duplicates are removed without affecting the order that channel-programs need to be fetched.
+' @param response - roSGNode, translated EPG channel list with requestorID
+Function applyEpgChannelListToScreen(response)
+  mergeLikedChannelsIntoEpgResponse(response)
 
-      ' logic explanation:
-      ' lets say v2/epg api returned channels Id list: [567888,567889,567890,567891,567892,567889,567893,567889]
-      ' EPG will be rendered as [567888,567889,567890,567891,567892,567889,567893,567889] 567888 as first, 567889 as second and 567889 as last, and so on.
-      ' if contentIdToFocusOnLoadComplete = 567892 then
-      '     channelListAA list is only used to check if channel-Id has been already added to the uniqueIdlist or not.
-      '     uniqueChannelIdsList=[567892, 567891, 567889, 567890, 567893,567888]
+  screen = getFromScreenCache(response.requestorID)
+  if screen = invalid
+    screen = getCurrentScreen()
+  end if
 
-      channelListAA = {}
-      index = 0
-      m.uniqueChannelIdsList = []
+  if screen <> invalid
+    screen.timeGridContent = response
 
-      if isNonEmptyString(screen.contentIdToFocusOnLoadComplete) = true
-        for i = 0 to response.getChildCount() - 1
-          epgChannel = response.getChild(i)
+    if response.containersList <> invalid
+      screen.containersList = response.containersList
+    end if
 
-          if epgChannel.id = screen.contentIdToFocusOnLoadComplete
-            index = i
-            channelListAA[epgChannel.id] = true
-            m.uniqueChannelIdsList[0] = epgChannel.id
-
-            upIndex = response.getChildCount()
-            for j = 1 to upIndex
-              if index - j >= 0
-                epgChannel = response.getChild(index - j)
-                if channelListAA[epgChannel.id] <> true
-                  channelListAA[epgChannel.id] = true
-                  m.uniqueChannelIdsList.push(epgChannel.id) ' store it Array to preserve the order of the original list from the server.
-                end if
-              end if
-
-              if index + j < upIndex
-                epgChannel = response.getChild(index + j)
-                if channelListAA[epgChannel.id] <> true
-                  channelListAA[epgChannel.id] = true
-                  m.uniqueChannelIdsList.push(epgChannel.id) ' store it Array to preserve the order of the original list from the server.
-                end if
-              end if
-            end for
-
-            exit for
+    if isLoggedInUser() = true AND screen.timeGridContent <> invalid
+      childCount = screen.timeGridContent.getChildCount()
+      for i = 0 to childCount - 1
+        channel = screen.timeGridContent.getChild(i)
+        if channel <> invalid AND channel.id <> invalid AND isLinearChannelLiked(channel.id) = true
+          if channel.hasField("isFavorite") = false
+            channel.addField("isFavorite", "bool", false)
           end if
-        end for
-      else
-        for i = 0 to response.getChildCount() - 1 'If no jump_to channel has been specified, then just load from first to last channel(epg screen)
-          epgChannel = response.getChild(i)
-          if channelListAA[epgChannel.id] <> true
-            channelListAA[epgChannel.id] = true
-            m.uniqueChannelIdsList.push(epgChannel.id) ' store it Array to preserve the order of the original list from the server.
-          end if
-        end for
-      end if
-      totalNumChannels = m.uniqueChannelIdsList.Count()
+          channel.isFavorite = true
+        end if
+      end for
+    end if
 
-      if totalNumChannels <= 0
-        onEPGError(response)
-      end if
-      ' make api request for first 10 visible channels. Then rest will be fetched after we receive programs for first 10 channels
+    setInContentCache(screen.timeGridContent, m.constants.ui.screenIds.linearVideoPlayerScreen)
+    nFetchInBatch = 10
+
+    channelListAA = {}
+    index = 0
+    m.uniqueChannelIdsList = []
+
+    if isNonEmptyString(screen.contentIdToFocusOnLoadComplete) = true
+      for i = 0 to response.getChildCount() - 1
+        epgChannel = response.getChild(i)
+
+        if epgChannel.id = screen.contentIdToFocusOnLoadComplete
+          index = i
+          channelListAA[epgChannel.id] = true
+          m.uniqueChannelIdsList[0] = epgChannel.id
+
+          upIndex = response.getChildCount()
+          for j = 1 to upIndex
+            if index - j >= 0
+              epgChannel = response.getChild(index - j)
+              if channelListAA[epgChannel.id] <> true
+                channelListAA[epgChannel.id] = true
+                m.uniqueChannelIdsList.push(epgChannel.id)
+              end if
+            end if
+
+            if index + j < upIndex
+              epgChannel = response.getChild(index + j)
+              if channelListAA[epgChannel.id] <> true
+                channelListAA[epgChannel.id] = true
+                m.uniqueChannelIdsList.push(epgChannel.id)
+              end if
+            end if
+          end for
+
+          exit for
+        end if
+      end for
+    else
+      for i = 0 to response.getChildCount() - 1
+        epgChannel = response.getChild(i)
+        if channelListAA[epgChannel.id] <> true
+          channelListAA[epgChannel.id] = true
+          m.uniqueChannelIdsList.push(epgChannel.id)
+        end if
+      end for
+    end if
+    totalNumChannels = m.uniqueChannelIdsList.Count()
+
+    if totalNumChannels > 0
       makeEPGProgramCalls(response.requestorID, nFetchInBatch)
-
+    else
+      onEPGError(response)
     end if
   end if
 End Function
@@ -477,8 +681,6 @@ Function onEPGScreenOKPressed()
 End Function
 
 
-
-
 Function onRefreshEPGScreenVideoPlay(msg)
   tubiLog("EPGScreenHelpers.onRefreshEPGScreenVideoPlay")
   refreshVideoPlay = msg.getData()
@@ -567,13 +769,30 @@ Function onEPGScrollingStatusChange(msg)
   tubiLog("EPGScreenHelpers.onEPGScrollingStatusChange ")
   scrollingStatus = msg.getData()
   screen = msg.getRoSGNode()
-  if scrollingStatus = true
+
+  ' Check if program grid OR channel grid OR category grid is scrolling
+  isScrolling = scrollingStatus = true
+  if screen.hasField("channelGridScrollingStatus") = true
+    if screen.channelGridScrollingStatus = true
+      isScrolling = true
+    end if
+  end if
+  if screen.hasField("categoryGridScrollingStatus") = true
+    if screen.categoryGridScrollingStatus = true
+      isScrolling = true
+    end if
+  end if
+
+  if isScrolling = true
     stopCountdownTimer()
     screen.fullscreenCountdown = -1
   else if screen.linearChannelToPlay <> invalid
-    linearVideoPlayer = getFromScreenCache(m.constants.ui.screenIds.linearVideoPlayerScreen)
-    if linearVideoPlayer <> invalid AND linearVideoPlayer.state = "playing"
-      startCountdownTimer()
+    ' Only resume timer if none of the grids are scrolling
+    if screen.scrollingStatus <> true AND (screen.hasField("channelGridScrollingStatus") = false OR screen.channelGridScrollingStatus <> true) AND (screen.hasField("categoryGridScrollingStatus") = false OR screen.categoryGridScrollingStatus <> true)
+      linearVideoPlayer = getFromScreenCache(m.constants.ui.screenIds.linearVideoPlayerScreen)
+      if linearVideoPlayer <> invalid AND linearVideoPlayer.state = "playing"
+        startCountdownTimer()
+      end if
     end if
   end if
 End Function
@@ -664,3 +883,285 @@ Function setTimeGridContentLoadingToComplete(screen)
   end if
   screen.contentIdToFocusOnLoadComplete = ""
 End Function
+
+
+Function onChannelSelected(msg)
+  screen = msg.getRoSgNode()
+  contentId = msg.getData()
+  handleChannelSelectedForFavorites(screen, contentId)
+End Function
+
+
+' @param screen - EPGHomeScreen or LinearVideoPlayerScreen (has timeGridContent, containersList, channelIdSelected)
+' @param contentId - channel id that was selected
+Function handleChannelSelectedForFavorites(screen, contentId)
+  epgCategoriesVariant = "none"
+  epgCategoriesExperiment = getStatsigExperimentResource("roku_linear_epg_categories", "roku_linear_epg_categories_v1", false)
+  if epgCategoriesExperiment <> invalid AND epgCategoriesExperiment.variant <> invalid
+    epgCategoriesVariant = epgCategoriesExperiment.variant
+  end if
+
+  if epgCategoriesVariant = "categories_with_favorites"
+    if isLoggedInUser() = true
+      if screen <> invalid AND contentId <> invalid
+        if isLinearChannelLiked(contentId) = true
+          action = m.constants.ui.likeDislikeActions.removeLike
+        else
+          action = m.constants.ui.likeDislikeActions.like
+        end if
+
+        handleAddRemoveFavorites(screen, action)
+      end if
+    else
+      startSignIn(onChannelRatingUpdated)
+    end if
+  end if
+End Function
+
+
+Function handleAddRemoveFavorites(screen, likeDislike = "")
+  if isNonEmptyString(likeDislike) = true
+    sRatingChange = likeDislike
+  else
+    sRatingChange = m.constants.ui.likeDislikeActions.like
+  end if
+
+  updateLikeDislikeRequestInfo = m.userDeviceApi.setContentRating(screen.channelIdSelected, sRatingChange, "linear")
+
+  m.makeRequest({
+    url: updateLikeDislikeRequestInfo.url
+    requestType: m.constants.reqNames.setContentRating
+    options: updateLikeDislikeRequestInfo.options
+    successCallback: onFavoritesAddRemoveSuccess
+    errorCallback: onFavoritesAddRemoveFailure
+    responseType: "assocarray"
+  })
+
+End Function
+
+
+Function onFavoritesAddRemoveSuccess(requestBody)
+  if requestBody <> invalid AND type(requestBody.data) = "roArray"
+    returnedContentId = requestBody.data[0]
+    sReturnedAction = requestBody.action
+
+    if returnedContentId <> invalid AND sReturnedAction <> invalid
+      epgScreen = getCurrentScreen()
+      isEpgOrLinearOverlay = (epgScreen <> invalid AND epgScreen.timeGridContent <> invalid AND (isAnEpgScreen(epgScreen) = true OR epgScreen.id = m.constants.ui.screenIds.linearVideoPlayerScreen))
+      if isEpgOrLinearOverlay = true
+        favoritesTitle = getTranslation("epg_favorites")
+        ' Find channel and check if it's already in favorites
+        ' Note: We need to check all channels because:
+        ' 1. If adding first time, channel won't be in favorites (favoriteChannelIndex = -1)
+        ' 2. We can't exit early until we've checked all channels to confirm it's not in favorites
+        originalChannel = invalid
+        favoriteChannelIndex = -1
+        contentIdStr = returnedContentId.toStr()
+        childCount = epgScreen.timeGridContent.getChildCount()
+
+        for i = 0 to childCount - 1
+          channel = epgScreen.timeGridContent.getChild(i)
+          if channel <> invalid AND channel.id <> invalid AND channel.id.toStr() = contentIdStr
+            parentId = channel.parentId
+            if parentId = "favorite_channels"
+              favoriteChannelIndex = i
+            else
+              if originalChannel = invalid
+                originalChannel = channel
+              end if
+            end if
+          end if
+        end for
+
+        if sReturnedAction = m.constants.ui.likeDislikeActions.like
+          if originalChannel <> invalid
+            if originalChannel.hasField("isFavorite") = false
+              originalChannel.addField("isFavorite", "bool", false)
+            end if
+
+            originalChannel.isFavorite = true
+
+            if favoriteChannelIndex = -1
+              epgCategoriesVariant = "none"
+              epgCategoriesExperiment = getStatsigExperimentResource("roku_linear_epg_categories", "roku_linear_epg_categories_v1", false)
+              if epgCategoriesExperiment <> invalid AND epgCategoriesExperiment.variant <> invalid
+                epgCategoriesVariant = epgCategoriesExperiment.variant
+              end if
+
+              if epgCategoriesVariant = "categories_with_favorites"
+                if epgScreen.hasField("containersList") = false
+                  epgScreen.addField("containersList", "node", false)
+                end if
+                if epgScreen.containersList = invalid
+                  epgScreen.containersList = CreateObject("roSGNode", "ContentNode")
+                end if
+
+                favoritesContainerExists = false
+                if epgScreen.containersList.getChildCount() > 0
+                  firstContainer = epgScreen.containersList.getChild(0)
+                  if firstContainer <> invalid AND firstContainer.containerId = "favorite_channels"
+                    favoritesContainerExists = true
+                  end if
+                end if
+
+                if favoritesContainerExists = false
+                  containerNode = CreateObject("roSGNode", "ContentNode")
+                  containerNode.title = favoritesTitle
+                  containerNode.addField("containerId", "string", false)
+                  containerNode.containerId = "favorite_channels"
+                  epgScreen.containersList.insertChild(containerNode, 0)
+                end if
+              end if
+
+              favoriteChannel = originalChannel.clone(true)
+              favoriteChannel.parentTitle = favoritesTitle
+              favoriteChannel.parentId = "favorite_channels"
+              if favoriteChannel.hasField("isFavorite") = false
+                favoriteChannel.addField("isFavorite", "bool", false)
+              end if
+              favoriteChannel.isFavorite = true
+              epgScreen.timeGridContent.insertChild(favoriteChannel, 0)
+            else
+              if favoriteChannelIndex >= 0
+                favoriteChannel = epgScreen.timeGridContent.getChild(favoriteChannelIndex)
+                if favoriteChannel <> invalid
+                  if favoriteChannel.hasField("isFavorite") = false
+                    favoriteChannel.addField("isFavorite", "bool", false)
+                  end if
+                  favoriteChannel.isFavorite = true
+                end if
+              end if
+            end if
+          end if
+        else if sReturnedAction = m.constants.ui.likeDislikeActions.removeLike
+          if favoriteChannelIndex >= 0
+            epgScreen.timeGridContent.removeChildIndex(favoriteChannelIndex)
+          end if
+          if originalChannel <> invalid
+            if originalChannel.hasField("isFavorite") = false
+              originalChannel.addField("isFavorite", "bool", false)
+            end if
+            originalChannel.isFavorite = false
+          end if
+          ' Remove Favorites category from containersList when all favorite channels are removed
+          if epgScreen.containersList <> invalid
+            favoritesRemaining = false
+            for j = 0 to epgScreen.timeGridContent.getChildCount() - 1
+              channel = epgScreen.timeGridContent.getChild(j)
+              if channel <> invalid AND channel.parentId = "favorite_channels"
+                favoritesRemaining = true
+                exit for
+              end if
+            end for
+            if favoritesRemaining = false
+              for k = epgScreen.containersList.getChildCount() - 1 to 0 step -1
+                container = epgScreen.containersList.getChild(k)
+                if container <> invalid AND container.containerId = "favorite_channels"
+                  epgScreen.containersList.removeChildIndex(k)
+                  exit for
+                end if
+              end for
+            end if
+          end if
+        end if
+
+        ' Keep likedContainer in sync (API persists; no global likeIds needed for EPG)
+        if returnedContentId <> invalid
+          updateLikedContainerForLinear(returnedContentId, sReturnedAction)
+        end if
+
+        ' Send BookmarkEvent for EPG favorites analytics (per analytics spec)
+        sendEPGFavoriteBookmarkAnalytics(returnedContentId, sReturnedAction, epgScreen)
+
+        epgScreen.updateTimeGridContent = true
+      end if
+    end if
+  end if
+End Function
+
+
+Function onFavoritesAddRemoveFailure(error)
+End Function
+
+
+Function revalidateEPGContentAfterLocalFavoritesAdd(epgScreen)
+  if epgScreen <> invalid
+    timeGridContent = epgScreen.timeGridContent
+    if timeGridContent <> invalid
+      firstChild = timeGridContent.getChild(0)
+      if firstChild <> invalid
+        if firstChild.hasField("validUntil") = false
+          firstChild.addField("validUntil", "integer", false)
+        end if
+        firstChild.validUntil = Uptime(0) + m.constants.cacheTimes.epgscreen
+      end if
+    end if
+  end if
+End Function
+
+
+' Remove Favorites category from containersList (category pills). containersList lives on screen, not on timeGridContent.
+Function removeFavoritesFromContainersList(containersList)
+  if containersList <> invalid
+    k = containersList.getChildCount() - 1
+    while k >= 0
+      container = containersList.getChild(k)
+      if container <> invalid AND container.containerId = "favorite_channels"
+        containersList.removeChildIndex(k)
+        exit while
+      end if
+      k = k - 1
+    end while
+  end if
+End Function
+
+
+Function removeEPGFavoritesOnSignOut()
+  tubiLog("EPGScreenHelpers.removeEPGFavoritesOnSignOut")
+
+  m.likedContainer = {}
+  deleteScreenContentCache(m.constants.ui.screenIds.linearVideoPlayerScreen)
+  deleteScreenContentCache(m.constants.ui.screenIds.epgScreen)
+  deleteFromScreenCache(m.constants.ui.screenIds.epgScreen)
+End Function
+
+
+' Send BookmarkEvent for EPG favorites add/remove (per analytics spec)
+' @channelId: dynamic, the channel id
+' @operation: string, likeDislikeActions.like or removeLike
+' @epgScreen: roSGNode, the EPG screen for tracking page info
+Function sendEPGFavoriteBookmarkAnalytics(channelId, operation, epgScreen)
+  if channelId <> invalid AND epgScreen <> invalid AND m.trackingLoggingTask <> invalid
+    op = "ADD_TO_QUEUE"
+    if operation = m.constants.ui.likeDislikeActions.removeLike
+      op = "REMOVE_FROM_QUEUE"
+    end if
+
+    pageOneof = m.Tracking.getAnalyticsPage("linear_browse_page", {})
+    if epgScreen.trackingPageInfo <> invalid
+      pageOneof = m.Tracking.getAnalyticsPage(epgScreen.trackingPageInfo.pageType, epgScreen.trackingPageInfo.pageValues)
+    end if
+
+    videoId = 0
+    if channelId <> invalid
+      if type(channelId) = "roInt" OR type(channelId) = "Integer" OR type(channelId) = "LongInteger"
+        videoId = channelId
+      else
+        videoId = channelId.toInt()
+        if videoId = invalid
+          videoId = 0
+        end if
+      end if
+    end if
+
+    m.trackingLoggingTask.trackEvent = {
+      type: "bookmark"
+      values: {
+        contentOneof: { video_id: videoId }
+        pageOneof: pageOneof
+        op: op
+      }
+    }
+  end if
+End Function
+

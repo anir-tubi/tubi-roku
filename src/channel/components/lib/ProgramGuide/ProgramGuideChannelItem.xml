@@ -6,10 +6,13 @@
   <script type="text/brightscript" uri="ProgramGuideChannelItem.brs" />
   <script type="text/brightscript" uri="pkg:/source/lib/Log.brs" />
   <script type="text/brightscript" uri="pkg:/components/lib/GlobalMixin.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/StatsigLib.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/StatsigExperiments.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/StatsigExperimentMixin.brs" />
 
   <interface>
     <field id="itemContent" type="node" />
-
+    <field id="itemHasFocus" type="float" />
     <field id="focusPercent" type="float" />
 
   </interface>
@@ -21,6 +24,13 @@
       width="186"
       opacity="1"
       uri="pkg:/images/ratingBackground.9.png"/>
+    <Poster
+      id="starIcon"
+      width="24"
+      height="24"
+      opacity="0"
+      translation="[3,3]"
+      uri="pkg:/images/icon-empty-star.webp"/>
     <Poster
       id="ChannelPoster"
       loadingBitmapUri="pkg:/images/placeholder.jpg"

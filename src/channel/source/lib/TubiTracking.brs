@@ -103,6 +103,7 @@ Function TubiTrackingInfo(constants)
     isString: tubiTracking_isString
     isNowWithinTimePeriod: tubiTracking_isNowWithinTimePeriod
     getHomePageContentModeMap: tubiTracking_getHomePageContentModeMap
+    getEPGContainerToNavSectionMap: tubiTracking_getEPGContainerToNavSectionMap
 
     ' an AA structure of the valid "Oneofs" that are needed in various protos messages
     allOneofs: tubiTracking_getOneOfs()
@@ -1313,6 +1314,13 @@ Function tubiTracking_getOneOfs()
       category_slug: ""
     }
 
+    ' ChannelGuideComponent - EPG jump navigation categories (container pills)
+    channel_guide_component: {
+      category_row: 1 ' 1 based index, always 1 for category row
+      category_col: -1 ' 1 based vertical position of category
+      utility_tile: {} ' UtilityTile message: id (containerId), row (vertical position), col: 1
+    }
+
     button_component: {
       button_type: "" 'ButtonType enum
       button_value: ""
@@ -1354,9 +1362,20 @@ Function tubiTracking_getOneOfs()
 
     dest_episode_video_list_component: {
       content_tile: {} ' ContentTile message
-
-      dest_category_component: categoryComponent
     }
+
+    dest_epg_component: {
+      content_tile: {} ' ContentTile message
+      category_slug: ""
+    }
+
+    dest_channel_guide_component: {
+      category_row: 1
+      category_col: -1
+      utility_tile: {}
+    }
+
+    dest_category_component: categoryComponent
 
     dest_collection_component: collectionComponent
   }
@@ -1383,6 +1402,58 @@ Function tubiTracking_getOneOfs()
     contentOneof: contentOneof
     selectorOneOf: selectorOneOf
   }
+End Function
+
+
+' Maps EPG container_id/container_slug to NavigationMenu.Section enum for NavigateWithinPageEvent
+Function tubiTracking_getEPGContainerToNavSectionMap()
+  map = {
+    ' Favorites & curated
+    "favorite_channels": "FAVORITES"
+    "featured_channels": "FEATURED"
+    "recently_added_channels": "RECENTLY_ADDED"
+    "recommended_linear_channels": "RECOMMENDED"
+    "recommended_linear_channels_ca": "RECOMMENDED"
+
+    ' News
+    "news": "NEWS"
+    "live_news": "NEWS"
+    "national_news": "NATIONAL_NEWS"
+    "business_news": "BUSINESS_NEWS"
+    "global_news": "GLOBAL_NEWS"
+    "culture_and_entertainment": "CULTURE_AND_ENTERTAINMENT_NEWS"
+    "local_news": "LOCAL_NEWS"
+
+    ' Sports & competition
+    "sports_on_tubi": "SPORTS"
+    "games_competition": "SPORTS"
+
+    ' Entertainment & genres
+    "entertainment": "ENTERTAINMENT"
+    "live_programming": "LINEAR"
+    "movie_channels": "MOVIES"
+    "classic_tv": "NOSTALGIA"
+    "reality": "ENTERTAINMENT"
+    "true_crime_channels": "ENTERTAINMENT"
+    "science_nature": "ENTERTAINMENT"
+    "lifestyle_channels": "ENTERTAINMENT"
+    "good_eats_channels": "ENTERTAINMENT"
+    "comedy_channels": "ENTERTAINMENT"
+    "kids_family_channels": "KIDS"
+    "sci_fi_supernatural": "ENTERTAINMENT"
+    "horror_channels": "ENTERTAINMENT"
+    "mystery_channels": "ENTERTAINMENT"
+    "tv_drama_channels": "ENTERTAINMENT"
+    "black_entertainment": "ENTERTAINMENT"
+    "tubi_originals_channel": "FEATURED"
+    "pop_culture": "ENTERTAINMENT"
+    "documentaries": "ENTERTAINMENT"
+
+    ' Weather & language
+    "weather": "WEATHER"
+    "espanol": "ESPANOL"
+  }
+  return map
 End Function
 
 

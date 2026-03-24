@@ -1,8 +1,11 @@
 Function init()
   m.poster = m.top.findNode("ChannelPoster")
   m.posterBg = m.top.findNode("channelPosterBG")
+  m.starIcon = m.top.findNode("starIcon")
+  m.observedFavoriteContent = invalid
   m.top.observeFieldscoped("itemContent", "onContentChange")
   m.top.observeFieldscoped("focusPercent", "onFocusPercentChange")
+  m.top.observeFieldScoped("itemHasFocus", "onItemHasFocusChange")
 
   theme = getThemeFromGlobal()
   if theme <> invalid
@@ -16,6 +19,51 @@ Function onContentChange()
   item = m.top.itemContent
   if item <> invalid
     m.poster.uri = item.HDSMALLICONURL
+    if m.observedFavoriteContent <> invalid
+      m.observedFavoriteContent.unobserveFieldScoped("isFavorite")
+      m.observedFavoriteContent = invalid
+    end if
+    if item.hasField("isFavorite") = false
+      item.addField("isFavorite", "bool", false)
+    end if
+    item.observeFieldScoped("isFavorite", "onIsFavoriteChange")
+    m.observedFavoriteContent = item
+    updateStarIcon()
+  else if m.observedFavoriteContent <> invalid
+    m.observedFavoriteContent.unobserveFieldScoped("isFavorite")
+    m.observedFavoriteContent = invalid
+  end if
+End Function
+
+
+Function onIsFavoriteChange(msg)
+  updateStarIcon()
+End Function
+
+
+Function updateStarIcon()
+  item = m.top.itemContent
+  focusPercent = 0.0
+  if m.top.focusPercent <> invalid
+    focusPercent = m.top.focusPercent
+  end if
+
+  epgCategoriesVariant = "none"
+  epgCategoriesExperiment = getStatsigExperimentResource("roku_linear_epg_categories", "roku_linear_epg_categories_v1", false)
+  if epgCategoriesExperiment <> invalid AND epgCategoriesExperiment.variant <> invalid
+    epgCategoriesVariant = epgCategoriesExperiment.variant
+  end if
+
+  if focusPercent > 0.5 AND epgCategoriesVariant = "categories_with_favorites"
+    m.starIcon.opacity = 1.0
+
+    if item <> invalid AND item.isFavorite = true
+      m.starIcon.uri = "pkg:/images/icon-star-filled.webp"
+    else
+      m.starIcon.uri = "pkg:/images/icon-empty-star.webp"
+    end if
+  else
+    m.starIcon.opacity = 0.0
   end if
 End Function
 
@@ -28,4 +76,10 @@ Function onFocusPercentChange()
     m.poster.opacity = 0.45
     m.posterBg.opacity = 1
   end if
+  updateStarIcon()
+End Function
+
+
+Function onItemHasFocusChange(msg)
+  updateStarIcon()
 End Function

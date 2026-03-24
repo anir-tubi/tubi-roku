@@ -42,6 +42,12 @@
 
     <field id="jumpToRowItem" alias="ProgramGrid.jumpToRowItem" />
 
+    <field id="isChannelGridFocused" type="boolean" value="false"/>
+
+    <field id="channelGridFocusable" type="boolean" value="true" alwaysNotify="true"/>
+
+    <field id="categoriesMenuVisible" type="boolean" value="true" alwaysNotify="true"/>
+
     <field id="setFocusedToPlay"  type="boolean" alwaysNotify="true" />
 
 
@@ -72,6 +78,8 @@
     <!--Since LinearChannelToPlay will get updated everytime minsLeftTimer is run, to protect unwanted trigging of observer, this field is used-->
     <field id="linearChannelToPlayUpdated" type="boolean" alwaysNotify="true"/>
 
+    <field id="channelIdSelected" type="string" alwaysNotify="true"/>
+
     <!--this field will be used to move the channelGrid when program grid moves-->
     <field id="currFocusRow" alias="ProgramGrid.currFocusRow" />
 
@@ -79,6 +87,9 @@
 
     <!--this field will be used for long presses to dismiss the timer-->
     <field id="scrollingStatus" type="boolean" alias="ProgramGrid.scrollingStatus" />
+    
+    <!-- Scrolling status for channel grid (MarkupList doesn't have built-in scrollingStatus) -->
+    <field id="channelGridScrollingStatus" type="boolean" value="false" alwaysNotify="true"/>
 
     <field id="rowItemfocused" alias="ProgramGrid.rowItemFocused" />
 
@@ -152,7 +163,7 @@
 
     <Label
       id="headerText"
-      translation="[0,51]"
+      translation="[300,51]"
       height="36"
       width="1000"
       horizAlign="left"
@@ -168,18 +179,19 @@
 
     <MarkupList
       id="channelsGrid"
-      translation="[0, 96]"
+      translation="[300, 96]"
       numRows="4"
       itemSize="[186,108]"
       itemSpacing="[0,12]"
       drawFocusFeedbackOnTop="false"
       focusFootprintBitmapUri="pkg:/images/ratingBackground.9.png"
+      focusBitmapUri="pkg:/images/epg-selector-$$RES$$.9.png"
       itemComponentName="ProgramGuideChannelItem"
       vertFocusAnimationStyle="fixedFocus"/>
 
     <CustomEPGRowList
       id="ProgramGrid"
-      translation="[198,96]"
+      translation="[498,96]"
       numRows="4"
       itemSize="[1776,108]"
       rowItemSize="[[500,108]]"

@@ -980,6 +980,8 @@ Function onPostSignOutServerPersistentDataRefresh()
     setUiModeForProfileSelected(authInfo)
   end if
 
+  ' Remove favorites category and favorite channels from EPG
+  removeEPGFavoritesOnSignOut()
   setContentToRefreshAllPersonalizedScreens()
   setSideNavSignedInItem(authInfo)
   refreshHomeScreenSideNav()
@@ -1075,6 +1077,23 @@ Function onDislikeAfterSignIn()
     'refresh the detail screen in case the newly signed in user has any progress with the current content
     refreshDetailScreenContent(currentScreen)
     currentScreen.refreshRelatedContent = true
+  end if
+End Function
+
+
+Function onChannelRatingUpdated()
+  tubiLog("SignInHelpers.onChannelRatingUpdated")
+  refreshUiAfterSignIn()
+  setContentToRefreshAllPersonalizedScreens()
+
+  currentScreen = popScreenAfterSignInProcess()
+  m.spinner.visible = false
+
+  if currentScreen <> invalid AND (currentScreen.getSubtype() = "EPGHomeScreen" OR currentScreen.id = m.constants.ui.screenIds.linearVideoPlayerScreen)
+    handleAddRemoveFavorites(currentScreen, m.constants.ui.likeDislikeActions.like)
+    ' Re-validate EPG content so onScreenFocusChange does not trigger redundant full refetch.
+    ' setContentToRefreshAllPersonalizedScreens invalidated it; we updated it locally.
+    revalidateEPGContentAfterLocalFavoritesAdd(currentScreen)
   end if
 End Function
 

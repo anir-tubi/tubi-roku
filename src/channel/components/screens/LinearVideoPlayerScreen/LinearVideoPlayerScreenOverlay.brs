@@ -25,6 +25,14 @@ Function init()
   m.top.observeField("updateTimeGridContent", "onTimeContentChange")
   m.top.observeField("timeGridContentLoading", "onTimeGridContentLoadingChange")
 
+  'category list
+  m.containerMarkupGrid = m.top.findNode("containerMarkupGrid")
+  m.containerMarkupGrid.observeFieldScoped("itemSelected", "onCategoryItemSelected")
+  m.containerMarkupGrid.observeFieldScoped("itemFocused", "onCategoryItemFocused")
+  m.containerMarkupGrid.observeFieldScoped("focusedChild", "onCategoryGridFocusChange")
+  m.EPG.observeField("focusedChild", "onEPGTimeGridFocusChange")
+  m.top.observeField("containersList", "onContainersListChanged")
+
   '//Closed Captioning Nodes
   m.closedCaptioningGroup = m.top.findNode("closedCaptioningGroup")
   m.closedCaptioningButtonList = m.top.findNode("closedCaptioningButtonList")
@@ -38,7 +46,14 @@ Function init()
   if theme <> invalid
     m.closedCaptioningButtonList.focusBitmapBlendColor = theme.focusedColor
     m.closedCaptioningButtonList.focusFootprintBlendColor = theme.neutralColor2
+    if m.containerMarkupGrid <> invalid
+      m.containerMarkupGrid.focusBitmapBlendColor = theme.focusedColor
+      m.containerMarkupGrid.focusFootprintBlendColor = theme.neutralColor
+    end if
   end if
+
+  ' Track last focused category for NavigateWithinPageEvent scroll detection
+  m.lastCategoryFocusedIndex = invalid
 
   '//It is best not to check the visible state of a UI element as it may be in a transitionary state. So m.bEPGVisible is used to know what is the intention of the EPG visible state.
   '//if the EPG is visible, then bEPGVisible is true. If the closed captioning is visible (and the EPG is not), then bEPGVisible is false. If there are more than 2 states, then this boolean will need to be changed to a different kind of variable
@@ -199,6 +214,256 @@ Function centerClosedCaptioning()
 End Function
 
 
+Function onContainersListChanged(msg)
+  tubiLog("LinearVideoPlayerScreenOverlay.onContainersListChanged")
+  containersList = msg.getData()
+  if containersList <> invalid AND m.containerMarkupGrid <> invalid
+    m.containerMarkupGrid.content = containersList
+    ' Only show containerMarkupGrid when EPG has focus
+    ' Visibility will be controlled by onEPGTimeGridFocusChange()
+    m.containerMarkupGrid.visible = false
+
+    if m.EPG <> invalid
+      epgCategoriesVariant = "none"
+      epgCategoriesExperiment = getStatsigExperimentResource("roku_linear_epg_categories", "roku_linear_epg_categories_v1", false)
+      if epgCategoriesExperiment <> invalid AND epgCategoriesExperiment.variant <> invalid
+        epgCategoriesVariant = epgCategoriesExperiment.variant
+      end if
+      m.EPG.channelGridFocusable = (epgCategoriesVariant = "categories_with_favorites")
+      m.EPG.categoriesMenuVisible = (epgCategoriesVariant <> "none")
+    end if
+  end if
+End Function
+
+
+Function onCategoryItemFocused(msg)
+  tubiLog("LinearVideoPlayerScreenOverlay.onCategoryItemFocused")
+  itemFocused = msg.getData()
+  m.top.reactedToKeyPresss = true
+
+  if itemFocused <> invalid AND m.containerMarkupGrid.content <> invalid
+    ' MarkupGrid returns [row, col] array
+    itemIndex = invalid
+    if isNonEmptyArray(itemFocused) = true AND itemFocused.count() = 2
+      row = itemFocused[0]
+      col = itemFocused[1]
+      itemIndex = row * m.containerMarkupGrid.numColumns + col
+      focusedContainerItem = m.containerMarkupGrid.content.getChild(itemIndex)
+    else if isNumber(itemFocused) = true
+      ' Fallback for single index
+      itemIndex = itemFocused
+      focusedContainerItem = m.containerMarkupGrid.content.getChild(itemFocused)
+    end if
+
+    if focusedContainerItem <> invalid
+      if itemIndex <> invalid AND m.lastCategoryFocusedIndex <> invalid AND m.lastCategoryFocusedIndex <> itemIndex
+        sendOverlayCategoryScrollNavigateWithinPageEvent(m.lastCategoryFocusedIndex, itemIndex)
+      end if
+      m.lastCategoryFocusedIndex = itemIndex
+
+      containerId = focusedContainerItem.containerId
+      categoryName = focusedContainerItem.title
+
+      ' Update headerText with category name
+      if categoryName <> invalid AND categoryName <> "" AND m.EPG <> invalid
+        headerText = m.EPG.findNode("headerText")
+        if headerText <> invalid
+          headerText.text = categoryName
+        end if
+      end if
+
+      if containerId <> invalid AND containerId <> ""
+        ' Find the first channel with matching parentId in timeGridContent
+        if m.top.timeGridContent <> invalid
+          for i = 0 to m.top.timeGridContent.getChildCount() - 1
+            channel = m.top.timeGridContent.getChild(i)
+            if channel <> invalid AND channel.parentId <> invalid AND channel.parentId = containerId
+              ' Jump to this channel using jumpToLinearChannelID
+              ' Format: [channelId, containerId]
+              m.EPG.jumpToLinearChannelID = [channel.id, containerId]
+              tubiLog("LinearVideoPlayerScreenOverlay.onCategoryItemFocused: Jumping to channel " + channel.id + " in container " + containerId)
+              exit for
+            end if
+          end for
+        end if
+      end if
+    end if
+  end if
+End Function
+
+
+Function onCategoryItemSelected(msg)
+  tubiLog("LinearVideoPlayerScreenOverlay.onCategoryItemSelected")
+  m.top.reactedToKeyPresss = true
+End Function
+
+
+Function sendOverlayCategoryScrollNavigateWithinPageEvent(lastFocusedIndex, focusedIndex)
+  if m.containerMarkupGrid <> invalid AND m.containerMarkupGrid.content <> invalid AND m.top.currentLinearVideoContent <> invalid
+    fromContainer = m.containerMarkupGrid.content.getChild(lastFocusedIndex)
+    toContainer = m.containerMarkupGrid.content.getChild(focusedIndex)
+    if fromContainer <> invalid AND toContainer <> invalid
+      fromContainerId = fromContainer.containerId
+      toContainerId = toContainer.containerId
+      toVerticalPos = focusedIndex + 1
+      utilityTileFrom = {}
+      if fromContainerId <> invalid
+        utilityTileFrom = { id: fromContainerId, row: lastFocusedIndex + 1, col: 1 }
+      end if
+      utilityTileTo = {}
+      if toContainerId <> invalid
+        utilityTileTo = { id: toContainerId, row: toVerticalPos, col: 1 }
+      end if
+      fromComponentValues = {
+        category_row: 1
+        category_col: lastFocusedIndex + 1
+        utility_tile: utilityTileFrom
+      }
+      toComponentValues = {
+        category_row: 1
+        category_col: toVerticalPos
+        utility_tile: utilityTileTo
+      }
+      pageValues = { video_id: m.top.currentLinearVideoContent.id.toInt() }
+      navigateWithinPageInfo = {
+        pageOneof: m.Tracking.getAnalyticsPage("video_player_page", pageValues)
+        componentOneof: m.Tracking.getAnalyticsComponent("channel_guide_component", fromComponentValues)
+        dest_componentOneof: m.Tracking.getAnalyticsDestinationComponent("dest_channel_guide_component", toComponentValues)
+        means_of_navigation: "SCROLL"
+        horizontal_location: 1
+        vertical_location: toVerticalPos
+      }
+      m.top.linearOverlayCategoryNavigateWithinPageInfo = navigateWithinPageInfo
+    end if
+  end if
+End Function
+
+
+Function sendOverlayCategoryToChannelNavigateWithinPageEvent()
+  if m.containerMarkupGrid <> invalid AND m.containerMarkupGrid.content <> invalid AND m.top.currentLinearVideoContent <> invalid
+    itemFocused = m.containerMarkupGrid.itemFocused
+    if itemFocused <> invalid
+      itemIndex = invalid
+      if isNonEmptyArray(itemFocused) = true AND itemFocused.count() = 2
+        itemIndex = itemFocused[0] * m.containerMarkupGrid.numColumns + itemFocused[1]
+      else if isNumber(itemFocused) = true
+        itemIndex = itemFocused
+      end if
+      if itemIndex <> invalid
+        focusedContainer = m.containerMarkupGrid.content.getChild(itemIndex)
+        if focusedContainer <> invalid
+          containerId = focusedContainer.containerId
+          verticalPos = itemIndex + 1
+          channelComponentValues = {
+            category_row: 1
+            category_col: verticalPos
+            utility_tile: {}
+          }
+          if containerId <> invalid
+            channelComponentValues.utility_tile = { id: containerId, row: verticalPos, col: 1 }
+          end if
+          channelRow = 1
+          channelCol = 1
+          contentTile = {}
+          if m.top.timeGridContent <> invalid AND containerId <> invalid
+            for i = 0 to m.top.timeGridContent.getChildCount() - 1
+              channel = m.top.timeGridContent.getChild(i)
+              if channel <> invalid AND channel.parentId = containerId
+                channelRow = i + 1
+                if channel.getChildCount() > 0
+                  program = channel.getChild(0)
+                  contentTile = m.Tracking.getAnalyticsTile(program, 1, channelRow)
+                end if
+                exit for
+              end if
+            end for
+          end if
+          pageValues = { video_id: m.top.currentLinearVideoContent.id.toInt() }
+          navigateWithinPageInfo = {
+            pageOneof: m.Tracking.getAnalyticsPage("video_player_page", pageValues)
+            componentOneof: m.Tracking.getAnalyticsComponent("channel_guide_component", channelComponentValues)
+            dest_componentOneof: m.Tracking.getAnalyticsDestinationComponent("dest_epg_component", { content_tile: contentTile, category_slug: containerId })
+            means_of_navigation: "BUTTON"
+            horizontal_location: channelCol
+            vertical_location: channelRow
+          }
+          m.top.linearOverlayCategoryNavigateWithinPageInfo = navigateWithinPageInfo
+        end if
+      end if
+    end if
+  end if
+End Function
+
+
+Function sendOverlayChannelToCategoryNavigateWithinPageEvent()
+  if m.containerMarkupGrid <> invalid AND m.containerMarkupGrid.content <> invalid AND m.top.currentLinearVideoContent <> invalid
+    programFocused = m.EPG.linearChannelFocused
+    if programFocused <> invalid
+      channel = programFocused.getParent()
+      if channel <> invalid
+        containerId = channel.parentId
+        if containerId <> invalid
+          contentTile = m.Tracking.getAnalyticsTile(programFocused, 1, 1)
+          destContainerIndex = -1
+          for i = 0 to m.containerMarkupGrid.content.getChildCount() - 1
+            c = m.containerMarkupGrid.content.getChild(i)
+            if c <> invalid AND c.containerId = containerId
+              destContainerIndex = i
+              exit for
+            end if
+          end for
+          if destContainerIndex >= 0
+            verticalPos = destContainerIndex + 1
+            destComponentValues = {
+              category_row: 1
+              category_col: verticalPos
+              utility_tile: { id: containerId, row: verticalPos, col: 1 }
+            }
+            pageValues = { video_id: m.top.currentLinearVideoContent.id.toInt() }
+            navigateWithinPageInfo = {
+              pageOneof: m.Tracking.getAnalyticsPage("video_player_page", pageValues)
+              componentOneof: m.Tracking.getAnalyticsComponent("epg_component", { content_tile: contentTile, category_slug: containerId })
+              dest_componentOneof: m.Tracking.getAnalyticsDestinationComponent("dest_channel_guide_component", destComponentValues)
+              means_of_navigation: "BUTTON"
+              horizontal_location: 1
+              vertical_location: verticalPos
+            }
+            m.top.linearOverlayCategoryNavigateWithinPageInfo = navigateWithinPageInfo
+          end if
+        end if
+      end if
+    end if
+  end if
+End Function
+
+
+Function onCategoryGridFocusChange(msg)
+  tubiLog("LinearVideoPlayerScreenOverlay.onCategoryGridFocusChange")
+  ' Show focus ring only when MarkupGrid has focus
+  if m.containerMarkupGrid <> invalid
+    if m.containerMarkupGrid.hasFocus() = true
+      m.containerMarkupGrid.drawFocusFeedback = true
+    else
+      m.containerMarkupGrid.drawFocusFeedback = false
+    end if
+  end if
+End Function
+
+
+Function onEPGTimeGridFocusChange(msg)
+  tubiLog("LinearVideoPlayerScreenOverlay.onEPGTimeGridFocusChange")
+  ' Show containerMarkupGrid when EPG has focus
+  ' Once visible, don't hide it
+  if m.containerMarkupGrid <> invalid
+    if m.EPG.hasFocus() = true OR m.EPG.isInFocusChain() = true
+      if m.containerMarkupGrid.content <> invalid AND m.containerMarkupGrid.content.getChildCount() > 0
+        m.containerMarkupGrid.visible = true
+      end if
+    end if
+  end if
+End Function
+
+
 Function displayOverlay(bDelay = false)
   tubiLog("LinearVideoPlayerScreenOverlay.displayOverlay")
   '//open the the overlay
@@ -263,6 +528,8 @@ Function onTimeContentChange()
   tubiLog("LinearVideoPlayerScreenOverlay.onTimeContentChanged")
   if m.top.updateTimeGridContent = true
     if m.top.timeGridContent <> invalid
+      ' Clear then set to force ProgramGuide to re-render when content structure changes (e.g. favorites removed on sign out)
+      m.EPG.content = invalid
       m.EPG.content = m.top.timeGridContent
       m.EPG.contentUpdated = true
       m.EPGError.visible = false
@@ -395,14 +662,34 @@ Function onKeyEvent(key as String, press as Boolean) as Boolean
   if m.top.isDisplaying = true AND press = true then
     tubiLog("LinearVideoPlayerScreenOverlay.onKeyEvent" + key)
     if key = "left"
-      if m.EPG.isInFocusChain() = true AND m.sideNav.visible = true
-        '//if the EPG has focus and the side nav is visible, then move the focus to the subtitles button
-        slideTo(m.EPGHorizontalSlide, m.slideOutEPGTranslation, m.top.animationDuration)
-        m.sideNav.setOpenState = "openedAndInFocus"
-        m.sideNav.buttonToFocusID = m.constants.ui.linearSideNavIds.epg
-        userInteraction = "TOGGLE_ON"
-        setComponentInteractionForSideNavInVideoPlayerOverLay(userInteraction, m.sideNav.focusedButtonID)
-        bKeyReacted = true
+      if m.EPG.isInFocusChain() = true
+        '//if the EPG has focus, check if categories menu is visible first
+        if m.containerMarkupGrid <> invalid AND m.containerMarkupGrid.visible = true AND m.containerMarkupGrid.content <> invalid AND m.containerMarkupGrid.content.getChildCount() > 0
+          ' Move focus to categories menu
+          sendOverlayChannelToCategoryNavigateWithinPageEvent()
+          m.containerMarkupGrid.setFocus(true)
+          slideTo(m.EPGHorizontalSlide, m.originalEPGTranslation, m.top.animationDuration)
+          m.sideNav.setOpenState = "openedAndNotInFocus"
+          bKeyReacted = true
+        else if m.sideNav.visible = true
+          '//if categories is not visible, move focus to side nav
+          slideTo(m.EPGHorizontalSlide, m.slideOutEPGTranslation, m.top.animationDuration)
+          m.sideNav.setOpenState = "openedAndInFocus"
+          m.sideNav.buttonToFocusID = m.constants.ui.linearSideNavIds.epg
+          userInteraction = "TOGGLE_ON"
+          setComponentInteractionForSideNavInVideoPlayerOverLay(userInteraction, m.sideNav.focusedButtonID)
+          bKeyReacted = true
+        end if
+      else if m.containerMarkupGrid <> invalid AND m.containerMarkupGrid.isInFocusChain() = true
+        '//if the categories menu has focus, move focus to side nav
+        if m.sideNav.visible = true
+          slideTo(m.EPGHorizontalSlide, m.slideOutEPGTranslation, m.top.animationDuration)
+          m.sideNav.setOpenState = "openedAndInFocus"
+          m.sideNav.buttonToFocusID = m.constants.ui.linearSideNavIds.epg
+          userInteraction = "TOGGLE_ON"
+          setComponentInteractionForSideNavInVideoPlayerOverLay(userInteraction, m.sideNav.focusedButtonID)
+          bKeyReacted = true
+        end if
       else if m.closedCaptioningGroup.isInFocusChain() = true
         m.sideNav.setOpenState = "openedAndInFocus"
         m.sideNav.buttonToFocusID = m.constants.ui.linearSideNavIds.subtitles
@@ -412,10 +699,33 @@ Function onKeyEvent(key as String, press as Boolean) as Boolean
       end if
     else if key = "right"
       if m.bEPGVisible = true AND m.EPG.isInFocusChain() = false
-        userInteraction = "TOGGLE_OFF"
-        setComponentInteractionForSideNavInVideoPlayerOverLay(userInteraction, m.sideNav.focusedButtonID)
-        goBackToEPGFromSideNav()
-        bKeyReacted = true
+        ' Check if focus is on side nav or categories menu
+        if m.containerMarkupGrid <> invalid AND m.containerMarkupGrid.isInFocusChain() = true
+          '//if the categories menu has focus, move focus to EPG
+          sendOverlayCategoryToChannelNavigateWithinPageEvent()
+          if m.EPG.channelGridFocusable = true
+            m.EPG.isChannelGridFocused = true
+          end if
+          m.EPG.setFocus(true)
+          slideTo(m.EPGHorizontalSlide, m.originalEPGTranslation, m.top.animationDuration)
+          m.sideNav.setOpenState = "closed"
+          userInteraction = "TOGGLE_OFF"
+          setComponentInteractionForSideNavInVideoPlayerOverLay(userInteraction, m.sideNav.focusedButtonID)
+          bKeyReacted = true
+        else
+          '//if the side nav has focus, move focus to categories menu (if visible) or EPG
+          if m.containerMarkupGrid <> invalid AND m.containerMarkupGrid.visible = true AND m.containerMarkupGrid.content <> invalid AND m.containerMarkupGrid.content.getChildCount() > 0
+            m.containerMarkupGrid.setFocus(true)
+            slideTo(m.EPGHorizontalSlide, m.originalEPGTranslation, m.top.animationDuration)
+            m.sideNav.setOpenState = "closed"
+            bKeyReacted = true
+          else
+            userInteraction = "TOGGLE_OFF"
+            setComponentInteractionForSideNavInVideoPlayerOverLay(userInteraction, m.sideNav.focusedButtonID)
+            goBackToEPGFromSideNav()
+            bKeyReacted = true
+          end if
+        end if
       else if m.bEPGVisible = false AND m.closedCaptioningGroup.isInFocusChain() = false
         displayClosedCaptioningMenu()
         slideTo(m.EPGHorizontalSlide, m.slideOutEPGTranslation, m.top.animationDuration)
@@ -426,6 +736,12 @@ Function onKeyEvent(key as String, press as Boolean) as Boolean
         m.sideNav.setOpenState = "openedAndInFocus"
         m.sideNav.buttonToFocusID = m.constants.ui.linearSideNavIds.subtitles
         hideClosedCaptioningMenu() '//Hide the CC menu and display EPG again
+        bKeyReacted = true
+      else if m.containerMarkupGrid <> invalid AND m.containerMarkupGrid.isInFocusChain() = true
+        '//if the categories menu has focus, move focus to EPG
+        m.EPG.setFocus(true)
+        slideTo(m.EPGHorizontalSlide, m.originalEPGTranslation, m.top.animationDuration)
+        m.sideNav.setOpenState = "closed"
         bKeyReacted = true
       else if m.EPG.isInFocusChain() = false
         goBackToEPGFromSideNav()
