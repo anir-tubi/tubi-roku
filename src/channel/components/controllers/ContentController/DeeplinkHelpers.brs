@@ -742,7 +742,7 @@ End Function
 ' @sendTracking: boolean , this parameter is used to control whether NavigateToPage events needs to send or not. In case of deeplinks, no need to send NavigateToPage Event
 Function handleDeeplinkSeriesSuccessResponse(refreshedContent) as Void
   if refreshedContent <> invalid
-    experiment = getStatsigExperimentResource("roku_content_details", "roku_content_details_v3_1", false)
+    experiment = getStatsigExperimentResource("", "roku_content_details_v4", false)
     if experiment.enabled = true
       playVodContentFromDetailScreen(refreshedContent)
       return
@@ -897,7 +897,7 @@ End Function
 Function handleDeeplinkEpisodeSuccessResponse(refreshedContent) as Void
 
   if refreshedContent <> invalid
-    experiment = getStatsigExperimentResource("roku_content_details", "roku_content_details_v3_1", false)
+    experiment = getStatsigExperimentResource("", "roku_content_details_v4", false)
     if experiment.enabled = true
       refreshedContent.currentEpisodeId = m.deepLinkContent.id
       playVodContentFromDetailScreen(refreshedContent)

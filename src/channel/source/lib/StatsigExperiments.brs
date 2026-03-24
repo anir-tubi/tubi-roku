@@ -137,11 +137,8 @@ Function StatsigExperimentsInterface(statsigExperimentsInfo) as Object
         }
       }
 
-      roku_content_details: {
-        ' New content details screen experiment
-        roku_content_details_v3_1: {
-          default: { "enabled": false, "enable_always_primary_buttons": false }
-        }
+      roku_content_details_v4: {
+        default: { "enabled": false, "enable_always_primary_buttons": false }
       }
 
       roku_sot_reverse_ui_test_detail_screen: {

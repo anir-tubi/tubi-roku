@@ -15,7 +15,7 @@
 '                                               playbackContainer - if srcForAds = container, then playbackContainer is set to the id of the container that was the source, otherwise not used.
 ''//::TODO:: Remove pageOrigin once we fixed sending invalid component interaction events- added this for debugging purpose
 Function showDetailScreen(content, sendTrackingOnResponse = true, successCb = invalid, errorCb = invalid, playbackSource = { "srcForAnalytic": "unknown", "srcForAds": "unknown" }) as Void
-  experiment = getStatsigExperimentResource("roku_content_details", "roku_content_details_v3_1", true)
+  experiment = getStatsigExperimentResource("", "roku_content_details_v4", true)
   if experiment.enabled = true
     ' Show new content details screen
     showVodDetailScreen(content, playbackSource, successCb, errorCb)
@@ -2182,7 +2182,7 @@ End Function
 Function skipDetailScreen(refreshedContent) as Void
   tubilog("detailScreenHelpers.skipDetailScreen")
 
-  experiment = getStatsigExperimentResource("roku_content_details", "roku_content_details_v3_1", false)
+  experiment = getStatsigExperimentResource("", "roku_content_details_v4", false)
   if experiment.enabled = true
     ' Show new content details screen
     playVodContentFromDetailScreen(refreshedContent)

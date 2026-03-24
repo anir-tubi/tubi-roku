@@ -71,7 +71,7 @@ Function init()
 
   m.isComingSoon = false ' Initialize coming soon flag
 
-  experiment = getStatsigExperimentResource("roku_content_details", "roku_content_details_v3_1", false)
+  experiment = getStatsigExperimentResource("", "roku_content_details_v4", false)
   ' TODO: This experiment has left exit always enabled. Remove if left exit will be disabled or dynamic
   ' m.isLeftBackExitEnabled = experiment <> invalid AND experiment.enable_left_button_exit = true
   m.isLeftBackExitEnabled = true
