@@ -104,10 +104,13 @@ Function setComponentInteractionEventForButton(componentInteractionValue as Stri
     user_interaction: componentInteractionValue
   }
 
-  m.top.trackingComponentInfo = {
-    componentType: "middle_nav_component"
-    componentValues: componentValues
-  }
+  ' Do not set middle_nav_component for playback buttons, otherwise we overwrite the related content tracking info for YMAL
+  if button.id <> "play" AND button.id <> "resume" AND button.id <> "startFromBeginning"
+    m.top.trackingComponentInfo = {
+      componentType: "middle_nav_component"
+      componentValues: componentValues
+    }
+  end if
 End Function
 
 
