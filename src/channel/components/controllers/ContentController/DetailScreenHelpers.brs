@@ -849,6 +849,23 @@ Function findNextEpisode2dIndex(currentItemFocused, contentNode)
 End Function
 
 
+' Finds the next episode in a flat episode list (used by VodDetailScreen v3)
+' @episodeId: String, the current episode's ID
+' @episodeList: Node, a flat list of episode nodes for the current season
+' @return: Node or invalid, the next episode node if found
+Function findNextEpisodeInList(episodeId, episodeList)
+  if episodeId <> invalid AND episodeList <> invalid
+    for i = 0 to episodeList.getChildCount() - 1
+      episode = episodeList.getChild(i)
+      if episode <> invalid AND episode.id = episodeId
+        return episodeList.getChild(i + 1)
+      end if
+    end for
+  end if
+  return invalid
+End Function
+
+
 ' @currentItemFocused: array, current episode 2D index
 ' @seriesContent: Node, a TubiContentNode filled with content meta data for a series.
 '

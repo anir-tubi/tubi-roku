@@ -1555,11 +1555,22 @@ Function updateRokuContinueWatchingInfo(content, position)
         if detailScreen <> invalid
           detailContent = detailScreen.content
 
-          if detailContent.id = content.parentId
+          if detailScreen.id = m.constants.ui.screenIds.vodDetailScreen AND detailScreen.episodes <> invalid
+            ' V3 path: episodes is a flat list for the current season
+            nextEpisode = invalid
+            if detailContent <> invalid AND detailContent.id = content.parentId
+              nextEpisode = findNextEpisodeInList(content.id, detailScreen.episodes)
+            end if
+            if nextEpisode <> invalid
+              addOrUpdateRokuContinueWatchingInfo(nextEpisode, 0)
+            else
+              deleteFromRokuContinueWatching(content)
+            end if
+          else if detailContent <> invalid AND detailContent.id = content.parentId
+            ' Old DetailScreen path: episodes are children of content node (season > episode tree)
             currentEpisode2DIndex = findEpisode2dIndex(content.id, detailContent)
             nextEpisode2DIndex = findNextEpisode2dIndex(currentEpisode2DIndex, detailContent)
 
-            ' Checking to make sure we are not at the end of the available episodes.
             if nextEpisode2DIndex[0] > 0 OR nextEpisode2DIndex[1] > 0
               seasonChild = detailContent.getChild(nextEpisode2DIndex[0])
               nextEpisode = invalid
