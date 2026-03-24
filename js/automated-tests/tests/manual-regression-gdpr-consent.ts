@@ -22,7 +22,11 @@ describe('GDPR/Consent Regression Tests', function () {
   });
 
   afterEach(async () => {
-    await proxy.pause();
+    try {
+      await proxy.pause();
+    } catch (e) {
+      // proxy may already be paused (e.g. paused mid-test)
+    }
   });
 
   // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/672515
@@ -116,8 +120,6 @@ describe('GDPR/Consent Regression Tests', function () {
     otBanner = await testUtils.getNodeForElement('otBanner');
     expect(otBanner.visible).to.be.true;
     expect(otBanner.opacity).to.equal(1);
-
-    proxy.pause();
   });
 
   // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/672520
@@ -204,8 +206,6 @@ describe('GDPR/Consent Regression Tests', function () {
     );
 
     expect(hasParentalControlsOption, 'Parental Controls option should not be present in UK region').to.be.false;
-
-    proxy.pause();
   });
 
   // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/672522
@@ -273,8 +273,6 @@ describe('GDPR/Consent Regression Tests', function () {
     );
 
     expect(hasEspanolOption, 'Espanol option should not be present in UK region').to.be.false;
-
-    proxy.pause();
   });
 
   // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/672523
@@ -363,8 +361,6 @@ describe('GDPR/Consent Regression Tests', function () {
     );
 
     expect(hasKidsModeOption, 'Kids Mode option should not be present in UK region with OneTrust enabled').to.be.false;
-
-    proxy.pause();
   });
 
   // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/672532
@@ -469,8 +465,6 @@ describe('GDPR/Consent Regression Tests', function () {
         await utils.sleep(100);
       }
     }
-
-    proxy.pause();
   });
 
   // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/672531
@@ -572,8 +566,6 @@ describe('GDPR/Consent Regression Tests', function () {
         await utils.sleep(100);
       }
     }
-
-    proxy.pause();
   });
 
   // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/672544

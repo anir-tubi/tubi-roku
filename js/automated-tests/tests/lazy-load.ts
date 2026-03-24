@@ -51,10 +51,10 @@ describe('LazyLoad', function () {
 
     // Navigate to a category with < 200 titles and validate < 200
     await testUtils.waitForElementToFullyShowOnScreen('channelRecommendedButton');
-    await testUtils.jumpToGridItemWithTitle('categoriesListMenu', 'Action');
+    await testUtils.jumpToGridItemWithTitle('categoriesListMenu', 'Classic TV & Movies');
     await testUtils.retryWithTimeOut(async () => {
       const focused = await testUtils.getCurrentlyFocusedGridItemContent('categoriesListMenu');
-      expect(focused.title).to.equal('Action');
+      expect(focused.title).to.equal('Classic TV & Movies');
     });
     await testUtils.waitForElementToShowOnScreen('channelCategoryGrid', 'Category grid not loaded');
     await ecp.sendKeypress(ecp.Key.Right);
@@ -86,10 +86,10 @@ describe('LazyLoad', function () {
 
     // Navigate to a category with 1000
     await testUtils.waitForElementToFullyShowOnScreen('channelRecommendedButton');
-    await testUtils.jumpToGridItemWithTitle('categoriesListMenu', 'Action');
+    await testUtils.jumpToGridItemWithTitle('categoriesListMenu', 'Classic TV & Movies');
     await testUtils.retryWithTimeOut(async () => {
       const focused = await testUtils.getCurrentlyFocusedGridItemContent('categoriesListMenu');
-      expect(focused.title).to.equal('Action');
+      expect(focused.title).to.equal('Classic TV & Movies');
     });
     await testUtils.waitForElementToShowOnScreen('channelCategoryGrid', 'Category grid not loaded');
     await ecp.sendKeypress(ecp.Key.Right);

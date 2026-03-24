@@ -25,6 +25,10 @@ on:
         required: false
         type: boolean
         default: false
+      skipSlackNotification:
+        required: false
+        type: boolean
+        default: false
     secrets:
       ROKU_AUTO_PAT:
         required: true
@@ -158,7 +162,7 @@ jobs:
           path: out/ui-tests-output/screenshots
 
       - name: Send Slack Notification
-        if: success() || failure()
+        if: (success() || failure()) && inputs.skipSlackNotification != true
         run: npx ts-node ./js/workflows/sendSlackAutomatedTestsResultNotification.ts "${{ inputs.target-branch }}"
 
       - name: Extract test stats from JSON report

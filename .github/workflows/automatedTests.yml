@@ -27,43 +27,66 @@ on:
           - 'Run All Tests'
           - 'Custom String'
           # The remaining options are generated using gulp outputAvailableAutomatedTestTags
+          - '@ads'
           - '@age_gate'
           - '@application_launch'
           - '@autoplay'
+          - '@browse_watching'
+          - '@buttons'
+          - '@carousel'
           - '@categories'
           - '@closed_captions'
+          - '@cwconsent'
+          - '@daily_sign_in_sign_out'
+          - '@details_page'
           - '@espanol'
+          - '@example'
+          - '@guest'
           - '@homescreen'
+          - '@kids_trailer'
+          - '@kidsmode'
           - '@kidsmode_guest'
           - '@kidsmode_registered'
-          - '@large_poster'
           - '@lazyload'
           - '@live'
+          - '@manual_regression'
           - '@mdp_1'
+          - '@movies'
           - '@multiple_audio'
           - '@mystuff'
+          - '@param'
           - '@parental_controls'
+          - '@password_reset'
+          - '@pivots'
           - '@playback_1'
           - '@reactions'
+          - '@registered'
           - '@registered_user'
           - '@regression'
           - '@sdp_1'
           - '@sdp_2'
           - '@search'
+          - '@send_feedback'
+          - '@series_details_page'
           - '@settings'
           - '@sidenav'
           - '@sidenav_test'
           - '@signupsaveprogress'
+          - '@signupsaveprogressexit'
           - '@smoke'
+          - '@spotlightAd'
+          - '@video_tiles'
           - '@videopreview'
           - '@welcome_modal'
-          - '@welcome_modaltest'
-          - '@send_feedback'
       customString:
         description: 'Use to provide a custom string of which test to run. You can use the the pipe symbol "|" to provide more than one one string. For example "C4151|C4153" would run both the C4151 test and C4153 test. This input is ignored unless "Custom String" is set above.'
         type: string
       bail:
         description: 'Stop running on first test failure'
+        default: false
+        type: boolean
+      skipSlackNotification:
+        description: 'Skip posting Slack notification when run completes'
         default: false
         type: boolean
 
@@ -89,5 +112,6 @@ jobs:
       tag: ${{ inputs.tag || 'Run All Tests' }}
       customString: ${{ inputs.customString || '' }}
       bail: ${{ inputs.bail || false }}
+      skipSlackNotification: ${{ inputs.skipSlackNotification || false }}
     secrets:
       ROKU_AUTO_PAT: ${{ secrets.ROKU_AUTO_PAT }}

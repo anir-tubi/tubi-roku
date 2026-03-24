@@ -2207,7 +2207,7 @@ Function skipDetailScreen(refreshedContent) as Void
         end if
       end if
 
-      ' TODO: Re-visit this if we do not graduate roku_content_details_v2 experiment.
+      ' TODO: Re-visit this if we do not graduate roku_content_details_v3 experiment.
       ' It is very confusing that method and variable names just that this logic is for series only but it does execute for both movie and series.
       episode = getEpisodeContent(refreshedContent)
 

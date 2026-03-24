@@ -809,7 +809,7 @@ describe('Core Manual Regression Tests', function () {
     try {
       await testUtils.waitForCurrentScreenToEqual('detailScreen', 5000);
       detailScreenLoaded = true;
-    } catch (_) {}
+    } catch (_) { }
     expect(detailScreenLoaded, 'Detail screen should not have loaded for restricted content').to.be.false;
     await testUtils.waitForCurrentScreenToEqual('homeScreen', 5000);
   });
@@ -2194,7 +2194,7 @@ describe('Core Manual Regression Tests', function () {
     await utils.sleep(2000);
 
     // Deeplink to the same series
-    await testUtils.startApplicationWithDeeplink({ mediaType: 'series', contentID: seriesId });
+    await testUtils.startApplicationWithDeeplink({ mediaType: 'series', contentID: '0' + seriesId });
     await testUtils.waitForCurrentScreenToEqual('videoPlayerScreen', 15000);
     await testUtils.waitForPlayerStateToEqual('videoPlayerScreen', 'playing', 10000);
 

@@ -13,8 +13,8 @@ describe('Title Details Page', function () {
       ...args,
       experimentOverrides: {
         roku_content_details: {
-          roku_content_details_v2: {
-            default: { "enabled": true, "enable_left_button_exit": true }
+          roku_content_details_v3: {
+            default: { "enabled": true, "enable_always_primary_buttons": true }
           }
         }
       }
@@ -22,7 +22,7 @@ describe('Title Details Page', function () {
   }
 
   // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/845203
-  it('C845203 - Full Screen Video hero in the detail page as background @guest @detailsPage', async () => {
+  it('C845203 - Full Screen Video hero in the detail page as background @guest,@details_page', async () => {
     await startApplicationWithExperimentOverrides('movies');
 
     await utils.sleep(3000);
@@ -1127,8 +1127,8 @@ describe('Title Details Page', function () {
     }, {
       user, experimentOverrides: {
         roku_content_details: {
-          roku_content_details_v2: {
-            default: { "enabled": true, "enable_left_button_exit": true }
+          roku_content_details_v3: {
+            default: { "enabled": true, "enable_always_primary_buttons": true }
           }
         }
       }

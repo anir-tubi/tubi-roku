@@ -163,7 +163,7 @@ describe('Live/Linear TV Regression Tests', function () {
     await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');
 
     // Navigate to On Now row (recommended_linear_channels)
-    const rowIndex = await shared.scrollDownToFindRow({ slug: 'recommended_linear_channels', rowListElementId: 'videoTitlesRowList' });
+    const rowIndex = await shared.scrollDownToFindRow({ slug: 'recommended_linear_channels', rowListElementId: 'videoTitlesRowList', maxScrolls: 25 });
     await testUtils.waitForElementFieldToEqual('videoTitlesRowList', 'itemFocused', rowIndex, 10000);
 
     // Verify we're on linear content
