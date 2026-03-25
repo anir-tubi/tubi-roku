@@ -445,7 +445,7 @@ async function createGithubRelease(done) {
         return (prev === remoteRelease) ? 'confirm' : null;
       },
       name: 'isPreRelease',
-      message: 'Should this release be marked as a pre release? Select no if the release will be deployed today. (y/n)',
+      message: 'Should this release be marked as a pre release? Select "no" if the release will be deployed today. (y/n)',
     },
     // if it's a pre-release, prompt what the release date should be
     {
@@ -545,7 +545,9 @@ async function pullOrFetchBranch(done, branch) {
     const { proceedWithGitPull } = await prompts({
       type: 'confirm',
       name: 'proceedWithGitPull',
-      message: `${branch} is missing remote tracking. Do you wish to proceed? (y/n)`,
+      message: `${branch} is not connected to the remote repository. (The branch may not have been pushed.)
+The release process needs the branch to be pushed to the remote before it can create the release and add notes.
+Do you wish to proceed anyway?`
     });
 
     if (!proceedWithGitPull) {
