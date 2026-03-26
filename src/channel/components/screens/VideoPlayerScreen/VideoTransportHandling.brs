@@ -53,8 +53,6 @@ Function onKeyEvent(key as String, press as Boolean) as Boolean
         else if m.focusedNode.isSameNode(m.progressBar) = true AND isActiveVideoState(m.VideoState, m.Video)
           handleSkipVideo(-10)
 
-        else if m.focusedNode.isSameNode(m.skipCuepointsButton) = true AND m.playerControlExperimentType = "none"
-          return false
         else
           buttonComponent = m.TransportButtons
           if m.TransportLayoutGroup <> invalid
@@ -148,12 +146,10 @@ Function onKeyEvent(key as String, press as Boolean) as Boolean
           showTransport()
           showBrowseWhileWatching()
         else if m.focusedNode.isSameNode(m.progressBar) = true
-          if m.playerControlExperimentType = "variant1" AND m.top.isTrailer = true
+          if m.top.isTrailer = true
             setFocusToComponent(m.SkipTrailerButton)
-          else if m.playerControlExperimentType = "variant1" AND m.TopOverlay.opacity = 1.0
+          else if m.TopOverlay.opacity = 1.0
             setFocusToComponent(m.StartButton, true)
-          else if m.playerControlExperimentType = "none" AND m.skipCuepointsButton.visible = true AND m.TopOverlay.opacity = 1.0
-            setFocusToComponent(m.skipCuepointsButton)
           else
             return false
           end if
@@ -174,9 +170,7 @@ Function onKeyEvent(key as String, press as Boolean) as Boolean
           showTransport()
           showBrowseWhileWatching()
         else if m.focusedNode.isSameNode(m.progressBar) = true
-          if m.playerControlExperimentType = "none"
-            setFocusToComponent(m.PlayPauseButton, true)
-          else if m.playerControlExperimentType = "variant1" AND m.top.isTrailer = false
+          if m.top.isTrailer = false
             relatedContent = m.top.relatedContent
 
             if relatedContent <> invalid AND relatedContent.getChildCount() > 0
@@ -191,20 +185,7 @@ Function onKeyEvent(key as String, press as Boolean) as Boolean
         else if m.skipCuepointsButton.hasFocus() = true
           setFocusToComponent(m.ProgressBar)
         else if isFocusOnPlayerControl() = true
-          if m.playerControlExperimentType = "variant1"
-            setFocusToComponent(m.progressBar)
-          else if m.playerControlExperimentType = "none" AND m.top.isTrailer = false
-            relatedContent = m.top.relatedContent
-
-            if relatedContent <> invalid AND relatedContent.getChildCount() > 0
-              setFocusToComponent(m.BrowseWhileWatching)
-              animateTransportAndBrowseWhileWatching("in")
-            else
-              return false
-            end if
-          else
-            return false
-          end if
+          setFocusToComponent(m.progressBar)
         else
           return false
         end if
@@ -228,11 +209,7 @@ Function onKeyEvent(key as String, press as Boolean) as Boolean
           resumeFromPause(true)
         else if m.VideoState = "rew" OR m.VideoState = "ffw"
 
-          if m.playerControlExperimentType = "none"
-            setFocusToComponent(m.PlayPauseButton)
-          else
-            setFocusToComponent(m.progressBar)
-          end if
+          setFocusToComponent(m.progressBar)
 
           endScrub(true)
         else if m.VideoState = "skip"
@@ -398,12 +375,8 @@ End Function
 'pause the video player
 Function pauseVideo(shouldShowTransport, shouldSendAnalytics = true)
 
-  if m.playerControlExperimentType = "variant1"
-    m.controlIcon.uri = "pkg:/images/transport/sgplayer/icon-pause.webp"
-    fade(m.controlIcon, "in", 0.6)
-  else
-    fade(m.controlIcon, "out", 0.2)
-  end if
+  m.controlIcon.uri = "pkg:/images/transport/sgplayer/icon-pause.webp"
+  fade(m.controlIcon, "in", 0.6)
 
   m.Video.control = "pause"
   updateVideoState("pause")
@@ -416,20 +389,10 @@ Function pauseVideo(shouldShowTransport, shouldSendAnalytics = true)
     showBrowseWhileWatching()
   end if
 
-  if m.playerControlExperimentType = "none"
-    if m.focusedNode.isSameNode(m.BrowseWhileWatching) = true
-      animateTransportAndBrowseWhileWatching("out")
-      setFocusToPlaybackControl()
-    end if
-
-    m.PlayPauseButton.uri = m.buttonUris.play
-    setFocusToComponent(m.PlayPauseButton)
-  else
-    if m.focusedNode.isSameNode(m.BrowseWhileWatching) = true
-      animateTransportAndBrowseWhileWatching("out")
-    end if
-    setFocusToComponent(m.progressBar)
+  if m.focusedNode.isSameNode(m.BrowseWhileWatching) = true
+    animateTransportAndBrowseWhileWatching("out")
   end if
+  setFocusToComponent(m.progressBar)
 
   if shouldSendAnalytics = true
     trackEvent({
@@ -489,16 +452,10 @@ Function resumeFromPause(shouldSendAnalytics)
     end if
   end if
 
-  if m.playerControlExperimentType <> "none"
-    m.controlIcon.uri = "pkg:/images/transport/sgplayer/icon-play.webp"
-    fade(m.controlIcon, "in", 0.6)
-    fade(m.controlIcon, "out", 0.2)
-    setFocusToComponent(m.progressBar)
-  else
-    fade(m.controlIcon, "out", 0.2)
-    m.PlayPauseButton.uri = m.buttonUris.pause
-    setFocusToComponent(m.PlayPauseButton)
-  end if
+  m.controlIcon.uri = "pkg:/images/transport/sgplayer/icon-play.webp"
+  fade(m.controlIcon, "in", 0.6)
+  fade(m.controlIcon, "out", 0.2)
+  setFocusToComponent(m.progressBar)
 
 End Function
 
@@ -522,13 +479,8 @@ Function resumeFromSkip()
     m.Video.control = "resume"
     updateVideoState("play")
   end if
-  m.PlayPauseButton.uri = m.buttonUris.pause
 
-  if m.playerControlExperimentType = "none"
-    setFocusToComponent(m.PlayPauseButton)
-  else
-    setFocusToComponent(m.progressBar)
-  end if
+  setFocusToComponent(m.progressBar)
 End Function
 
 
@@ -547,11 +499,7 @@ Function handleSkipTrailer()
   hideBrowseWhileWatching()
   resetTransportButtons()
 
-  if m.playerControlExperimentType = "none"
-    setFocusToComponent(m.PlayPauseButton)
-  else
-    setFocusToComponent(m.progressBar)
-  end if
+  setFocusToComponent(m.progressBar)
 End Function
 
 
@@ -565,11 +513,7 @@ Function goToStart()
 
   if m.VideoState = "ffw" OR m.VideoState = "rew"
     endScrub(false)
-    if m.playerControlExperimentType = "none"
-      setFocusToComponent(m.StartButton)
-    else
-      setFocusToComponent(m.progressBar)
-    end if
+    setFocusToComponent(m.progressBar)
   else if m.VideoState <> "skip"
     playProgressEvent = getPlayProgressEvent("goToStart")
     if playProgressEvent <> invalid
@@ -643,16 +587,6 @@ Function handleOk()
         setComponentInteractionInfo("play_from_beginning")
       end if
       goToStart()
-    else if focusButtonId = m.RewindButton.id
-      handleRewind()
-    else if focusButtonId = m.HopBackButton.id
-      handleHopBack(false, 30)
-    else if focusButtonId = m.PlayPauseButton.id
-      handlePlayPause()
-    else if focusButtonId = m.HopForwardButton.id
-      handleHopForward(30)
-    else if focusButtonId = m.FastForwardButton.id
-      handleFastForward()
     else if focusButtonId = m.EndButton.id
       if focusButtonId = m.EndButton.id
         setComponentInteractionInfo("next_episode")
@@ -684,11 +618,7 @@ Function handlePlayPause()
     resumeFromSkip()
   end if
 
-  if m.playerControlExperimentType = "none"
-    setFocusToComponent(m.PlayPauseButton)
-  else
-    setFocusToComponent(m.progressBar)
-  end if
+  setFocusToComponent(m.progressBar)
 End Function
 
 
@@ -704,8 +634,6 @@ Function handleFastForward()
   if m.VideoState = "rew"
     updateVideoState("ffw")
     m.scrubAmt = 0
-    m.RewindButton.uri = m.buttonUris.rewind
-    m.FastForwardButton.uri = m.buttonUris.fastForwardLevels[0]
     seekSpeed = m.scrubAmt + 1
 
     'increase the fast forward speed
@@ -715,7 +643,6 @@ Function handleFastForward()
     else
       m.scrubAmt = 0
     end if
-    m.FastForwardButton.uri = m.buttonUris.fastForwardLevels[m.scrubAmt]
     seekSpeed = m.scrubAmt + 1
 
     'start the fast forward
@@ -723,26 +650,18 @@ Function handleFastForward()
     m.positionAtJumpStart = m.playerPosition
     beginScrub()
     updateVideoState("ffw")
-    m.FastForwardButton.uri = m.buttonUris.fastForwardLevels[0]
-    m.PlayPauseButton.uri = m.buttonUris.play
     seekSpeed = 1
   end if
 
-  if m.playerControlExperimentType <> "none"
-    m.seekIcon.uri = "pkg:/images/transport/sgplayer/icon-vector-fwd.webp"
-    m.seekSpeed.text = seekSpeed
-    childrenCount = m.seekControlGroup.getChildCount()
-    m.seekControlGroup.removeChildrenIndex(childrenCount, 0)
-    m.seekControlGroup.appendChild(m.seekSpeed)
-    m.seekControlGroup.appendChild(m.seekIcon)
-    m.thumbnail.showBorder = true
-  end if
+  m.seekIcon.uri = "pkg:/images/transport/sgplayer/icon-vector-fwd.webp"
+  m.seekSpeed.text = seekSpeed
+  childrenCount = m.seekControlGroup.getChildCount()
+  m.seekControlGroup.removeChildrenIndex(childrenCount, 0)
+  m.seekControlGroup.appendChild(m.seekSpeed)
+  m.seekControlGroup.appendChild(m.seekIcon)
+  m.thumbnail.showBorder = true
 
-  if m.playerControlExperimentType = "none"
-    setFocusToComponent(m.FastForwardButton)
-  else
-    setFocusToComponent(m.progressBar)
-  end if
+  setFocusToComponent(m.progressBar)
 End Function
 
 
@@ -757,8 +676,6 @@ Function handleRewind()
   if m.VideoState = "ffw"
     updateVideoState("rew")
     m.scrubAmt = 0
-    m.FastForwardButton.uri = m.buttonUris.fastforward
-    m.RewindButton.uri = m.buttonUris.rewindLevels[0]
     seekSpeed = m.scrubAmt + 1
 
     'increase the rewind speed
@@ -768,7 +685,6 @@ Function handleRewind()
     else
       m.scrubAmt = 0
     end if
-    m.RewindButton.uri = m.buttonUris.rewindLevels[m.scrubAmt]
     seekSpeed = m.scrubAmt + 1
 
     'start the rewind
@@ -776,26 +692,18 @@ Function handleRewind()
     m.positionAtJumpStart = m.playerPosition
     beginScrub()
     updateVideoState("rew")
-    m.RewindButton.uri = m.buttonUris.rewindLevels[0]
-    m.PlayPauseButton.uri = m.buttonUris.play
     seekSpeed = 1
   end if
 
-  if m.playerControlExperimentType <> "none"
-    m.seekIcon.uri = "pkg:/images/transport/sgplayer/icon-vector-rew.webp"
-    m.seekSpeed.text = seekSpeed
-    childrenCount = m.seekControlGroup.getChildCount()
-    m.seekControlGroup.removeChildrenIndex(childrenCount, 0)
-    m.seekControlGroup.appendChild(m.seekIcon)
-    m.seekControlGroup.appendChild(m.seekSpeed)
-    m.thumbnail.showBorder = true
-  end if
+  m.seekIcon.uri = "pkg:/images/transport/sgplayer/icon-vector-rew.webp"
+  m.seekSpeed.text = seekSpeed
+  childrenCount = m.seekControlGroup.getChildCount()
+  m.seekControlGroup.removeChildrenIndex(childrenCount, 0)
+  m.seekControlGroup.appendChild(m.seekIcon)
+  m.seekControlGroup.appendChild(m.seekSpeed)
+  m.thumbnail.showBorder = true
 
-  if m.playerControlExperimentType = "none"
-    setFocusToComponent(m.RewindButton)
-  else
-    setFocusToComponent(m.progressBar)
-  end if
+  setFocusToComponent(m.progressBar)
 End Function
 
 
@@ -803,11 +711,7 @@ End Function
 Function handleHopForward(duration)
   if m.VideoState = "ffw" OR m.VideoState = "rew"
     endScrub(false)
-    if m.playerControlExperimentType = "none"
-      setFocusToComponent(m.HopForwardButton)
-    else
-      setFocusToComponent(m.progressBar)
-    end if
+    setFocusToComponent(m.progressBar)
   else if m.VideoState <> "skip"
     playProgressEvent = getPlayProgressEvent("handleHopForward")
     if playProgressEvent <> invalid
@@ -836,11 +740,7 @@ End Function
 ' remoteReplayButton - true/false (true - if replay button on remote is pressed/voice input, false - if replay icon is pressed or seek voice input)
 ' duration is seek/skip/replay in seconds.
 Function handleHopBack(remoteReplayButton, duration)
-  if m.playerControlExperimentType = "none"
-    setFocusToComponent(m.HopBackButton) 'necessary because there is a dedicated hop back button on certain roku remotes
-  else
-    setFocusToComponent(m.progressBar)
-  end if
+  setFocusToComponent(m.progressBar)
 
   if m.VideoState = "ffw" OR m.VideoState = "rew"
     endScrub(false)
@@ -911,7 +811,6 @@ Function handleSkipVideo(amt)
   end if
 
   showBrowseWhileWatching()
-  m.PlayPauseButton.uri = m.buttonUris.play
 
   if m.focusedNode.isSameNode(m.ProgressBar) = false
     setFocusToComponent(m.ProgressBar)
@@ -920,32 +819,29 @@ Function handleSkipVideo(amt)
   showThumbnail()
   hideSeekGroup()
 
-  if m.playerControlExperimentType <> "none"
-    if amt = 10
-      m.quickSeekIcon.uri = "pkg:/images/transport/sgplayer/forward-10.webp"
+  if amt = 10
+    m.quickSeekIcon.uri = "pkg:/images/transport/sgplayer/forward-10.webp"
+  else
+    m.quickSeekIcon.uri = "pkg:/images/transport/sgplayer/rewind-10.webp"
+  end if
+
+  duration = m.Video.duration
+  position = m.playerPosition + amt
+
+  if duration <> invalid then
+
+    if duration < 3600
+      currentSeekPosition = formatLengthAsMinsAndSecs(position)
     else
-      m.quickSeekIcon.uri = "pkg:/images/transport/sgplayer/rewind-10.webp"
+      currentSeekPosition = formatLengthAsTimestamp(position)
     end if
 
-    duration = m.Video.duration
-    position = m.playerPosition + amt
+    m.quickSeekLabel.text = currentSeekPosition
 
-    if duration <> invalid then
-
-      if duration < 3600
-        currentSeekPosition = formatLengthAsMinsAndSecs(position)
-      else
-        currentSeekPosition = formatLengthAsTimestamp(position)
-      end if
-
-      m.quickSeekLabel.text = currentSeekPosition
-
-      if isNonEmptyString(currentSeekPosition) = true
-        showQuickSeekLabelAndIcon()
-      else
-        hideQuickSeekLabelAndIcon()
-      end if
-
+    if isNonEmptyString(currentSeekPosition) = true
+      showQuickSeekLabelAndIcon()
+    else
+      hideQuickSeekLabelAndIcon()
     end if
 
   end if
@@ -1177,10 +1073,8 @@ Function beginScrub()
   fade(m.controlIcon, "out", 0.2)
   showThumbnail()
 
-  if m.playerControlExperimentType <> "none"
-    hideQuickSeekLabelAndIcon()
-    showSeekGroup()
-  end if
+  hideQuickSeekLabelAndIcon()
+  showSeekGroup()
 
   m.scrubTimespan.mark()
 
@@ -1214,14 +1108,9 @@ Function endScrub(shouldJump = false)
   animateTransport("out")
   hideBrowseWhileWatching(false)
   resetTransportButtons()
-  m.PlayPauseButton.uri = m.buttonUris.pause
 
-  if m.playerControlExperimentType = "none"
-    setFocusToComponent(m.PlayPauseButton)
-  else
-    setFocusToComponent(m.progressBar)
-    fade(m.controlIcon, "out", 0.2)
-  end if
+  setFocusToComponent(m.progressBar)
+  fade(m.controlIcon, "out", 0.2)
 
   if shouldJump = true
     jumpToPosition(m.playerPosition)
@@ -1310,7 +1199,6 @@ Function jumpToPosition(position)
     end if
   end if
 
-  m.PlayPauseButton.uri = m.buttonUris.pause
   m.lastButtonPressPos = position
 
   ' update history when seeking
@@ -1318,9 +1206,7 @@ Function jumpToPosition(position)
 
   updateLastPingTime(m.playerPosition)
 
-  if m.playerControlExperimentType <> "none"
-    fade(m.controlIcon, "out", 0.6)
-  end if
+  fade(m.controlIcon, "out", 0.6)
 
   m.Thumbnail.visible = false
   hideSeekGroup()
@@ -1410,14 +1296,6 @@ End Function
 Function resetTransportButtons()
   m.SkipTrailerButton.focusState = false
   m.StartButton.focusState = false
-  m.RewindButton.uri = m.buttonUris.rewind
-  m.RewindButton.focusState = false
-  m.HopBackButton.focusState = false
-  m.PlayPauseButton.uri = m.buttonUris.play
-  m.PlayPauseButton.focusState = false
-  m.HopForwardButton.focusState = false
-  m.FastForwardButton.uri = m.buttonUris.fastForward
-  m.FastForwardButton.focusState = false
   m.EndButton.focusState = false
   m.closedCaptionAudioButton.focusState = false
   if m.sendFeedBackButton.hasField("focusState") = true
@@ -1429,17 +1307,7 @@ End Function
 '@sayAudioText: boolean, true if we want to announce the audio guide.
 Function setFocusToPlaybackControl(sayAudioText = false)
 
-  if m.playerControlExperimentType = "none"
-    if m.VideoState = "ffw"
-      setFocusToComponent(m.FastForwardButton, sayAudioText)
-    else if m.VideoState = "rew"
-      setFocusToComponent(m.RewindButton, sayAudioText)
-    else
-      setFocusToComponent(m.PlayPauseButton, sayAudioText)
-    end if
-  else
-    setFocusToComponent(m.progressBar)
-  end if
+  setFocusToComponent(m.progressBar, sayAudioText)
 
 End Function
 
@@ -1582,23 +1450,6 @@ Function sayFocusedButtonAudioGuide(focusButtonId)
     audioGuideText = audioGuideHints.skipTrailerButtonHint
   else if focusButtonId = m.StartButton.id
     audioGuideText = audioGuideHints.playFromBeginningButtonHint
-  else if focusButtonId = m.RewindButton.id
-    audioGuideText = audioGuideHints.rewindButtonHint
-  else if focusButtonId = m.HopBackButton.id
-    audioGuideText = audioGuideHints.hopBackButtonHint + " 30 seconds " + m.constants.audioGuideHints.buttonHint
-  else if focusButtonId = m.PlayPauseButton.id
-
-    ' Based on video state using play or pause text.
-    if m.VideoState = "play" then
-      audioGuideText = audioGuideHints.pauseButtonHint
-    else
-      audioGuideText = audioGuideHints.playButtonHint
-    end if
-
-  else if focusButtonId = m.HopForwardButton.id
-    audioGuideText = audioGuideHints.hopForwardButtonHint + " 30 seconds " + m.constants.audioGuideHints.buttonHint
-  else if focusButtonId = m.FastForwardButton.id
-    audioGuideText = audioGuideHints.fastForwardButtonHint
   else if focusButtonId = m.EndButton.id
     audioGuideText = audioGuideHints.goToNextVideoButtonHint
   else if focusButtonId = m.closedCaptionAudioButton.id
@@ -1618,28 +1469,15 @@ Function showTransport()
   ' update transport thumbnails before showing the transport UI
   updateTransport()
 
-  if m.playerControlExperimentType = "none"
-    updatePlayPauseUri()
-  end if
-
-  'Firing the exposure event when transport UI is displayed.
-  getStatsigExperimentResource("roku_player_improvement", "roku_player_control_ui_refresh_v4")
-
   creditCuePoints = getCreditCuepointsFromContent(m.top.content)
 
   if m.top.isInFocusChain() = true AND isSkipIntroCuePointsReached(creditCuePoints) = false
-    ' Only set focus on the play/pause button if the video player has focus (as opposed to some other UI)
+    ' Only set focus on the progress bar if the video player has focus (as opposed to some other UI)
     ' and the skip cuepoints button should not be focused (ie. nowPos is not within intro)
-
-    if m.playerControlExperimentType = "variant1"
-      m.focusedNode = m.progressBar
-    else
-      'm.focusedNode holds the node/component which helps setting/unsetting focus to component/m.top on video player screen
-      m.focusedNode = m.PlayPauseButton
-    end if
+    m.focusedNode = m.progressBar
     setFocusToComponent(m.focusedNode)
   else
-    if m.playerControlExperimentType = "variant1" AND m.skipCuepointsButton.visible = false
+    if m.skipCuepointsButton.visible = false
       setFocusToComponent(m.progressBar)
     end if
   end if
@@ -1742,13 +1580,11 @@ Function handleSkipCuepointsButtonOnAnimateTransport(direction)
       slideTo(m.skipCuepointsButton, [skipCuepointsButtonTransLation[0], m.skipCuepointsButtonUpTranslation], 0.6)
     end if
 
-    if m.playerControlExperimentType = "variant1"
-      if m.skipCuepointsButton.visible = true
-        width = m.skipCuepointsButton.boundingRect().width + 12
-        m.TransportButtons.translation = [m.TransportButtonsXTranslation - width, transportButtonsTranslation[1]]
-      else
-        m.TransportButtons.translation = [m.TransportButtonsXTranslation, transportButtonsTranslation[1]]
-      end if
+    if m.skipCuepointsButton.visible = true
+      width = m.skipCuepointsButton.boundingRect().width + 12
+      m.TransportButtons.translation = [m.TransportButtonsXTranslation - width, transportButtonsTranslation[1]]
+    else
+      m.TransportButtons.translation = [m.TransportButtonsXTranslation, transportButtonsTranslation[1]]
     end if
 
   else if direction = "out"
@@ -1770,7 +1606,7 @@ Function updateTransportTimes()
 
   if duration <> invalid then
 
-    if m.playerControlExperimentType <> "none" AND duration < 3600
+    if duration < 3600
       currentSeekPosition = formatLengthAsMinsAndSecs(m.playerPosition)
       remainingTime = formatLengthAsMinsAndSecs(duration - m.playerPosition)
     else
@@ -1782,6 +1618,10 @@ Function updateTransportTimes()
     m.currentSeekLabel.text = currentSeekPosition
     m.RemainingLabel.text = "-" + remainingTime
     m.RemainingLabel.translation = [1920 - m.marginX - m.RemainingLabel.boundingRect().width - 10, m.RemainingLabel.translation[1]]
+
+    if m.quickSeekIcon.visible = true
+      positionQuickSeekIconHorizontally()
+    end if
   end if
 End Function
 
@@ -1804,9 +1644,7 @@ End Function
 Function showThumbnail()
   tubiLog("videoTransportHandling.showThumbnail")
   if m.Thumbnail.spriteUrls <> invalid AND m.Thumbnail.spriteUrls.count() > 0
-    if m.playerControlExperimentType <> "none"
-      m.thumbnail.showBorder = true
-    end if
+    m.thumbnail.showBorder = true
     m.Thumbnail.visible = true
   else
     m.Thumbnail.visible = false
@@ -1826,15 +1664,22 @@ Function hideSeekGroup()
 End Function
 
 
-Function showQuickSeekLabelAndIcon()
-  m.quickSeekLabel.visible = true
-  elapsedLabelWidth = m.ElapsedLabel.boundingRect().width
+' Places quickSeekIcon immediately after the elapsed time glyphs (same parent as ElapsedLabel).
+Function positionQuickSeekIconHorizontally() as Void
+  elapsedRect = m.ElapsedLabel.boundingRect()
+  elapsedContentWidth = elapsedRect.width
 
-  if elapsedLabelWidth = 0
-    elapsedLabelWidth = 100
+  if elapsedContentWidth = 0
+    elapsedContentWidth = 100
   end if
 
-  m.quickSeekIcon.translation = [m.marginX + elapsedLabelWidth + 10, -2]
+  m.quickSeekIcon.translation = [m.marginX + elapsedContentWidth + 10, m.quickSeekIcon.translation[1]]
+End Function
+
+
+Function showQuickSeekLabelAndIcon()
+  m.quickSeekLabel.visible = true
+  positionQuickSeekIconHorizontally()
   m.quickSeekIcon.visible = true
 End Function
 
@@ -1842,15 +1687,6 @@ End Function
 Function hideQuickSeekLabelAndIcon()
   m.quickSeekLabel.visible = false
   m.quickSeekIcon.visible = false
-End Function
-
-
-Function updatePlayPauseUri()
-  if m.videoState = "pause"
-    m.PlayPauseButton.uri = m.buttonUris.play
-  else
-    m.PlayPauseButton.uri = m.buttonUris.pause
-  end if
 End Function
 
 
@@ -2247,9 +2083,7 @@ Function animateTransportAndBrowseWhileWatching(direction)
     m.BrowseWhileWatching.open = true
     updatePlayerLogLib(m.playerLogLib, "updateBrowseWhileWatchingOpenCount")
 
-    if m.playerControlExperimentType <> "none"
-      fade(m.controlIcon, "out", 0.6)
-    end if
+    fade(m.controlIcon, "out", 0.6)
 
   else
     if m.skipCuepointsButtonTimer <> invalid
@@ -2257,11 +2091,9 @@ Function animateTransportAndBrowseWhileWatching(direction)
     end if
 
     if m.VideoState = "ffw" OR m.VideoState = "rew"
-      if m.playerControlExperimentType <> "none"
-        m.thumbnail.showBorder = true
-        hideQuickSeekLabelAndIcon()
-        showSeekGroup()
-      end if
+      m.thumbnail.showBorder = true
+      hideQuickSeekLabelAndIcon()
+      showSeekGroup()
 
       m.Thumbnail.visible = true
     else
@@ -2292,10 +2124,8 @@ Function animateTransportAndBrowseWhileWatching(direction)
       fade(m.SkipTrailerButton, "in", 0.6)
     end if
 
-    if m.playerControlExperimentType <> "none"
-      if m.videoState = "pause"
-        fade(m.controlIcon, "in", 0.6)
-      end if
+    if m.videoState = "pause"
+      fade(m.controlIcon, "in", 0.6)
     end if
 
   end if

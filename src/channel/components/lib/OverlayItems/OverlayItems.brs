@@ -29,7 +29,13 @@ Function onItemInfoChanged(msg)
 
   if items.title <> invalid
     titleLabel = createObject("roSGNode", "Label")
-    titleLabel.id = items.id.trim()
+    if items.id = "subtitleTracks"
+      titleLabel.id = "closedCaptionSectionHeaderLabel"
+    else if items.id = "audioTracks"
+      titleLabel.id = "audioTracksSectionHeaderLabel"
+    else
+      titleLabel.id = items.id.trim()
+    end if
     titleLabel.text = items.title
     titleLabel.height = 40
     m.overLayItemsLayoutGroup.appendChild(titleLabel)

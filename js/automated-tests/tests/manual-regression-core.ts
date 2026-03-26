@@ -1207,7 +1207,7 @@ describe('Core Manual Regression Tests', function () {
     expect(closedCaptionAudioButton.uri).to.contain('pkg:/images/transport/sgplayer/icon-subtitles');
 
     // Navigate right to open Options
-    await ecp.sendKeypress(ecp.Key.Right, { count: 4 });
+    await ecp.sendKeypress(ecp.Key.Right, { count: 3 });
     await ecp.sendKeypress(ecp.Key.Ok);
     await utils.sleep(1000);
 
@@ -1254,7 +1254,7 @@ describe('Core Manual Regression Tests', function () {
     await utils.sleep(800);
 
     // Navigate right to open Options
-    await ecp.sendKeypress(ecp.Key.Right, { count: 4 });
+    await ecp.sendKeypress(ecp.Key.Right, { count: 3 });
     await ecp.sendKeypress(ecp.Key.Ok);
 
     // Verify that AD is still enabled for the second title
@@ -1298,7 +1298,7 @@ describe('Core Manual Regression Tests', function () {
     await testUtils.waitForPlayerStateToEqual('videoPlayerScreen', 'paused');
 
     // Navigate right to open Audio and Subtitle Options
-    await ecp.sendKeypress(ecp.Key.Right, { count: 4 });
+    await ecp.sendKeypress(ecp.Key.Right, { count: 3 });
     await ecp.sendKeypress(ecp.Key.Ok);
     await utils.sleep(1000);
 

@@ -34,7 +34,8 @@ describe('Multiple Audio', function () {
     expect(closedCaptionAudioButton.uri).to.contain('pkg:/images/transport/sgplayer/icon-subtitles');
 
     // Navigate right to open Options
-    await ecp.sendKeypress(ecp.Key.Right, { count: 4 });
+    await ecp.sendKeypress(ecp.Key.Up);
+    await ecp.sendKeypress(ecp.Key.Right, { count: 2 });
     await ecp.sendKeypress(ecp.Key.Ok);
 
     // Validate options
@@ -68,7 +69,7 @@ describe('Multiple Audio', function () {
     expect(closedCaptionAudioButton.uri).to.contain('pkg:/images/transport/sgplayer/icon-subtitles');
 
     // Navigate right to open Options
-    await ecp.sendKeypress(ecp.Key.Right, { count: 4 });
+    await ecp.sendKeypress(ecp.Key.Right, { count: 3 });
     await ecp.sendKeypress(ecp.Key.Ok);
 
     // Validate options
@@ -96,7 +97,7 @@ describe('Multiple Audio', function () {
     await ecp.sendKeypress(ecp.Key.Up);
 
     // Navigate right to open Options
-    await ecp.sendKeypress(ecp.Key.Right, { count: 4 });
+    await ecp.sendKeypress(ecp.Key.Right, { count: 3 });
     await ecp.sendKeypress(ecp.Key.Ok, {wait:2500});
 
     // Verify that AD is still enabled
@@ -119,7 +120,7 @@ describe('Multiple Audio', function () {
 
     // Navigate right to open Options
     await testUtils.waitForPlayerStateToEqual('videoPlayerScreen', 'paused');
-    await ecp.sendKeypress(ecp.Key.Right, { count: 4 });
+    await ecp.sendKeypress(ecp.Key.Right, { count: 3 });
     await ecp.sendKeypress(ecp.Key.Ok);
 
     // Validate CC and MA options

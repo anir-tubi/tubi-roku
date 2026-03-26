@@ -1043,25 +1043,6 @@ Function getConstants()
   constants.player.playerResults.completed = "COMPLETED"
   constants.player.playerResults.closed = "CLOSED"
 
-  'urls for the images that are required for the transport
-  constants.player.transportButtons = {}
-  constants.player.transportButtons.fastForward = "pkg:/images/transport/sgplayer/icon-ffw.webp"
-  constants.player.transportButtons.fastForwardLevels = [
-    "pkg:/images/transport/sgplayer/icon-ffw-1.webp",
-    "pkg:/images/transport/sgplayer/icon-ffw-2.webp",
-    "pkg:/images/transport/sgplayer/icon-ffw-3.webp"
-  ]
-
-  constants.player.transportButtons.rewind = "pkg:/images/transport/sgplayer/icon-rew.webp"
-  constants.player.transportButtons.rewindLevels = [
-    "pkg:/images/transport/sgplayer/icon-rew-1.webp",
-    "pkg:/images/transport/sgplayer/icon-rew-2.webp",
-    "pkg:/images/transport/sgplayer/icon-rew-3.webp"
-  ]
-
-  constants.player.transportButtons.pause = "pkg:/images/transport/sgplayer/icon-pause.webp"
-  constants.player.transportButtons.play = "pkg:/images/transport/sgplayer/icon-play.webp"
-
   ' "ids" for the different skip button texts
   constants.player.skipCuepointsButtonTypes = {}
   constants.player.skipCuepointsButtonTypes.intro = "skipIntro"

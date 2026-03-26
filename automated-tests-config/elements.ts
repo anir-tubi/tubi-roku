@@ -966,13 +966,13 @@ const elements = typeCheckElements({
   /** rewind button icon */
   rewindButton: {
     keyPath:
-      '#ContentController.#uiGroup.#ContentGroup.#screenStackGroup.#ScreenStack.#videoPlayerScreen.#HUD.#Transport.#TransportButtons.#RewindButton',
+      '#ContentController.#uiGroup.#ContentGroup.#screenStackGroup.#ScreenStack.#videoPlayerScreen.#HUD.#seekGroup.#seekBackground.#seekControlGroup.#seekIcon',
   },
 
   /** FF button not pressed */
   fastForwardButton: {
     keyPath:
-      '#ContentController.#uiGroup.#ContentGroup.#screenStackGroup.#ScreenStack.#videoPlayerScreen.#HUD.#Transport.#TransportButtons.#FastForwardButton',
+      '#ContentController.#uiGroup.#ContentGroup.#screenStackGroup.#ScreenStack.#videoPlayerScreen.#HUD.#seekGroup.#seekBackground.#seekControlGroup.#seekIcon',
   },
 
   /** Transport buttons  */
@@ -983,7 +983,7 @@ const elements = typeCheckElements({
 
   rewindButton3xPS4b: {
     keyPath:
-      '#ContentController.#uiGroup.#ContentGroup.#screenStackGroup.#ScreenStack.#videoPlayerScreen.#HUD.#Transport.#TransportButtons.#RewindButton',
+      '#ContentController.#uiGroup.#ContentGroup.#screenStackGroup.#ScreenStack.#videoPlayerScreen.#HUD.#seekGroup.#seekBackground.#seekControlGroup.#seekIcon',
     xpath:
       '/TubiScene/ContentController/Group/Group/ScreenStack/VideoPlayerScreen/Group[4]/Group/Group/TransportButton[2]',
   },
@@ -997,14 +997,14 @@ const elements = typeCheckElements({
 
   fastForwardButton3x: {
     keyPath:
-      '#ContentController.#uiGroup.#ContentGroup.#screenStackGroup.#ScreenStack.#videoPlayerScreen.#HUD.#Transport.#TransportButtons.#FastForwardButton',
+      '#ContentController.#uiGroup.#ContentGroup.#screenStackGroup.#ScreenStack.#videoPlayerScreen.#HUD.#seekGroup.#seekBackground.#seekControlGroup.#seekIcon',
     xpath:
       '/TubiScene/ContentController/Group/Group/ScreenStack/VideoPlayerScreen/Group[4]/Group/Group/TransportButton[6]',
   },
 
   rewindButton3x: {
     keyPath:
-      '#ContentController.#uiGroup.#ContentGroup.#screenStackGroup.#ScreenStack.#videoPlayerScreen.#HUD.#Transport.#TransportButtons.#RewindButton',
+      '#ContentController.#uiGroup.#ContentGroup.#screenStackGroup.#ScreenStack.#videoPlayerScreen.#HUD.#seekGroup.#seekBackground.#seekControlGroup.#seekIcon',
     xpath:
       '/TubiScene/ContentController/Group/Group/ScreenStack/VideoPlayerScreen/Group[4]/Group/Group/TransportButton[2]',
   },
@@ -1061,14 +1061,14 @@ const elements = typeCheckElements({
 
   rewindButton2xb: {
     keyPath:
-      '#ContentController.#uiGroup.#ContentGroup.#screenStackGroup.#ScreenStack.#videoPlayerScreen.#HUD.#Transport.#TransportButtons.#RewindButton',
+      '#ContentController.#uiGroup.#ContentGroup.#screenStackGroup.#ScreenStack.#videoPlayerScreen.#HUD.#seekGroup.#seekBackground.#seekControlGroup.#seekIcon',
     xpath:
       '/TubiScene/ContentController/Group/Group/ScreenStack/VideoPlayerScreen/Group[4]/Group/Group/TransportButton[2]',
   },
 
   rewindButton2x: {
     keyPath:
-      '#ContentController.#uiGroup.#ContentGroup.#screenStackGroup.#ScreenStack.#videoPlayerScreen.#HUD.#Transport.#TransportButtons.#RewindButton',
+      '#ContentController.#uiGroup.#ContentGroup.#screenStackGroup.#ScreenStack.#videoPlayerScreen.#HUD.#seekGroup.#seekBackground.#seekControlGroup.#seekIcon',
     xpath:
       '/TubiScene/ContentController/Group/Group/ScreenStack/VideoPlayerScreen/Group[4]/Group/Group/TransportButton[2]',
   },
@@ -1452,22 +1452,34 @@ const elements = typeCheckElements({
       '#ContentController.#uiGroup.#ContentGroup.#screenStackGroup.#ScreenStack.#searchScreen.#SearchScreenInfoPanel.#infoPanelGroup.#Offset.#DescriptionGroup.#Description',
   },
 
-  /** Play/Pause button */
+  /** Play/Pause control (progress bar is focused for OK / play key when transport is visible) */
   playPauseButton: {
     keyPath:
-      '#ContentController.#uiGroup.#ContentGroup.#screenStackGroup.#ScreenStack.#videoPlayerScreen.#HUD.#Transport.#TransportButtons.#PlayPauseButton',
+      '#ContentController.#uiGroup.#ContentGroup.#screenStackGroup.#ScreenStack.#videoPlayerScreen.#HUD.#Transport.#ProgressBar',
+  },
+
+  /** Scrub / FF-RW speed indicator group (visible while fast-forward or rewind is active) */
+  videoPlayerSeekGroup: {
+    keyPath:
+      '#ContentController.#uiGroup.#ContentGroup.#screenStackGroup.#ScreenStack.#videoPlayerScreen.#HUD.#seekGroup',
+  },
+
+  /** Scrub speed label (1x / 2x / 3x) inside seek UI */
+  videoPlayerSeekSpeedLabel: {
+    keyPath:
+      '#ContentController.#uiGroup.#ContentGroup.#screenStackGroup.#ScreenStack.#videoPlayerScreen.#HUD.#seekGroup.#seekBackground.#seekControlGroup.#seekSpeedLabel',
   },
 
   /** Forward 30 Button highlighted */
   forward30Button: {
     keyPath:
-      '#ContentController.#uiGroup.#ContentGroup.#screenStackGroup.#ScreenStack.#videoPlayerScreen.#HUD.#Transport.#TransportButtons.#HopForwardButton',
+      '#ContentController.#uiGroup.#ContentGroup.#screenStackGroup.#ScreenStack.#videoPlayerScreen.#HUD.#Transport.#ProgressBar',
   },
 
   /** rewind 30 Button highlighted */
   rewind30Button: {
     keyPath:
-      '#ContentController.#uiGroup.#ContentGroup.#screenStackGroup.#ScreenStack.#videoPlayerScreen.#HUD.#Transport.#TransportButtons.#HopBackButton',
+      '#ContentController.#uiGroup.#ContentGroup.#screenStackGroup.#ScreenStack.#videoPlayerScreen.#HUD.#Transport.#ProgressBar',
   },
 
   /** The actual Episodes page. Can be used to see if something on the episodes screen has focus */
@@ -2144,13 +2156,13 @@ const elements = typeCheckElements({
   /** CC Sectoon Header Label */
   closedCaptionSectionHeaderLabel: {
     keyPath:
-      '#ContentController.#uiGroup.#ContentGroup.#screenStackGroup.#ScreenStack.#videoPlayerScreen.#closedCaptionAndAudioSelectionOverlayGroup.#closedCaptionAndAudioSelectionOverlay.0.1.1.#subtitleTracks',
+      '#ContentController.#uiGroup.#ContentGroup.#screenStackGroup.#ScreenStack.#videoPlayerScreen.#closedCaptionAndAudioSelectionOverlayGroup.#closedCaptionAndAudioSelectionOverlay.0.1.1.#closedCaptionSectionHeaderLabel',
   },
 
   /** Audio Tracks Section Header Label */
   audioTracksSectionHeaderLabel: {
     keyPath:
-      '#ContentController.#uiGroup.#ContentGroup.#screenStackGroup.#ScreenStack.#videoPlayerScreen.#closedCaptionAndAudioSelectionOverlayGroup.#closedCaptionAndAudioSelectionOverlay.0.1.2.#audioTracks',
+      '#ContentController.#uiGroup.#ContentGroup.#screenStackGroup.#ScreenStack.#videoPlayerScreen.#closedCaptionAndAudioSelectionOverlayGroup.#closedCaptionAndAudioSelectionOverlay.0.1.2.#audioTracksSectionHeaderLabel',
   },
 
   /** Audio label */

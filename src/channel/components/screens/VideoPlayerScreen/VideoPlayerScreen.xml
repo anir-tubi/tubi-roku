@@ -501,7 +501,77 @@
         layoutDirection="vert"
         vertAlignment="top"
         horizAlignment="custom"
-        opacity="1.0" />
+        opacity="1.0">
+        <LayoutGroup
+          id="TransportButtons"
+          layoutDirection="horiz"
+          vertAlignment="top"
+          horizAlignment="right"
+          itemSpacings="[12]"
+          translation="[1730, 0]">
+          <TextIconButton
+            id="StartButton"
+            uri="pkg:/images/icon-resume.webp"
+            hasUnfocusedBackground="true"
+            iconWidth="36"
+            iconHeight="36"
+            alwaysShowLabel="false" />
+          <TextIconButton
+            id="EndButton"
+            uri="pkg:/images/transport/sgplayer/icon-to-end.webp"
+            hasUnfocusedBackground="true"
+            iconWidth="36"
+            iconHeight="36"
+            alwaysShowLabel="false" />
+          <TextIconButton
+            id="closedCaptionAudioButton"
+            uri="pkg:/images/transport/sgplayer/icon-subtitles.webp"
+            hasUnfocusedBackground="true"
+            iconWidth="36"
+            iconHeight="36"
+            alwaysShowLabel="false" />
+          <TextIconButton
+            id="sendFeedBackButton"
+            uri="pkg:/images/transport/sgplayer/icon-help.webp"
+            hasUnfocusedBackground="true"
+            iconWidth="36"
+            iconHeight="36"
+            alwaysShowLabel="false"
+            visible="false" />
+        </LayoutGroup>
+        <TubiProgressBar
+          id="ProgressBar"
+          height="16"
+          progress="0.0" />
+        <Group id="timeGroup">
+          <Label
+            id="ElapsedLabel"
+            width="0"
+            height="48"
+            text="00:00:00"
+            vertAlign="center">
+            <Font
+              role="font" />
+          </Label>
+          <Poster
+            id="quickSeekIcon"
+            width="36"
+            height="36"
+            translation="[120, -2]"
+            visible="false" />
+          <Label
+            id="RemainingLabel"
+            width="240"
+            height="48"
+            text="-00:00:00"
+            translation="[1695, 0]"
+            horizAlign="right"
+            vertAlign="center">
+            <Font
+              role="font" />
+          </Label>
+        </Group>
+      </LayoutGroup>
 
       <!-- Thumbnail should be placed as the last child of the HUD component so that transport
       buttons or components do not overlay it. -->
@@ -513,12 +583,6 @@
 
     </Group>  <!-- HUD -->
 
-    <TransportButton
-      id="SkipTrailerButton"
-      width="260"
-      height="80"
-      translation="[0, -10]" />
-
     <TextIconButton
       id="SkipTrailerTextIconButton"
       uri="pkg:/images/transport/sgplayer/icon-movie-series.webp"
@@ -528,10 +592,6 @@
       alwaysShowLabel="true"
       translation="[192, 783]"
       opacity="0.0" />
-
-    <SimpleButton
-      id="skipCuepointsSimpleButton"
-      visible="false" />
 
     <TextIconButton
       id="skipCuepointsTextIconButton"

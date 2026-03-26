@@ -33,18 +33,16 @@ describe('Playback', function () {
     await ecp.sendKeypress(ecp.Key.Play);
     await testUtils.waitForPlayerStateToEqual('videoPlayerScreen', 'playing');
 
-    // Press OK twice to activate player controls
-    await utils.sleep(5000);
-    await ecp.sendKeypress(ecp.Key.Play);
-
-    //Get current player position
-    const currentposition = await testUtils.getPlayerPosition();
-    const startposition = currentposition;
-    console.log('start', startposition);
-
-    // Hover on the ff 30 second button, get start position
-    await ecp.sendKeypress(ecp.Key.Right);
     await utils.sleep(2000);
+    await ecp.sendKeypress(ecp.Key.Play);
+    await testUtils.waitForPlayerStateToEqual('videoPlayerScreen', 'paused');
+
+    const startposition = await testUtils.getPlayerPosition();
+
+    // Fast-forward scrub (transport no longer has a +30s hop control)
+    await ecp.sendKeypress(ecp.Key.Forward);
+    await utils.sleep(2500);
+    await ecp.sendKeypress(ecp.Key.Ok);
     await seekWithinRange(startposition);
 
   });
@@ -63,26 +61,24 @@ describe('Playback', function () {
     await testUtils.waitForCurrentScreenToEqual('videoPlayerScreen');
     await testUtils.waitForPlayerStateToEqual('videoPlayerScreen', 'playing');
 
-    // Press OK  to activate player controls
+    // Pause and scrub forward, then scrub back (hop buttons removed from transport)
     await ecp.sendKeypress(ecp.Key.Play);
-
-    //Move forward in timeline and Get current player position
+    await testUtils.waitForPlayerStateToEqual('videoPlayerScreen', 'paused');
     await testUtils.waitForElementToFullyShowOnScreen('playPauseButton');
-    await ecp.sendKeypress(ecp.Key.Right);
 
-    // See highlighted forward 30 button? press OK
-    await testUtils.waitForElementToFullyShowOnScreen('forward30Button');
+    await ecp.sendKeypress(ecp.Key.Forward);
+    await utils.sleep(2000);
     await ecp.sendKeypress(ecp.Key.Ok);
+    await testUtils.waitForPlayerStateToEqual('videoPlayerScreen', 'playing');
 
-    //Get player position
-    const currentPosition = await testUtils.getPlayerPosition();
-    const startPosition = currentPosition;
+    const midPosition = await testUtils.getPlayerPosition();
 
-
-    // Hover on the rewind 30 second button, get start position
-    await ecp.sendKeypress(ecp.Key.Left);
-    await testUtils.waitForElementToFullyShowOnScreen('rewind30Button');
-    await seekWithinRange(startPosition);
+    await ecp.sendKeypress(ecp.Key.Play);
+    await testUtils.waitForPlayerStateToEqual('videoPlayerScreen', 'paused');
+    await ecp.sendKeypress(ecp.Key.Rewind);
+    await utils.sleep(2000);
+    await ecp.sendKeypress(ecp.Key.Ok);
+    await seekWithinRange(midPosition);
 
   });
 
@@ -94,24 +90,20 @@ describe('Playback', function () {
     await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');
     await shared.ensurePlayableContentFocused();
 
-    //Play title, pause to open player, move right to FF button and press, verify state
+    //Play title, pause to open player, use remote Forward for fast-forward scrub (no on-screen FF button)
     await ecp.sendKeypress(ecp.Key.Play);
     await testUtils.waitForPlayerStateToEqual('videoPlayerScreen', 'playing');
     await ecp.sendKeypress(ecp.Key.Play);
     const playPauseButton = await testUtils.getNodeForElement('playPauseButton');
     expect(playPauseButton.visible).to.equal(true);
     await testUtils.waitForPlayerStateToEqual('videoPlayerScreen', 'paused');
-    await ecp.sendKeypress(ecp.Key.Right, { count: 2 });
+    await ecp.sendKeypress(ecp.Key.Forward);
+    await testUtils.waitForElementToFullyShowOnScreen('videoPlayerSeekGroup');
 
-    // FF button highlighted
     const fastForwardButton = await testUtils.getNodeForElement('fastForwardButton');
     expect(fastForwardButton.visible).to.equal(true);
-
-    // Press FF button
-    await ecp.sendKeypress(ecp.Key.Ok);
-
-    // Verify FF button state is FF 1
-    expect(fastForwardButton.uri).to.contain('pkg:/images/transport/sgplayer/icon-ffw');
+    expect(fastForwardButton.uri).to.contain('pkg:/images/transport/sgplayer/icon-vector-fwd');
+    expect(await testUtils.getElementField('videoPlayerSeekSpeedLabel', 'text')).to.equal('1');
 
   });
 
@@ -123,23 +115,21 @@ describe('Playback', function () {
     await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');
     await shared.ensurePlayableContentFocused();
 
-    //Play title, pause to open player, move right to FF button and press, verify state
+    //Play title, pause, increase fast-forward speed with remote Forward
     await ecp.sendKeypress(ecp.Key.Play);
     await testUtils.waitForPlayerStateToEqual('videoPlayerScreen', 'playing');
     await ecp.sendKeypress(ecp.Key.Play);
     const playPauseButton = await testUtils.getNodeForElement('playPauseButton');
     expect(playPauseButton.visible).to.equal(true);
-    await ecp.sendKeypress(ecp.Key.Right, { count: 2 });
+    await testUtils.waitForPlayerStateToEqual('videoPlayerScreen', 'paused');
+    await ecp.sendKeypress(ecp.Key.Forward);
+    await testUtils.waitForElementToFullyShowOnScreen('videoPlayerSeekGroup');
+    await ecp.sendKeypress(ecp.Key.Forward);
 
-    // FF button highlighted
     const fastForwardButton = await testUtils.getNodeForElement('fastForwardButton');
     expect(fastForwardButton.visible).to.equal(true);
-
-    // Press FF button twice
-    await ecp.sendKeypress(ecp.Key.Ok, { count: 2 });
-
-    // Verify FF button state is FF 2
-    expect(fastForwardButton.uri).to.contain('pkg:/images/transport/sgplayer/icon-ffw');
+    expect(fastForwardButton.uri).to.contain('pkg:/images/transport/sgplayer/icon-vector-fwd');
+    expect(await testUtils.getElementField('videoPlayerSeekSpeedLabel', 'text')).to.equal('2');
 
   });
 
@@ -151,23 +141,22 @@ describe('Playback', function () {
     await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');
     await shared.ensurePlayableContentFocused();
 
-    //Play title, pause to open player, move right to FF button and press, verify state
+    //Play title, pause, three Forward presses for 3x scrub speed
     await ecp.sendKeypress(ecp.Key.Play);
     await testUtils.waitForPlayerStateToEqual('videoPlayerScreen', 'playing');
     await ecp.sendKeypress(ecp.Key.Play);
     const playPauseButton = await testUtils.getNodeForElement('playPauseButton');
     expect(playPauseButton.visible).to.equal(true);
-    await ecp.sendKeypress(ecp.Key.Right, { count: 2 });
+    await testUtils.waitForPlayerStateToEqual('videoPlayerScreen', 'paused');
+    await ecp.sendKeypress(ecp.Key.Forward);
+    await testUtils.waitForElementToFullyShowOnScreen('videoPlayerSeekGroup');
+    await ecp.sendKeypress(ecp.Key.Forward);
+    await ecp.sendKeypress(ecp.Key.Forward);
 
-    // FF button highlighted
     const fastForwardButton = await testUtils.getNodeForElement('fastForwardButton');
     expect(fastForwardButton.visible).to.equal(true);
-
-    // Press FF button three times
-    await ecp.sendKeypress(ecp.Key.Ok, { count: 3 });
-
-    // Verify FF button state is FF 3
-    expect(fastForwardButton.uri).to.equal('pkg:/images/transport/sgplayer/icon-ffw.webp');
+    expect(fastForwardButton.uri).to.contain('pkg:/images/transport/sgplayer/icon-vector-fwd');
+    expect(await testUtils.getElementField('videoPlayerSeekSpeedLabel', 'text')).to.equal('3');
 
   });
 
@@ -180,23 +169,20 @@ describe('Playback', function () {
     await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');
     await shared.ensurePlayableContentFocused();
 
-    //Play title, pause to open player, move right to FF button and press, verify state
+    //Play title, pause; fourth Forward wraps scrub speed back to 1x (maxScrub = 2 → speeds 1,2,3,1)
     await ecp.sendKeypress(ecp.Key.Play);
     await testUtils.waitForPlayerStateToEqual('videoPlayerScreen', 'playing');
     await ecp.sendKeypress(ecp.Key.Play);
     await testUtils.waitForPlayerStateToEqual('videoPlayerScreen', 'paused');
-    await ecp.sendKeypress(ecp.Key.Right, { count: 2 });
+    await ecp.sendKeypress(ecp.Key.Forward);
+    await testUtils.waitForElementToFullyShowOnScreen('videoPlayerSeekGroup');
+    await ecp.sendKeypress(ecp.Key.Forward);
+    await ecp.sendKeypress(ecp.Key.Forward);
+    await ecp.sendKeypress(ecp.Key.Forward);
 
-    // FF button highlighted
-    await testUtils.waitForElementToFullyShowOnScreen('fastForwardButton');
-
-    // Press FF button four times
-    await ecp.sendKeypress(ecp.Key.Ok, { count: 4 });
-
-    // Verify FF button state is FF 4 (back to 1x)
-    const fastForwardButton = testUtils.getNodeForElement('fastForwardButton');
-    expect((await fastForwardButton).uri).to.equal('pkg:/images/transport/sgplayer/icon-ffw-1.webp');
-
+    const fastForwardButton = await testUtils.getNodeForElement('fastForwardButton');
+    expect(fastForwardButton.uri).to.contain('pkg:/images/transport/sgplayer/icon-vector-fwd');
+    expect(await testUtils.getElementField('videoPlayerSeekSpeedLabel', 'text')).to.equal('1');
 
   });
 
@@ -211,12 +197,12 @@ describe('Playback', function () {
     //Play title, pause to open player, move right to FF button and press, verify state
     await ecp.sendKeypress(ecp.Key.Play);
     await testUtils.waitForPlayerStateToEqual('videoPlayerScreen', 'playing');
-    // Press FF button three time
     await ecp.sendKeypress(ecp.Key.Forward, { count: 3 });
+    await testUtils.waitForElementToFullyShowOnScreen('videoPlayerSeekGroup');
 
-    // Verify FF button state is FF 3
     const fastForwardButton = await testUtils.getNodeForElement('fastForwardButton');
-    expect(fastForwardButton.uri).to.contain('pkg:/images/transport/sgplayer/icon-ffw');
+    expect(fastForwardButton.uri).to.contain('pkg:/images/transport/sgplayer/icon-vector-fwd');
+    expect(await testUtils.getElementField('videoPlayerSeekSpeedLabel', 'text')).to.equal('3');
 
     // Back out of the video player to land on Details page after FF
     await utils.sleep(3000);
@@ -279,22 +265,17 @@ describe('Playback', function () {
     await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');
     await shared.ensurePlayableContentFocused();
 
-    //Play title, pause to open player, move right to FF button and press, verify state
+    //Play title, pause, remote Rewind for rewind scrub
     await ecp.sendKeypress(ecp.Key.Play);
     await testUtils.waitForPlayerStateToEqual('videoPlayerScreen', 'playing');
     await ecp.sendKeypress(ecp.Key.Play);
     await testUtils.waitForPlayerStateToEqual('videoPlayerScreen', 'paused');
-    await ecp.sendKeypress(ecp.Key.Left, { count: 2 });
+    await ecp.sendKeypress(ecp.Key.Rewind);
+    await testUtils.waitForElementToFullyShowOnScreen('videoPlayerSeekGroup');
 
-    // Rewind button highlighted
-    await testUtils.waitForElementToFullyShowOnScreen('rewindButton');
-
-    // Press Rewind button
-    await ecp.sendKeypress(ecp.Key.Ok);
-
-    // Verify Rewind button state is RW 1
     const rewindButton1x = await testUtils.getNodeForElement('rewindButton');
-    expect(rewindButton1x.uri).to.contain('pkg:/images/transport/sgplayer/icon-rew-1');
+    expect(rewindButton1x.uri).to.contain('pkg:/images/transport/sgplayer/icon-vector-rew');
+    expect(await testUtils.getElementField('videoPlayerSeekSpeedLabel', 'text')).to.equal('1');
 
   });
 
@@ -306,21 +287,20 @@ describe('Playback', function () {
     await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');
     await shared.ensurePlayableContentFocused();
 
-    //Play title, pause to open player, move leff to Rewind button and press, verify state
+    //Play title, pause, two Rewind presses for 2x rewind scrub
     await ecp.sendKeypress(ecp.Key.Play);
     await testUtils.waitForPlayerStateToEqual('videoPlayerScreen', 'playing');
-    await ecp.sendKeypress(ecp.Key.Up);
-    await testUtils.waitForElementToFullyShowOnScreen('transportButtons');
-    await ecp.sendKeypress(ecp.Key.Left, { count: 2 });
+    await ecp.sendKeypress(ecp.Key.Play);
+    await testUtils.waitForPlayerStateToEqual('videoPlayerScreen', 'paused');
+    await ecp.sendKeypress(ecp.Key.Rewind);
+    await testUtils.waitForElementToFullyShowOnScreen('videoPlayerSeekGroup');
+    await utils.sleep(500);
+    await ecp.sendKeypress(ecp.Key.Rewind);
 
-    // Press Rewind button twice
-    await utils.sleep(2000);
-    await ecp.sendKeypress(ecp.Key.Ok, { count: 2 });
-
-    // Verify Rewind button state is RW 2
     await testUtils.waitForElementToFullyShowOnScreen('rewindButton2x');
     const rewindButton2x = await testUtils.getNodeForElement('rewindButton2x');
-    expect(rewindButton2x.uri).to.contain('pkg:/images/transport/sgplayer/icon-rew-2');
+    expect(rewindButton2x.uri).to.contain('pkg:/images/transport/sgplayer/icon-vector-rew');
+    expect(await testUtils.getElementField('videoPlayerSeekSpeedLabel', 'text')).to.equal('2');
 
   });
 
@@ -332,22 +312,19 @@ describe('Playback', function () {
     await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');
     await shared.ensurePlayableContentFocused();
 
-    //Play title, pause to open player, move right to FF button and press, verify state
+    //Play title, pause, three Rewind presses for 3x rewind scrub
     await ecp.sendKeypress(ecp.Key.Play);
     await testUtils.waitForPlayerStateToEqual('videoPlayerScreen', 'playing');
     await ecp.sendKeypress(ecp.Key.Play);
     await testUtils.waitForPlayerStateToEqual('videoPlayerScreen', 'paused');
-    await ecp.sendKeypress(ecp.Key.Left, { count: 2 });
+    await ecp.sendKeypress(ecp.Key.Rewind);
+    await testUtils.waitForElementToFullyShowOnScreen('videoPlayerSeekGroup');
+    await ecp.sendKeypress(ecp.Key.Rewind);
+    await ecp.sendKeypress(ecp.Key.Rewind);
 
-    // Rewind button highlighted
-    await testUtils.waitForElementToFullyShowOnScreen('rewindButton');
-
-    // Press Rewind button 3x
-    await ecp.sendKeypress(ecp.Key.Ok, { count: 3 });
-
-    // Verify Rewind button state is RW 3
     const rewindButton3x = await testUtils.getNodeForElement('rewindButton3x');
-    expect(rewindButton3x.uri).to.contain('pkg:/images/transport/sgplayer/icon-rew-3');
+    expect(rewindButton3x.uri).to.contain('pkg:/images/transport/sgplayer/icon-vector-rew');
+    expect(await testUtils.getElementField('videoPlayerSeekSpeedLabel', 'text')).to.equal('3');
 
   });
 
@@ -359,23 +336,20 @@ describe('Playback', function () {
     await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');
     await shared.ensurePlayableContentFocused();
 
-    //Play title, pause to open player, move left to rewind button and press, verify state
+    //Play title, pause; fourth Rewind wraps scrub speed back to 1x
     await ecp.sendKeypress(ecp.Key.Play);
     await testUtils.waitForPlayerStateToEqual('videoPlayerScreen', 'playing');
     await ecp.sendKeypress(ecp.Key.Play);
     await testUtils.waitForPlayerStateToEqual('videoPlayerScreen', 'paused');
-    await ecp.sendKeypress(ecp.Key.Left, { count: 2 });
+    await ecp.sendKeypress(ecp.Key.Rewind);
+    await testUtils.waitForElementToFullyShowOnScreen('videoPlayerSeekGroup');
+    await ecp.sendKeypress(ecp.Key.Rewind);
+    await ecp.sendKeypress(ecp.Key.Rewind);
+    await ecp.sendKeypress(ecp.Key.Rewind);
 
-    // Rewind button highlighted
-    const rewindButton = await testUtils.waitForElementToFullyShowOnScreen('rewindButton');
-
-    // Press Rewind button 4x
-    await ecp.sendKeypress(ecp.Key.Ok, { count: 4 });
-
-    // Verify Rewind button state is RW 1 again
     const rewindButton1x = await testUtils.getNodeForElement('rewindButton');
-    await testUtils.waitForElementToFullyShowOnScreen('rewindButton');
-    expect(rewindButton1x.uri).to.contain('pkg:/images/transport/sgplayer/icon-rew-1');
+    expect(rewindButton1x.uri).to.contain('pkg:/images/transport/sgplayer/icon-vector-rew');
+    expect(await testUtils.getElementField('videoPlayerSeekSpeedLabel', 'text')).to.equal('1');
 
   });
 
@@ -390,8 +364,8 @@ describe('Playback', function () {
     // Initiate playback
     await ecp.sendKeypress(ecp.Key.Play);
 
-    // Verify playback
-    await testUtils.waitForElementToHaveFocus('videoPlayerScreen');
+    // Verify playback (focus lives on a child e.g. ProgressBar, not the screen root)
+    await testUtils.waitForCurrentScreenToEqual('videoPlayerScreen', 15000);
     await testUtils.waitForPlayerStateToEqual('videoPlayerScreen', 'playing', 15000);
   });
 });
