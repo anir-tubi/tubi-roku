@@ -510,7 +510,6 @@ End Function
 '   - Skin Ad (wrapper)
 '   - Carousel (adRowlistCarousel)
 '   - Spotlight (adRowlistSpotlight)
-'   - Thematic Takeover
 '
 ' NOTE: Despite the experiment name containing "HDC" (Home Display Container),
 ' it controls ALL homescreen ad products, not just carousel/spotlight.
@@ -545,7 +544,11 @@ Function onHomesceenAdDisplaySuccessResponse(response)
               m.videoTileOverlayGroup.visible = false
             end if
           else if adResponse.type = m.constants.ui.contentTypes.adRowlistCarousel OR adResponse.type = m.constants.ui.contentTypes.adRowlistSpotlight OR adResponse.type = m.constants.ui.contentTypes.thematicTakeover
-            if getStatsigExperimentResource("ads_homegrid_layer", "ads_hdc_all_holdback_v3", true).enabled = true
+            if adResponse.type = m.constants.ui.contentTypes.thematicTakeover
+              '//Thematic Takeover ads are not controlled by the ads_hdc_all_holdback_v3 experiment YET.
+              '//Work is being done to move them onto the same experiment as the other ad types, but in the meantime, we not gate them as being controlled by the experiment.
+              aParsedResponseAfterExperimentCheck.push(adResponse)
+            else if getStatsigExperimentResource("ads_homegrid_layer", "ads_hdc_all_holdback_v3", true).enabled = true
               aParsedResponseAfterExperimentCheck.push(adResponse)
             end if
           end if
