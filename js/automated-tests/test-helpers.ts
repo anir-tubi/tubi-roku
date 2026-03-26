@@ -2480,16 +2480,26 @@ class TestHelpers {
    * // Find row by title with custom max scrolls
    * await testHelpers.scrollDownToFindRow({ title: 'On Now', maxScrolls: 40 });
    */
-  async scrollDownToFindRow(options: { title?: string | string[]; slug?: string | string[]; rowListElementId?: ElementOrElementId; maxScrolls?: number }): Promise<number> {
-    const { title, slug, rowListElementId = 'videoTitlesRowList', maxScrolls = 20 } = options;
+  async scrollDownToFindRow(options: { id?: string | string[]; title?: string | string[]; slug?: string | string[]; rowListElementId?: ElementOrElementId; maxScrolls?: number }): Promise<number> {
+    const { id, title, slug, rowListElementId = 'videoTitlesRowList', maxScrolls = 20 } = options;
 
-    if (!title && !slug) {
-      throw new Error('Either "title" or "slug" must be provided');
+    if (!id && !title && !slug) {
+      throw new Error('Either "id", "title", or "slug" must be provided');
     }
 
     // Convert single values to arrays for consistent handling
-    const searchValues = slug ? (Array.isArray(slug) ? slug : [slug]) : (Array.isArray(title) ? title : [title!]);
-    const isSlugSearch = !!slug;
+    let searchValues: string[] = [];
+    let searchField: string = '';
+    if (id) {
+      searchValues = Array.isArray(id) ? id : [id];
+      searchField = 'id';
+    } else if (slug) {
+      searchValues = Array.isArray(slug) ? slug : [slug];
+      searchField = 'slug';
+    } else {
+      searchValues = Array.isArray(title) ? title : [title!];
+      searchField = 'TITLE';
+    }
 
     let found = false;
     let scrollCount = 0;
@@ -2509,26 +2519,20 @@ class TestHelpers {
             continue;
           }
 
-          if (isSlugSearch) {
-            // Check slug field
-            if (rowMetadata.slug && searchValues.includes(rowMetadata.slug)) {
-              found = true;
-              foundRowIndex = rowIndex;
-              break;
-            }
-          } else {
-            // Check TITLE field
-            if (rowMetadata.TITLE && searchValues.includes(rowMetadata.TITLE)) {
-              found = true;
-              foundRowIndex = rowIndex;
-              break;
-            }
+          // Check the selected search field
+          if (rowMetadata[searchField] && searchValues.includes(rowMetadata[searchField])) {
+            found = true;
+            foundRowIndex = rowIndex;
+            break;
           }
         }
 
         if (found && foundRowIndex !== undefined) {
           // Jump directly to the found row
           await testUtils.jumpToRowIndex(rowListElementId, foundRowIndex, 10000);
+          // Log the metadata of the focused row after jumping
+          const focusedRowsMetadata = await testUtils.getAllRowListRowsMetadata(rowListElementId, 10000);
+          const focusedRowMetadata = focusedRowsMetadata[foundRowIndex];
           return foundRowIndex;
         }
 
@@ -2549,9 +2553,8 @@ class TestHelpers {
     }
 
     // If we reach here, the row was not found
-    const fieldType = isSlugSearch ? 'slug' : 'title';
     const searchList = searchValues.join('", "');
-    throw new Error(`Could not find row with ${fieldType} "${searchList}" after scrolling down ${maxScrolls} times`);
+    throw new Error(`Could not find row with ${searchField} "${searchList}" after scrolling down ${maxScrolls} times`);
   }
 
 

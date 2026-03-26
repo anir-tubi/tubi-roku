@@ -1,0 +1,76 @@
+{
+  "_comment": "Mock data for THEMATIC TAKEOVER ads - Used for thematic takeover tests on homescreen/category screen containers.",
+  "ads": {
+    "ad_units": {
+      "thematic_takeover_1": {
+        "trackers": {
+          "imp": [
+            "https://ads.production-public.tubi.io/pixel/v3/spotlight/homescreen/ROKU?id=ThematicTakeoverTest1&data=test-impression-pixel-data-1"
+          ]
+        },
+        "ad": {
+          "assets": {
+            "container_id": {
+              "text": "featured"
+            },
+            "brand_logo": {
+              "url": "https://ads-image.production-public.tubi.io/common/aidHash%3D42246f0d/gypPreLbkNATnZNzbA6XPy-BEA_Tubi_thematic_200x32.png"
+            },
+            "brand_graphic": {
+              "url": "https://ads-image.production-public.tubi.io/common/aidHash%3D42246f0d/NxNfKjEhtBscTkG5mwIJBA-BEA_Tubi_thematic_112x108.png"
+            }
+          },
+          "id": 777777
+        },
+        "valid_duration": 21600,
+        "rendering_code": "thematic_takeover_row"
+      },
+      "thematic_takeover_2": {
+        "trackers": {
+          "imp": [
+            "https://ads.production-public.tubi.io/pixel/v3/spotlight/categories/ROKU?id=ActionCategoryTest&data=test-impression-pixel-action"
+          ]
+        },
+        "ad": {
+          "assets": {
+            "container_id": {
+              "text": "action"
+            },
+            "brand_logo": {
+              "url": "https://ads-image.production-public.tubi.io/common/aidHash%3D42246f0d/gypPreLbkNATnZNzbA6XPy-BEA_Tubi_thematic_200x32.png"
+            },
+            "brand_graphic": {
+              "url": "https://ads-image.production-public.tubi.io/common/aidHash%3D42246f0d/NxNfKjEhtBscTkG5mwIJBA-BEA_Tubi_thematic_112x108.png"
+            }
+          },
+          "id": 888888
+        },
+        "valid_duration": 21600,
+        "rendering_code": "thematic_takeover_row"
+      },
+      "thematic_takeover_3": {
+        "trackers": {
+          "imp": [
+            "https://ads.production-public.tubi.io/pixel/v3/spotlight/networks/ROKU?id=NetworkTest&data=test-impression-pixel-networks"
+          ]
+        },
+        "ad": {
+          "assets": {
+            "container_id": {
+              "text": "aetv"
+            },
+            "brand_logo": {
+              "url": "https://ads-image.production-public.tubi.io/common/aidHash%3D42246f0d/gypPreLbkNATnZNzbA6XPy-BEA_Tubi_thematic_200x32.png"
+            },
+            "brand_graphic": {
+              "url": "https://ads-image.production-public.tubi.io/common/aidHash%3D42246f0d/NxNfKjEhtBscTkG5mwIJBA-BEA_Tubi_thematic_112x108.png"
+            }
+          },
+          "id": 999999
+        },
+        "valid_duration": 21600,
+        "rendering_code": "thematic_takeover_row"
+      }
+    }
+  }
+}

@@ -32,7 +32,9 @@ export enum AdType {
   /** Spotlight container ads - Looping in grid (hdc_row) */
   Spotlight = 'spotlight',
   /** Carousel ads - Brand elements with rotation (hdc_row) */
-  Carousel = 'carousel'
+  Carousel = 'carousel',
+  /** Thematic Takeover ads - Apply branded theme to existing containers */
+  ThematicTakeover = 'thematicTakeover'
 }
 
 /**
@@ -60,6 +62,7 @@ class AdTestHelpers {
    *   - Need to test wrapper ads (autoplay fullscreen)
    *   - Need to test spotlight ads (looping in grid)
    *   - Need to test carousel ads (brand elements with rotation)
+   *   - Need to test thematic takeover ads (branded themes on containers)
    *   - Need to test multiple ad types together
    * 
    * PROVIDES:
@@ -78,6 +81,10 @@ class AdTestHelpers {
    * @example
    * // Mock spotlight ads
    * await adTestHelpers.mockAds([AdType.Spotlight]);
+   * 
+   * @example
+   * // Mock thematic takeover ads (applies brand theme to containers)
+   * await adTestHelpers.mockAds([AdType.ThematicTakeover]);
    * 
    * @example
    * // Mock multiple ad types
@@ -160,6 +167,12 @@ class AdTestHelpers {
       if (options?.validDuration !== undefined && adsResponse.ads.ad_units['hdc_row']) {
         adsResponse.ads.ad_units['hdc_row'].valid_duration = options.validDuration;
       }
+    }
+
+    // Load thematic takeover ads if requested (can be combined with other ad types)
+    if (includesType(AdType.ThematicTakeover)) {
+      const thematicData = this.loadAdMockFile('ads_thematic_takeover.json');
+      Object.assign(adsResponse.ads.ad_units, thematicData.ads.ad_units);
     }
 
     return new Promise((resolve) => {
