@@ -218,6 +218,7 @@ Function onCastingContentFetchSuccess(content as Object) as Void
   playbackSource = {
     "srcForAnalytic": m.constants.player.playbackSource.unknown
     "srcForAds": m.constants.player.playbackOrigin.deeplink
+    "isCastingSession": true
   }
 
   playbackPosition = 0

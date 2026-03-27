@@ -95,8 +95,9 @@ End Function
 '                                                    valid values are "deeplink" , "ap_auto", "ap_select", "container", "ymal", "search", "epg", "unknown"
 
 '                                               playbackContainer - if srcForAds = container, then playbackContainer is set to the id of the container that was the source, otherwise not used.
+'                                               isCastingSession - optional boolean, if true, the session is casting-initiated
 ' @position: integer, the position from which to start video playback
-Function setupVideoPlayer(content, playbackSource = { "srcForAnalytic": "unknown", "srcForAds": "unknown" }, position = 0)
+Function setupVideoPlayer(content, playbackSource = { "srcForAnalytic": "unknown", "srcForAds": "unknown", "isCastingSession": false }, position = 0)
   ' Limit to devices with 512Mb RAM as those are the most likely to crash from exceeding the memory limit during playback.
   if m.constants.deviceInfo.lowVram = true
     updateScreenCacheOnPlayback(m.constants.ui.screenIds.VideoPlayerScreen)
@@ -166,6 +167,7 @@ Function setupVideoPlayer(content, playbackSource = { "srcForAnalytic": "unknown
 
   ' resetting to default value
   videoPlayer.isTrailer = false
+  videoPlayer.isCastingSession = (playbackSource.isCastingSession <> invalid AND playbackSource.isCastingSession = true)
 
   if content <> invalid
     if content.isTrailer

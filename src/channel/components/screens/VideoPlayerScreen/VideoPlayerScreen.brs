@@ -959,6 +959,11 @@ Function playContent()
         end if
       end if
 
+      ' Skip pre-roll for casting-initiated sessions when the experiment is enabled.
+      if fetchPreroll = true AND m.top.isCastingSession = true
+        fetchPreroll = (getStatsigExperimentResource("roku_player_improvement", "casting_playback_preroll_skip_v1").enabled = false)
+      end if
+
       if fetchPreroll = true
         updatePlayerLogLib(m.playerLogLib, "setAdType", "preroll")
 

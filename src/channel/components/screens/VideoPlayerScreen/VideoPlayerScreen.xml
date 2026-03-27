@@ -55,6 +55,9 @@
         -->
     <field id="enableAds" type="boolean" value="true" />
 
+    <!-- Whether this playback session was initiated via mobile casting (Voyager) -->
+    <field id="isCastingSession" type="boolean" value="false" />
+
     <!-- State that lets the player know how it is being used, so it can determine
         -  how it should do tracking.
         -  Allowed sources are:
