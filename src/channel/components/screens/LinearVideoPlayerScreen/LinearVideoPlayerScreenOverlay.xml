@@ -7,6 +7,7 @@
   <script type="text/brightscript" uri="../../../source/lib/TubiLanguageTranslate.brs" />
   <script type="text/brightscript" uri="../../../source/lib/Auth.brs" />
   <script type="text/brightscript" uri="../../../source/lib/TubiTracking.brs" />
+  <script type="text/brightscript" uri="../../lib/EPGMiddleNavAnalyticsMixin.brs" />
   <script type="text/brightscript" uri="pkg:/source/lib/StringUtils.brs" />
   <script type="text/brightscript" uri="pkg:/source/3rdparty/rta/typeUtils.brs" />
   <script type="text/brightscript" uri="pkg:/source/lib/StatsigLib.brs" />
@@ -28,6 +29,9 @@
 
       <!-- Content might be loading in batch. So render only when timeGridContent is set -->
       <field id="updateTimeGridContent" type="boolean" alwaysNotify="true" />
+
+      <!-- Match EPGHomeScreen.jumpToRowItemByID: [channelId, containerId] for ProgramGuide focus after grid refresh -->
+      <field id="jumpToRowItemByID" alias="EPG.jumpToLinearChannelID" />
 
       <!-- Tells the overlay to show -->
       <field id="showOverlay" type="boolean" alwaysNotify="true"/>
@@ -76,6 +80,10 @@
       <field id="rowItemFocused" alias="EPG.rowItemFocused" />
 
       <field id="epgScrollingStatus" alias="EPG.scrollingStatus" />
+
+      <field id="channelGridScrollingStatus" alias="EPG.channelGridScrollingStatus" />
+
+      <field id="categoryGridScrollingStatus" type="boolean" value="false" alwaysNotify="true" />
 
       <!-- Holds the information needed to populate a navigate_within_page event. This will
            be observed by the contentController via LinearVideoPlayerScreenHelper
@@ -150,7 +158,7 @@
             translation="[0,740]"
             numRows="10"
             numColumns="1"
-            itemSize="[278,72]"
+            itemSize="[278,56]"
             itemSpacing="[0,12]"
             drawFocusFeedback="false"
             drawFocusFeedbackOnTop="false"

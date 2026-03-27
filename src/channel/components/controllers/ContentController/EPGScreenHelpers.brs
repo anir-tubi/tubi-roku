@@ -384,7 +384,15 @@ End Function
 
 ' @param response - roSGNode, translated EPG channel list with requestorID
 Function applyEpgChannelListToScreen(response)
-  mergeLikedChannelsIntoEpgResponse(response)
+  epgCategoriesVariant = "none"
+  epgCategoriesExperiment = getStatsigExperimentResource("roku_linear_epg_categories", "roku_linear_epg_categories_v1", false)
+  if epgCategoriesExperiment <> invalid AND epgCategoriesExperiment.variant <> invalid
+    epgCategoriesVariant = epgCategoriesExperiment.variant
+  end if
+
+  if epgCategoriesVariant = "categories_with_favorites"
+    mergeLikedChannelsIntoEpgResponse(response)
+  end if
 
   screen = getFromScreenCache(response.requestorID)
   if screen = invalid
@@ -770,25 +778,14 @@ Function onEPGScrollingStatusChange(msg)
   scrollingStatus = msg.getData()
   screen = msg.getRoSGNode()
 
-  ' Check if program grid OR channel grid OR category grid is scrolling
-  isScrolling = scrollingStatus = true
-  if screen.hasField("channelGridScrollingStatus") = true
-    if screen.channelGridScrollingStatus = true
-      isScrolling = true
-    end if
-  end if
-  if screen.hasField("categoryGridScrollingStatus") = true
-    if screen.categoryGridScrollingStatus = true
-      isScrolling = true
-    end if
-  end if
+  isScrolling = (scrollingStatus = true OR screen.channelGridScrollingStatus = true OR screen.categoryGridScrollingStatus = true)
 
   if isScrolling = true
     stopCountdownTimer()
     screen.fullscreenCountdown = -1
   else if screen.linearChannelToPlay <> invalid
     ' Only resume timer if none of the grids are scrolling
-    if screen.scrollingStatus <> true AND (screen.hasField("channelGridScrollingStatus") = false OR screen.channelGridScrollingStatus <> true) AND (screen.hasField("categoryGridScrollingStatus") = false OR screen.categoryGridScrollingStatus <> true)
+    if screen.scrollingStatus <> true AND screen.channelGridScrollingStatus <> true AND screen.categoryGridScrollingStatus <> true
       linearVideoPlayer = getFromScreenCache(m.constants.ui.screenIds.linearVideoPlayerScreen)
       if linearVideoPlayer <> invalid AND linearVideoPlayer.state = "playing"
         startCountdownTimer()
@@ -919,12 +916,64 @@ Function handleChannelSelectedForFavorites(screen, contentId)
 End Function
 
 
+' Sets isFavorite on every timeGridContent row whose id matches contentIdStr.
+Function setEpgFavoriteOnMatchingChannels(screen, contentIdStr, isFavorite as Boolean) as Void
+  if screen <> invalid AND screen.timeGridContent <> invalid AND isNonEmptyString(contentIdStr) = true
+    i = 0
+    childCount = screen.timeGridContent.getChildCount()
+    while i < childCount
+      channel = screen.timeGridContent.getChild(i)
+      if channel <> invalid AND channel.id <> invalid AND channel.id.toStr() = contentIdStr
+        if channel.hasField("isFavorite") = false
+          channel.addField("isFavorite", "bool", false)
+        end if
+        channel.isFavorite = isFavorite
+      end if
+      i = i + 1
+    end while
+  end if
+End Function
+
+
+' Updates matching channel rows' isFavorite immediately so the EPG star icon updates before the API returns.
+' @param action - m.constants.ui.likeDislikeActions.like or removeLike
+Function applyOptimisticEpgFavoriteState(screen, contentIdStr, action) as Void
+  if isNonEmptyString(action) = true AND (action = m.constants.ui.likeDislikeActions.like OR action = m.constants.ui.likeDislikeActions.removeLike)
+    setEpgFavoriteOnMatchingChannels(screen, contentIdStr, action = m.constants.ui.likeDislikeActions.like)
+  end if
+End Function
+
+
+' Reverts applyOptimisticEpgFavoriteState when setContentRating fails.
+Function revertOptimisticEpgFavoriteState(revertInfo) as Void
+  if revertInfo <> invalid AND revertInfo.screen <> invalid AND isNonEmptyString(revertInfo.contentIdStr) = true AND isNonEmptyString(revertInfo.action) = true
+    action = revertInfo.action
+    if action = m.constants.ui.likeDislikeActions.like OR action = m.constants.ui.likeDislikeActions.removeLike
+      optimisticFavorite = (action = m.constants.ui.likeDislikeActions.like)
+      setEpgFavoriteOnMatchingChannels(revertInfo.screen, revertInfo.contentIdStr, not optimisticFavorite)
+    end if
+  end if
+End Function
+
+
 Function handleAddRemoveFavorites(screen, likeDislike = "")
   if isNonEmptyString(likeDislike) = true
     sRatingChange = likeDislike
   else
     sRatingChange = m.constants.ui.likeDislikeActions.like
   end if
+
+  contentIdStr = ""
+  if screen <> invalid AND screen.channelIdSelected <> invalid
+    contentIdStr = screen.channelIdSelected.toStr()
+  end if
+
+  m.optimisticFavoriteRevertInfo = {
+    screen: screen
+    contentIdStr: contentIdStr
+    action: sRatingChange
+  }
+  applyOptimisticEpgFavoriteState(screen, contentIdStr, sRatingChange)
 
   updateLikeDislikeRequestInfo = m.userDeviceApi.setContentRating(screen.channelIdSelected, sRatingChange, "linear")
 
@@ -941,6 +990,8 @@ End Function
 
 
 Function onFavoritesAddRemoveSuccess(requestBody)
+  m.optimisticFavoriteRevertInfo = invalid
+
   if requestBody <> invalid AND type(requestBody.data) = "roArray"
     returnedContentId = requestBody.data[0]
     sReturnedAction = requestBody.action
@@ -970,73 +1021,62 @@ Function onFavoritesAddRemoveSuccess(requestBody)
                 originalChannel = channel
               end if
             end if
+            if favoriteChannelIndex > -1 AND originalChannel <> invalid then
+              exit for
+            end if
           end if
         end for
 
+        focusRestoreParentId = ""
+        if originalChannel <> invalid AND originalChannel.hasField("parentId") = true AND isNonEmptyString(originalChannel.parentId) = true AND originalChannel.parentId <> "favorite_channels"
+          focusRestoreParentId = originalChannel.parentId
+        end if
+
         if sReturnedAction = m.constants.ui.likeDislikeActions.like
           if originalChannel <> invalid
-            if originalChannel.hasField("isFavorite") = false
-              originalChannel.addField("isFavorite", "bool", false)
+
+            epgCategoriesVariant = "none"
+            epgCategoriesExperiment = getStatsigExperimentResource("roku_linear_epg_categories", "roku_linear_epg_categories_v1", false)
+            if epgCategoriesExperiment <> invalid AND epgCategoriesExperiment.variant <> invalid
+              epgCategoriesVariant = epgCategoriesExperiment.variant
             end if
 
-            originalChannel.isFavorite = true
-
-            if favoriteChannelIndex = -1
-              epgCategoriesVariant = "none"
-              epgCategoriesExperiment = getStatsigExperimentResource("roku_linear_epg_categories", "roku_linear_epg_categories_v1", false)
-              if epgCategoriesExperiment <> invalid AND epgCategoriesExperiment.variant <> invalid
-                epgCategoriesVariant = epgCategoriesExperiment.variant
+            if epgCategoriesVariant = "categories_with_favorites"
+              if epgScreen.hasField("containersList") = false
+                epgScreen.addField("containersList", "node", false)
+              end if
+              if epgScreen.containersList = invalid
+                epgScreen.containersList = CreateObject("roSGNode", "ContentNode")
               end if
 
-              if epgCategoriesVariant = "categories_with_favorites"
-                if epgScreen.hasField("containersList") = false
-                  epgScreen.addField("containersList", "node", false)
-                end if
-                if epgScreen.containersList = invalid
-                  epgScreen.containersList = CreateObject("roSGNode", "ContentNode")
-                end if
-
-                favoritesContainerExists = false
-                if epgScreen.containersList.getChildCount() > 0
-                  firstContainer = epgScreen.containersList.getChild(0)
-                  if firstContainer <> invalid AND firstContainer.containerId = "favorite_channels"
-                    favoritesContainerExists = true
-                  end if
-                end if
-
-                if favoritesContainerExists = false
-                  containerNode = CreateObject("roSGNode", "ContentNode")
-                  containerNode.title = favoritesTitle
-                  containerNode.addField("containerId", "string", false)
-                  containerNode.containerId = "favorite_channels"
-                  epgScreen.containersList.insertChild(containerNode, 0)
+              favoritesContainerExists = false
+              if epgScreen.containersList.getChildCount() > 0
+                firstContainer = epgScreen.containersList.getChild(0)
+                if firstContainer <> invalid AND firstContainer.containerId = "favorite_channels"
+                  favoritesContainerExists = true
                 end if
               end if
 
-              favoriteChannel = originalChannel.clone(true)
-              favoriteChannel.parentTitle = favoritesTitle
-              favoriteChannel.parentId = "favorite_channels"
-              if favoriteChannel.hasField("isFavorite") = false
-                favoriteChannel.addField("isFavorite", "bool", false)
-              end if
-              favoriteChannel.isFavorite = true
-              epgScreen.timeGridContent.insertChild(favoriteChannel, 0)
-            else
-              if favoriteChannelIndex >= 0
-                favoriteChannel = epgScreen.timeGridContent.getChild(favoriteChannelIndex)
-                if favoriteChannel <> invalid
-                  if favoriteChannel.hasField("isFavorite") = false
-                    favoriteChannel.addField("isFavorite", "bool", false)
-                  end if
-                  favoriteChannel.isFavorite = true
-                end if
+              if favoritesContainerExists = false
+                containerNode = CreateObject("roSGNode", "ContentNode")
+                containerNode.title = favoritesTitle
+                containerNode.addField("containerId", "string", false)
+                containerNode.containerId = "favorite_channels"
+                epgScreen.containersList.insertChild(containerNode, 0)
               end if
             end if
+
+            favoriteChannel = originalChannel.clone(true)
+            favoriteChannel.parentTitle = favoritesTitle
+            favoriteChannel.parentId = "favorite_channels"
+            if favoriteChannel.hasField("isFavorite") = false
+              favoriteChannel.addField("isFavorite", "bool", false)
+            end if
+            favoriteChannel.isFavorite = true
+            epgScreen.timeGridContent.insertChild(favoriteChannel, 0)
           end if
         else if sReturnedAction = m.constants.ui.likeDislikeActions.removeLike
-          if favoriteChannelIndex >= 0
-            epgScreen.timeGridContent.removeChildIndex(favoriteChannelIndex)
-          end if
+          epgScreen.timeGridContent.removeChildIndex(favoriteChannelIndex)
           if originalChannel <> invalid
             if originalChannel.hasField("isFavorite") = false
               originalChannel.addField("isFavorite", "bool", false)
@@ -1074,6 +1114,10 @@ Function onFavoritesAddRemoveSuccess(requestBody)
         sendEPGFavoriteBookmarkAnalytics(returnedContentId, sReturnedAction, epgScreen)
 
         epgScreen.updateTimeGridContent = true
+
+        if isNonEmptyString(focusRestoreParentId) = true AND epgScreen.hasField("jumpToRowItemByID") = true
+          epgScreen.jumpToRowItemByID = [returnedContentId, focusRestoreParentId]
+        end if
       end if
     end if
   end if
@@ -1081,6 +1125,8 @@ End Function
 
 
 Function onFavoritesAddRemoveFailure(error)
+  revertOptimisticEpgFavoriteState(m.optimisticFavoriteRevertInfo)
+  m.optimisticFavoriteRevertInfo = invalid
 End Function
 
 
@@ -1100,7 +1146,6 @@ Function revalidateEPGContentAfterLocalFavoritesAdd(epgScreen)
 End Function
 
 
-' Remove Favorites category from containersList (category pills). containersList lives on screen, not on timeGridContent.
 Function removeFavoritesFromContainersList(containersList)
   if containersList <> invalid
     k = containersList.getChildCount() - 1

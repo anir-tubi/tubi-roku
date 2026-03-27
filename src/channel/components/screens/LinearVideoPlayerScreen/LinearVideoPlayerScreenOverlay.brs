@@ -54,6 +54,11 @@ Function init()
 
   ' Track last focused category for NavigateWithinPageEvent scroll detection
   m.lastCategoryFocusedIndex = invalid
+  m.categoryGridScrollingTimer = CreateObject("roSGNode", "Timer")
+  m.categoryGridScrollingTimer.duration = m.constants.timers.epgGridScrollingSettleDuration
+  m.categoryGridScrollingTimer.repeat = false
+  m.categoryGridScrollingTimer.observeFieldScoped("fire", "onCategoryGridScrollingComplete")
+  m.middleNavFocusedContainerId = invalid
 
   '//It is best not to check the visible state of a UI element as it may be in a transitionary state. So m.bEPGVisible is used to know what is the intention of the EPG visible state.
   '//if the EPG is visible, then bEPGVisible is true. If the closed captioning is visible (and the EPG is not), then bEPGVisible is false. If there are more than 2 states, then this boolean will need to be changed to a different kind of variable
@@ -241,6 +246,13 @@ Function onCategoryItemFocused(msg)
   itemFocused = msg.getData()
   m.top.reactedToKeyPresss = true
 
+  m.top.categoryGridScrollingStatus = true
+
+  ' Debounce: stop cancels any pending fire; start begins a new delay so "scrolling complete"
+  ' runs only after focus stays on one item for the full settle duration.
+  m.categoryGridScrollingTimer.control = "stop"
+  m.categoryGridScrollingTimer.control = "start"
+
   if itemFocused <> invalid AND m.containerMarkupGrid.content <> invalid
     ' MarkupGrid returns [row, col] array
     itemIndex = invalid
@@ -295,6 +307,10 @@ End Function
 Function onCategoryItemSelected(msg)
   tubiLog("LinearVideoPlayerScreenOverlay.onCategoryItemSelected")
   m.top.reactedToKeyPresss = true
+  selectedContainerId = getCategoryContainerIdFromMarkupGrid(m.containerMarkupGrid, msg.getData())
+  if isNonEmptyString(selectedContainerId) = true
+    sendLinearVideoOverlayMiddleNavComponentInteractionForContainerId(m.top, m.Tracking, selectedContainerId, "CONFIRM")
+  end if
 End Function
 
 
@@ -325,10 +341,17 @@ Function sendOverlayCategoryScrollNavigateWithinPageEvent(lastFocusedIndex, focu
         utility_tile: utilityTileTo
       }
       pageValues = { video_id: m.top.currentLinearVideoContent.id.toInt() }
+      destMiddleNavValues = getMiddleNavDestinationValuesForContainerId(m.Tracking, toContainerId)
+      destComponentType = "dest_middle_nav_component"
+      destComponentValues = destMiddleNavValues
+      if destMiddleNavValues.count() = 0
+        destComponentType = "dest_channel_guide_component"
+        destComponentValues = toComponentValues
+      end if
       navigateWithinPageInfo = {
         pageOneof: m.Tracking.getAnalyticsPage("video_player_page", pageValues)
-        componentOneof: m.Tracking.getAnalyticsComponent("channel_guide_component", fromComponentValues)
-        dest_componentOneof: m.Tracking.getAnalyticsDestinationComponent("dest_channel_guide_component", toComponentValues)
+        componentOneof: m.Tracking.getAnalyticsComponent("epg_component", fromComponentValues)
+        dest_componentOneof: m.Tracking.getAnalyticsDestinationComponent(destComponentType, destComponentValues)
         means_of_navigation: "SCROLL"
         horizontal_location: 1
         vertical_location: toVerticalPos
@@ -379,10 +402,17 @@ Function sendOverlayCategoryToChannelNavigateWithinPageEvent()
             end for
           end if
           pageValues = { video_id: m.top.currentLinearVideoContent.id.toInt() }
+          destMiddleNavValues = getMiddleNavDestinationValuesForContainerId(m.Tracking, containerId)
+          destComponentType = "dest_middle_nav_component"
+          destComponentValues = destMiddleNavValues
+          if destMiddleNavValues.count() = 0
+            destComponentType = "dest_epg_component"
+            destComponentValues = { content_tile: contentTile, category_slug: containerId }
+          end if
           navigateWithinPageInfo = {
             pageOneof: m.Tracking.getAnalyticsPage("video_player_page", pageValues)
-            componentOneof: m.Tracking.getAnalyticsComponent("channel_guide_component", channelComponentValues)
-            dest_componentOneof: m.Tracking.getAnalyticsDestinationComponent("dest_epg_component", { content_tile: contentTile, category_slug: containerId })
+            componentOneof: m.Tracking.getAnalyticsComponent("epg_component", channelComponentValues)
+            dest_componentOneof: m.Tracking.getAnalyticsDestinationComponent(destComponentType, destComponentValues)
             means_of_navigation: "BUTTON"
             horizontal_location: channelCol
             vertical_location: channelRow
@@ -420,10 +450,17 @@ Function sendOverlayChannelToCategoryNavigateWithinPageEvent()
               utility_tile: { id: containerId, row: verticalPos, col: 1 }
             }
             pageValues = { video_id: m.top.currentLinearVideoContent.id.toInt() }
+            destMiddleNavValues = getMiddleNavDestinationValuesForContainerId(m.Tracking, containerId)
+            destComponentType = "dest_middle_nav_component"
+            destComponentValuesForNav = destMiddleNavValues
+            if destMiddleNavValues.count() = 0
+              destComponentType = "dest_channel_guide_component"
+              destComponentValuesForNav = destComponentValues
+            end if
             navigateWithinPageInfo = {
               pageOneof: m.Tracking.getAnalyticsPage("video_player_page", pageValues)
               componentOneof: m.Tracking.getAnalyticsComponent("epg_component", { content_tile: contentTile, category_slug: containerId })
-              dest_componentOneof: m.Tracking.getAnalyticsDestinationComponent("dest_channel_guide_component", destComponentValues)
+              dest_componentOneof: m.Tracking.getAnalyticsDestinationComponent(destComponentType, destComponentValuesForNav)
               means_of_navigation: "BUTTON"
               horizontal_location: 1
               vertical_location: verticalPos
@@ -443,10 +480,29 @@ Function onCategoryGridFocusChange(msg)
   if m.containerMarkupGrid <> invalid
     if m.containerMarkupGrid.hasFocus() = true
       m.containerMarkupGrid.drawFocusFeedback = true
+      if m.middleNavFocusedContainerId = invalid
+        focusedContainerId = getCategoryContainerIdFromMarkupGrid(m.containerMarkupGrid, invalid)
+        if isNonEmptyString(focusedContainerId) = true
+          sendLinearVideoOverlayMiddleNavComponentInteractionForContainerId(m.top, m.Tracking, focusedContainerId, "TOGGLE_ON")
+          m.middleNavFocusedContainerId = focusedContainerId
+        end if
+      end if
     else
       m.containerMarkupGrid.drawFocusFeedback = false
+      if m.middleNavFocusedContainerId <> invalid
+        sendLinearVideoOverlayMiddleNavComponentInteractionForContainerId(m.top, m.Tracking, m.middleNavFocusedContainerId, "TOGGLE_OFF")
+        m.middleNavFocusedContainerId = invalid
+      end if
+
+      onCategoryGridScrollingComplete()
     end if
   end if
+End Function
+
+
+Function onCategoryGridScrollingComplete()
+  m.top.categoryGridScrollingStatus = false
+  m.categoryGridScrollingTimer.control = "stop"
 End Function
 
 

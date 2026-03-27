@@ -16,11 +16,25 @@ Function init()
   m.containerMarkupGrid.observeFieldScoped("itemFocused", "onCategoryItemFocused")
   m.containerMarkupGrid.observeFieldScoped("focusedChild", "onCategoryGridFocusChange")
 
+  m.epgCategoriesVariant = "none"
+  epgCategoriesExperiment = getStatsigExperimentResource("roku_linear_epg_categories", "roku_linear_epg_categories_v1", false)
+  if epgCategoriesExperiment <> invalid AND epgCategoriesExperiment.variant <> invalid
+    m.epgCategoriesVariant = epgCategoriesExperiment.variant
+  end if
+
   ' Track if user is actively navigating to prevent unwanted video playback
   m.isUserNavigating = false
 
   ' Track last focused category for NavigateWithinPageEvent scroll detection
   m.lastCategoryFocusedIndex = invalid
+
+  m.categoryGridScrollingTimer = CreateObject("roSGNode", "Timer")
+  m.categoryGridScrollingTimer.duration = m.constants.timers.epgGridScrollingSettleDuration
+  m.categoryGridScrollingTimer.repeat = false
+  m.categoryGridScrollingTimer.observeFieldScoped("fire", "onCategoryGridScrollingComplete")
+
+  ' Middle-nav ComponentInteraction: TOGGLE_ON while a category pill has focus; cleared on TOGGLE_OFF
+  m.middleNavFocusedContainerId = invalid
 
   'clock
   m.clock = m.top.findNode("clock")
@@ -105,24 +119,13 @@ Function onCategoryItemFocused(msg)
   ' User is navigating in category menu, prevent video playback
   m.isUserNavigating = true
 
-  ' Set scrolling status when category grid is being scrolled (stops timer)
-  ' Similar to program grid's scrollingStatus - set true when scrolling
+  ' Mark category grid as scrolling until debounce completes (mirrors program grid scrollingStatus).
   m.top.categoryGridScrollingStatus = true
 
-  ' Cancel existing timer if any
-  if m.categoryGridScrollingTimer <> invalid
-    m.categoryGridScrollingTimer.control = "stop"
-    m.categoryGridScrollingTimer.unobserveFieldScoped("fire")
-    m.categoryGridScrollingTimer = invalid
-  end if
-
-  ' Create timer to reset scrolling status after scrolling stops (similar to program grid)
-  timer = CreateObject("roSGNode", "Timer")
-  timer.duration = 0.3
-  timer.repeat = false
-  timer.observeFieldScoped("fire", "onCategoryGridScrollingComplete")
-  timer.control = "start"
-  m.categoryGridScrollingTimer = timer
+  ' Debounce: stop cancels any pending fire; start begins a new delay so "scrolling complete"
+  ' runs only after focus stays on one item for the full settle duration.
+  m.categoryGridScrollingTimer.control = "stop"
+  m.categoryGridScrollingTimer.control = "start"
 
   if itemFocused <> invalid AND m.containerMarkupGrid.content <> invalid
     ' MarkupGrid returns [row, col] array
@@ -185,29 +188,33 @@ Function onCategoryGridFocusChange(msg)
   if m.containerMarkupGrid <> invalid
     if m.containerMarkupGrid.hasFocus() = true
       m.containerMarkupGrid.drawFocusFeedback = true
+      if m.middleNavFocusedContainerId = invalid
+        focusedContainerId = getCategoryContainerIdFromMarkupGrid(m.containerMarkupGrid, invalid)
+        if isNonEmptyString(focusedContainerId) = true
+          sendEPGScreenMiddleNavComponentInteractionForContainerId(m.top, m.Tracking, focusedContainerId, "TOGGLE_ON")
+          m.middleNavFocusedContainerId = focusedContainerId
+        end if
+      end if
     else
       m.containerMarkupGrid.drawFocusFeedback = false
-      ' Reset scrolling status when category grid loses focus
-      m.top.categoryGridScrollingStatus = false
-      ' Cancel timer when losing focus
-      if m.categoryGridScrollingTimer <> invalid
-        m.categoryGridScrollingTimer.control = "stop"
-        m.categoryGridScrollingTimer.unobserveFieldScoped("fire")
-        m.categoryGridScrollingTimer = invalid
+      if m.middleNavFocusedContainerId <> invalid
+        sendEPGScreenMiddleNavComponentInteractionForContainerId(m.top, m.Tracking, m.middleNavFocusedContainerId, "TOGGLE_OFF")
+        m.middleNavFocusedContainerId = invalid
+      end if
+      onCategoryGridScrollingComplete()
+
+      if m.top.isInFocusChain() = false
+        m.top.refreshEPGScreenVideoPlay = true
+        fadeInContentArea()
       end if
     end if
   end if
 End Function
 
 
-Function onCategoryGridScrollingComplete(msg)
-  ' Reset scrolling status when category grid scrolling stops (similar to program grid)
+Function onCategoryGridScrollingComplete()
   m.top.categoryGridScrollingStatus = false
-  if m.categoryGridScrollingTimer <> invalid
-    m.categoryGridScrollingTimer.control = "stop"
-    m.categoryGridScrollingTimer.unobserveFieldScoped("fire")
-    m.categoryGridScrollingTimer = invalid
-  end if
+  m.categoryGridScrollingTimer.control = "stop"
 End Function
 
 
@@ -244,10 +251,17 @@ Function sendEPGCategoryScrollNavigateWithinPageEvent(fromIndex, toIndex)
         if m.top.trackingPageInfo.pagetype <> invalid then pageType = m.top.trackingPageInfo.pagetype
         if m.top.trackingPageInfo.pageValues <> invalid then pageValues = m.top.trackingPageInfo.pageValues
       end if
+      destMiddleNavValues = getMiddleNavDestinationValuesForContainerId(m.Tracking, toContainerId)
+      destComponentType = "dest_middle_nav_component"
+      destComponentValues = destMiddleNavValues
+      if destMiddleNavValues.count() = 0
+        destComponentType = "dest_channel_guide_component"
+        destComponentValues = toComponentValues
+      end if
       navigateWithinPageInfo = {
         pageOneof: m.Tracking.getAnalyticsPage(pageType, pageValues)
-        componentOneof: m.Tracking.getAnalyticsComponent("channel_guide_component", fromComponentValues)
-        dest_componentOneof: m.Tracking.getAnalyticsDestinationComponent("dest_channel_guide_component", toComponentValues)
+        componentOneof: m.Tracking.getAnalyticsComponent("epg_component", fromComponentValues)
+        dest_componentOneof: m.Tracking.getAnalyticsDestinationComponent(destComponentType, destComponentValues)
         means_of_navigation: "SCROLL"
         horizontal_location: 1
         vertical_location: toVerticalPos
@@ -304,10 +318,17 @@ Function sendEPGCategoryToChannelNavigateWithinPageEvent()
             if m.top.trackingPageInfo.pagetype <> invalid then pageType = m.top.trackingPageInfo.pagetype
             if m.top.trackingPageInfo.pageValues <> invalid then pageValues = m.top.trackingPageInfo.pageValues
           end if
+          destMiddleNavValues = getMiddleNavDestinationValuesForContainerId(m.Tracking, containerId)
+          destComponentType = "dest_middle_nav_component"
+          destComponentValues = destMiddleNavValues
+          if destMiddleNavValues.count() = 0
+            destComponentType = "dest_epg_component"
+            destComponentValues = { content_tile: contentTile, category_slug: containerId }
+          end if
           navigateWithinPageInfo = {
             pageOneof: m.Tracking.getAnalyticsPage(pageType, pageValues)
-            componentOneof: m.Tracking.getAnalyticsComponent("channel_guide_component", channelComponentValues)
-            dest_componentOneof: m.Tracking.getAnalyticsDestinationComponent("dest_epg_component", { content_tile: contentTile, category_slug: containerId })
+            componentOneof: m.Tracking.getAnalyticsComponent("epg_component", channelComponentValues)
+            dest_componentOneof: m.Tracking.getAnalyticsDestinationComponent(destComponentType, destComponentValues)
             means_of_navigation: "BUTTON"
             horizontal_location: channelCol
             vertical_location: channelRow
@@ -351,10 +372,17 @@ Function sendEPGChannelToCategoryNavigateWithinPageEvent()
               if m.top.trackingPageInfo.pagetype <> invalid then pageType = m.top.trackingPageInfo.pagetype
               if m.top.trackingPageInfo.pageValues <> invalid then pageValues = m.top.trackingPageInfo.pageValues
             end if
+            destMiddleNavValues = getMiddleNavDestinationValuesForContainerId(m.Tracking, containerId)
+            destComponentType = "dest_middle_nav_component"
+            destComponentValuesForNav = destMiddleNavValues
+            if destMiddleNavValues.count() = 0
+              destComponentType = "dest_channel_guide_component"
+              destComponentValuesForNav = destComponentValues
+            end if
             navigateWithinPageInfo = {
               pageOneof: m.Tracking.getAnalyticsPage(pageType, pageValues)
               componentOneof: m.Tracking.getAnalyticsComponent("epg_component", { content_tile: contentTile, category_slug: containerId })
-              dest_componentOneof: m.Tracking.getAnalyticsDestinationComponent("dest_channel_guide_component", destComponentValues)
+              dest_componentOneof: m.Tracking.getAnalyticsDestinationComponent(destComponentType, destComponentValuesForNav)
               means_of_navigation: "BUTTON"
               horizontal_location: 1
               vertical_location: verticalPos
@@ -370,9 +398,11 @@ End Function
 
 Function onCategoryItemSelected(msg)
   tubiLog("EPGHomeScreen.onCategoryItemSelected")
-  ' User is selecting a category, mark as navigating
-  ' Jump logic is now handled in onCategoryItemFocused
   m.isUserNavigating = true
+  selectedContainerId = getCategoryContainerIdFromMarkupGrid(m.containerMarkupGrid, msg.getData())
+  if isNonEmptyString(selectedContainerId) = true
+    sendEPGScreenMiddleNavComponentInteractionForContainerId(m.top, m.Tracking, selectedContainerId, "CONFIRM")
+  end if
 End Function
 
 
@@ -488,12 +518,6 @@ End Function
 
 
 Function handleEPGCategoriesVisibility()
-  m.epgCategoriesVariant = "none"
-  epgCategoriesExperiment = getStatsigExperimentResource("roku_linear_epg_categories", "roku_linear_epg_categories_v1", false)
-  if epgCategoriesExperiment <> invalid AND epgCategoriesExperiment.variant <> invalid
-    m.epgCategoriesVariant = epgCategoriesExperiment.variant
-  end if
-
   if m.epgTimeGrid <> invalid
     isCategoriesWithFavorites = (m.epgCategoriesVariant = "categories_with_favorites")
     m.epgTimeGrid.channelGridFocusable = isCategoriesWithFavorites
@@ -513,13 +537,8 @@ End Function
 
 Function onEPGTimeGridFocusChange(msg)
   tubiLog("EPGHomeScreen.onEPGTimeGridFocusChange")
-  epgCategoriesVariant = "none"
-  epgCategoriesExperiment = getStatsigExperimentResource("roku_linear_epg_categories", "roku_linear_epg_categories_v1", false)
-  if epgCategoriesExperiment <> invalid AND epgCategoriesExperiment.variant <> invalid
-    epgCategoriesVariant = epgCategoriesExperiment.variant
-  end if
 
-  if m.containerMarkupGrid <> invalid AND epgCategoriesVariant <> "none"
+  if m.containerMarkupGrid <> invalid AND m.epgCategoriesVariant <> "none"
     if m.epgTimeGrid.hasFocus() = true OR m.epgTimeGrid.isInFocusChain() = true
       if m.containerMarkupGrid.content <> invalid AND m.containerMarkupGrid.content.getChildCount() > 0
         m.containerMarkupGrid.visible = true
@@ -633,12 +652,7 @@ Function onKeyEvent(key as String, press as Boolean) as Boolean
       handlePlayInput()
       return true
     else if key = "back" OR key = "left"
-      epgCategoriesVariant = "none"
-      epgCategoriesExperiment = getStatsigExperimentResource("roku_linear_epg_categories", "roku_linear_epg_categories_v1", false)
-      if epgCategoriesExperiment <> invalid AND epgCategoriesExperiment.variant <> invalid
-        epgCategoriesVariant = epgCategoriesExperiment.variant
-      end if
-      if epgCategoriesVariant <> "none" AND m.epgTimeGrid.isInFocusChain() = true
+      if m.epgCategoriesVariant <> "none" AND m.epgTimeGrid.isInFocusChain() = true
         if m.containerMarkupGrid <> invalid AND m.containerMarkupGrid.content <> invalid AND m.containerMarkupGrid.content.getChildCount() > 0
           sendEPGChannelToCategoryNavigateWithinPageEvent()
           m.containerMarkupGrid.setFocus(true)
@@ -646,12 +660,7 @@ Function onKeyEvent(key as String, press as Boolean) as Boolean
         end if
       end if
     else if key = "right"
-      epgCategoriesVariant = "none"
-      epgCategoriesExperiment = getStatsigExperimentResource("roku_linear_epg_categories", "roku_linear_epg_categories_v1", false)
-      if epgCategoriesExperiment <> invalid AND epgCategoriesExperiment.variant <> invalid
-        epgCategoriesVariant = epgCategoriesExperiment.variant
-      end if
-      if epgCategoriesVariant <> "none" AND m.containerMarkupGrid <> invalid AND m.containerMarkupGrid.hasFocus() = true
+      if m.epgCategoriesVariant <> "none" AND m.containerMarkupGrid <> invalid AND m.containerMarkupGrid.hasFocus() = true
         sendEPGCategoryToChannelNavigateWithinPageEvent()
         m.epgTimeGrid.isChannelGridFocused = true
         m.epgTimeGrid.setFocus(true)

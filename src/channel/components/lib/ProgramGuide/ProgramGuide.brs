@@ -32,6 +32,11 @@ Function init()
   m.updateMinsLeftTimer = m.top.findNode("updateMinsLeftTimer")
   m.updateMinsLeftTimer.observeField("fire", "onUpdateMinsLeftTimer")
 
+  m.channelGridScrollingTimer = CreateObject("roSGNode", "Timer")
+  m.channelGridScrollingTimer.duration = m.constants.timers.epgGridScrollingSettleDuration
+  m.channelGridScrollingTimer.repeat = false
+  m.channelGridScrollingTimer.observeFieldScoped("fire", "onChannelGridScrollingComplete")
+
   typographyConstants = getTypographyConstants()
   setTypographyOfLabel(m.backToLiveText, typographyConstants.ids.bodySmallStrong)
   setTypographyOfLabel(m.headerText, typographyConstants.ids.subheaderSmall)
@@ -221,15 +226,6 @@ Function onTimeGridFocusChange()
       m.ProgramGrid.setFocus(true)
     end if
 
-    if m.updateMinsLeftTimer.control <> "start"
-      m.updateMinsLeftTimer.control = "start"
-      if m.programGrid.content <> invalid
-        'UpdateMinsLeftTimer might take a whole min to update after content has been rendered.
-        'Call this function to ensure current program shows how much time left on the program on every time timeGrid first gets focus.
-        onUpdateMinsLeftTimer()
-      end if
-    end if
-
   else if m.top.isInFocusChain() = false
     m.updateMinsLeftTimer.control = "stop"
   end if
@@ -254,24 +250,12 @@ Function onChannelGridItemFocused(msg)
   channelFocusedIndex = msg.getData()
 
   if channelFocusedIndex <> invalid AND channelFocusedIndex >= 0
-    ' Set scrolling status when channel grid is being scrolled (stops timer)
-    ' Similar to program grid's scrollingStatus - set true when scrolling
     m.top.channelGridScrollingStatus = true
 
-    ' Cancel existing timer if any
-    if m.channelGridScrollingTimer <> invalid
-      m.channelGridScrollingTimer.control = "stop"
-      m.channelGridScrollingTimer.unobserveFieldScoped("fire")
-      m.channelGridScrollingTimer = invalid
-    end if
-
-    ' Create timer to reset scrolling status after scrolling stops (similar to program grid)
-    timer = CreateObject("roSGNode", "Timer")
-    timer.duration = 0.3
-    timer.repeat = false
-    timer.observeFieldScoped("fire", "onChannelGridScrollingComplete")
-    timer.control = "start"
-    m.channelGridScrollingTimer = timer
+    ' Debounce: stop cancels any pending fire; start begins a new delay so "scrolling complete"
+    ' runs only after focus stays on one item for the full settle duration.
+    m.channelGridScrollingTimer.control = "stop"
+    m.channelGridScrollingTimer.control = "start"
 
     tubiLog("ProgramGuide.onChannelGridItemFocused - syncing program grid to row: " + channelFocusedIndex.toStr())
     m.programGrid.jumpToRowItem = [channelFocusedIndex, 0]
@@ -285,11 +269,7 @@ End Function
 Function onChannelGridScrollingComplete(msg)
   ' Reset scrolling status when channel grid scrolling stops (similar to program grid)
   m.top.channelGridScrollingStatus = false
-  if m.channelGridScrollingTimer <> invalid
-    m.channelGridScrollingTimer.control = "stop"
-    m.channelGridScrollingTimer.unobserveFieldScoped("fire")
-    m.channelGridScrollingTimer = invalid
-  end if
+  m.channelGridScrollingTimer.control = "stop"
 End Function
 
 

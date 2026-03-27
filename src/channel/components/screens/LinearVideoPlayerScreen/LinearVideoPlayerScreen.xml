@@ -46,6 +46,8 @@
     <field id="updateTimeGridContent" type="boolean" alwaysNotify="true"
       alias="VideoOverlay.updateTimeGridContent" />
 
+    <field id="jumpToRowItemByID" alias="VideoOverlay.jumpToRowItemByID" />
+
     <!-- Is the content of the EPG component loading? -->
     <field id="timeGridContentLoading" type="boolean" alwaysNotify="true"
       alias="VideoOverlay.timeGridContentLoading" />

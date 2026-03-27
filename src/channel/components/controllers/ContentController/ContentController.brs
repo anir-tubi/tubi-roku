@@ -2615,6 +2615,7 @@ End Function
 
 Function onFullscreenCountdown()
   tubiLog("ContentController.onFullscreenCountdown")
+
   screen = getCurrentScreen()
 
   if screen <> invalid
@@ -3885,6 +3886,8 @@ Function showLinearPlayerSignInModal(content)
   tubiLog("ContentController.showLinearPlayerSignInModal")
 
   if content <> invalid
+    stopCountdownTimer()
+
     ' Get program name for the modal
 
     currentProgram = getCurrentLiveProgram(content)

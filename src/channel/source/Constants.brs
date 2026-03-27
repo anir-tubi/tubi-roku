@@ -913,6 +913,9 @@ Function getConstants()
     constants.timers.categoryContentRefreshTimeout = 12 * 60 * 60
   end if
 
+  ' Debounce (seconds) for EPG grid "scrolling settled" (category grid, channel grid, overlays)
+  constants.timers.epgGridScrollingSettleDuration = 0.3
+
   '// Time in seconds when we fire impression pixels after an HDC ad has gained focus
   constants.timers.adFocusPixelFire = 1
   '// Time in seconds when we fire impression pixels after a skinAd wrapper ad has gained focus

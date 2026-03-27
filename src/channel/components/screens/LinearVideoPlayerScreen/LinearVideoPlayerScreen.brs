@@ -520,9 +520,12 @@ Function onVideoPositionChange(msg)
     m.AdsSSAITask.videoPosition = position
   end if
 
-  '//After some time has elapsed and the channel guide isn't currently visible and loading, then hide the overlay
+  '///After some time has elapsed and the channel guide isn't currently visible and loading, user is not interacting then hide the overlay.
   if m.VideoState = "play" AND m.VideoOverlay <> invalid AND m.VideoOverlay.isDisplaying = true
-    if m.VideoOverlay.epgScrollingStatus = false AND m.playerPosition > m.lastButtonPressPos + m.overlayAutoHideTime
+    channelGridScrolling = (m.VideoOverlay.channelGridScrollingStatus = true)
+    categoryGridScrolling = (m.VideoOverlay.categoryGridScrollingStatus = true)
+
+    if m.VideoOverlay.epgScrollingStatus = false AND channelGridScrolling = false AND categoryGridScrolling = false AND m.playerPosition > m.lastButtonPressPos + m.overlayAutoHideTime
       hideOverlay()
     end if
   end if
