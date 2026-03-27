@@ -14,6 +14,7 @@ Function showVodDetailScreen(inputContent, playbackSource, successCb = invalid, 
 
     ' we make changes to the content from this point forward. If we don't clone, changes will be propagated to the original content in home or search screen.
     content = inputContent.clone(true)
+    applyVodDetailContentSotSignalsPerDetailScreenExperiment(content, true)
     screen = CreateObject("roSGNode", "VodDetailScreen")
     screen.observeFieldScoped("componentInteractionInfo", "onComponentInteractionInfoChange")
     screen.observeFieldScoped("backButtonPressed", "onDetailBackButtonPressedChange")
@@ -130,6 +131,7 @@ Function onGetVodContentSuccess(content)
     if screen.content <> invalid
       content.sotInfo = screen.content.sotInfo
     end if
+    applyVodDetailContentSotSignalsPerDetailScreenExperiment(content)
     screen.content = content
     screen.contentUpdated = true
     screen.wasContentFetchCompleted = true
@@ -556,6 +558,7 @@ Function onGetSeriesEpisodesSuccess(response)
     if screen <> invalid AND screen.content <> invalid AND content <> invalid
       ' Since SOT info is present only at home screen, we are copying it to the detail screen content.
       content.sotInfo = screen.content.sotInfo
+      applyVodDetailContentSotSignalsPerDetailScreenExperiment(content)
       screen.content.update(content, true)
       screen.episodes = seasonNode
       screen.contentUpdated = true
@@ -1424,6 +1427,7 @@ Function onGetSeasonListFallbackSuccess(content)
     screen = getDetailScreenFromStackWithId(m.constants.ui.screenIds.vodDetailScreen, content.id)
     if screen <> invalid AND screen.content <> invalid
       content.sotInfo = screen.content.sotInfo
+      applyVodDetailContentSotSignalsPerDetailScreenExperiment(content)
       screen.content.update(content, true)
 
       seasonData = buildSeasonListFromContent(content)
@@ -1556,4 +1560,22 @@ Function buildSeasonEpisodesNode(content, seasonNum, seasonChildIndexMap) as Obj
   seasonNode.appendChildren(seasonChild.getChildren(-1, 0))
 
   return seasonNode
+End Function
+
+
+Function applyVodDetailContentSotSignalsPerDetailScreenExperiment(content, sendExposureEvent = false) as Void
+  if content <> invalid
+    sotInfo = content.sotInfo
+
+    if isAA(sotInfo) = true
+      sotMetaDataTopLabels = sotInfo.sotMetaDataTopLabels
+      sotMetaData = sotInfo.sotMetaData
+      sotMarkers = sotInfo.sotMarkers
+      statsigSendEvent = (sendExposureEvent = true AND (isNonEmptyArray(sotMetaDataTopLabels) = true OR isNonEmptyArray(sotMetaData) = true OR isAA(sotMarkers) = true))
+
+      if getStatsigExperimentResource("roku_sot_reverse_ui_test_detail_screen", "roku_sot_reverse_ui_test_detail_screen_v1", statsigSendEvent).enabled = true
+        content.sotInfo = invalid
+      end if
+    end if
+  end if
 End Function
