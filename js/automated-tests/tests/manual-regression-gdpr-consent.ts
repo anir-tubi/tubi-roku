@@ -36,11 +36,11 @@ describe('GDPR/Consent Regression Tests', function () {
      * - Connected to VPN in UK
      * - User has not used Tubi (non-Registered)
      * - No consent data for User or Device ID
-     * 
+     *
      * Test Steps:
      * 1. Launch Tubi as Guest
      * 2. From Initial Consent screen, attempt to exit the page using remote button except for Home button on remote (background app)
-     * 
+     *
      * Expected:
      * - User sees Initial Consent screen
      * - User Cannot exit Initial Consent screen
@@ -130,13 +130,13 @@ describe('GDPR/Consent Regression Tests', function () {
      * - User has not used Tubi (non-Registered)
      * - No consent data for User or Device ID
      * - OneTrust consent enabled
-     * 
+     *
      * Test Steps:
      * 1. Launch Tubi as Guest with country code GB and OneTrust enabled
      * 2. Accept OneTrust consent if present
      * 3. Navigate to Settings
      * 4. Check for Parental Control settings
-     * 
+     *
      * Expected:
      * - User should not see any Parental Control settings option in the UK region
      */
@@ -215,11 +215,11 @@ describe('GDPR/Consent Regression Tests', function () {
      * - Device in UK (country code GB)
      * - User has not used Tubi (non-Registered)
      * - No consent data for User or Device ID
-     * 
+     *
      * Test Steps:
      * 1. Launch Tubi as Guest with country code GB
      * 2. From Home, check if there is a Espanol option
-     * 
+     *
      * Expected:
      * - User should not see any method to open Espanol mode (left Nav, Top Nav, etc)
      */
@@ -283,12 +283,12 @@ describe('GDPR/Consent Regression Tests', function () {
      * - User has not used Tubi (non-Registered)
      * - No consent data for User or Device ID
      * - OneTrust consent enabled
-     * 
+     *
      * Test Steps:
      * 1. Launch Tubi as Guest with country code GB and OneTrust enabled
      * 2. Accept OneTrust consent
      * 3. From Home, check if there is a Kids Mode option
-     * 
+     *
      * Expected:
      * - User should not see any method to open Kids Mode (left Nav, Top Nav, etc)
      */
@@ -371,13 +371,13 @@ describe('GDPR/Consent Regression Tests', function () {
      * - User has not used Tubi (non-Registered)
      * - No consent data for User or Device ID
      * - OneTrust consent enabled
-     * 
+     *
      * Test Steps:
      * 1. Launch Tubi as Guest with country code GB and OneTrust enabled
      * 2. From Initial Consent screen select Reject All
      * 3. From Home screen go to Settings
      * 4. From Settings go to Privacy Center
-     * 
+     *
      * Expected:
      * - Privacy Center should be accessible and display consent options
      * - All non-essential consent options should be unchecked after rejecting all
@@ -475,13 +475,13 @@ describe('GDPR/Consent Regression Tests', function () {
      * - User has not used Tubi (non-Registered)
      * - No consent data for User or Device ID
      * - OneTrust consent enabled
-     * 
+     *
      * Test Steps:
      * 1. Launch Tubi as Guest with country code GB and OneTrust enabled
      * 2. From Initial Consent screen select Accept All
      * 3. From Home screen go to Settings
      * 4. From Settings go to Privacy Center
-     * 
+     *
      * Expected:
      * - Privacy Center should be accessible and display consent options
      * - All consent options should be checked after accepting all
@@ -576,14 +576,14 @@ describe('GDPR/Consent Regression Tests', function () {
      * - User has not used Tubi (non-Registered)
      * - No consent data for User or Device ID
      * - OneTrust consent enabled
-     * 
+     *
      * Test Steps:
      * 1. Launch Tubi as Guest with country code GB and OneTrust enabled
      * 2. From Initial Consent screen select Accept All
      * 3. From Home screen go to Sign In from Left Nav
      * 4. From Registration flow, register a new Tubi user
      * 5. From Age Gate, enter birth year (YYYY) which is over 18yrs old
-     * 
+     *
      * Expected:
      * - User is able to Register
      * - User is at Home screen

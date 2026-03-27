@@ -13,7 +13,7 @@ describe('Title Details Page', function () {
       ...args,
       experimentOverrides: {
         roku_content_details: {
-          roku_content_details_v3_1: {
+          roku_content_details_v4: {
             default: { "enabled": true, "enable_always_primary_buttons": false }
           }
         }
@@ -345,7 +345,7 @@ describe('Title Details Page', function () {
     await testUtils.waitForElementToShowOnScreen('categoryPosterFirst');
     await ecp.sendKeypress(ecp.Key.Right, { wait: 200 });
     await testUtils.waitForElementToFullyShowOnScreen('categoriesDetailsPageInfo');
-    // Are we on the Video Grid and are the category titles available? 
+    // Are we on the Video Grid and are the category titles available?
     await ecp.sendKeypress(ecp.Key.Ok, { wait: 200 });
 
     // Verify Channel Video Grid
@@ -1127,7 +1127,7 @@ describe('Title Details Page', function () {
     }, {
       user, experimentOverrides: {
         roku_content_details: {
-          roku_content_details_v3_1: {
+          roku_content_details_v4: {
             default: { "enabled": true, "enable_always_primary_buttons": false }
           }
         }
@@ -1189,4 +1189,3 @@ describe('Title Details Page', function () {
   });
 
 });
-

@@ -79,7 +79,7 @@ Function init()
   m.isAlwaysPrimaryButtons = experiment <> invalid AND experiment.enable_always_primary_buttons = true
 
   m.leftChevron.visible = m.isLeftBackExitEnabled
-  ' TODO: Temporary fix for section tabs spaciing in roku_content_details_v3 experiment. Remove if sectionTabs will be visible
+  ' TODO: Temporary fix for section tabs spaciing in roku_content_details_v4 experiment. Remove if sectionTabs will be visible
   if m.sectionTabs.visible = false
     m.sectionTabsSpacing = 0
   else
