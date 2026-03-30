@@ -34,16 +34,15 @@ Function init()
   m.countdownGroup.secondsTranslationId = "screenEndCard_upNextIn"
   m.countdownGroup.maxSeconds = m.constants.player.upNextCountdown
 
-  m.UpNextSeriesMenu = m.top.findNode("UpNextSeriesMenu")
-  m.UpNextSeriesMenu.observeFieldScoped("itemSelected", "onSeriesItemSelected")
-  upNextSeriesMenuButtonContent = m.top.findNode("UpNextSeriesMenuButtonContent")
-  upNextSeriesMenuButtonContent.title = getTranslation("screenEndCard_nextEpisode")
-
-  '//Resize the button based on the string length
-  tempChannelMenuItem = CreateObject("roSGNode", "DetailMenuItem")
-  tempChannelMenuItem.itemContent = upNextSeriesMenuButtonContent
-  potentialWidth = tempChannelMenuItem.calculatedTextWidth + tempChannelMenuItem.leftTextPadding + tempChannelMenuItem.rightTextPadding
-  m.UpNextSeriesMenu.itemSize = [potentialWidth, m.UpNextSeriesMenu.itemSize[1]]
+  m.upNextSeriesButton = m.top.findNode("upNextSeriesButton")
+  m.upNextSeriesButton.observeFieldScoped("wasSelected", "onSeriesItemSelected")
+  buttonContent = CreateObject("roSGNode", "ContentNode")
+  buttonContent.update({
+    title: getTranslation("screenEndCard_nextEpisode")
+    iconUrl: "pkg:/images/transport/sgplayer/icon-to-end.webp"
+    isPrimaryButton: true
+  }, true)
+  m.upNextSeriesButton.itemContent = buttonContent
 
   m.Timer = m.top.findNode("UpNextCountdownTimer")
   m.MovieGroup = m.top.findNode("UpNextMovieGroup")
@@ -161,7 +160,7 @@ Function onComponentFocus()
     if m.MovieGroup.visible = true
       m.GridMovie.setFocus(true)
     else if m.SeriesGroup.visible = true
-      m.UpNextSeriesMenu.setFocus(true)
+      m.upNextSeriesButton.setFocus(true)
     end if
     m.focusBox.visible = true
   else if m.top.isInFocusChain() <> true
@@ -169,7 +168,7 @@ Function onComponentFocus()
     m.isUpNextFocused = false
     m.GridMovie.setFocus(false)
     m.GridSeries.setFocus(false)
-    m.UpNextSeriesMenu.setFocus(false)
+    m.upNextSeriesButton.setFocus(false)
     m.focusBox.visible = false
     ' Hide countdown timer for simplified UI in series mode
     if m.SeriesGroup.visible = true AND m.isSimplifiedUI = true

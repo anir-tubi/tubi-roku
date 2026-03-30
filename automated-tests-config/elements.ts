@@ -2244,7 +2244,7 @@ const elements = typeCheckElements({
 
   autoplayUINextEpisodeButton: {
     keyPath:
-      '#ContentController.#uiGroup.#ContentGroup.#screenStackGroup.#ScreenStack.#videoPlayerScreen.#UpNext.#UpNextUI.#UpNextParent.#UpNextSeriesGroup.#UpNextSeriesMenu',
+      '#ContentController.#uiGroup.#ContentGroup.#screenStackGroup.#ScreenStack.#videoPlayerScreen.#UpNext.#UpNextUI.#UpNextParent.#UpNextSeriesGroup.#upNextSeriesButton',
   },
 
   autoplayUISeriesGrid: {
