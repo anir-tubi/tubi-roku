@@ -1299,6 +1299,8 @@ Function getConstants()
   constants.ui.ages = {}
   constants.ui.ages.ageGate = 13
 
+  constants.ui.maxProfileCount = 8
+
 
   'what ratings are highly mature and should be treated differently? May not be applicable to all countries.
   constants.ui.matureRatings = {}

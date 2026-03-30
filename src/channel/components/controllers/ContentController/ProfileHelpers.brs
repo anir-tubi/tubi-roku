@@ -21,13 +21,13 @@ Function showProfileSelectorScreen(constants, profiles = invalid, disableBack = 
     profiles = m.tubiAuthUpdate.getAllProfilesAuthInfo()
   end if
 
-  if profiles = invalid OR profiles.count() = 0 OR (profiles.count() = 1 AND profiles["guest"] <> invalid)
+  if profiles = invalid OR getUserProfileCount(profiles) = 0
     startChannelFromAppLoad()
   else
     menuContent = getProfilesListContent(profiles)
     pCount = menuContent.getChildCount()
     if pCount > 0 'at least one profile is present
-      if pCount < 7 AND isKidsUIOn() <> true
+      if isKidsUIOn() <> true
         'append add account item
         addProfileItem = createObject("roSGNode", "ContentNode")
         addProfileItem.id = "add_profile"
@@ -272,8 +272,31 @@ End Function
 Function showAddProfileScreen()
   hideNavMenu(false)
   stopAllVideoPlayers()
-  showEmailScreenWithProfileSelection()
+  if getUserProfileCount() >= m.constants.ui.maxProfileCount
+    showAccountLimitReachedModal()
+  else
+    showEmailScreenWithProfileSelection()
+  end if
 
+End Function
+
+
+Function showAccountLimitReachedModal()
+  title = getTranslation("dialog_account_limit_reached_title")
+  message = getTranslation("dialog_account_limit_reached_description")
+
+  currentScreen = getCurrentScreen()
+  dialogEvent = {
+    type: "dialog"
+    values: {
+      dialog_type: "INFORMATION" 'DialogType enum
+      pageOneof: m.Tracking.getAnalyticsPage(currentScreen.trackingPageInfo.pageType, currentScreen.trackingPageInfo.pageValues)
+      dialog_action: "SHOW"
+      dialog_sub_type: "account_limit_reached"
+    }
+  }
+  buttons = [getTranslation("dialog_button_close")]
+  showSimpleInstantResumableModal(title, message, buttons, dialogEvent, m.trackingLoggingTask)
 End Function
 
 

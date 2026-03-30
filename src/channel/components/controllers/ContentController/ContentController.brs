@@ -4167,11 +4167,7 @@ Function performProfileMigration()
     isSignedUser = isLoggedInUser(authInfo)
     profiles = auth.getAllProfilesAuthInfo()
 
-    if profiles["guest"] <> invalid
-      profileCount = profiles.count() - 1
-    else
-      profileCount = profiles.count()
-    end if
+    profileCount = getUserProfileCount(profiles)
 
     if getStatsigExperimentResource("roku_multi_account", "roku_multi_account_v1", false).variant <> "none" AND isSignedUser = true
 

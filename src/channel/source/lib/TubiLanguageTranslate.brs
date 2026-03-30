@@ -673,6 +673,14 @@ Function getTranslation_en_US()
       "description": "label of the confirmation button of the dialog window that asks the user if they want to sign out of the app",
       "message": "Sign Out"
     },
+    "dialog_account_limit_reached_title": {
+      "description": "Title of the dialog shown when the user has reached the maximum number of accounts",
+      "message": "Account Limit Reached"
+    },
+    "dialog_account_limit_reached_description": {
+      "description": "Description of the dialog shown when the user has reached the maximum number of accounts",
+      "message": "Maximum 8 accounts on Tubi. To add a new one, sign out of an existing account in Settings."
+    },
     "error_check_birthdate_description": {
       "description": "message letting the user know that they were not able to be signed in",
       "message": "There was an issue when trying to sign you in. Please enter the channel and sign in again."

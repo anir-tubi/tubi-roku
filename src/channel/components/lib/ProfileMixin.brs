@@ -17,13 +17,7 @@ Function isUserInMultiAccount()
     return false
   end if
 
-
-  if profiles["guest"] <> invalid
-    profileCount = profiles.count() - 1
-  else
-    profileCount = profiles.count()
-  end if
-
+  profileCount = getUserProfileCount(profiles)
 
   isTreamentEnabled = (getStatsigExperimentResource("roku_multi_account", "roku_multi_account_v1", false).variant <> "none")
 
@@ -39,4 +33,23 @@ Function isUserInMultiAccount()
   end if
 
   return false
+End Function
+
+
+Function getUserProfileCount(profiles = invalid)
+  if profiles = invalid
+    if m.Auth = invalid
+      m.Auth = TubiAuth(m.constants)
+    end if
+
+    profiles = m.Auth.getAllProfilesAuthInfo()
+  end if
+
+  if profiles["guest"] <> invalid
+    profileCount = profiles.count() - 1
+  else
+    profileCount = profiles.count()
+  end if
+
+  return profileCount
 End Function
