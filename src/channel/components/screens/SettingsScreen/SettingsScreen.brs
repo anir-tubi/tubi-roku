@@ -554,7 +554,6 @@ Function createSignOutProfilePanel(existingPanel = invalid)
     panel = existingPanel
   end if
 
-  panel.title = getTranslation("screenSettings_menu_Account")
   signInInfo = m.top.signInInfo
 
   sName = ""
@@ -580,9 +579,13 @@ Function createSignOutProfilePanel(existingPanel = invalid)
     end if
 
   end if
-  panel.name = sName
+  if sParentalRating = 0 OR sParentalRating = 1 OR sParentalRating = 4 OR sParentalRating = 5
+    panel.name = sName
+  else
+    panel.name = getTranslation("screenSettings_name_prefix", { name: sName })
+  end if
 
-  panel.email = sEmail
+  panel.email = getTranslation("screenSettings_email_prefix", { email: sEmail })
   panel.avatarUrl = sAvatarUrl
 
   panel.description = getTranslation("screenSettings_manage_account_description")

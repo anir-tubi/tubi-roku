@@ -2184,6 +2184,14 @@
     "description": "A title for the manage account screen",
     "message": "To update your info or manage preferences, scan the QR code or visit the URL. Relaunch the app to see any changes."
   },
+  "screenSettings_name_prefix": {
+    "description": "Label showing the signed-in user name on the account settings panel",
+    "message": "You are signed in as {name}"
+  },
+  "screenSettings_email_prefix": {
+    "description": "Label showing the signed-in user email on the account settings panel",
+    "message": "Email: {email}"
+  },
   "kids_screen_heading": {
     "description": "Heading of the kids screen",
     "message": "Choose an Adult to Add a Kids Account"

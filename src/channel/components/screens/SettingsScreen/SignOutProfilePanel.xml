@@ -11,7 +11,6 @@
 
   <interface>
     <field id="email" type="string" alias="Email.text" />
-    <field id="title" alias="title.text" />
     <field id="offset" alias="Offset.translation" />
     <field id="avatarUrl" alias="Avatar.uri" />
     <field id="initial" alias="Avatar.text" />
@@ -23,7 +22,6 @@
     <field id="removeKidsSignOutBtn" type="boolean" value="false" alwaysNotify="true" />
     <field id="activationUrl" alias="QRCodeUrlString.text" />
     <field id="manageTitle" alias="ManageTitle.text" />
-    <!-- parental rating will tell whether we add sign out button or not -->
     <field id="parentalRating" type="integer" alwaysNotify="true" />
     <field id="linkedAccountsLabel" alias="LinkedAccountsLabel.text" />
     <field id="linkedAccountsDescription" alias="LinkedAccountsDescription.text" />
@@ -40,60 +38,79 @@
       <LayoutGroup
         layoutDirection="vert"
         horizAlignment="left"
-        itemSpacings="[48,48,96,96,48,48]">
-        <Label
-          id="Title">
-          <Font
-            role="font" />
-        </Label>
+        itemSpacings="[48, 48, 63]">
 
         <LayoutGroup
-          layoutDirection="horiz"
-          itemSpacings="[28]"
-          vertAlignment="center">
-          <ProfileIcon
-            id="avatar"
-            height="121"
-            width="121" />
-          <LayoutGroup
-            id="NameEmailGroup"
-            itemSpacings="[6]"
-            vertAlignment="center"
-            horizAlignment="left">
-            <Label
-              id="Name"
-              height="38"
-              vertAlign="bottom">
-              <Font
-                role="font" />
-            </Label>
-
-            <Label
-              id="Email"
-              height="27"
-              vertAlign="bottom">
-              <Font
-                role="font" />
-            </Label>
-            <Poster
-              id="TubiKidsLogo"
-              visible="false"
-              width="99"
-              height="18"
-              uri="pkg:/images/profile-kids-logo.png" />
-          </LayoutGroup>
+          id="ManageTitleDescriptionGroup"
+          layoutDirection="vert"
+          itemSpacings="[12]">
+          <Label
+            id="ManageTitle"
+            width="1176"
+            maxLines="1">
+            <Font
+              role="font" />
+          </Label>
+          <Label
+            id="Description"
+            width="801"
+            wrap="true"
+            maxLines="2">
+            <Font
+              role="font" />
+          </Label>
         </LayoutGroup>
 
         <LayoutGroup
-          id="SignOutButtonLayoutGroup">
-          <TextIconButton
-            id="SignOutButton"
-            alwaysShowLabel="true"
-            uri="pkg:/images/sideNavExit.webp"
-            bgUri="pkg:/images/menu-focus-$$RES$$.9.png"
-            hasUnfocusedBackground="true"
-            iconWidth="36"
-            iconHeight="36" />
+          id="ProfileSignOutGroup"
+          layoutDirection="vert"
+          itemSpacings="[48]">
+          <LayoutGroup
+            layoutDirection="horiz"
+            itemSpacings="[15]"
+            vertAlignment="center">
+            <ProfileIcon
+              id="avatar"
+              height="120"
+              width="120" />
+            <LayoutGroup
+              id="NameEmailGroup"
+              layoutDirection="vert"
+              itemSpacings="[9]"
+              vertAlignment="center"
+              horizAlignment="left">
+              <Label
+                id="Name"
+                height="42">
+                <Font
+                  role="font" />
+              </Label>
+              <Label
+                id="Email"
+                height="42">
+                <Font
+                  role="font" />
+              </Label>
+              <Poster
+                id="TubiKidsLogo"
+                visible="false"
+                width="99"
+                height="18"
+                uri="pkg:/images/profile-kids-logo.png" />
+            </LayoutGroup>
+          </LayoutGroup>
+
+          <LayoutGroup
+            id="SignOutButtonLayoutGroup">
+            <TextIconButton
+              id="SignOutButton"
+              alwaysShowLabel="true"
+              uri="pkg:/images/sideNavExit.webp"
+              bgUri="pkg:/images/menu-focus-$$RES$$.9.png"
+              hasUnfocusedBackground="true"
+              iconWidth="36"
+              iconHeight="36" />
+          </LayoutGroup>
         </LayoutGroup>
 
         <LayoutGroup
@@ -121,57 +138,35 @@
             id="LinkedAccountsGrid"
             drawFocusFeedback="false"
             itemComponentName="ProfileSettingMenuItem"
-            itemSize="[200,164]"
-            itemSpacing="[6,6]"
+            itemSize="[222,165]"
+            itemSpacing="[24,24]"
             numRows="1"
             numColumns="7">
           </MarkupGrid>
 
         </LayoutGroup>
+      </LayoutGroup>
 
-        <LayoutGroup
-          id="ManageTitleDescriptionGroup"
-          layoutDirection="vert"
-          itemSpacings="[12,48]"
-          vertAlignment="center">
-          <Label
-            id="ManageTitle"
-            width="1176"
-            maxLines="1">
-            <Font
-              role="font" />
-          </Label>
-          <Label
-            id="Description"
-            width="1176"
-            wrap="true"
-            maxLines="2">
-            <Font
-              role="font" />
-          </Label>
-
-          <LayoutGroup
-            layoutDirection="horiz"
-            itemSpacings="[24]"
-            vertAlignment="center">
-            <Poster
-              id="QrCodePoster"
-              width="231"
-              height="231"
-              loadDisplayMode="scaleToFit"
-              uri="pkg:/images/QRCode.png" />
-
-            <Label
-              id="QRCodeUrlString"
-              width="362"
-              height="56"
-              maxLines="2"
-              vertAlign="bottom">
-              <Font
-                role="font" />
-            </Label>
-          </LayoutGroup>
-        </LayoutGroup>
+      <LayoutGroup
+        id="QRCodeGroup"
+        layoutDirection="vert"
+        horizAlignment="center"
+        translation="[1050,78]"
+        itemSpacings="[12]">
+        <Poster
+          id="QrCodePoster"
+          width="270"
+          height="270"
+          loadDisplayMode="scaleToFit"
+          uri="pkg:/images/QRCode.png" />
+        <Label
+          id="QRCodeUrlString"
+          width="270"
+          horizAlign="center"
+          maxLines="1">
+          <Font
+            role="font" />
+        </Label>
       </LayoutGroup>
     </Group>
   </children>
