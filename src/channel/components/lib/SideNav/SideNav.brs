@@ -253,6 +253,7 @@ Function onSignInChange()
       if m.top.isUserInMultiAccount = true
         m.profileContent.bottomTxt = m.bottomTextStr
         m.profileContent.shortDescriptionLine1 = ""
+        m.profileContent.shortDescriptionLine2 = ""
         m.profileContent.sideIconUrl = "pkg:/images/downArrow.png"
         m.profileContent.iconUrl = m.top.profileUrl
         m.profileContent.filledIconUrl = m.top.profileUrl

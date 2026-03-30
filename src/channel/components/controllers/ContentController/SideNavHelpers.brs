@@ -100,6 +100,7 @@ Function setSideNavSignedInItem(authInfo)
         sName = authInfo.name
       end if
       if isUserInMultiAccount() = true
+        m.SideNav.isUserInMultiAccount = true
         if isNonEmptyString(authInfo.parentId) = true
           m.SideNav.displayKids = false
         end if

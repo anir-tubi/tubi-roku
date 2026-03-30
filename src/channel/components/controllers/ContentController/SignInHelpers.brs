@@ -558,11 +558,25 @@ Function onBackgroundScreenUpdated(msg)
 End Function
 
 
+Function handleRegistrationForMultipleAccounts(response)
+  if m.enableMultipleAccounts = invalid
+    m.enableMultipleAccounts = getExternalConfigValueFromGlobal("enable_multiple_accounts", false)
+  end if
+
+  if isUserInMultiAccount() = true OR (m.enableMultipleAccounts = true AND m.constants.deviceInfo.countryCode = "US") 'remove the country code check once we take multi account to other countries
+    m.tubiAuthUpdate.handleRegistration(response, true)
+    'create fake guest profile so that user has option to switch to guest.
+    m.tubiAuthUpdate.createOrUpdateProfileAuth("guest", { "name": "", })
+  else
+    m.tubiAuthUpdate.handleRegistration(response, false)
+  end if
+End Function
+
+
 ' onSignUpResponse callback is triggered when the sign up is success
 ' @_response: the response of signUp API in the form of AA
 Function onSignUpResponse(response)
-  isUsrInMultiAccount = isUserInMultiAccount()
-  m.tubiAuthUpdate.handleRegistration(response, isUsrInMultiAccount)
+  handleRegistrationForMultipleAccounts(response)
 
   event = {
     type: "account"
@@ -642,8 +656,8 @@ End Function
 ' onSignInResponse callback is triggered when the sign In is success
 ' @response: assocarray or invalid, the response of signIn API in the form of AA or invalid if called from onQueryStatusOfMagicLinkResponse
 Function onSignInResponse(response)
-  isUsrInMultiAccount = isUserInMultiAccount()
-  m.tubiAuthUpdate.handleRegistration(response, isUsrInMultiAccount)
+
+  handleRegistrationForMultipleAccounts(response)
 
 
   event = {
