@@ -27,6 +27,8 @@ Function showVodDetailScreen(inputContent, playbackSource, successCb = invalid, 
     screen.observeFieldScoped("playSelectedEpisode", "onPlaySelectedEpisodeChange")
     screen.observeFieldScoped("shouldPauseVideoPreview", "onVodDetailShouldPauseVideoPreviewChange")
     screen.observeFieldScoped("backgroundUriList", "onVodDetailBackgroundUriListChange")
+    screen.observeFieldScoped("refreshContent", "onVodDetailRefreshContent")
+    screen.observeFieldScoped("refreshRelatedContent", "onVodDetailRefreshRelatedContent")
     screen.id = m.constants.ui.screenIds.vodDetailScreen
     screen.shouldFocusWhenPushed = m.top.fadeInContentController
     screen.playbackSource = playbackSource
@@ -48,7 +50,7 @@ Function showVodDetailScreen(inputContent, playbackSource, successCb = invalid, 
       "error": errorCb
     }
 
-    updatePreviewPlayerToFullScreen()
+    updatePreviewPlayerToCondensedView()
     if isVideoPreviewPlaying() = true
       if m.videoPreviewPlayer <> invalid
         m.videoPreviewPlayer.videoPlayerType = "BANNER"
@@ -59,11 +61,27 @@ Function showVodDetailScreen(inputContent, playbackSource, successCb = invalid, 
 
     onVodDetailBackgroundUriListChange()
 
-    getYouMayAlsoLikeContent(content)
+    v5Experiment = getStatsigExperimentResource("", "roku_content_details_v5", false)
+    isPerformanceEnhanced = (v5Experiment <> invalid AND v5Experiment.variant = "performance_enhanced")
+    screen.isPerformanceEnhanced = isPerformanceEnhanced
+
+    if isPerformanceEnhanced = true
+      m.relatedContentDebounceTimer = CreateObject("roSGNode", "Timer")
+      m.relatedContentDebounceTimer.duration = 2
+      m.relatedContentDebounceTimer.repeat = false
+      m.relatedContentDebounceTimer.observeFieldScoped("fire", "onRelatedContentDebounceTimerFired")
+      m.relatedContentDebounceTimer.control = "start"
+    else
+      getYouMayAlsoLikeContent(content)
+    end if
 
     if content.type = m.constants.ui.contentTypes.series
       screen.wasContentFetchCompleted = false
-      getSeasonList(content.id, onGetSeasonListSuccess, onGetSeasonListError)
+      if isPerformanceEnhanced = true
+        getSingleContentFromServer(content, onGetSeasonListFallbackSuccess, onGetSeasonListFallbackError)
+      else
+        getSeasonList(content.id, onGetSeasonListSuccess, onGetSeasonListError)
+      end if
     else
       ' During deep-link use case we already have the complete content node, so we can skip the fetch.
       screen.wasContentFetchCompleted = content.hasVideoResources
@@ -87,6 +105,25 @@ Function onVodDetailBackgroundUriListChange()
   screen = getDetailScreenFromStackWithId(m.constants.ui.screenIds.vodDetailScreen)
   if screen <> invalid AND screen.content <> invalid AND isNonEmptyArray(screen.content.backgrounds) = true
     updateVodDetailBackground(screen.content)
+  end if
+End Function
+
+
+' Content is stale after returning from suspend or background — re-fetch from API
+Function onVodDetailRefreshContent(msg)
+  screen = msg.getRoSGNode()
+  if screen <> invalid AND screen.content <> invalid
+    getSingleContentFromServer(screen.content, onGetVodContentSuccess, onGetVodContentError)
+  end if
+End Function
+
+
+' Related content is stale — re-fetch "You May Also Like" content
+Function onVodDetailRefreshRelatedContent(msg)
+  screen = msg.getRoSGNode()
+  if screen <> invalid AND screen.content <> invalid
+    screen.relatedContent = invalid
+    getYouMayAlsoLikeContent(screen.content)
   end if
 End Function
 
@@ -507,16 +544,27 @@ End Function
 
 
 ' Handles focused season change
+' When content was fetched via Content API (seasonChildIndexMap present), builds
+' episodes locally. Otherwise falls back to the Episodes API call.
 ' @msg: object, the message containing the focused season
 Function onFocusedSeasonChange(msg)
   tubiLog("VodDetailScreenHelpers.onFocusedSeasonChange")
   focusedSeason = msg.getData()
   screen = msg.getRoSGNode()
   if screen <> invalid AND screen.content <> invalid AND focusedSeason <> invalid AND focusedSeason <> screen.defaultSelectedSeason AND screen.seasonList <> invalid
-    seasons = screen.seasonList.seasons
-    if seasons <> invalid AND seasons[focusedSeason.toStr()] <> invalid
-      totalEpisodes = seasons[focusedSeason.toStr()].count()
-      getSeriesEpisodes(screen.content.id, focusedSeason, 1, totalEpisodes)
+    seasonNum = focusedSeason.toStr()
+
+    if screen.seasonList.seasonChildIndexMap <> invalid
+      seasonEpisodes = buildSeasonEpisodesNode(screen.content, seasonNum, screen.seasonList.seasonChildIndexMap)
+      if seasonEpisodes <> invalid
+        screen.episodes = seasonEpisodes
+      end if
+    else
+      seasons = screen.seasonList.seasons
+      if seasons <> invalid AND seasons[seasonNum] <> invalid
+        totalEpisodes = seasons[seasonNum].count()
+        getSeriesEpisodes(screen.content.id, focusedSeason, 1, totalEpisodes)
+      end if
     end if
   end if
 End Function
@@ -1085,7 +1133,6 @@ End Function
 ' @param playbackSource - Playback source information for analytics
 ' @param episodes - Optional episodes list for series content (used when skipping detail screen)
 Function executeVodDetailSuccessCallback(content, playbackSource, episodes = invalid) as Void
-  tubiLog("VodDetailScreenHelpers.executeVodDetailSuccessCallback")
 
   if m.top.fadeInContentController = true
     ' send deep-link analytics if the content was deep-linked to this screen.
@@ -1369,6 +1416,16 @@ Function refreshVodDetailScreenAfterPlayback(shouldSendAnalyticsEvent, reason) a
 End Function
 
 
+' Debounced callback for fetching related content
+' Fires after a delay to avoid competing with primary content API calls
+Function onRelatedContentDebounceTimerFired()
+  screen = getDetailScreenFromStackWithId(m.constants.ui.screenIds.vodDetailScreen)
+  if screen <> invalid AND screen.content <> invalid AND screen.relatedContent = invalid
+    getYouMayAlsoLikeContent(screen.content)
+  end if
+End Function
+
+
 ' Fetches "You May Also Like" related content for a given content item
 ' Makes API request to get recommended content and updates the detail screen on success
 ' @param content - Content node to get related content for
@@ -1405,14 +1462,18 @@ End Function
 
 
 ' ============================================================================
-' Season List API Fallback
+' Season List API Fallback / Content API Approach
 '
-' The following functions are used exclusively as a fallback when the
-' getSeasonList API fails. In that scenario, we fetch the full series content
-' via getSingleContentFromServer and reconstruct the seasonList, episode map,
+' The following functions fetch the full series content via
+' getSingleContentFromServer and reconstruct the seasonList, episode map,
 ' and season selector from the content API response.
 '
-' Flow: onGetSeasonListError -> getSingleContentFromServer
+' Used in two scenarios:
+' 1. Fallback when getSeasonList API fails (onGetSeasonListError)
+' 2. Default approach when roku_content_details_v5.variant = "performance_enhanced",
+'    replacing the Season List API + Episodes API flow with a single call
+'
+' Flow: getSingleContentFromServer
 '       -> onGetSeasonListFallbackSuccess / onGetSeasonListFallbackError
 ' ============================================================================
 

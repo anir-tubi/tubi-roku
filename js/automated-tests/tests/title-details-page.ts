@@ -13,8 +13,8 @@ describe('Title Details Page', function () {
       ...args,
       experimentOverrides: {
         roku_content_details: {
-          roku_content_details_v4: {
-            default: { "enabled": true, "enable_always_primary_buttons": false }
+          roku_content_details_v5: {
+            default: { "enabled": true }
           }
         }
       }
@@ -1127,8 +1127,8 @@ describe('Title Details Page', function () {
     }, {
       user, experimentOverrides: {
         roku_content_details: {
-          roku_content_details_v4: {
-            default: { "enabled": true, "enable_always_primary_buttons": false }
+          roku_content_details_v5: {
+            default: { "enabled": true }
           }
         }
       }

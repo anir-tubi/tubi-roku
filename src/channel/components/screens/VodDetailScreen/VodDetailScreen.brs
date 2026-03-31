@@ -71,15 +71,14 @@ Function init()
 
   m.isComingSoon = false ' Initialize coming soon flag
 
-  experiment = getStatsigExperimentResource("", "roku_content_details_v4", false)
+  experiment = getStatsigExperimentResource("", "roku_content_details_v5", false)
   ' TODO: This experiment has left exit always enabled. Remove if left exit will be disabled or dynamic
   ' m.isLeftBackExitEnabled = experiment <> invalid AND experiment.enable_left_button_exit = true
   m.isLeftBackExitEnabled = true
   m.v3ExperimentEnabled = experiment <> invalid AND experiment.enabled = true
-  m.isAlwaysPrimaryButtons = experiment <> invalid AND experiment.enable_always_primary_buttons = true
 
   m.leftChevron.visible = m.isLeftBackExitEnabled
-  ' TODO: Temporary fix for section tabs spaciing in roku_content_details_v4 experiment. Remove if sectionTabs will be visible
+  ' TODO: Temporary fix for section tabs spacing in roku_content_details_v5 experiment. Remove if sectionTabs will be visible
   if m.sectionTabs.visible = false
     m.sectionTabsSpacing = 0
   else
@@ -128,8 +127,19 @@ Function onScreenFocusChange()
 
     m.contentContainer.setFocus(true)
 
-    if m.top.content <> invalid AND isNonEmptyArray(m.top.content.backgrounds) = true
-      m.top.backgroundUriList = m.top.content.backgrounds
+    content = m.top.content
+    if content <> invalid AND isNonEmptyArray(content.backgrounds) = true
+      m.top.backgroundUriList = content.backgrounds
+    end if
+
+    if content <> invalid AND m.top.isPerformanceEnhanced = true
+      if shouldRefresh(content) = true
+        m.top.refreshContent = true
+      end if
+
+      if shouldRefresh(m.top.relatedContent) = true
+        m.top.refreshRelatedContent = true
+      end if
     end if
   end if
 End Function
@@ -261,11 +271,6 @@ Function refreshButtonList()
     addQueueButton(buttons, bookmark)
   end if
 
-  if m.isAlwaysPrimaryButtons = true
-    for each button in buttons
-      button.isPrimaryButton = true
-    end for
-  end if
   m.actionButtonList.buttons = buttons
   m.actionButtonList.visible = isNonEmptyArray(buttons)
 
@@ -336,9 +341,7 @@ Function showRatingsOverlay() as Void
 
   m.ratingsButtonNode = focusedButton.button
   m.ratingsButtonNode.padding = 66
-  if m.isAlwaysPrimaryButtons = false
-    m.ratingsButtonNode.dynamicIsPrimaryButton = true
-  end if
+  m.ratingsButtonNode.dynamicIsPrimaryButton = true
   m.ratingsButtonNode.observeFieldScoped("translation", "onRatingsButtonTranslationChange")
   m.contentContainer.observeFieldScoped("translation", "onRatingsButtonTranslationChange")
   m.actionButtonList.observeFieldScoped("translation", "onRatingsButtonTranslationChange")
@@ -377,9 +380,7 @@ Function hideRatingsOverlay() as Void
   m.ratingsOverlay.visible = false
   if m.ratingsButtonNode <> invalid
     m.ratingsButtonNode.padding = 33
-    if m.isAlwaysPrimaryButtons = false
-      m.ratingsButtonNode.dynamicIsPrimaryButton = false
-    end if
+    m.ratingsButtonNode.dynamicIsPrimaryButton = false
     m.ratingsButtonNode.unobserveFieldScoped("translation")
     m.contentContainer.unobserveFieldScoped("translation")
     m.actionButtonList.unobserveFieldScoped("translation")

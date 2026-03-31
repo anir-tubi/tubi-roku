@@ -139,8 +139,14 @@ Function StatsigExperimentsInterface(statsigExperimentsInfo) as Object
         }
       }
 
-      roku_content_details_v4: {
-        default: { "enabled": false, "enable_always_primary_buttons": false }
+      ' Content details experiment (v5, replaces v4)
+      ' - enabled: controls whether VodDetailScreen is used instead of legacy DetailScreen
+      ' - variant: "control" (default) or "performance_enhanced"
+      '   "performance_enhanced": uses single Content API call for series instead of
+      '   Season List API + Episodes API (2 calls), and defers related content fetch
+      '   until the user navigates to the "More Like This" tab.
+      roku_content_details_v5: {
+        default: { "enabled": false, "variant": "control" }
       }
 
       roku_sot_reverse_ui_test_detail_screen: {

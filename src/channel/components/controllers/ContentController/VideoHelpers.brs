@@ -807,7 +807,7 @@ End Function
 Function returnToDetailScreenFromVideo(sendAnalyticsEvent, shouldUpdateEpisodeScreenContent, reason) as Void
   tubiLog("VideoHelpers.returnToDetailScreenFromVideo")
 
-  experiment = getStatsigExperimentResource("", "roku_content_details_v4", false)
+  experiment = getStatsigExperimentResource("", "roku_content_details_v5", false)
   if experiment.enabled = true
     ' Show new content details screen
     refreshVodDetailScreenAfterPlayback(sendAnalyticsEvent, reason)
@@ -1037,7 +1037,7 @@ Function onSkipTrailer(msg) as Void
   end if
 
 
-  experiment = getStatsigExperimentResource("", "roku_content_details_v4", false)
+  experiment = getStatsigExperimentResource("", "roku_content_details_v5", false)
   if experiment.enabled = true AND skipTrailer = true
     if isComingSoon = false
       videoPlayer = getFromScreenCache(m.constants.ui.screenIds.videoPlayerScreen)
@@ -1120,6 +1120,7 @@ Function showPlayerError(errorMessage, errorCode)
     if errorCode = invalid
       errorCode = ""
     end if
+
     userErrorCode = getUserFacingErrorCode(m.constants.errors.context.playerScreen, m.constants.errors.subtypes.playerPlaybackError, errorCode.toStr())
 
     videoId = 0
@@ -1148,9 +1149,22 @@ Function showPlayerError(errorMessage, errorCode)
 End Function
 
 
-Function onRetryPlayerError()
-  ' try to resume the video from the last checkpoint
+Function onRetryPlayerError() as Void
   screen = getCurrentScreen()
+  if screen = invalid then return
+
+  ' For VodDetailScreen (performance_enhanced): video resource URLs may have expired
+  ' Fetch fresh content before retrying
+  if screen.getSubtype() = "VodDetailScreen" AND screen.isPerformanceEnhanced = true
+    if screen.content <> invalid
+      getSingleContentFromServer(screen.content, onFreshContentRetryComplete, onFreshContentRetryComplete)
+      return
+    end if
+    detailScreenResumeHelper(screen)
+    return
+  end if
+
+  ' Legacy DetailScreen retry
   if screen.isSubtype("DetailScreen") = true
     if screen.watchTrailerSelected = true
       trailerHelper(screen)
@@ -1158,6 +1172,23 @@ Function onRetryPlayerError()
       detailScreenResumeHelper(screen)
     end if
   end if
+End Function
+
+
+' Callback after fetching fresh content for retry
+' On success, updates VodDetailScreen content before resuming playback
+' On error, falls back to retrying with existing content
+Function onFreshContentRetryComplete(response) as Void
+  tubiLog("VideoHelpers.onFreshContentRetryComplete")
+  screen = getCurrentScreen()
+  if screen = invalid OR screen.getSubtype() <> "VodDetailScreen" then return
+
+  if isNode(response) = true
+    screen.content = response
+    screen.contentUpdated = true
+  end if
+
+  detailScreenResumeHelper(screen)
 End Function
 
 

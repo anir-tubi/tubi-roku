@@ -2589,6 +2589,11 @@ Function resumeApp()
       ' without content which will be a blank screen. To avoid it, stop the counter and refresh the EPGScreen videoplay
       stopCountdownTimer()
       refreshEPGScreenVideoPlay(false, currentScreen)
+    else if currentScreen.id = m.constants.ui.screenIds.vodDetailScreen
+      previewState = getVideoPreviewState()
+      if previewState = "stopped" OR previewState = "paused"
+        startVideoPreview(currentScreen.content, currentScreen.trackingPageInfo)
+      end if
     end if
   end if
 

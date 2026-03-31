@@ -8,6 +8,7 @@
   <script type="text/brightscript" uri="pkg:/components/lib/TypographyMixin.brs" />
   <script type="text/brightscript" uri="pkg:/components/lib/UserMixin.brs" />
   <script type="text/brightscript" uri="pkg:/components/lib/ComingSoonMixin.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/CacheValidationMixin.brs" />
   <script type="text/brightscript" uri="VodDetailScreenAnalytics.brs" />
   <script type="text/brightscript" uri="VodDetailScreen.brs" />
 
@@ -40,6 +41,9 @@
     <field id="shouldRefreshButtonList" type="boolean" value="false" alwaysNotify="true" />
     <field id="shouldRefreshScreen" type="boolean" value="false" alwaysNotify="true" />
     <field id="focusRelatedContent" type="boolean" value="false" />
+    <field id="isPerformanceEnhanced" type="boolean" value="false" />
+    <field id="refreshContent" type="boolean" alwaysNotify="true" />
+    <field id="refreshRelatedContent" type="boolean" alwaysNotify="true" />
 
     <!-- OUTPUTS -->
 
