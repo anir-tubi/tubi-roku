@@ -532,9 +532,9 @@ Function playUpNextContent(nextContent, playbackSource = { "srcForAnalytic": "un
       nowPos = processResume(content)
 
       ' Skip recap for series autoplay when user deliberately clicks "Next Episode"
-      ' Experiment: roku_postplay_countdown_timer_series_v2
+      ' Experiment: roku_postplay_countdown_timer_series_v3
       ' Conditions: simplifiedUI = true AND automaticSkipRecap = true AND autoplayMode = "deliberate"
-      seriesPostplayTimerExperiment = getStatsigExperimentResource("roku_player_improvement", "roku_postplay_countdown_timer_series_v2", false)
+      seriesPostplayTimerExperiment = getStatsigExperimentResource("roku_player_improvement", "roku_postplay_countdown_timer_series_v3", false)
       shouldSkipRecap = (seriesPostplayTimerExperiment.simplifiedUI = true AND seriesPostplayTimerExperiment.automaticSkipRecap = true)
 
       recapSkipped = false

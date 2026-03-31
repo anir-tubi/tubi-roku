@@ -562,7 +562,7 @@ Function initExperiments()
   m.alignAdRequestWithinWindow = alignAdRequestExperimentConfig.requestWithinWindow
 
   ' Postplay series countdown experiment
-  m.seriesPostplayTimerExperiment = getStatsigExperimentResource("roku_player_improvement", "roku_postplay_countdown_timer_series_v2", false)
+  m.seriesPostplayTimerExperiment = getStatsigExperimentResource("roku_player_improvement", "roku_postplay_countdown_timer_series_v3", false)
   m.seriesPostplayCountdown = m.seriesPostplayTimerExperiment.countdown
 
   ' Async stop experiment - only enable on firmware 14.0+
