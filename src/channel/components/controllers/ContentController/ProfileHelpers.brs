@@ -190,6 +190,8 @@ Function handleProfileSelectionViaGate(profileSelected)
         handleRegularProfileSelection(profileSelected)
       end if
     end if
+  else
+    focusCurrentScreen()
   end if
 End Function
 
@@ -304,7 +306,7 @@ Function handleBeforeProfileSelection(parentScreenType)
 
   if parentScreenType = "ProfileSelectorScreen"
     stopAllVideoPlayers()
-    resetSideNav(false)
+    hideNavMenu(false)
     if m.callbackAfterSignIn = invalid
       m.callbackAfterSignIn = refreshScreenAndContentAfterSignIn
     end if
@@ -312,7 +314,7 @@ Function handleBeforeProfileSelection(parentScreenType)
   else if parentScreenType = "SideNav"
     m.callbackAfterSignIn = onSideNavSignInCompleted
     stopAllVideoPlayers()
-    resetSideNav(false)
+    hideNavMenu(false)
   end if
 End Function
 
