@@ -740,7 +740,7 @@ Function cmsApi_setAppImageParams(existingParams = {})
     tileLogo = m.convertImageSizeFor720p(tileLogo)
   end if
 
-  existingParams["app_images[background_tb]"] = "w" + background[0].toStr() + "h" + background[1].toStr() + "_background"
+  existingParams["app_images[background_tb]"] = "w" + background[0].toStr() + "h" + background[1].toStr() + "_hero"
   existingParams["app_images[logo]"] = "w" + tileLogo[0].toStr() + "h" + tileLogo[1].toStr() + "_logo"
 
   return existingParams

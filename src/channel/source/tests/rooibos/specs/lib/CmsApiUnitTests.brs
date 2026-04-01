@@ -18,6 +18,27 @@ Function CmsApiSetup()
     return [newWidth, newHeight]
   End Function
 
+  ' Helper function to get expected app_images param string the same way setAppImageParams does
+  ' (uses background/creatorTileLogo sizes, applies 720p conversion if needed, returns formatted string)
+  m.getExpectedAppImageParam = Function(imageType as String) as String
+    imageSizes = m.cmsApi.constants.ui.imageSizes
+    if imageType = "background"
+      size = imageSizes.background
+      suffix = "_hero"
+    else if imageType = "logo"
+      size = imageSizes.creatorTileLogo
+      suffix = "_logo"
+    else
+      return ""
+    end if
+
+    if m.is720p = true
+      size = m.convertImageSizeFor720p(size)
+    end if
+
+    return "w" + size[0].ToStr() + "h" + size[1].ToStr() + suffix
+  End Function
+
   ' Helper function to get expected image param string the same way setImageParams does
   ' (uses largePoster/largeLandscape, applies 720p conversion if needed, returns formatted string)
   m.getExpectedImageParam = Function(imageType as String, isSearchScreen = false) as String
@@ -795,6 +816,7 @@ Function cmsApi_createSearchReqInfo_test()
   ]
 
   searchUrl = m.cmsApi.constants.urls.search
+  searchV3Url = m.cmsApi.constants.urls.searchV3
 
   searchOptions = {
     params: {
@@ -820,7 +842,8 @@ Function cmsApi_createSearchReqInfo_test()
   m.assertEqual(searchInfo.options.params["images[poster_tb]"], searchOptions.params["images[poster_tb]"])
 
   ' with kids mode
-  searchInfo = m.cmsApi.createSearchReqInfo("search_text", false)
+  searchOptions.params["is_kids_mode"] = true
+  searchInfo = m.cmsApi.createSearchReqInfo("search_text", true)
 
   m.assertEqual(searchInfo.count(), 2)
   m.assertAAHasKeys(searchInfo, infoKeys)
@@ -831,6 +854,40 @@ Function cmsApi_createSearchReqInfo_test()
   m.assertEqual(searchInfo.options.params["search"], searchOptions.params["search"])
   m.assertEqual(searchInfo.options.params["is_kids_mode"], searchOptions.params["is_kids_mode"])
   m.assertEqual(searchInfo.options.params["images[poster_tb]"], searchOptions.params["images[poster_tb]"])
+
+  ' with includeApps - uses searchV3 url and adds app image params
+  appsParams = [
+    "platform"
+    "device_id"
+    "search"
+    "is_kids_mode"
+    "images[poster_tb]"
+    "include_creator_apps"
+    "app_images[background_tb]"
+    "app_images[logo]"
+  ]
+
+  searchInfo = m.cmsApi.createSearchReqInfo("search_text", false, invalid, true, true)
+
+  m.assertEqual(searchInfo.count(), 2)
+  m.assertAAHasKeys(searchInfo, infoKeys)
+  m.assertEqual(searchInfo.url, searchV3Url)
+  m.assertAAHasKeys(searchInfo.options.params, appsParams)
+  m.assertEqual(searchInfo.options.params["platform"], m.cmsApi.constants.platform)
+  m.assertEqual(searchInfo.options.params["device_id"], m.cmsApi.constants.deviceInfo.deviceId)
+  m.assertEqual(searchInfo.options.params["search"], "search_text")
+  m.assertEqual(searchInfo.options.params["is_kids_mode"], false)
+  m.assertEqual(searchInfo.options.params["include_creator_apps"], true)
+  m.assertEqual(searchInfo.options.params["app_images[background_tb]"], m.getExpectedAppImageParam("background"))
+  m.assertEqual(searchInfo.options.params["app_images[logo]"], m.getExpectedAppImageParam("logo"))
+
+  ' without includeApps - does not use searchV3 url and has no app image params
+  searchInfo = m.cmsApi.createSearchReqInfo("search_text", false)
+
+  m.assertEqual(searchInfo.url, searchUrl)
+  m.assertInvalid(searchInfo.options.params["include_creator_apps"])
+  m.assertInvalid(searchInfo.options.params["app_images[background_tb]"])
+  m.assertInvalid(searchInfo.options.params["app_images[logo]"])
 End Function
 
 
@@ -929,4 +986,37 @@ Function cmsApi_setTupianLandscapeParam_test()
   m.assertInvalid(updatedParams["images[poster_tb]"])
   m.assertNotInvalid(updatedParams["images[landscape_tb]"])
   m.assertEqual(updatedParams["images[landscape_tb]"], landscapeParam)
+End Function
+
+
+'@Test unit tests setAppImageParams
+Function cmsApi_setAppImageParams_test()
+  backgroundParam = m.getExpectedAppImageParam("background")
+  logoParam = m.getExpectedAppImageParam("logo")
+
+  ' test add background and logo with pre-existing params
+  existingParams = {
+    userid: "1234"
+    is_existing: true
+  }
+
+  updatedParams = m.cmsApi.setAppImageParams(existingParams)
+
+  m.assertNotInvalid(updatedParams.userid)
+  m.assertNotInvalid(updatedParams.is_existing)
+  m.assertNotInvalid(updatedParams["app_images[background_tb]"])
+  m.assertNotInvalid(updatedParams["app_images[logo]"])
+  m.assertEqual(updatedParams["app_images[background_tb]"], backgroundParam)
+  m.assertEqual(updatedParams["app_images[logo]"], logoParam)
+
+  ' test that no poster/landscape image params are added
+  existingParams = {
+    userid: "1234"
+    is_existing: true
+  }
+
+  updatedParams = m.cmsApi.setAppImageParams(existingParams)
+
+  m.assertInvalid(updatedParams["images[poster_tb]"])
+  m.assertInvalid(updatedParams["images[landscape_tb]"])
 End Function
