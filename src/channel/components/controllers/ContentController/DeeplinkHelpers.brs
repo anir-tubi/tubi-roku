@@ -1093,6 +1093,7 @@ Function getPlaybackSourceForDeeplinkType()
     return {
       "srcForAnalytic": m.constants.player.playbackSource.unknown
       "srcForAds": m.constants.player.playbackOrigin.deeplink
+      "isCastingSession": (m.deeplinkContent <> invalid AND isNonEmptyString(m.deeplinkContent.sourceDeviceId) = true)
     }
   else
     return {

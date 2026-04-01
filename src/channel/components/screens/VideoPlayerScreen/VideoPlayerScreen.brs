@@ -946,8 +946,11 @@ Function playContent()
         end for
       end if
 
-      ' Below block is needed for resume_playback_preroll_strategy_v1 experiment.
-      if fetchPreroll = true AND playNowPos > 0
+      ' Skip pre-roll for casting-initiated sessions starting from the beginning when the experiment is enabled.
+      if fetchPreroll = true AND m.top.isCastingSession = true
+        fetchPreroll = (getStatsigExperimentResource("casting_playback_preroll_skip", "casting_playback_preroll_skip_v1").enabled = false)
+      else if fetchPreroll = true AND playNowPos > 0
+        ' Below block is needed for resume_playback_preroll_strategy_v1 experiment.
         prerollFetchStrategy = getStatsigExperimentResource("roku_player_improvement", "resume_playback_preroll_strategy_v1", true).strategy
 
         if prerollFetchStrategy = "resume_ad_break_previous_cue_or_zero"
@@ -957,11 +960,6 @@ Function playContent()
         else if prerollFetchStrategy = "resume_skip_preroll"
           fetchPreroll = false
         end if
-      end if
-
-      ' Skip pre-roll for casting-initiated sessions when the experiment is enabled.
-      if fetchPreroll = true AND m.top.isCastingSession = true
-        fetchPreroll = (getStatsigExperimentResource("roku_player_improvement", "casting_playback_preroll_skip_v1").enabled = false)
       end if
 
       if fetchPreroll = true

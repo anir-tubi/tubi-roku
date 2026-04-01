@@ -70,12 +70,6 @@ Function StatsigExperimentsInterface(statsigExperimentsInfo) as Object
         resume_playback_preroll_strategy_v1: {
           default: { "strategy": "resume_ad_break_at_now_pos" }
         }
-
-        ' Skip pre-roll ads for casting-initiated CTV sessions (Voyager).
-        ' When enabled, pre-roll ad fetch is bypassed for sessions started via mobile casting.
-        casting_playback_preroll_skip_v1: {
-          default: { "enabled": false }
-        }
       }
 
       roku_linear_reg_gate: {
@@ -197,6 +191,13 @@ Function StatsigExperimentsInterface(statsigExperimentsInfo) as Object
 
       roku_content_v3_endpoints: {
         default: { "enabled": false }
+      }
+
+      ' Skip pre-roll ads for casting-initiated CTV sessions (Voyager or ECP deeplink from mobile).
+      casting_playback_preroll_skip: {
+        casting_playback_preroll_skip_v1: {
+          default: { "enabled": false }
+        }
       }
     }
     statsigExperimentsInfo: statsigExperimentsInfo
