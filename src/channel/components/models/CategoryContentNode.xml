@@ -50,5 +50,11 @@
 
     <!-- UI customization data for child content (e.g. SOT badge labels) -->
     <field id="child_ui_customization" type="assocarray" />
+
+    <!-- Ad overlay for row-decorating ad types (e.g. sponsoredLiveEventsHero).
+         Carries an AdContentNode set by HomeScreenHelpers when a sponsored overlay
+         is active for this row. Components reading itemContent can check
+         itemContent.getParent().sponsor to render the ad overlay. -->
+    <field id="sponsor" type="node" />
   </interface>
 </component>

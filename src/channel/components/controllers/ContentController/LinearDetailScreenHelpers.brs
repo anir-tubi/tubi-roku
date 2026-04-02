@@ -1,7 +1,14 @@
 ' Show the linear detail screen for the selected content.
 ' @content, associative array, the content item to show.
 ' @playbackSource, associative array, the playback source for the content.
-Function showLinearDetailScreen(content, playbackSource)
+' @replayDetailSendTracking, boolean, passed to showDetailScreen when content.isReplay (OK / deeplink / EPG path).
+' @replayDetailSuccessCb, callback for showDetailScreen when content.isReplay (play path uses skipDetailScreen).
+Function showLinearDetailScreen(content, playbackSource, replayDetailSendTracking = true, replayDetailSuccessCb = invalid) as Void
+  if content <> invalid AND content.isReplay = true
+    showDetailScreen(content, replayDetailSendTracking, replayDetailSuccessCb, invalid, playbackSource)
+    return
+  end if
+
   showHideLogoBasedOnUiMode()
 
   if content <> invalid
@@ -25,7 +32,22 @@ Function showLinearDetailScreen(content, playbackSource)
       }
     }
     getLinearRelatedContent(content)
+
+    ' Fetch full content to get creator title_art (skip for deeplinks since they already fetch full content)
+    if m.enteredFromDeepLink <> true
+      getSingleContentFromServer(content, onLinearDetailContentRefreshSuccess, invalid)
+    end if
+
     pushScreen(screen, true, true)
+  end if
+End Function
+
+
+' Updates the LinearDetailScreen content with refreshed data (e.g. creator title_art)
+Function onLinearDetailContentRefreshSuccess(refreshedContent) as Void
+  screen = getScreenFromStackById(m.constants.ui.screenIds.linearDetailScreen)
+  if screen <> invalid AND refreshedContent <> invalid AND screen.content <> invalid AND screen.content.id = refreshedContent.id
+    screen.content = refreshedContent
   end if
 End Function
 
@@ -204,5 +226,15 @@ End Function
 Function onLinearDetailCtaButtonSelected(msg)
   screen = msg.getRoSGNode()
   content = screen.content
-  processUserContentSelection(content, screen, screen.playbackSource)
+  buttonId = msg.getData()
+
+  if buttonId = "hub" AND content <> invalid AND isAA(content.creatorTensorApp) = true AND isNonEmptyString(content.creatorTensorApp.id) = true
+    screen.trackingComponentInfo = {
+      componentType: "middle_nav_component"
+      componentValues: { middle_nav_section: "COLLECTION" }
+    }
+    showPivotDetailScreen(content.creatorTensorApp)
+  else
+    processUserContentSelection(content, screen, screen.playbackSource)
+  end if
 End Function

@@ -23,6 +23,7 @@
     <script type="text/brightscript" uri="Parsers/ServerPersistentDataParser.brs" />
     <script type="text/brightscript" uri="Parsers/ConsentScreenParsers.brs" />
     <script type="text/brightscript" uri="Parsers/PivotParsers.brs" />
+    <script type="text/brightscript" uri="Parsers/AdParsers.brs" />
     <script type="text/brightscript" uri="pkg:/source/lib/TubiBookmarks.brs" />
     <script type="text/brightscript" uri="pkg:/source/lib/CmsApi.brs" />
     <script type="text/brightscript" uri="pkg:/source/lib/ApiUtils.brs" />

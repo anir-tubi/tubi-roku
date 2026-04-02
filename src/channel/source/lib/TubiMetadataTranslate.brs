@@ -22,6 +22,7 @@ Function TubiMetadataTranslate(constants, experiments = invalid, soTStaticConfig
     ' private
     constants: constants
     contentTypes: constants.ui.contentTypes
+    appTypes: constants.ui.appTypes
     creditsDuration: constants.player.creditsDuration
     allowAfterHours: constants.settings.allowAfterHours
     experiments: experiments
@@ -51,6 +52,7 @@ Function TubiMetadataTranslate(constants, experiments = invalid, soTStaticConfig
     getSignalTrustInfo: tubiMetadataTranslate_getSignalTrustInfo
     parseScheduleData: tubiMetadataTranslate_parseScheduleData
     parseUICustomization: tubiMetadataTranslate_parseUICustomization
+    buildUICustomizationTile: tubiMetadataTranslate_buildUICustomizationTile
     processSotStaticConfig: tubiMetadataTranslate_processSotStaticConfig
     isVideoTileEnabledScreen: tubiMetadataTranslate_isVideoTileEnabledScreen
   }
@@ -107,10 +109,10 @@ Function tubiMetadataTranslate_getThumbnailImage(contentFromServer, gridType = "
     end if
   else if gridType = gridItemTypes.videoTile AND canvasImages <> invalid AND isNonEmptyArray(canvasImages.video_tiles_portrait_tb) = true
     sThumbnailURL = canvasImages.video_tiles_portrait_tb[0]
-  else if gridType = gridItemTypes.controlLandscape AND canvasImages <> invalid AND isNonEmptyArray(canvasImages.control_landscape_tb) = true
-    sThumbnailURL = canvasImages.control_landscape_tb[0]
-  else if gridType = gridItemTypes.landscape OR gridType = gridItemTypes.landscapeNoTitle OR gridType = gridItemTypes.landscapeInnerMetadata OR gridType = gridItemTypes.linear OR gridType = gridItemTypes.episodeItem OR gridType = gridItemTypes.episodeItemLatestEpisodes then
-    if canvasImages <> invalid AND type(canvasImages.landscape_tb) = "roArray" AND isNonEmptyString(canvasImages.landscape_tb[0])
+  else if gridType = gridItemTypes.landscape OR gridType = gridItemTypes.landscapeNoTitle OR gridType = gridItemTypes.landscapeInnerMetadata OR gridType = gridItemTypes.linear OR gridType = gridItemTypes.episodeItem OR gridType = gridItemTypes.episodeItemLatestEpisodes OR gridType = gridItemTypes.landscapeSeries OR gridType = gridItemTypes.landscapeSeriesMultiple then
+    if gridType = gridItemTypes.episodeItem AND canvasImages <> invalid AND type(canvasImages.episode_landscape_tb) = "roArray" AND isNonEmptyString(canvasImages.episode_landscape_tb[0])
+      sThumbnailURL = canvasImages.episode_landscape_tb[0]
+    else if canvasImages <> invalid AND type(canvasImages.landscape_tb) = "roArray" AND isNonEmptyString(canvasImages.landscape_tb[0])
       '//A custom landscape size was requested, use this image instead of the default image
       sThumbnailURL = canvasImages.landscape_tb[0]
     else if canvasImages <> invalid AND type(canvasImages.hero_tb) = "roArray" AND isNonEmptyString(canvasImages.hero_tb[0])
@@ -198,6 +200,8 @@ End Function
 ' Translate the backend type into a more readable client side content type
 Function tubiMetadataTranslate_translateBackendTypeToClientSideType(sBackendType = "" as String) as String
   sReturn = ""
+  sBackendType = LCase(sBackendType)
+
   if sBackendType = "c"
     sReturn = m.contentTypes.category
   else if sBackendType = "cwso"
@@ -216,8 +220,12 @@ Function tubiMetadataTranslate_translateBackendTypeToClientSideType(sBackendType
     sReturn = m.contentTypes.sportsEvent
   else if sBackendType = "n"
     sReturn = m.contentTypes.navigate
-  else if sBackendType = "app"
-    sReturn = m.contentTypes.app
+  else if sBackendType = "creator"
+    sReturn = m.appTypes.creator
+  else if sBackendType = "pivot"
+    sReturn = m.appTypes.pivot
+  else if sBackendType = "explore"
+    sReturn = m.appTypes.explore
   end if
 
   return sReturn
@@ -250,7 +258,7 @@ End Function
 ' @sotInfo: assocArray, reference to SOT info object that will be updated
 ' @return: assocArray, updated SOT info object
 Function tubiMetadataTranslate_processSotStaticConfig(contentFromServer as Object, sotInfo as Object) as Object
-  if isAA(m.soTStaticConfig) = true AND m.soTStaticConfig.count() > 0 AND isAA(m.soTStaticConfig.customizations) = true
+  if isNonEmptyAA(m.soTStaticConfig) = true AND isNonEmptyAA(m.soTStaticConfig.customizations) = true
     contentId = contentFromServer.id
     newEpisodesMatch = false
     onlyOnTubiMatch = false
@@ -434,6 +442,13 @@ Function tubiMetadataTranslate_translateRecursive(contentFromServer as Object, t
     if contentFromServer.num_seasons <> invalid AND contentFromServer.num_seasons > 0
       translatedContent.update({
         seasons: contentFromServer.num_seasons
+      }, true)
+    end if
+
+    app = contentFromServer.creator_tensor_app
+    if isAA(app) AND isNonEmptyString(app.id)
+      translatedContent.update({
+        "creatorTensorApp": app
       }, true)
     end if
   end if
@@ -642,7 +657,8 @@ Function tubiMetadataTranslate_translateRecursive(contentFromServer as Object, t
     translatedContent.HDGRIDPOSTERURL = sPortraitURL
   end if
 
-  if contentFromServer.type = "app" AND isAA(contentFromServer.images) = true AND isNonEmptyArray(contentFromServer.images.logo) = true
+  isAppType = isNonEmptyString(contentFromServer.type) AND arrayIncludes(m.constants.ui.appTypes.keys(), LCase(contentFromServer.type)) = true
+  if isAppType = true AND isAA(contentFromServer.images) = true AND isNonEmptyArray(contentFromServer.images.logo) = true
     translatedContent.logo = m.getRoundedCornersURL(contentFromServer.images.logo[0], 999)
   else
     translatedContent.logo = ""
@@ -789,6 +805,20 @@ Function tubiMetadataTranslate_translateRecursive(contentFromServer as Object, t
 
   if contentFromServer.has_trailer = true then translatedContent.hasTrailer = true
 
+  if isAA(contentFromServer.ui_customization) = true AND isAA(contentFromServer.ui_customization.style) = true
+    uiStyle = contentFromServer.ui_customization.style
+    translatedContent.update({
+      uiCustomization: {
+        appId: uiStyle.app_id
+        titleArt: uiStyle.title_art
+        logo: uiStyle.logo
+        background: uiStyle.background
+        title: uiStyle.title
+        description: uiStyle.description
+      }
+    }, true)
+  end if
+
   ' video preview
   if isNonEmptyArray(contentFromServer.video_previews) = true AND isAA(contentFromServer.video_previews[0])
     videoPreview = contentFromServer.video_previews[0]
@@ -933,6 +963,16 @@ Function tubiMetadataTranslate_translateRecursive(contentFromServer as Object, t
     else if type(translatedContent) = "roSGNode"
       translatedContent.update({
         "seriesTitle": contentFromServer.series_title
+      }, true)
+    end if
+  end if
+
+  if contentFromServer.is_replay = true then
+    if type(translatedContent) = "roAssociativeArray"
+      translatedContent["isReplay"] = true
+    else if type(translatedContent) = "roSGNode"
+      translatedContent.update({
+        isReplay: true
       }, true)
     end if
   end if
@@ -1180,10 +1220,15 @@ Function tubiMetadataTranslate_translateHomescreen(contentToTranslate, contentMo
           "cursor": m.constants.performance.categoryGridList.initialBlockSize
           "hasMoreContent": true
         }
-
-        if isAA(container.ui_customization) = true
-          parsedUicustomization = m.parseUICustomization(container.ui_customization)
-          categoryAA.uiCustomization = parsedUicustomization
+        uiCustomization = container.ui_customization
+        if isAA(uiCustomization) = true
+          parsedUiCustomization = m.parseUICustomization(uiCustomization)
+          categoryAA.uiCustomization = parsedUiCustomization
+          categoryAA.containerStyle = uiCustomization.container_style
+          if isAA(uiCustomization.style) AND isNonEmptyString(uiCustomization.style.background)
+            categoryAA.containerBackground = uiCustomization.style.background
+          end if
+          m.buildUICustomizationTile(uiCustomization, container.id, categoryAA)
         end if
 
         homescreenAA.children.push(categoryAA)
@@ -1773,7 +1818,6 @@ Function tubiMetadataTranslate_buildCategoryChildrenInfo(container, contents, co
               rating = fullChild.ratings[0].value
             end if
 
-            controlLandscape = m.getRoundedCornersURL(m.getThumbnailImage(fullChild, m.constants.ui.gridItemTypes.controlLandscape))
             childAA = {
               id: fullChild.id
               title: fullChild.title
@@ -1790,7 +1834,6 @@ Function tubiMetadataTranslate_buildCategoryChildrenInfo(container, contents, co
               type: sContentType
               userStarRating: rottenTomatoScore
               featuredLandscape: featuredLandscape
-              controlLandscape: controlLandscape
               sotPosterLabels: sotPosterLabels
               sotInfo: sotInfo
               hasSubtitles: (fullChild.hasSubtitles = true OR fullChild.has_subtitle = true OR (fullChild.subtitleTracks <> invalid AND fullChild.subtitleTracks.isEmpty() = false))
@@ -1798,6 +1841,18 @@ Function tubiMetadataTranslate_buildCategoryChildrenInfo(container, contents, co
               availabilityEnds: fullChild.availability_ends
               parentId: container.id
             }
+
+            if parentGridItemType = m.constants.ui.gridItemTypes.episodeItem OR parentGridItemType = m.constants.ui.gridItemTypes.episodeItemLatestEpisodes OR parentGridItemType = m.constants.ui.gridItemTypes.landscapeSeries OR parentGridItemType = m.constants.ui.gridItemTypes.landscapeSeriesMultiple
+              childAA.landscape = m.getThumbnailImage(fullChild, parentGridItemType)
+            end if
+
+            if isBoolean(fullChild.is_replay) AND fullChild.is_replay = true
+              childAA.isReplay = fullChild.is_replay
+            end if
+
+            if isNonEmptyString(fullChild.series_title)
+              childAA.seriesTitle = fullChild.series_title
+            end if
           else
 
             childAA = {
@@ -1850,6 +1905,14 @@ Function tubiMetadataTranslate_buildCategoryChildrenInfo(container, contents, co
                     program.live = schedule.live
                     program.id = prgId
                     programs.push(program)
+                  else
+                    ' In certain scenarios we will not have program level info so exposing schedule data directly.
+                    programs.push({
+                      id: prgId
+                      start_time: schedule.start_time
+                      end_time: schedule.end_time
+                      live: schedule.live
+                    })
                   end if
                 end if
               end for
@@ -1872,7 +1935,7 @@ Function tubiMetadataTranslate_buildCategoryChildrenInfo(container, contents, co
 
           if childAA.type <> "ContentNode"
             '//if the subtype is not the default ContentNode, then set the gridItemType field
-            if childAA.type = m.constants.ui.contentTypes.app
+            if arrayIncludes(m.constants.ui.appTypes.keys(), LCase(childAA.type)) = true
               childAA.gridItemType = gridItemTypes.appItem
             else
               childAA.gridItemType = gridType
@@ -2201,7 +2264,7 @@ Function tubiMetadataTranslate_getGridItemType(container, orientation, constants
   else if isAA(container.ui_customization) = true AND container.ui_customization.type = "live_event_banner"
     gridItemType = gridItemTypes.liveEventBanner
   else if isUserInVideoTilesExperiment = true
-    gridItemType = gridItemTypes.videoTile
+    gridItemType = resolveVideoTileGridItemType(container, gridItemTypes)
   else if container.type = constants.ui.categoryTypes.linear
     gridItemType = gridItemTypes.linear
   else if container.id = constants.ui.categoryIds.certifiedFresh
@@ -3170,7 +3233,9 @@ Function tubiMetadataTranslate_translateSearchResults(contentToTranslate, isSign
   contents = contentToTranslate.contents
 
   ' V3 search API returns apps as a separate top-level key; merge into contents
-  ' so app-type items can be resolved the same way as content items
+  ' so app-type items can be resolved the same way as content items.
+  ' With include_apps, the apps map has real types (CREATOR, PIVOT, EXPLORE)
+  ' which flow through translateBackendTypeToClientSideType unchanged.
   apps = contentToTranslate.apps
   if isNonEmptyAA(apps) = true
     if isAA(contents) = true
@@ -3263,20 +3328,7 @@ Function tubiMetadataTranslate_getTheIconAndTextFromConfig(sotSignal, content)
 
         end if
 
-        ' Use iconV2 only if the user is part of the "roku_sot_reverse_ui_test" experiment;
-        ' If we decide not to graduate this experiment, revert to the previous behavior (show the original icon instead of iconV2)
-        ' or uncomment the code below:
-        ' if isNonEmptyString(signalMap.icon) = true
-        '     sotIcon = signalMap.icon
-        ' end if
-        if m.statSigExperiments <> invalid
-          experiment = m.statSigExperiments.getExperimentResource("roku_sot_reverse_ui_test", "roku_sot_reverse_ui_test_v1")
-          if isAA(experiment) = true AND experiment.enabled = true AND isNonEmptyString(signalMap.icon_v2) = true
-            sotIcon = signalMap.icon_v2
-          else if isNonEmptyString(signalMap.icon) = true
-            sotIcon = signalMap.icon
-          end if
-        else if isNonEmptyString(signalMap.icon) = true
+        if isNonEmptyString(signalMap.icon) = true
           sotIcon = signalMap.icon
         end if
 
@@ -3418,17 +3470,73 @@ End Function
 Function tubiMetadataTranslate_parseUICustomization(uiCustomization) as Object
   parsedUicustomization = {}
 
-  if isAA(uiCustomization) = true AND uiCustomization.type = "live_event_banner" AND isAA(uiCustomization.style) = true
+  if isAA(uiCustomization) = true AND isAA(uiCustomization.style) = true
     style = uiCustomization.style
-    parsedUicustomization.style = {
-      bannerTextGuest: style.banner_text_guest
-      bannerTextRegistered: style.banner_text_registered
-      bannerBackground: style.background_tv
-      bannerScreenBackground: style.background_tv_behind_banner
-    }
+
+    if uiCustomization.type = "live_event_banner"
+      parsedUicustomization.style = {
+        bannerTextGuest: style.banner_text_guest
+        bannerTextRegistered: style.banner_text_registered
+        bannerBackground: style.background_tv
+        bannerScreenBackground: style.background_tv_behind_banner
+      }
+    else if isNonEmptyString(style.app_id)
+      parsedUicustomization.type = "hub_row_lockup"
+      parsedUicustomization.style = {
+        eventLogo: style.logo
+        titleArt: style.title_art
+        background: style.background
+        title: style.title
+        description: style.description
+        buttonText: getTranslation("explore")
+        appId: style.app_id
+      }
+    end if
   end if
 
   return parsedUicustomization
+End Function
+
+
+' Builds a UI customization tile from the container's ui_customization and inserts
+' it as the first child of the category. Extensible for future customization types.
+'
+' @param uiCustomization - The ui_customization AA from the container
+' @param containerId - The container's id, used to generate the tile id
+' @param categoryAA - The category AA to insert the tile into
+Function tubiMetadataTranslate_buildUICustomizationTile(uiCustomization, containerId, categoryAA) as Void
+  if isAA(uiCustomization) = false OR isAA(uiCustomization.style) = false then return
+
+  style = uiCustomization.style
+  tile = invalid
+
+  uiType = uiCustomization.type
+  hasOwnRenderer = (uiType = "live_event_spotlight" OR uiType = "live_event_banner")
+  if isNonEmptyString(style.app_id) AND isNonEmptyString(uiCustomization.container_style) = false AND hasOwnRenderer = false
+    hubLockupSize = m.constants.ui.imageSizes.hubRowLockup
+    tile = {
+      subtype: "ContentNode"
+      id: style.app_id
+      title: style.title
+      type: m.constants.ui.appTypes.explore
+      gridItemType: m.constants.ui.gridItemTypes.hubRowLockup
+      hubLogoUri: style.logo
+      titleArt: style.title_art
+      hubTitle: style.title
+      hubSynopsis: style.description
+      buttonText: getTranslation("explore")
+      backgroundImage: style.background
+      ' Multiplying by 1.0 to ensure the width is a float
+      FHDItemWidth: hubLockupSize[0] * 1.0
+    }
+    categoryAA.hasHubRowLockup = true
+  end if
+
+  if tile <> invalid
+    children = [tile]
+    children.append(categoryAA.children)
+    categoryAA.children = children
+  end if
 End Function
 
 
@@ -3452,4 +3560,28 @@ Function tubiMetadataTranslate_isVideoTileEnabledScreen(screenId = "", uiMode = 
   end if
 
   return false
+End Function
+
+
+' Resolves the grid item type for video tile containers based on ui_customization
+' @param container - The container AA from the API response
+' @param gridItemTypes - Constants for grid item types
+' @return String grid item type
+Function resolveVideoTileGridItemType(container, gridItemTypes) as String
+  if isAA(container.ui_customization) = false then return gridItemTypes.videoTile
+
+  containerStyle = container.ui_customization.container_style
+
+  if containerStyle = "landscape_medium"
+    if isAA(container.ui_customization.style) = true AND container.ui_customization.style.show_series_title = true
+      return gridItemTypes.landscapeSeriesMultiple
+    end if
+    return gridItemTypes.landscapeSeries
+  else if containerStyle = "landscape_series_multiple"
+    return gridItemTypes.landscapeSeriesMultiple
+  else if containerStyle = "landscape_series" OR containerStyle = "landscape_large"
+    return gridItemTypes.landscapeSeries
+  end if
+
+  return gridItemTypes.videoTile
 End Function

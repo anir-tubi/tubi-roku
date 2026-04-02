@@ -12,6 +12,7 @@
   <script type="text/brightscript" uri="pkg:/components/lib/TypographyMixin.brs" />
   <script type="text/brightscript" uri="pkg:/components/lib/DevGridOverlay.brs" />
   <script type="text/brightscript" uri="pkg:/source/lib/StringUtils.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/GeneralTaskModule.brs" />
 
   <interface>
     <!-- INPUTS -->
@@ -43,7 +44,7 @@
 
         <MarkupList
           id="testingAidMenu"
-          numRows="12"
+          numRows="14"
           itemSize="[420,80]"
           itemSpacing="[0,8]"
           itemComponentName="CheckButton"
@@ -58,6 +59,12 @@
             <CheckButtonContentNode
               id="branchBuilds"
               title="Branch Builds" />
+            <CheckButtonContentNode
+              id="rokuAds"
+              title="Ads" />
+            <CheckButtonContentNode
+              id="mockServer"
+              title="Mock" />
             <CheckButtonContentNode
               id="changeLanguage"
               title="Change Language" />

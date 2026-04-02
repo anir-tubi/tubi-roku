@@ -737,7 +737,7 @@ End Function
 Function tubiAuth_updateAuthInfo(newAccess)
   updatedAuthInfo = invalid
 
-  if newAccess <> invalid AND newAccess.expires_in <> invalid AND newAccess.access_token <> invalid
+  if isAA(newAccess) AND newAccess.expires_in <> invalid AND newAccess.access_token <> invalid
     dateTime = CreateObject("roDateTime")
     newExpireTime = dateTime.asSeconds() + newAccess.expires_in
 

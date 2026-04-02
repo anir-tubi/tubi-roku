@@ -1,5 +1,5 @@
-<?xml version="1.0" encoding="utf-8" ?>
-<component name="ProgramGuide" extends="Group" >
+<?xml version="1.0" encoding="utf-8"?>
+<component name="ProgramGuide" extends="Group">
   <script type="text/brightscript" uri="ProgramGuide.brs" />
   <script type="text/brightscript" uri="pkg:/components/lib/EPGMixin.brs" />
   <script type="text/brightscript" uri="pkg:/components/lib/GlobalMixin.brs" />
@@ -13,24 +13,27 @@
   <script type="text/brightscript" uri="pkg:/source/lib/TubiLanguageTranslate.brs" />
   <script type="text/brightscript" uri="pkg:/source/lib/StringUtils.brs" />
   <script type="text/brightscript" uri="pkg:/source/3rdparty/rta/typeUtils.brs" />
-  <script type="text/brightscript" uri="pkg:/components/lib/TypographyMixin.brs"/>
+  <script type="text/brightscript" uri="pkg:/components/lib/TypographyMixin.brs" />
 
   <interface>
     <!-- INPUTS -->
 
     <!--content-->
-    <field id="content" type="node"/>
+    <field id="content" type="node" />
 
     <!-- contentUpdated will be set when the new content is ready to be displayed on the screen. -->
-    <field id="contentUpdated" type="boolean" alwaysNotify="true"/>
+    <field id="contentUpdated" type="boolean" alwaysNotify="true" />
 
-    <!-- Set the ID that the TimeGrid should jump to when displayed on the linear TV video player. Second element in the array is not used in case of EPG -->
-    <field id="jumpToLinearChannelID" type="array" alwaysNotify="true"/>
+    <!-- Set the ID that the TimeGrid should jump to when displayed on the linear TV video player.
+    Second element in the array is not used in case of EPG -->
+    <field id="jumpToLinearChannelID" type="array" alwaysNotify="true" />
 
     <!-- Set to true when EPG overlay present on the fullplayer -->
-    <field id="shouldSendComponentInteractionEventOnJumpToLinearChannelId" type="boolean" value="false"/>
+    <field id="shouldSendComponentInteractionEventOnJumpToLinearChannelId" type="boolean"
+      value="false" />
 
-    <!--Select the TimeGrid mode. These values are available in constants 'EPGChannelPlayMode'
+    <!--Select
+    the TimeGrid mode. These values are available in constants 'EPGChannelPlayMode'
         1: playItemOnSelect: update the channel that should be playing based on the item being selected
         2: playItemOnFocus: update the channel that should be playing based on the item being focused
       -->
@@ -38,58 +41,67 @@
 
     <!-- EPGFullMode  true : 3 and half rows visible with floating focus
                         false : 1 and half  = rows visible with fixedFocus-->
-    <field id="EPGFullMode" type="boolean" value="true"/>
+    <field id="EPGFullMode" type="boolean" value="true" />
 
     <field id="jumpToRowItem" alias="ProgramGrid.jumpToRowItem" />
 
-    <field id="isChannelGridFocused" type="boolean" value="false"/>
+    <field id="isChannelGridFocused" type="boolean" value="false" />
 
-    <field id="channelGridFocusable" type="boolean" value="true" alwaysNotify="true"/>
+    <field id="channelGridFocusable" type="boolean" value="true" alwaysNotify="true" />
 
-    <field id="categoriesMenuVisible" type="boolean" value="true" alwaysNotify="true"/>
+    <field id="categoriesMenuVisible" type="boolean" value="true" alwaysNotify="true" />
 
-    <field id="setFocusedToPlay"  type="boolean" alwaysNotify="true" />
+    <field id="setFocusedToPlay" type="boolean" alwaysNotify="true" />
 
 
     <!-- Keeps the information used for user tracking - structure looks like:
         {
-          pageType: "linear_browse_page"  'corresponds to one of the page types in tubiTracking_getAnalyticsPage() which mirrors the protos repo
-          pageValues: {}          'an assoc array with key/values that match the pageType as found in tubiTracking_getAnalyticsPage()
+          pageType: "linear_browse_page"  'corresponds to one of the page types in
+    tubiTracking_getAnalyticsPage() which mirrors the protos repo
+          pageValues: {}          'an assoc array with key/values that match the pageType as found in
+    tubiTracking_getAnalyticsPage()
         }
       -->
-    <field id="trackingPageInfo" type="assocarray" alwaysNotify="true"/>
+    <field id="trackingPageInfo" type="assocarray" alwaysNotify="true" />
 
 
     <!-- OUTPUTS -->
-    <field id="linearChannelSelected" type="node" alwaysNotify="true"/>
+    <field id="linearChannelSelected" type="node" alwaysNotify="true" />
 
-    <field id="linearChannelFocused" type="node"/>
+    <field id="linearChannelFocused" type="node" />
 
-    <!--Since linearChannelFocused will get updated everytime minsLeftTimer is run, to protect unwanted trigging of observer, this field is used-->
-    <field id="linearChannelFocusedUpdated" type="boolean" alwaysNotify="true"/>
+    <!--Since
+    linearChannelFocused will get updated everytime minsLeftTimer is run, to protect unwanted
+    trigging of observer, this field is used-->
+    <field id="linearChannelFocusedUpdated" type="boolean" alwaysNotify="true" />
 
     <!-- present the ready node to play -->
     <field id="linearChannelToPlay" type="node" />
 
-    <!-- this field will update the background images when content has needsLogIn = true and user is in roku_linear_reg_gate_v1_1 experiment -->
-    <field id="isBackgroundImagesChanges" type="boolean" alwaysNotify="true"/>
+    <!-- this field will update the background images when content has needsLogIn = true and user is
+    in roku_linear_reg_gate_v1_1 experiment -->
+    <field id="isBackgroundImagesChanges" type="boolean" alwaysNotify="true" />
 
 
-    <!--Since LinearChannelToPlay will get updated everytime minsLeftTimer is run, to protect unwanted trigging of observer, this field is used-->
-    <field id="linearChannelToPlayUpdated" type="boolean" alwaysNotify="true"/>
+    <!--Since
+    LinearChannelToPlay will get updated everytime minsLeftTimer is run, to protect unwanted
+    trigging of observer, this field is used-->
+    <field id="linearChannelToPlayUpdated" type="boolean" alwaysNotify="true" />
 
-    <field id="channelIdSelected" type="string" alwaysNotify="true"/>
+    <field id="channelIdSelected" type="string" alwaysNotify="true" />
 
-    <!--this field will be used to move the channelGrid when program grid moves-->
+    <!--this
+    field will be used to move the channelGrid when program grid moves-->
     <field id="currFocusRow" alias="ProgramGrid.currFocusRow" />
 
-    <field id="okPressed" type="boolean" alwaysNotify="true"/>
+    <field id="okPressed" type="boolean" alwaysNotify="true" />
 
-    <!--this field will be used for long presses to dismiss the timer-->
+    <!--this
+    field will be used for long presses to dismiss the timer-->
     <field id="scrollingStatus" type="boolean" alias="ProgramGrid.scrollingStatus" />
-    
+
     <!-- Scrolling status for channel grid (MarkupList doesn't have built-in scrollingStatus) -->
-    <field id="channelGridScrollingStatus" type="boolean" value="false" alwaysNotify="true"/>
+    <field id="channelGridScrollingStatus" type="boolean" value="false" alwaysNotify="true" />
 
     <field id="rowItemfocused" alias="ProgramGrid.rowItemFocused" />
 
@@ -97,13 +109,13 @@
            be observed by the contentController via epgScreenHelper
            which will be responsible for sending component_interaction events.
       -->
-    <field id="componentInteractionInfo" type="assocarray"/>
+    <field id="componentInteractionInfo" type="assocarray" />
 
     <!-- Holds the information needed to populate a navigate_within_page event. This will
            be observed by the contentController via epgScreenHelper
            which will be responsible for sending navigate_within_page events.
       -->
-    <field id="navigateWithinPageInfo" type="assocarray"/>
+    <field id="navigateWithinPageInfo" type="assocarray" />
 
     <!-- Keeps the information used for user tracking - structure looks like:
       {
@@ -120,7 +132,7 @@
         }
       }
     -->
-    <field id="epgTrackingComponentInfo" type="assocarray" alwaysNotify="true"/>
+    <field id="epgTrackingComponentInfo" type="assocarray" alwaysNotify="true" />
 
   </interface>
 
@@ -129,7 +141,7 @@
       translation="[0,0]"
       width="1728"
       height="558"
-      uri="pkg:/images/epgBackgroud.png"/>
+      uri="pkg:/images/epgBackgroud.png" />
 
     <LayoutGroup
       id="backToLive"
@@ -142,7 +154,7 @@
         id="leftIcon"
         width="21"
         height="21"
-        uri="pkg:/images/left-arrow.png"/>
+        uri="pkg:/images/left-arrow.png" />
 
       <Label
         id="backToLiveText"
@@ -157,7 +169,7 @@
         ellipsizeOnBoundary="true">
         <Font
           id="backToLiveTextFont"
-          role="font"/>
+          role="font" />
       </Label>
     </LayoutGroup>
 
@@ -174,7 +186,7 @@
       ellipsizeOnBoundary="true">
       <Font
         id="headerTextFont"
-        role="font"/>
+        role="font" />
     </Label>
 
     <MarkupList
@@ -187,7 +199,7 @@
       focusFootprintBitmapUri="pkg:/images/ratingBackground.9.png"
       focusBitmapUri="pkg:/images/epg-selector-$$RES$$.9.png"
       itemComponentName="ProgramGuideChannelItem"
-      vertFocusAnimationStyle="fixedFocus"/>
+      vertFocusAnimationStyle="fixedFocus" />
 
     <CustomEPGRowList
       id="ProgramGrid"
@@ -208,11 +220,11 @@
       maintainHorizFocusPosition="false"
       fadeFocusFeedbackWhenAutoScrolling="true"
       scrollSpeed="3"
-      vertFocusAnimationStyle="fixedFocus"/>
+      vertFocusAnimationStyle="fixedFocus" />
 
     <Timer
       id="updateMinsLeftTimer"
       duration="60"
-      repeat="true"/>
+      repeat="true" />
   </children>
 </component>

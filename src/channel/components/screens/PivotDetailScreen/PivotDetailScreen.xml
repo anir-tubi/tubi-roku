@@ -8,10 +8,14 @@
 <component name="PivotDetailScreen" extends="VideoTilesScreen">
   <script type="text/brightscript" uri="pkg:/source/lib/ApiUtils.brs" />
   <script type="text/brightscript" uri="pkg:/source/lib/CmsApi.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/AdsApi.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/AdsUtils.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/Auth.brs" />
   <script type="text/brightscript" uri="pkg:/source/lib/MathUtils.brs" />
   <script type="text/brightscript" uri="pkg:/source/lib/TubiMetadataTranslate.brs" />
   <script type="text/brightscript" uri="pkg:/source/lib/TubiTracking.brs" />
   <script type="text/brightscript" uri="pkg:/components/lib/TypographyMixin.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/AnimationMixin.brs" />
   <script type="text/brightscript" uri="PivotDetailScreen.brs" />
   <interface>
     <!-- INPUTS -->
@@ -47,16 +51,38 @@
     <!-- Signals that more tiles are being appended to a container during lazy loading -->
     <!-- Possible values: "none", "start", "complete" -->
     <field id="containerAppendMoreTilesStatus" type="string" value="none" />
+
+    <!-- Sponsored hub ad content data (assets, trackers, adId) -->
+    <field id="sponsoredHubAdContent" type="assocarray" />
   </interface>
 
   <children>
+    <Poster
+      id="backgroundPoster"
+      width="1920"
+      height="1080"
+      visible="false"
+      loadDisplayMode="scaleToFill" />
+
     <Group
       id="screenContentGroup"
       translation="[84, 0]">
-      <Label
-        id="pivotTitleLabel"
+      <LayoutGroup
+        id="titleGroup"
+        layoutDirection="horiz"
+        vertAlignment="center"
+        itemSpacings="[16]"
         translation="[0, 48]"
-        visible="false" />
+        visible="false">
+        <Poster
+          id="pivotLogo"
+          loadWidth="141"
+          loadHeight="63"
+          visible="false"
+          loadDisplayMode="limitSize" />
+        <Label
+          id="pivotTitleLabel" />
+      </LayoutGroup>
       <Group id="PageGroup">
         <TubiRowList
           id="rowList"
@@ -73,5 +99,13 @@
           vertFocusAnimationStyle="fixedFocus" />
       </Group>
     </Group>
+
+    <Poster
+      id="sponsorshipPoster"
+      translation="[981, 39]"
+      width="636"
+      height="168"
+      visible="false"
+      loadDisplayMode="scaleToFit" />
   </children>
 </component>

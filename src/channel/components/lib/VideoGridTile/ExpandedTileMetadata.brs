@@ -259,15 +259,7 @@ Function handleSOTBadgesAndLayout(itemContent) as Void
   backgroundUri = "pkg:/images/rounded-background-$$RES$$.9.png"
   markerFont = m.bodySmallStrong
   translation = [15, 15]
-  if getStatsigExperimentResource("roku_sot_reverse_ui_test", "roku_sot_reverse_ui_test_v1", false).enabled = true
-    badgeTextFont = m.bodySmallStrong
-    textColor = m.focusedTextColor
-    markerFont = m.bodyMediumStrongFont
-    backgroundUri = "pkg:/images/badge-background-$$RES$$.9.png"
-    translation = [4, 4]
-  end if
 
-  isSotBadgesExist = false
 
   if m.top.variant = "detailScreenInfoPanel"
     config = {
@@ -372,22 +364,16 @@ Function handleSOTBadgesAndLayout(itemContent) as Void
       end if
 
       if isNonEmptyArray(topLabels) = true
-        isSotBadgesExist = true
         showTopLabels(m.secondLineGroup, topLabels)
       end if
 
       if isNonEmptyArray(metaDataLabels) = true
-        isSotBadgesExist = true
         if m.sotBadge <> invalid AND m.sotBadge.getParent() <> invalid
           m.firstLineGroup.removeChild(m.sotBadge)
         end if
         showMetaDataLabels(m.secondLineGroup, metaDataLabels)
       end if
 
-      ' Fire exposure event when sot labels are displayed and visible
-      if isSotBadgesExist = true
-        getStatsigExperimentResource("roku_sot_reverse_ui_test", "roku_sot_reverse_ui_test_v1", true)
-      end if
     end if
 
     ' With 3 lines of description text, the height is 230px and with 2 lines of description text, the height is 192px.
@@ -514,22 +500,13 @@ Function metadataOnPosterContent(itemContent)
     textColor = m.primaryTextColor
     backgroundUri = "pkg:/images/rounded-background-$$RES$$.9.png"
     badgeTextFont = m.bodySmallFont
-    if getStatsigExperimentResource("roku_sot_reverse_ui_test", "roku_sot_reverse_ui_test_v1", false).enabled = true
-      textColor = m.focusedTextColor
-      backgroundUri = "pkg:/images/badge-background-$$RES$$.9.png"
-      badgeTextFont = m.bodySmallStrong
-    end if
 
     m.sotBadge.textColor = textColor
     m.sotBadge.borderUri = ""
-    m.sotBadge.height = 36
     m.sotBadge.backgroundUri = backgroundUri
     m.sotBadge.badgeTextFont = badgeTextFont
     m.sotBadge.text = sotBadge.sotLabelText
     m.sotBadge.iconUri = sotBadge.sotIcon
-
-    'Fore exposure event when metadata shown.
-    getStatsigExperimentResource("roku_sot_reverse_ui_test", "roku_sot_reverse_ui_test_v1", true)
 
   else if isSotBadgePresent = true
     ratingSotParent.removeChild(m.sotBadge)

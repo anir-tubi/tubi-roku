@@ -29,7 +29,9 @@
 ' @param rowListNode - The row list node
 ' @param infoPanelNode - The info panel node (optional, can be invalid)
 Function initVideoTilesScreen(contentAreaNode, rowListNode, infoPanelNode = invalid) as Void
-  constants = getConstantsFromGlobal()
+  m.constants = getConstantsFromGlobal()
+  constants = m.constants
+  m.nodeHelpers = TubiNodeHelpers()
 
   m.contentAreaNode = contentAreaNode
   m.originalContentAreaTranslation = m.contentAreaNode.translation
@@ -55,6 +57,7 @@ Function initVideoTilesScreen(contentAreaNode, rowListNode, infoPanelNode = inva
   m.lastFocusColumnIndex = 0
   m.lastFocusRow = 0
   m.ignoreCurrColumnChange = false
+  m.ignoreRowColumnChange = false
 
   ' Set up row list observers for video tiles
   rowListNode.observeFieldScoped("currFocusColumn", "onRowCurrFocusColumnChange")
@@ -71,6 +74,9 @@ Function initVideoTilesScreen(contentAreaNode, rowListNode, infoPanelNode = inva
   ' Set up top-level observer for enableVideoTiles
   m.top.observeFieldScoped("enableVideoTiles", "onEnableVideoTilesChange")
   m.top.observeFieldScoped("focusedChild", "onScreenFocusChange")
+  m.top.observeFieldScoped("rowCurrFocusColumn", "onRowCurrFocusColumnUpdate")
+  m.top.observeFieldScoped("expiredContainerIds", "onExpiredContainerIds")
+  m.top.observeFieldScoped("listingRefreshData", "onListingRefreshData")
 
   ' Initialize rowListTranslation and field syncs immediately
   updateRowListTranslation(rowListNode.translation)
@@ -79,12 +85,99 @@ Function initVideoTilesScreen(contentAreaNode, rowListNode, infoPanelNode = inva
 End Function
 
 
-' Handles screen focus changes
+' Handles screen focus changes and triggers content/container refresh when needed
 Function onScreenFocusChange() as Void
   if m.top.hasFocus() = true
-    m.rowList.setFocus(true)
+    contentRefreshed = checkContentRefresh()
+    if contentRefreshed = false
+      checkContainerRefresh()
+    end if
+    m.rowListNode.setFocus(true)
   end if
-  m.top.listHasFocus = m.rowList.isInFocusChain()
+  m.top.listHasFocus = m.rowListNode.isInFocusChain()
+End Function
+
+
+' Checks if top-level content has expired and fires refreshContent signal
+' @return Boolean - true if content refresh was triggered
+Function checkContentRefresh() as Boolean
+  if m.top.enableContentRefresh = true AND m.top.content <> invalid AND shouldRefresh(m.top.content)
+    m.top.refreshContent = true
+    return true
+  end if
+  return false
+End Function
+
+
+' Checks individual containers for expiration and fires expiredContainerIds signal
+Function checkContainerRefresh() as Void
+  if m.top.enableContainerRefresh <> true OR m.top.content = invalid then return
+
+  expiredIds = []
+  containers = m.top.content.getChildren(-1, 0)
+  for each container in containers
+    if shouldRefresh(container) = true
+      expiredIds.push(container.id)
+    end if
+  end for
+  if expiredIds.count() > 0
+    m.top.expiredContainerIds = expiredIds
+  end if
+End Function
+
+
+' Fetches expired containers via batch request
+' Requires m.cmsApi to be initialized by the child screen
+' @param msg - Message containing array of expired container IDs
+Function onExpiredContainerIds(msg) as Void
+  containerIds = msg.getData()
+  if isNonEmptyArray(containerIds) = false OR m.cmsApi = invalid then return
+
+  batchRequests = m.cmsApi.createBatchReqInfoForContainers({
+    containerIds: containerIds
+    bKidsMode: m.top.isKidsMode
+    isSignedInUser: m.top.isSignedInUser
+    uiMode: m.top.uiMode
+    screenId: m.top.id
+    appId: m.top.containerRefreshAppId
+  })
+  if batchRequests <> invalid AND batchRequests.count() > 0
+    makeBatchNetworkRequest({
+      requests: batchRequests
+      responseType: "node"
+      successCallback: onContainerRefreshSuccess
+    })
+  end if
+End Function
+
+
+' Handles successful container refresh batch response
+' Replaces expired containers in the existing content tree
+' @param response - Batch response node containing refreshed container data
+Function onContainerRefreshSuccess(response) as Void
+  if response = invalid OR m.top.content = invalid then return
+
+  refreshedContainers = response.getChildren(-1, 0)
+  existingContainers = m.top.content.getChildren(-1, 0)
+
+  for each refreshedContainer in refreshedContainers
+    if refreshedContainer = invalid then continue for
+
+    for j = 0 to existingContainers.count() - 1
+      existingContainer = existingContainers[j]
+      if existingContainer <> invalid AND existingContainer.id = refreshedContainer.id
+        m.top.content.replaceChild(refreshedContainer, j)
+        exit for
+      end if
+    end for
+  end for
+End Function
+
+
+' Observer callback for listingRefreshData field — delegates to BaseScreen's processListingRefreshData
+' @param msg - Message containing AA keyed by scheduleId with listing data from the EPG API
+Function onListingRefreshData(msg) as Void
+  processListingRefreshData(msg.getData())
 End Function
 
 
@@ -198,21 +291,28 @@ End Function
 
 
 ' Updates focus X offset for video tile expansion effect
-' @param rowListNode - The row list node
 ' @param currFocusRow - Current focused row index
-' @param isInTransit - Whether focus is transitioning between rows (default: false)
-Function updateFocusXOffset(rowListNode, currFocusRow, isInTransit = false) as Void
+Function updateFocusXOffset(rowListNode, currFocusRow, currFocusColumn = -1) as Void
   if m.top.enableVideoTiles = false then return
 
-  rowContent = m.top.content
+  rowContent = rowListNode.content
   focusXOffsets = rowListNode.focusXOffset
+  isComponentInFocusChain = m.top.isInFocusChain() = true
   if isNode(rowContent) = true AND isNonEmptyArray(focusXOffsets) = true
     focusXOffset = []
     for i = 0 to rowContent.getChildCount() - 1
       category = rowContent.getChild(i)
       gridItemType = category.gridItemType
-      if (i = currFocusRow OR (isInTransit = true AND i = currFocusRow + 1)) AND isVideoTileEnabledContainer(gridItemType) = true
-        focusXOffset.push(m.expandedTileFocusXOffset)
+      if i = currFocusRow AND isVideoTileEnabledContainer(gridItemType) = true AND isComponentInFocusChain = true
+        columnIndex = currFocusColumn
+        if columnIndex < 0 then columnIndex = category.focusIndex
+        if columnIndex = invalid OR columnIndex < 0 then columnIndex = 0
+        focusedItem = m.nodeHelpers.getNodeFromPosition(rowContent, [i, columnIndex])
+        if focusedItem <> invalid AND arrayIncludes(m.constants.ui.nonVideoTileGridItemTypes, focusedItem.gridItemType) = true
+          focusXOffset.push(0)
+        else
+          focusXOffset.push(m.expandedTileFocusXOffset)
+        end if
       else
         focusXOffset.push(0)
       end if
@@ -220,6 +320,7 @@ Function updateFocusXOffset(rowListNode, currFocusRow, isInTransit = false) as V
     ' To Avoid unnecessary updates to the focusXOffset field, doing a simple array comparison.
     if FormatJson(focusXOffset) <> FormatJson(rowListNode.focusXOffset)
       m.ignoreCurrColumnChange = true
+      m.lastFocusColumnIndex = currFocusColumn
       rowListNode.focusXOffset = focusXOffset
       m.ignoreCurrColumnChange = false
     end if
@@ -322,6 +423,7 @@ Function onRowItemFocusedChange(msg) as Void
     category = rowContent.getChild(rowItemFocused[0])
     if category <> invalid
       category.focusIndex = rowItemFocused[1]
+      updateFocusXOffset(m.rowListNode, rowItemFocused[0])
     end if
   end if
 End Function
@@ -332,8 +434,7 @@ End Function
 ' @param gridItemType - The grid item type to check
 ' @return Boolean - True if video tiles are enabled for this container
 Function isVideoTileEnabledContainer(gridItemType) as Boolean
-  constants = getConstantsFromGlobal()
-  return arrayIncludes(constants.ui.nonVideoTileGridItemTypes, gridItemType) = false AND gridItemType = constants.ui.gridItemTypes.videoTile
+  return arrayIncludes(m.constants.ui.nonVideoTileGridItemTypes, gridItemType) = false AND gridItemType = m.constants.ui.gridItemTypes.videoTile
 End Function
 
 
@@ -355,13 +456,14 @@ End Function
 ' @param rowItemSize - Array of row item sizes
 ' @param rowHeights - Array of row heights
 ' @param content - Content node
-Function configureRowHeights(rowListNode, rowItemSize, rowHeights, content) as Void
+' @param variableWidthItems - Array of booleans indicating which rows have variable-width items (e.g. hub lockup)
+Function configureRowHeights(rowListNode, rowItemSize, rowHeights, content, variableWidthItems = []) as Void
   rowListNode.update({
     "itemSize": [1920, m.gridItemSize[1]]
     "rowItemSize": rowItemSize
     "rowHeights": rowHeights
     "showRowLabel": [true]
-    "focusXOffset": [0]
+    "variableWidthItems": variableWidthItems
   }, true)
 
   ' Set initial focus offset for video tiles if enabled
@@ -438,6 +540,14 @@ End Function
 Function getTubiContentNodeFromRowItem(rowItemIndex, metadataTranslate = invalid, isSignedIn = false) as Dynamic
   content = getContentNodeFromRowItem(rowItemIndex)
 
+  if content = invalid then return invalid
+
+  gridItemType = content.gridItemType
+  ' This is needed hack to account for items appending client side.
+  isNonResolvableGridItem = arrayIncludes(m.constants.ui.nonVideoTileGridItemTypes, gridItemType) = true AND arrayIncludes(m.constants.ui.liveEventsGridTypes, gridItemType) = false
+
+  if isNonResolvableGridItem = true then return content
+
   if content <> invalid AND isNonEmptyString(content.id) AND metadataTranslate <> invalid
     category = m.top.content.getChild(rowItemIndex[0])
     if category <> invalid
@@ -448,4 +558,17 @@ Function getTubiContentNodeFromRowItem(rowItemIndex, metadataTranslate = invalid
   end if
 
   return invalid
+End Function
+
+
+' Recalculates focus X offset when the focused column changes within a row
+Function onRowCurrFocusColumnUpdate(msg) as Void
+  rowItemFocused = m.rowListNode.rowItemFocused
+  if rowItemFocused <> invalid AND m.ignoreRowColumnChange = false
+    columnFocused = msg.getData()
+    if columnFocused < 0 then columnFocused = 0
+    updateFocusXOffset(m.rowListNode, rowItemFocused[0], columnFocused)
+  else
+    m.ignoreRowColumnChange = false
+  end if
 End Function

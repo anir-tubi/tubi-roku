@@ -1,5 +1,5 @@
-<?xml version="1.0" encoding="utf-8" ?>
-<component name="EPGHomeScreen" extends="BaseScreen" >
+<?xml version="1.0" encoding="utf-8"?>
+<component name="EPGHomeScreen" extends="BaseScreen">
 
   <script type="text/brightscript" uri="EPGHomeScreen.brs" />
   <script type="text/brightscript" uri="../../lib/AnimationMixin.brs" />
@@ -11,31 +11,38 @@
   <interface>
     <!-- INPUT -->
 
-    <!--Timegrid content updated in batches-->
+    <!--Timegrid
+    content updated in batches-->
     <field id="timeGridContent" type="node" />
 
     <!-- Content might be loading in batch. So render only when timeGridContent is set -->
     <field id="updateTimeGridContent" type="boolean" alwaysNotify="true" />
 
     <!-- Is the content of the EPG Screen loading? -->
-    <!-- This field is not currently being used by the screen (as the screen uses the loading indicator in ContentController) but is needed to ensure screens that load EPG content use the same interface and this field is part of that interface.-->
+    <!-- This field is not currently being used by the screen (as the screen uses the loading
+    indicator in ContentController) but is needed to ensure screens that load EPG content use the
+    same interface and this field is part of that interface.-->
     <field id="timeGridContentLoading" type="boolean" alwaysNotify="true" />
 
-    <!-- Not Used in EPGScreen. But this field is set in SideNav functions and without interface brightScript will throw error  -->
-    <field id="enabled" type="boolean" alwaysNotify="true"/>
+    <!-- Not Used in EPGScreen. But this field is set in SideNav functions and without interface
+    brightScript will throw error  -->
+    <field id="enabled" type="boolean" alwaysNotify="true" />
 
     <!-- set to true if the user is signed in and we want to change the experience based on that -->
     <field id="signedIn" type="boolean" value="false" />
 
 
-    <!--this field is used to reset the timeGrid linearChannelToPlay field in case of player error-->
-    <field id="resetPlayerContent" type="boolean" alwaysNotify="true"/>
+    <!--this
+    field is used to reset the timeGrid linearChannelToPlay field in case of player error-->
+    <field id="resetPlayerContent" type="boolean" alwaysNotify="true" />
 
-    <!--The the video and hide the video player-->
-    <field id="refreshEPGScreenVideoPlay" type="boolean" alwaysNotify="true"/>
+    <!--The
+    the video and hide the video player-->
+    <field id="refreshEPGScreenVideoPlay" type="boolean" alwaysNotify="true" />
 
-    <!-- The number that is used as how many more seconds until the linear video player will be going fullscreen -->
-    <field id="fullscreenCountdown" type="integer" alias="InfoPanel.fullscreenCountdown"/>
+    <!-- The number that is used as how many more seconds until the linear video player will be
+    going fullscreen -->
+    <field id="fullscreenCountdown" type="integer" alias="InfoPanel.fullscreenCountdown" />
 
     <field id="infoPanelVisible" alias="InfoPanel.visible" />
 
@@ -50,37 +57,44 @@
 
     <!-- OUTPUTS -->
 
-    <field id="epgScreenOkPressed" type="boolean" alwaysNotify="true"/>
+    <field id="epgScreenOkPressed" type="boolean" alwaysNotify="true" />
 
-    <!--Channel Item Focused-->
+    <!--Channel
+    Item Focused-->
     <field id="linearChannelFocused" type="node" />
 
-    <!--Channel Item to play in EPG video player or linear video player-->
-    <field id="linearChannelToPlay" type="node"/>
+    <!--Channel
+    Item to play in EPG video player or linear video player-->
+    <field id="linearChannelToPlay" type="node" />
 
     <!-- content on the EPG Screen is loaded and spinner can be turned off -->
     <field id="contentReady" type="boolean" value="false" alwaysNotify="true" />
 
     <!-- Pass through Program Guide component events to EpgScreen helper -->
-    <field id="channelIdSelected" alias="programGuide.channelIdSelected" alwaysNotify="true"/>
+    <field id="channelIdSelected" alias="programGuide.channelIdSelected" alwaysNotify="true" />
 
     <!-- Trigger the content to be loaded.   -->
-    <field id="loadAllChannels" type="boolean" value="false" alwaysNotify="true"/>
+    <field id="loadAllChannels" type="boolean" value="false" alwaysNotify="true" />
 
-    <!--observe the scrolling status of program Grid to stop/start count down timer-->
+    <!--observe
+    the scrolling status of program Grid to stop/start count down timer-->
     <field id="scrollingStatus" type="boolean" alias="programGuide.scrollingStatus" />
-    
+
     <!-- Combined scrolling status: true if program grid OR channel grid is scrolling -->
-    <field id="channelGridScrollingStatus" type="boolean" alias="programGuide.channelGridScrollingStatus" />
+    <field id="channelGridScrollingStatus" type="boolean"
+      alias="programGuide.channelGridScrollingStatus" />
 
     <!-- Scrolling status for category grid (containerMarkupGrid) -->
-    <field id="categoryGridScrollingStatus" type="boolean" value="false" alwaysNotify="true"/>
+    <field id="categoryGridScrollingStatus" type="boolean" value="false" alwaysNotify="true" />
 
     <!-- Pass through Program Guide component events to EpgScreen helper -->
     <field id="programGuideNavigateWithinPageInfo" alias="programGuide.navigateWithinPageInfo" />
 
     <!-- Pass through Program Guide component events to EpgScreen helper -->
     <field id="programGuidecomponentInteractionInfo" alias="programGuide.componentInteractionInfo" />
+
+    <!-- EPG banner selection with the active banner's game_id -->
+    <field id="epgBannerSelected" type="assocarray" alwaysNotify="true" />
 
   </interface>
 
@@ -94,8 +108,15 @@
           maxHeight="355"
           translation="[0,180]"
           maxTitleLines="2"
-          visible="false"/>
+          visible="false" />
       </Group>
+      <Banner
+        id="epgBanner"
+        width="1120"
+        height="81"
+        translation="[549, 521]"
+        visible="false" />
+
       <MarkupGrid
         id="containerMarkupGrid"
         translation="[0,606]"
@@ -110,10 +131,10 @@
         itemComponentName="LabelItem"
         vertFocusAnimationStyle="fixedFocus"
         fadeFocusFeedbackWhenAutoScrolling="true"
-        visible="false"/>
+        visible="false" />
       <ProgramGuide
         id="programGuide"
-        translation="[0,510]"/>
+        translation="[6, 516]" />
     </Group>
 
     <Clock
@@ -121,11 +142,11 @@
       width="93"
       height="36"
       visible="true"
-      translation="[1729,72]"/>
+      translation="[1729,72]" />
     <!-- For viewers that watch a REALLY long time, or just never close the app, force a refresh -->
     <Timer
       id="channelRefreshTimer"
-      repeat="true"/>
+      repeat="true" />
 
   </children>
 </component>

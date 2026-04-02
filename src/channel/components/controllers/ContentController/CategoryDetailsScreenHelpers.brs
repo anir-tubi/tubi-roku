@@ -146,7 +146,7 @@ Function fetchCategoryDetails(content, index = 0, contentMode = "")
       ' Request thematic takeover ads (only for initial load, not lazy loading)
       if isKidsUIOn() = false AND isParentalControlsAdultLevel() = true
         aAdTypes = [m.constants.adTypes.thematicTakeover]
-        createHomescreenAdRequest(m.constants.ui.screenIds.categoryDetailsScreen, onCategoryDetailsAdSuccess, aAdTypes, onCategoryDetailsAdError)
+        createHomeScreenAdRequest(m.constants.ui.screenIds.categoryDetailsScreen, onCategoryDetailsAdSuccess, aAdTypes, onCategoryDetailsAdError)
       else
         ' In kids mode, skip ad request
         screen.adContent = []

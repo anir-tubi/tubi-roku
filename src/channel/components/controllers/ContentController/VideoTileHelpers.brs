@@ -13,7 +13,7 @@
 ' @param screen roSGNode - The screen node to set up observers on
 Function setupVideoTilesObservers(screen) as Void
   if screen <> invalid
-    screen.observeFieldScoped("contentFocused", "onRowFocusedItemChange")
+    screen.observeFieldScoped("contentFocusedUpdated", "onRowFocusedItemChange")
     screen.observeFieldScoped("rowCurrFocusColumn", "onRowCurrFocusColumnChange")
     screen.observeFieldScoped("listCurrFocusRow", "onRowCurrFocusRowChange")
     screen.observeFieldScoped("listHasFocus", "onListHasFocusChange")
@@ -42,13 +42,6 @@ Function updateVideoTileOverlayVisibility(screen = invalid, isVideoTileEnabled =
   ' Calculate isVideoTileEnabled if not provided
   if isVideoTileEnabled = invalid
     isVideoTileEnabled = isVideoTileEnabledScreen() AND screen.content <> invalid
-  end if
-
-  ' Check if the focused content is a video tile enabled container
-  ' Also disable overlay for spotlight and carousel ad containers
-  if isVideoTileEnabled = true AND screen.contentFocused <> invalid
-    gridItemType = screen.contentFocused.gridItemType
-    isVideoTileEnabled = isVideoTileEnabledContainer(gridItemType) OR gridItemType = m.constants.ui.gridItemTypes.adRowlistSpotlight OR gridItemType = m.constants.ui.gridItemTypes.adRowlistCarousel
   end if
 
   ' Set visibility based on video tiles enabled and lastFocusedList
@@ -166,6 +159,10 @@ Function onRowCurrFocusColumnChange() as Void
   end if
 
   rowFocused = screen.listCurrFocusRow
+
+  if isNumber(rowFocused) = false OR rowFocused < 0
+    rowFocused = 0
+  end if
   updateVideoTileOnFocusChange(rowFocused, columnFocused, screen)
 
   ' Trigger lazy loading for next batch of items
@@ -413,13 +410,17 @@ Function updatePredictedRowMetadata(content, rowFocused, screen) as Void
 
   ' Get column index from category's preserved focus
   columnFocused = normalizeIndex(nextCategory.focusIndex)
+  inTransitItemContent = nextCategory.getChild(columnFocused)
 
-  ' Show in-transit overlay only for video tile enabled containers
-  isVideoTileEnabled = isVideoTileEnabledContainer(nextCategory.gridItemType)
+  ' Show in-transit overlay only for video tile enabled containers with video tile items
+  isNonVideoItem = false
+  if inTransitItemContent <> invalid
+    isNonVideoItem = arrayIncludes(m.constants.ui.nonVideoTileGridItemTypes, inTransitItemContent.gridItemType) = true
+  end if
+  isVideoTileEnabled = isVideoTileEnabledContainer(nextCategory.gridItemType) AND isNonVideoItem = false
   m.inTransitInlineVideoMetadataOverlay.visible = (isVideoTileEnabled = true)
 
   if isVideoTileEnabled = true
-    inTransitItemContent = nextCategory.getChild(columnFocused)
     m.inTransitInlineVideoMetadataOverlay.itemContent = inTransitItemContent
   end if
 End Function
@@ -635,6 +636,7 @@ End Function
 
 ' Updates screen background based on focused video tile content
 ' Shows full screen background for live events or ad content
+' Uses container background from ui_customization when available
 ' Falls back to default background for home screen
 '
 ' @param content roSGNode - The focused content node
@@ -646,7 +648,27 @@ Function updateVideoTileScreenBackground(content, screen) as Void
   if shouldShowVideoBackground = true
     setVideoContentScreenBackground(screen, content)
   else if isVideoTileEnabled = true
-    displayDefaultBackground()
+    category = invalid
+    if isNode(screen) = true AND isNode(screen.content) = true AND screen.hasField("listCurrFocusRow") = true
+      currFocusRow = screen.listCurrFocusRow
+      if currFocusRow <> invalid AND currFocusRow = Int(currFocusRow)
+        category = screen.content.getChild(Int(currFocusRow))
+      end if
+    end if
+    categoryBg = ""
+    if isNode(category) = true AND isAA(category.hubLockupAd) AND isNonEmptyString(category.hubLockupAd.background)
+      categoryBg = category.hubLockupAd.background
+    else if isNode(category) = true AND isNonEmptyString(category.containerBackground)
+      categoryBg = category.containerBackground
+    end if
+    if isNonEmptyString(categoryBg)
+      m.backgroundGroup.backgroundInfo = {
+        type: m.constants.ui.backgroundTypes.fullScreen
+        uriList: [categoryBg]
+      }
+    else
+      displayDefaultBackground()
+    end if
   end if
 End Function
 
@@ -678,4 +700,92 @@ Function updateVideoTileSize(scrollingStatus = false) as Void
   ' Focus indicator needs extra padding
   m.inlinePreviewFocusIndicator.width = width + focusRingPadding
   m.inlinePreviewFocusIndicator.height = height + focusRingPadding
+End Function
+
+
+' Reads pending listing schedule IDs from the global field for the given screen
+' and makes a bulk listing API call to refresh schedule data.
+' The screen ID is encoded in each request ID (format: "screenId_scheduleId") so the async
+' callback can extract it from the response keys without relying on shared instance state.
+' Positions remain in the global until the callback consumes and clears them.
+' @param screen - The screen node to fetch listings for
+Function fetchPendingListings(screen) as Void
+  if screen = invalid then return
+
+  pendingData = m.global.pendingListingRefreshData
+  if pendingData = invalid then return
+
+  screenData = pendingData[screen.id]
+  if screenData = invalid OR screenData.count() = 0 then return
+
+  batchRequests = []
+  for each scheduleId in screenData.keys()
+    reqInfo = {
+      id: screen.id + "_" + scheduleId
+      url: m.constants.urls.content.epgListingEndpoint + "/" + scheduleId
+      requestType: m.constants.reqNames.getEpgListing
+      responseType: "assocarray"
+      retries: 0
+    }
+    batchRequests.push(reqInfo)
+  end for
+
+  m.makeBatchRequest({
+    requests: batchRequests
+    successCallback: onBulkListingRefreshSuccess
+    errorCallback: onBulkListingRefreshError
+    responseType: "assocarray"
+  })
+End Function
+
+
+' Handles successful bulk listing refresh response.
+' Extracts the screen ID from the first response key (format: "screenId_scheduleId"),
+' re-keys the response to plain schedule IDs, reads positions from the global, and
+' clears the consumed screen entry to prevent redundant fetches.
+' @param response - AA keyed by "screenId_scheduleId" containing listing data
+Function onBulkListingRefreshSuccess(response) as Void
+  if response = invalid then return
+
+  ' Extract screen ID from the first response key
+  firstKey = invalid
+  for each key in response
+    firstKey = key
+    exit for
+  end for
+  if firstKey = invalid then return
+
+  separatorIndex = firstKey.Instr("_")
+  if separatorIndex < 0 then return
+  screenId = firstKey.Left(separatorIndex)
+
+  ' Read positions from global and clear consumed screen entry
+  pendingData = m.global.pendingListingRefreshData
+  if pendingData = invalid then return
+
+  positions = pendingData[screenId]
+  if positions = invalid then return
+
+  pendingData.delete(screenId)
+  m.global.pendingListingRefreshData = pendingData
+
+  ' Re-key response from "screenId_scheduleId" to plain "scheduleId"
+  listings = {}
+  for each compoundKey in response
+    scheduleId = compoundKey.Mid(separatorIndex + 1)
+    listings[scheduleId] = response[compoundKey]
+  end for
+
+  screen = getScreenFromStackById(screenId)
+  if screen <> invalid
+    screen.listingRefreshData = {
+      listings: listings
+      positions: positions
+    }
+  end if
+End Function
+
+
+' Handles bulk listing refresh error
+Function onBulkListingRefreshError(_error) as Void
 End Function

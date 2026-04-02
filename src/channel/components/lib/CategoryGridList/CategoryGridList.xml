@@ -23,6 +23,7 @@
   <script type="text/brightscript" uri="pkg:/source/lib/StatsigExperiments.brs" />
   <script type="text/brightscript" uri="pkg:/source/lib/StatsigLib.brs" />
   <script type="text/brightscript" uri="pkg:/components/lib/StatsigExperimentMixin.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/TubiNodeHelpers.brs" />
 
   <interface>
     <!-- INPUT -->
@@ -162,7 +163,7 @@
 
     <field id="oldCursorPosition" type="vector2d" value="[-1,-1]" />
 
-    <field id="selectedPosition" type="array" />
+    <field id="selectedPosition" type="array" alwaysNotify="true" />
 
     <field id="focusedPosition" type="array" />
 
@@ -210,7 +211,8 @@
     <!-- Field to trigger row height reset. Pass integer row index (e.g., 0 for first row). -->
     <field id="requestRowHeightReset" type="integer" alwaysNotify="true" />
 
-    <!-- Resets focus X offset and row height when leaving the category grid (e.g., focusing pivot list) -->
+    <!-- Resets focus X offset and row height when leaving the category grid (e.g., focusing pivot
+    list) -->
     <field id="resetCategoryGridState" type="boolean" alwaysNotify="true" />
   </interface>
 

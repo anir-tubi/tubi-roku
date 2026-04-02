@@ -7,7 +7,6 @@ Function init()
   m.infoPanelGroup = m.top.findNode("infoPanelGroup")
   m.topHeaderGroup = m.top.findNode("topHeaderGroup")
   m.sotTopLabelGroup = m.top.findNode("sotTopLabelGroup")
-  m.liveBadgeHeader = m.top.findNode("liveBadgeHeader")
   m.channelNameHeader = m.top.findNode("channelNameHeader")
   m.leftHeaderImage = m.top.findNode("LeftHeaderImage")
 
@@ -20,6 +19,7 @@ Function init()
   m.titleLogo = m.top.findNode("TitleLogo")
   m.titleLogo.width = m.constants.ui.imageSizes.titleLogo[0]
   m.titleLogo.height = m.constants.ui.imageSizes.titleLogo[1]
+  m.eventLogo = m.top.findNode("eventLogo")
   m.episode = m.top.findNode("Episode")
   m.twoLineInfo = m.top.findNode("TwoLineInfo")
 
@@ -41,6 +41,7 @@ Function init()
 
   m.secondLineGroup = m.top.findNode("SecondLineGroup")
   m.secondLineAvailabilityBadge = m.secondLineGroup.findNode("SecondLineAvailabilityBadge")
+  m.linearAvailabilityBadge = m.secondLineGroup.findNode("linearAvailabilityBadge")
   m.line2 = m.secondLineGroup.findNode("Line2")
   m.rottenTomatoBadge = m.secondLineGroup.findNode("rottenTomatoBadge")
 
@@ -81,6 +82,7 @@ Function init()
   m.top.observeFieldScoped("description", "onDescriptionChange")
   m.top.observeFieldScoped("lineOneData", "onLineOneDataChange")
   m.top.observeFieldScoped("lineTwoData", "onLineTwoDataChange")
+  m.top.observeFieldScoped("itemContent", "onItemContentChange")
   m.top.observeFieldScoped("seasonEpisodeCount", "onSeasonEpisodeCountChange")
   m.top.observeFieldScoped("directors", "onDirectorsChange")
   m.top.observeFieldScoped("starring", "onStarringChange")
@@ -91,10 +93,10 @@ Function init()
   m.top.observeFieldScoped("calculateHeight", "onCalculateHeight")
   m.top.observeFieldScoped("focusedChild", "onComponentFocus")
   m.top.observeFieldScoped("loginReason", "onLoginReasonChange")
-  m.top.observeFieldScoped("liveBadgeHeaderText", "onLiveBadgeHeaderTextChange")
   m.top.observeFieldScoped("isTubiOriginal", "onIsTubiOriginalChange")
   m.top.observeFieldScoped("sotMarkers", "onSotMarkersChange")
   m.top.observeFieldScoped("availabilityStarts", "onAvailabilityStartsChange")
+  m.top.observeFieldScoped("eventLogoUri", "onEventLogoUriChange")
   m.offset.observeFieldScoped("translation", "onOffsetTranslationChange")
   m.partnerLogo.observeFieldScoped("loadStatus", "onPosterLoadStatus")
   m.rating.observeFieldScoped("loadStatus", "onPosterLoadStatus")
@@ -398,9 +400,6 @@ Function onSotMarkersChange(msg)
   if shouldAddMarker = true
 
     markerFont = m.bodySmallStrong
-    if getStatsigExperimentResource("roku_sot_reverse_ui_test", "roku_sot_reverse_ui_test_v1", false).enabled = true
-      markerFont = m.markerFont
-    end if
     config = {
       markerFont: markerFont
       maxWidth: m.top.width - 12
@@ -515,24 +514,6 @@ Function onLoginReasonChange(msg)
 End Function
 
 
-Function onLiveBadgeHeaderTextChange(msg)
-  sText = msg.getData()
-  if isNonEmptyString(sText) = true
-    m.liveBadgeHeader.text = sText
-    formatBadge(sText, m.liveBadgeHeader)
-    ' Making sure we add the live badge few in case we had it removed.
-    if m.nodeHelpers.getChildIndex(m.topHeaderGroup, m.liveBadgeHeader) = -1
-      m.topHeaderGroup.insertChild(m.liveBadgeHeader, 0)
-    end if
-    m.liveBadgeHeader.visible = true
-  else
-    m.liveBadgeHeader.visible = false
-    if m.nodeHelpers.getChildIndex(m.topHeaderGroup, m.liveBadgeHeader) >= 0
-      m.topHeaderGroup.removeChild(m.liveBadgeHeader)
-    end if
-  end if
-End Function
-
 
 Function onIsTubiOriginalChange(msg)
   isTubiOriginal = msg.getData()
@@ -580,12 +561,6 @@ Function setSotTopLabels()
   backgroundUri = "pkg:/images/rounded-background-$$RES$$.9.png"
   badgeTextFont = m.bodySmall
   markerFont = m.bodySmallStrong
-  if getStatsigExperimentResource("roku_sot_reverse_ui_test", "roku_sot_reverse_ui_test_v1", false).enabled = true
-    textColor = m.theme.focusedTextColor
-    backgroundUri = "pkg:/images/badge-background-$$RES$$.9.png"
-    badgeTextFont = m.bodySmallStrong
-    markerFont = m.markerFont
-  end if
 
   config = {
     markerFont: markerFont
@@ -950,18 +925,14 @@ Function onLineTwoDataChange(msg)
     insertIndex = 0
 
     ' handle availability badge
-    availabilityBadgeIsPresent = (m.secondLineAvailabilityBadge.getParent() <> invalid)
-    if isNonEmptyString(data.badgeText)
-      if availabilityBadgeIsPresent = false
-        secondLineGroup.insertChild(m.secondLineAvailabilityBadge, insertIndex)
-      end if
-
+    if m.top.itemContent <> invalid AND m.linearAvailabilityBadge.isConfigured = true
+      m.linearAvailabilityBadge.visible = true
+      secondLineGroup.insertChild(m.linearAvailabilityBadge, insertIndex)
+      insertIndex++
+    else if isNonEmptyString(data.badgeText)
+      secondLineGroup.insertChild(m.secondLineAvailabilityBadge, insertIndex)
       formatBadge(data.badgeText, m.secondLineAvailabilityBadge)
       insertIndex++
-    else
-      if availabilityBadgeIsPresent = true
-        secondLineGroup.removeChild(m.secondLineAvailabilityBadge)
-      end if
     end if
 
     ' handle 2nd line text
@@ -999,6 +970,12 @@ Function onLineTwoDataChange(msg)
   end if
 
   shouldCalculateHeight()
+End Function
+
+
+' Passes itemContent to the AvailabilityBadge for linear content
+Function onItemContentChange(msg) as Void
+  m.linearAvailabilityBadge.itemContent = msg.getData()
 End Function
 
 
@@ -1239,8 +1216,6 @@ Function resetDefaultState()
   infoPanelGroupChildrenCount = m.infoPanelGroup.getChildCount()
   m.infoPanelGroup.removeChildrenIndex(infoPanelGroupChildrenCount, 0)
 
-  m.liveBadgeHeader.visible = false
-
   offsetChildrenCount = m.offset.getChildCount()
   m.offset.removeChildrenIndex(offsetChildrenCount, 0)
 
@@ -1301,6 +1276,7 @@ Function onModeChange()
     m.infoPanelGroup.appendChild(m.offset)
     offsetChildrenArray = [
       m.sotTopLabelGroup,
+      m.eventLogo,
       m.titleGroup,
       m.twoLineInfo,
       m.descriptionGroup
@@ -1636,26 +1612,7 @@ Function formatBadge(text, badgeComponent, iconUri = "")
   theme = m.theme
   uText = UCase(text)
   if theme <> invalid
-    if uText = UCase(getTranslation("screenSearch_liveText"))
-      ' LIVE badge
-      badgeComponent.borderUri = ""
-      badgeComponent.badgeTextFont = m.typographyConstants.ids.bodySmall
-      badgeComponent.backgroundUri = "pkg:/images/rounded-rect-live-$$RES$$.9.png"
-      badgeComponent.textColor = theme.primaryTextColor
-      badgeComponent.iconUri = "pkg:/images/live-icon-filled.webp"
-      badgeComponent.text = uText
-    else if uText = UCase(getTranslation("replay"))
-      ' REPLAY badge
-      badgeComponent.backgroundColor = theme.backgroundColorLight
-      badgeComponent.textColor = theme.textDarkColor
-      badgeComponent.text = uText
-    else if uText = UCase(getTranslation("onNow"))
-      badgeComponent.badgeTextFont = m.typographyConstants.ids.bodySmall
-      badgeComponent.borderUri = ""
-      badgeComponent.backgroundUri = "pkg:/images/rounded-rect-on-now-$$RES$$.9.png"
-      badgeComponent.textColor = theme.primaryTextColor
-      badgeComponent.text = uText
-    else if badgeComponent.id = m.rottenTomatoBadge.id
+    if badgeComponent.id = m.rottenTomatoBadge.id
       badgeComponent.showBackground = false
       badgeComponent.iconUri = "pkg:/images/certified-fresh.png"
       badgeComponent.textColor = theme.primaryTextColor
@@ -1669,6 +1626,26 @@ Function formatBadge(text, badgeComponent, iconUri = "")
     end if
   end if
 
+End Function
+
+
+Function onEventLogoUriChange(msg)
+  eventLogoUri = msg.getData()
+  eventLogoIsPresent = (m.eventLogo.getParent() <> invalid)
+  if isNonEmptyString(eventLogoUri) = true
+    if eventLogoIsPresent = false
+      titleIndex = m.nodeHelpers.getChildIndex(m.offset, m.titleGroup)
+      if titleIndex >= 0
+        m.offset.insertChild(m.eventLogo, titleIndex)
+      end if
+    end if
+    m.eventLogo.uri = eventLogoUri
+  else if eventLogoIsPresent = true
+    m.offset.removeChild(m.eventLogo)
+    m.eventLogo.uri = ""
+  end if
+
+  shouldCalculateHeight()
 End Function
 
 

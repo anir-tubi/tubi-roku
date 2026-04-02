@@ -139,6 +139,18 @@ Function onPivotItemContentChange(msg = invalid) as Void
   ' RowList sets a 0-based "index" field on item components; convert to
   ' 1-based column for the tracking payload
   m.pivotCol = topRef.index + 1
+
+  images = itemContent.images
+  if isAA(images) = true
+    if isNonEmptyString(images.background) = true
+      m.pivotBackground.uri = images.background
+    end if
+
+    if isNonEmptyString(images.pillBackground) = true
+      m.top.backgroundUri = images.pillBackground
+      m.buttonBackground.blendColor = "0xFFFFFF"
+    end if
+  end if
 End Function
 
 

@@ -226,6 +226,12 @@ Function registerParsingCallbacks()
     parseError: parseHomeScreenAdsError
   }
 
+  ' sponsored hub ads
+  m.requestTypes[m.constants.reqNames.getSponsoredHubAds] = {
+    parseSuccess: parseSponsoredHubAdsSuccess
+    parseError: parseSponsoredHubAdsError
+  }
+
   ' category list screen
   m.requestTypes[m.constants.reqNames.getCategoriesListScreen] = {
     parseSuccess: parseCategoryListSuccess
@@ -341,7 +347,7 @@ Function registerParsingCallbacks()
   }
 
   m.requestTypes[m.constants.reqNames.getPivotContainers] = {
-    parseSuccess: parseHomeScreenContentSuccess
+    parseSuccess: parsePivotContainersSuccess
     parseError: parseGenericError
     passRawResponse: true
   }

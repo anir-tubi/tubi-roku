@@ -36,10 +36,5 @@
       height="9"
       visible="false"/>
 
-    <LayoutGroup
-      layoutDirection="horiz"
-      id="badgeGroup"
-      itemSpacings="[9]" />
-
   </children>
 </component>

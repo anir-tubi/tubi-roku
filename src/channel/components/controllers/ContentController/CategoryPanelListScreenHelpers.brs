@@ -97,7 +97,7 @@ Function fetchCategoryPanelDetails(categoryId, index = 0)
     ' Request thematic takeover ads (only for initial load, not lazy loading)
     if isKidsUIOn() = false AND isParentalControlsAdultLevel() = true
       aAdTypes = [m.constants.adTypes.thematicTakeover]
-      createHomescreenAdRequest(m.constants.ui.screenIds.categoryPanelListScreen, onCategoryPanelAdSuccess, aAdTypes, onCategoryPanelAdError)
+      createHomeScreenAdRequest(m.constants.ui.screenIds.categoryPanelListScreen, onCategoryPanelAdSuccess, aAdTypes, onCategoryPanelAdError)
     else
       ' In kids mode, skip ad request
       screen.adContent = []
@@ -113,6 +113,13 @@ Function fetchCategoryPanelDetails(categoryId, index = 0)
     params["cursor"] = index
     params["contents_limit"] = m.constants.performance.categoryGridList.lazyLoadBatchSize
     params["expanded"] = true
+  end if
+
+  eventConfig = getExternalConfigValueFromGlobal("event", invalid)
+  if eventConfig <> invalid AND eventConfig.hub <> invalid AND categoryId = eventConfig.hub.container_id
+    if isNonEmptyString(eventConfig.hub.id)
+      params["app_id"] = eventConfig.hub.id
+    end if
   end if
 
   options.params = params
@@ -183,7 +190,7 @@ Function onCategoryDetailPanelResponse(categoryContent)
 
         ' For initial load (first time), wait for both content and ads to be ready
         if screen.categoryContent = invalid
-          ' Set content on screen but don't trigger load until ads are ready
+          prependEventHubTileToCategoryContent(categoryContent, focusedItem)
           screen.categoryContent = categoryContent
           screen.categoryContentFetchCompleted = true
           checkIfCategoryPanelContentIsReady(screen)
@@ -455,6 +462,9 @@ Function onCategoriesPanelListSuccess(response)
 
     if screen <> invalid
       screen.isLoading = false
+
+      prependEventHubCategoryToList(response)
+
       screen.content = response
       screen.shouldLoadContent = true
 
@@ -560,6 +570,45 @@ Function onContentGridHasFocusChange(msg)
   if msg.getData() = false AND currentScreen.subtype() = "CategoryPanelListScreen"
     currentScreen.isBackPressedFromCategoryDetailPanel = true
   end if
+End Function
+
+
+' Prepends the event hub as a category entry in the left-side category list.
+' This makes the hub appear as the first selectable category (e.g. "FIFA World Cup™ FOX Hub")
+' so users can browse into it like any other category.
+' @param categoriesList - ContentNode containing the list of category nodes
+Function prependEventHubCategoryToList(categoriesList) as Void
+  eventHubTileAA = getEventHubTileAA()
+  if eventHubTileAA = invalid then return
+
+  if categoriesList.getChildCount() > 0
+    firstChild = categoriesList.getChild(0)
+    if firstChild <> invalid AND firstChild.id = eventHubTileAA.containerId then return
+  end if
+
+  eventHubNode = CreateObject("roSGNode", "ContentNode")
+  eventHubNode.update({
+    id: eventHubTileAA.containerId
+    title: eventHubTileAA.title
+    type: "category"
+  }, true)
+  categoriesList.insertChild(eventHubNode, 0)
+End Function
+
+
+' Prepends the event hub content tile as the first item inside a category's content grid.
+' Only applies when the focused category matches the hub's container_id, ensuring the
+' hub tile (with logo, title art, and special gridItemType) appears at position 0.
+' @param categoryContent - ContentNode containing the category's content tiles
+' @param focusedItem - The currently focused category list item
+Function prependEventHubTileToCategoryContent(categoryContent, focusedItem) as Void
+  eventHubTileAA = getEventHubTileAA()
+  if eventHubTileAA = invalid then return
+  if focusedItem.id <> eventHubTileAA.containerId then return
+
+  eventHubTileNode = CreateObject("roSGNode", "ContentNode")
+  eventHubTileNode.update(eventHubTileAA, true)
+  categoryContent.insertChild(eventHubTileNode, 0)
 End Function
 
 

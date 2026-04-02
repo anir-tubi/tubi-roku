@@ -70,8 +70,20 @@ End Function
 
 
 ' Handles pivotContent changes - measures widths and sets content
+' Prepends a hub pivot if the event hub is active in external config
 Function onPivotContentChange(_msg = invalid) as Void
-  buildAndSetContent(m.top.pivotContent)
+  rootContent = m.top.pivotContent
+  if rootContent = invalid then return
+
+  hubPivotNode = createHubPivotNode()
+  if hubPivotNode <> invalid
+    rowNode = rootContent.getChild(0)
+    if rowNode <> invalid
+      rowNode.insertChild(hubPivotNode, 0)
+    end if
+  end if
+
+  buildAndSetContent(rootContent)
 End Function
 
 
@@ -115,6 +127,49 @@ Function buildAndSetContent(rootContent) as Void
   topRef.content = rootContent
   topRef.visible = true
   topRef.contentReady = true
+End Function
+
+
+' Creates a hub pivot node from the event.hub external config if the hub is
+' currently active (within start_time / end_time). Returns a ContentNode or invalid.
+Function createHubPivotNode() as Dynamic
+  config = getExternalConfigInfoFromGlobal()
+  if config = invalid OR config.event = invalid OR config.event.hub = invalid
+    return invalid
+  end if
+
+  hub = config.event.hub
+  if isNonEmptyString(hub.id) = false OR isNonEmptyString(hub.title) = false
+    return invalid
+  end if
+
+  if isNowWithinTimePeriod(hub.start_time, hub.end_time) = false
+    return invalid
+  end if
+
+  images = {
+    background: "pkg:/images/transparent.png"
+  }
+  if isNonEmptyString(hub.pill_background)
+    images.pillBackground = hub.pill_background
+  end if
+
+  node = CreateObject("roSGNode", "ContentNode")
+  node.update({
+    id: hub.id
+    title: hub.title
+    description: hub.container_description
+  }, true)
+  node.addFields({
+    type: "EXPLORER"
+    genres: []
+    tags: []
+    images: images
+    isPrimaryButton: true
+    containerId: hub.container_id
+  })
+
+  return node
 End Function
 
 

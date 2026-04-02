@@ -52,7 +52,7 @@ jobs:
       - name: Run unit tests
         run: |
           echo "Unit Tests are running"
-          gulp test --sametab > log.txt 2> log.txt
+          npx gulp test --sametab > log.txt 2> log.txt
           actual=`grep 'RESULT:' log.txt | tail -1`
           expected="RESULT: Success"
           cat log.txt

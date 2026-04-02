@@ -144,7 +144,6 @@ Function createBadge(labelData, config)
   badge.borderUri = ""
   badge.backgroundUri = config.backgroundUri
   badge.textColor = config.textColor
-  badge.height = 40
 
   if config.badgeTextFont <> invalid
     badge.badgeTextFont = config.badgeTextFont
@@ -233,7 +232,6 @@ Function createSotPosterLabels(sotInfo, config)
     sotBadge.id = "sotBadge"
     sotBadge.borderUri = ""
     sotBadge.isSotBadge = true
-    sotBadge.height = 40
     sotBadge.backgroundUri = config.backgroundUri
     sotBadge.textColor = config.textColor
     sotBadge.translation = config.translation

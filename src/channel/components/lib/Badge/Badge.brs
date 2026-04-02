@@ -9,7 +9,7 @@ Function init()
   m.top.observeFieldScoped("maxWidth", "onMaxWidthChanged")
 
   m.typographyConstants = getTypographyConstants()
-  setTypographyOfLabel(m.badgeText, m.typographyConstants.ids.bodyExtraSmallStrong)
+  setTypographyOfLabel(m.badgeText, m.typographyConstants.ids.bodySmall)
 End Function
 
 Function onMaxWidthChanged()
@@ -94,7 +94,7 @@ Function onSetTypography(msg)
     fontSize = m.typographyConstants.ids[fontSize]
     setTypographyOfLabel(m.badgeText, fontSize)
   else
-    setTypographyOfLabel(m.badgeText, m.typographyConstants.ids.bodySmallStrong)
+    setTypographyOfLabel(m.badgeText, m.typographyConstants.ids.bodySmall)
   end if
 
 End Function

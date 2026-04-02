@@ -36,6 +36,14 @@ Function getConstants()
       end if
     end if
 
+    if constants.settings.mode <> "production" then
+      hasMockProfile = (settingsOverride.mockServerProfile <> invalid AND settingsOverride.mockServerProfile <> "")
+      hasMockAdTypes = (settingsOverride.mockServerAdTypes <> invalid AND settingsOverride.mockServerAdTypes <> "")
+      if hasMockProfile OR hasMockAdTypes then
+        constants.settings.mockServerEnabled = true
+      end if
+    end if
+
     if settingsOverride.sudoCountry <> invalid then
       constants.settings.sudoCountry = settingsOverride.sudoCountry
     end if
@@ -287,6 +295,7 @@ Function getConstants()
   constants.reqNames.getMiniHomescreen = "getMiniHomescreen"
   constants.reqNames.getCategoriesListScreen = "getCategoriesListScreen"
   constants.reqNames.getHomescreenAds = "getHomescreenAds"
+  constants.reqNames.getSponsoredHubAds = "getSponsoredHubAds"
   constants.reqNames.getCategoryDetailsScreen = "getCategoryDetailsScreen"
   constants.reqNames.getSearchDefault = "getSearchDefault"
   constants.reqNames.getCategory = "getCategory"
@@ -349,6 +358,7 @@ Function getConstants()
   constants.reqNames.statsigExposure = "statsigExposure"
   constants.reqNames.fetchStatsigExperimentsActive = "fetchStatsigExperimentsActive"
   constants.reqNames.fetchStatsigExperimentsPaused = "fetchStatsigExperimentsPaused"
+  constants.reqNames.registerMockDevice = "registerMockDevice"
   constants.reqNames.getEpgListing = "getEpgListing"
   constants.reqNames.getCollection = "getCollection"
   constants.reqNames.postPinUpdateForKids = "postPinUpdateForKids"
@@ -639,13 +649,9 @@ Function getConstants()
   constants.urls.autopilot.upNextContent = constants.urls.autopilot.urlBase + "/v3/autoplay"
 
   'search url
-  constants.urls.search = "https://search.production-public.tubi.io/api/v2/search"
+  constants.urls.search = "https://search.production-public.tubi.io/api/v3/search"
   if constants.settings.mode <> "production" AND constants.settings.stagingApis = true
-    constants.urls.search = "https://search.staging-public.tubi.io/api/v2/search"
-  end if
-  constants.urls.searchV3 = "https://search.production-public.tubi.io/api/v3/search"
-  if constants.settings.mode <> "production" AND constants.settings.stagingApis = true
-    constants.urls.searchV3 = "https://search.staging-public.tubi.io/api/v3/search"
+    constants.urls.search = "https://search.staging-public.tubi.io/api/v3/search"
   end if
 
   'autocomplete search url
@@ -668,7 +674,7 @@ Function getConstants()
   if constants.settings.mode <> "production" AND constants.settings.stagingApis = true
     constants.urls.tensor.cdn.urlBase = "https://tensor-cdn.staging-public.tubi.io/api"
   end if
-  constants.urls.tensor.cdn.homescreen = constants.urls.tensor.cdn.urlBase + "/v7/homescreen"
+  constants.urls.tensor.cdn.homescreen = constants.urls.tensor.cdn.urlBase + "/v8/homescreen"
   constants.urls.tensor.cdn.container = constants.urls.tensor.cdn.urlBase + "/v7/containers"
   constants.urls.tensor.cdn.epgChannelIds = constants.urls.tensor.cdn.urlBase + "/v2/epg"
   constants.urls.tensor.cdn.browserList = constants.urls.tensor.cdn.urlBase + "/v1/browse_list"
@@ -765,6 +771,9 @@ Function getConstants()
   ' Console API for experiments management
   constants.urls.statsig.consoleBaseUrl = "https://abproxy.production-public.tubi.io/console/v1/"
   constants.urls.statsig.consoleExperiments = constants.urls.statsig.consoleBaseUrl + "experiments"
+
+  constants.settings.mockServerUrl = "https://mock-server.int.tubi.io/"
+  constants.settings.mockServerProxyUrl = constants.settings.mockServerUrl + "api/proxy?device_id=" + constants.deviceInfo.deviceId.EncodeUriComponent()
 
   ' Configuring the live news manifest proxy url.
   constants.urls.qaProxy = {}
@@ -877,7 +886,10 @@ Function getConstants()
   constants.adTypes.adRowlistSpotlight = "adRowlistSpotlight"
   constants.adTypes.adRowlistCarousel = "adRowlistCarousel"
   constants.adTypes.skinAd = "skinAd"
+  constants.adTypes.sponsoredHub = "sponsoredHub"
+  constants.adTypes.sponsoredLiveEventsHero = "sponsoredLiveEventsHero"
   constants.adTypes.thematicTakeover = "thematicTakeover"
+  constants.adTypes.hubRowLockupAd = "hubRowLockupAd"
 
   'common http request headers
   constants.headers = {}
@@ -918,8 +930,8 @@ Function getConstants()
 
   '// Time in seconds when we fire impression pixels after an HDC ad has gained focus
   constants.timers.adFocusPixelFire = 1
-  '// Time in seconds when we fire impression pixels after a skinAd wrapper ad has gained focus
-  constants.timers.skinAdFocusPixelFire = 0.01
+  '// Time in seconds when we fire impression pixels after a hero ad (i.e. skinAd wrapper, sponsored live events container, etc) has gained focus
+  constants.timers.heroAdFocusPixelFire = 0.01
 
   ' Time in seconds after which stored hasAge info becomes expired for COPPA
   constants.timers.coppaFailTimeout = 24 * 60 * 60 ' 1 day
@@ -1391,11 +1403,14 @@ Function getConstants()
   constants.ui.contentTypes.adRowlistSpotlight = "adRowlistSpotlight"
   constants.ui.contentTypes.adRowlistCarousel = "adRowlistCarousel"
   constants.ui.contentTypes.thematicTakeover = "thematicTakeover"
+  constants.ui.contentTypes.sponsoredLiveEventsHero = "sponsoredLiveEventsHero"
+  constants.ui.contentTypes.hubRowLockupAd = "hubRowLockupAd"
   constants.ui.contentTypes.movie = "movie"
-  constants.ui.contentTypes.app = "app"
 
   constants.ui.appTypes = {}
-  constants.ui.appTypes.creator = "CREATOR"
+  constants.ui.appTypes.creator = "creator"
+  constants.ui.appTypes.pivot = "pivot"
+  constants.ui.appTypes.explore = "explore"
 
   constants.ui.playerTypes = {}
   constants.ui.playerTypes.fox = "fox"
@@ -1626,6 +1641,8 @@ Function getConstants()
   'Sizes of large landscape thumbnails that need to sent to the backend so Tupian, the dynamic image sizer tool, can provide the correct sized images
   constants.ui.imageSizes.largestLandscape = [661, 372]
 
+  constants.ui.imageSizes.episodeLandscape = [636, 357]
+
   'Sizes of linear to sent to the backend so Tupian, the dynamic image sizer tool, can provide the correct sized images
   constants.ui.imageSizes.linear = [384, 144]
 
@@ -1642,6 +1659,7 @@ Function getConstants()
   constants.ui.imageSizes.adRowlistCarouselThumbnail = [118, 118]
   'Sizes of featured row  poster thumbnails that need to sent to the backend so Tupian, the dynamic image sizer tool, can provide the correct sized images
   constants.ui.imageSizes.videoTilesPortrait = [310, 442]
+  constants.ui.imageSizes.hubRowLockup = [636, 573]
 
   ' Readding the renamed constant from the previous experiment. Due to it causing a crash when user fallbacks to submission release.
   constants.ui.imageSizes.featuredPortraitSmall = [310, 442]
@@ -1668,6 +1686,7 @@ Function getConstants()
   constants.ui.imageSizes.categoryLargePoster = [291, 417]
 
   constants.ui.imageSizes.creatorDetailScreenLogo = [36, 36]
+  constants.ui.imageSizes.creatorDetailScreenTitleArt = [0, 60]
   constants.ui.imageSizes.creatorVodDetailScreenLogo = [81, 81]
   constants.ui.imageSizes.creatorScreenLogo = [64, 64]
   constants.ui.imageSizes.creatorScreenBackground = [1161, 651]
@@ -1692,8 +1711,6 @@ Function getConstants()
   else
     constants.ui.imageSizes.fullScreenBackground = [1920, 1080]
   end if
-
-  constants.ui.imageSizes.controlLandscape = [360, 201]
 
   constants.ui.categoryMenuPanelList = {}
   constants.ui.categoryMenuPanelList.columnWidths = [384]
@@ -1779,17 +1796,20 @@ Function getConstants()
   constants.ui.gridItemTypes.certifiedFresh = "certifiedFresh"
   constants.ui.gridItemTypes.liveEventSpotlight = "liveEventSpotlight"
   constants.ui.gridItemTypes.liveEventBanner = "liveEventBanner"
-  constants.ui.gridItemTypes.controlLandscape = "controlLandscape"
   constants.ui.gridItemTypes.episodeItem = "episodeItem"
   constants.ui.gridItemTypes.appItem = "appItem"
   constants.ui.gridItemTypes.episodeItemLatestEpisodes = "episodeItemLatestEpisodes"
+  constants.ui.gridItemTypes.landscapeSeries = "landscapeSeries"
+  constants.ui.gridItemTypes.landscapeSeriesMultiple = "landscapeSeriesMultiple"
+  constants.ui.gridItemTypes.hubRowLockup = "hubRowLockup"
+  constants.ui.gridItemTypes.eventHubTile = "eventHubTile"
 
   ' Holds the container ids which are not video tile containers.
   ' This will help us to avoid showing the expanded video tile.
   ' We will include ads containers in this list in future.
   constants.ui.noHeaderGridTypes = [constants.ui.gridItemTypes.liveEventSpotlight, constants.ui.gridItemTypes.liveEventBanner]
   constants.ui.liveEventsGridTypes = [constants.ui.gridItemTypes.liveEventSpotlight, constants.ui.gridItemTypes.liveEventBanner]
-  constants.ui.nonVideoTileGridItemTypes = [constants.ui.gridItemTypes.historySignedOutUser, constants.ui.gridItemTypes.liveEventSpotlight, constants.ui.gridItemTypes.liveEventBanner, constants.ui.gridItemTypes.adRowlistCarousel, constants.ui.gridItemTypes.adRowlistSpotlight, constants.ui.gridItemTypes.emptyContainer]
+  constants.ui.nonVideoTileGridItemTypes = [constants.ui.gridItemTypes.historySignedOutUser, constants.ui.gridItemTypes.liveEventSpotlight, constants.ui.gridItemTypes.liveEventBanner, constants.ui.gridItemTypes.adRowlistCarousel, constants.ui.gridItemTypes.adRowlistSpotlight, constants.ui.gridItemTypes.emptyContainer, constants.ui.gridItemTypes.hubRowLockup, constants.ui.gridItemTypes.eventHubTile]
   constants.ui.fullScreenVideoPlayerGridItemTypes = [constants.ui.gridItemTypes.skinAd, constants.ui.gridItemTypes.liveEventSpotlight]
   constants.ui.noInfoPanelGridItemTypes = [constants.ui.gridItemTypes.liveEventSpotlight, constants.ui.gridItemTypes.skinAd, constants.ui.gridItemTypes.adRowlistSpotlight]
   constants.ui.adGridItemTypes = [constants.ui.gridItemTypes.adRowlistCarousel, constants.ui.gridItemTypes.skinAd, constants.ui.gridItemTypes.adRowlistSpotlight]
@@ -2126,6 +2146,7 @@ Function getConstants()
   constants.deeplinks.entrypoints.news = "news"
   constants.deeplinks.entrypoints.episodeList = "episodeList"
   constants.deeplinks.entrypoints.video = "video"
+  constants.deeplinks.entrypoints.collection = "collection"
 
   ' Creating Backend/Frontend mapping for preference keys.
   ' ****** IMPORTANT - PLEASE DO NOT FORGOT *********

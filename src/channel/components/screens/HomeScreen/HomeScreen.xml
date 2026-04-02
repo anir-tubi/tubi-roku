@@ -179,6 +179,7 @@
 
     <!-- set to the contentNode of the CategoryGridList item which was clicked on -->
     <field id="contentSelected" type="node" />
+    <field id="tileSelected" type="boolean" alwaysNotify="true" />
 
     <!-- set to the contentNode of the CategoryGridList item which was focused when
            the "play" input transport deeplink was triggered
@@ -191,6 +192,9 @@
     not call resolveAbbreviatedContent() and so is not unique each time it is created so this para
     is needed. -->
     <field id="contentFocused" type="node" alwaysNotify="true" />
+
+    <!-- Boolean signal that fires after contentFocused is updated -->
+    <field id="contentFocusedUpdated" type="boolean" alwaysNotify="true" />
 
     <!-- set to the tubi content of the new row container (row of contentFocused) which was focused
     on -->
@@ -207,8 +211,6 @@
     <field id="cursorPosition" alias="CategoryGridList.cursorPosition" />
 
     <field id="currCategoryId" alias="CategoryGridList.currCategoryId" />
-
-    <field id="selectedPosition" alias="CategoryGridList.selectedPosition" />
 
     <!-- Communicates that the homescreen has focused on a sponsored container/category/row.
       This may happen when the homescreen/categoryGridList is regaining focus, or it may
@@ -253,6 +255,9 @@
     will triggered change events. ) -->
     <field id="personalizationId" type="string" alias="CategoryGridList.personalizationId" />
     <field id="adImpressionUpdates" type="array" />
+    <field id="hubLockupAdUpdate" type="assocarray" alwaysNotify="true" />
+    <!-- Holds the parsed AdContentNode for the active Sponsored Live Events Hero ad (uses titleImageUrl for brand logo URL) -->
+    <field id="sponsoredLiveEventsHeroAdContent" type="node" />
 
     <!-- PIVOT LIST -->
     <!-- ServerPersistentData for PivotList CmsApi -->
@@ -275,6 +280,24 @@
   </interface>
 
   <children>
+    <Poster
+      id="containerBackgroundPoster"
+      width="1920"
+      height="1080"
+      opacity="0.0"
+      loadDisplayMode="scaleToFill" />
+    <Poster
+      id="hubFocusGradient"
+      uri="pkg:/images/hub_container_focus_gradient.png"
+      width="1920"
+      height="1080"
+      visible="false" />
+    <Poster
+      id="hubPeekGradient"
+      uri="pkg:/images/hub_container_peek_gradient.png"
+      width="1920"
+      height="1080"
+      visible="false" />
     <Group id="PageGroup">
       <MaskGroup
         id="pivotContentArea"
@@ -312,17 +335,9 @@
             id="CategoryGridList" />
         </MaskGroup>
       </Group>
-      <Poster
-        id="dimMask"
-        uri="pkg:/images/dim-mask.png"
-        width="1920"
-        height="250"
-        translation="[0, 830]"
-        visible="false" />
     </Group>
     <Group
       id="adContentGroup" />
-
     <!-- For viewers that watch a REALLY long time, or just never close the app, force a refresh -->
     <Timer
       id="CategoryRefreshTimer"

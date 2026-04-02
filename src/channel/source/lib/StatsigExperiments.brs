@@ -116,12 +116,6 @@ Function StatsigExperimentsInterface(statsigExperimentsInfo) as Object
         }
       }
 
-      roku_sot_reverse_ui_test: {
-        roku_sot_reverse_ui_test_v1: {
-          default: { "enabled": false }
-        }
-      }
-
       roku_multi_account: {
         roku_multi_account_v1: {
           default: { "variant": "none" } ' "none", "adult_with_kids"

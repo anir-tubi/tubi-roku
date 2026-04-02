@@ -311,8 +311,10 @@ Function onRowItemFocused(msg) as Boolean
     if category <> invalid
       if category.id = m.constants.ui.categoryIds.guestUserMyStuff
         m.top.contentFocused = category.getChild(0)
+        m.top.contentFocusedUpdated = true
       else
         m.top.contentFocused = getTubiContentNodeFromRowItem(newCursorPosition, m.metadataTranslate, m.top.signedIn)
+        m.top.contentFocusedUpdated = true
       end if
 
       m.oldCategoryId = m.currCategoryId
@@ -429,7 +431,6 @@ Function populateInfoPanel(mode, contentNode)
       populateInfoPanelWithHomescreenStyleItemMode(contentNode, m.InfoPanel)
     else if mode = m.constants.ui.infoPanelModes.linearHomeScreen
       m.InfoPanel.mode = mode
-      m.InfoPanel.liveBadgeHeaderText = UCase(getTranslation("screenSearch_liveText"))
       m.InfoPanel.reminderIsSet = false
       m.InfoPanel.width = 650
     else if mode = m.constants.ui.infoPanelModes.continueWatching

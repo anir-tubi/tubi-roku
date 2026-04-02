@@ -32,6 +32,26 @@ Function init() as Void
   end if
 
   topRef.observeFieldScoped("itemContent", "onItemContentChange")
+  topRef.observeFieldScoped("width", "onWidthChange")
+End Function
+
+
+Function onWidthChange(msg) as Void
+  itemWidth = msg.getData()
+  if itemWidth <= 0 then return
+
+  thumbnailHeight = int(itemWidth * 9 / 16)
+
+  progressBarPadding = 32
+  progressBarWidth = itemWidth - progressBarPadding
+
+  m.thumbnail.width = itemWidth
+  m.thumbnail.height = thumbnailHeight
+  m.episodeTitle.width = itemWidth
+  m.description.width = itemWidth
+  m.progressBarGroup.width = progressBarWidth
+  m.progressBarGroup.translation = [15, thumbnailHeight - 18]
+  m.progressBar.width = progressBarWidth
 End Function
 
 
@@ -74,6 +94,20 @@ Function onItemContentChange(msg = invalid) as Void
     if isNonEmptyString(content.seriesTitle) = true then
       episodeTitle = content.seriesTitle + chr(10) + episodeTitle
     end if
+  else if content.gridItemType = "landscapeSeriesMultiple" then
+    m.episodeTitle.maxLines = 2
+    m.description.maxLines = 2
+
+    m.description.text = content.description
+
+    if isNonEmptyString(content.seriesTitle) = true then
+      episodeTitle = content.seriesTitle + chr(10) + episodeTitle
+    end if
+  else if content.gridItemType = "landscapeSeries" then
+    m.description.maxLines = 3
+    m.episodeTitle.maxLines = 1
+
+    m.description.text = content.description
   else
     m.description.scale = [1, 1]
     m.description.visible = true

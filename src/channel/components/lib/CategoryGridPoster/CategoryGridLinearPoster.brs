@@ -1,6 +1,5 @@
 Function init()
   m.poster = m.top.findNode("Poster")
-  m.badgeGroup = m.top.findNode("badgeGroup")
   m.progressBar = m.top.findNode("progressBar")
   m.top.observeField("itemContent", "onContentChange")
   m.top.observeFieldScoped("height", "onPosterSizeChange")
@@ -9,22 +8,6 @@ Function init()
   if m.global <> invalid
     m.global.observeFieldScoped("refreshLinearChannels", "onRefreshLinearChannels")
   end if
-
-  m.typographyConstants = getTypographyConstants()
-
-  m.BadgeTypes = {
-    live: "live"
-    onNow: "onNow"
-    tomorrow: "tomorrow"
-    today: "today"
-    tonight: "tonight"
-    language: "language"
-  }
-
-  m.languages = {
-    spanish: "Español"
-    french: "Français"
-  }
 
   setThemeColors()
 End Function
@@ -40,11 +23,6 @@ Function setThemeColors()
   theme = getThemeFromGlobal()
 
   if theme <> invalid
-    m.primaryTextColor = theme.primarytextcolor
-    m.focused2Color = theme.focused2color
-    m.neutralSolidColor = theme.neutralsolidcolor
-    m.blueBadgeColor = theme.bluebadgecolor
-
     m.progressBar.focusColor = theme.focusedcolor
     m.progressBar.trackColor = theme.neutralcolor
     m.progressBar.unfocusColor = theme.focusedcolor
@@ -59,7 +37,6 @@ End Function
 
 
 Function updateItemContent(itemContent)
-  removeBadges()
   sPosterURL = ""
 
   if itemContent <> invalid
@@ -78,23 +55,10 @@ Function updateItemContent(itemContent)
         sPosterURL = currentProgram.hdgridposterurl
       end if
 
-      'make sure to add language badges before other badges
-      if itemContent.language <> invalid
-        setBadge(m.badgeTypes.language, itemContent.language)
-      end if
-
-      if currentProgram.live = true
-        setBadge(m.badgeTypes.live)
-      else
-        ' TODO Add other badges like today/tomorrow etc
-        setBadge(m.badgeTypes.onNow)
-      end if
-
       progress = getLinearProgramProgress(currentProgram)
       setProgressBar(progress)
-    else 'showing channel info
+    else
       m.progressBar.visible = false
-      setBadge(m.badgeTypes.onNow)
     end if
   end if
 
@@ -125,72 +89,6 @@ Function onHandleFocus()
       m.lockIcon.opacity = 0.0
     end if
   end if
-End Function
-
-'@badgeType - string, Indicating format of the badge
-'@badgeText - string, Indicating text on the badge
-Function setBadge(badgeType = "live", badgeText = "")
-
-  isSotReverseUiExperimentEnabled = getStatsigExperimentResource("roku_sot_reverse_ui_test", "roku_sot_reverse_ui_test_v1", false).enabled = true
-
-  if badgeType = m.badgeTypes.live
-    badge = m.badgeGroup.createChild("Badge")
-    badge.iconUri = "pkg:/images/live-icon-filled.webp"
-    badge.textColor = m.primaryTextColor
-    badge.maxWidth = m.top.width - 12
-    badge.height = 40
-
-    if isSotReverseUiExperimentEnabled = true
-      badge.backgroundColor = m.focused2Color
-      badge.backgroundUri = "pkg:/images/badge-background-$$RES$$.9.png"
-      m.badgeGroup.translation = [4, 4]
-      badge.badgeTextFont = m.typographyConstants.ids.bodySmallStrong
-    else
-      badge.badgeTextFont = m.typographyConstants.ids.bodySmall
-      badge.borderUri = ""
-      badge.backgroundUri = "pkg:/images/rounded-rect-live-$$RES$$.9.png"
-      m.badgeGroup.translation = [12, 12]
-    end if
-
-    badge.text = getTranslation("screenSearch_liveText")
-  else if badgeType = m.badgeTypes.onNow
-    badge = m.badgeGroup.createChild("Badge")
-    badge.textColor = m.primaryTextColor
-    badge.maxWidth = m.top.width - 12
-    badge.height = 40
-
-    if isSotReverseUiExperimentEnabled = true
-      badge.backgroundColor = m.blueBadgeColor
-      badge.backgroundUri = "pkg:/images/badge-background-$$RES$$.9.png"
-      m.badgeGroup.translation = [4, 4]
-      badge.badgeTextFont = m.typographyConstants.ids.bodySmallStrong
-    else
-      badge.badgeTextFont = m.typographyConstants.ids.bodySmall
-      badge.borderUri = ""
-      badge.backgroundUri = "pkg:/images/rounded-rect-on-now-$$RES$$.9.png"
-      m.badgeGroup.translation = [12, 12]
-    end if
-
-    badge.text = getTranslation("onNow")
-  else if badgeType = m.badgeTypes.language
-    if badgeText <> ""
-      lang = Ucase(badgeText)
-      if lang <> "ENGLISH"
-        badge = m.badgeGroup.createChild("Badge")
-        badge.backgroundColor = m.neutralSolidcolor
-        badge.textColor = m.primaryTextColor
-        badge.text = m.languages[lang]
-      end if
-    end if
-    m.badgeGroup.translation = [12, 12]
-  end if
-
-End Function
-
-
-Function removeBadges()
-  childCount = m.badgeGroup.getChildCount()
-  m.badgeGroup.removeChildrenIndex(childCount, 0)
 End Function
 
 

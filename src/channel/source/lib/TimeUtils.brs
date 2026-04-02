@@ -331,6 +331,29 @@ Function isToday(dateString)
 End Function
 
 
+' Determines if the input date falls on the next calendar day.
+' Uses local-time midnight ranges — toLocalTime() applies the same system
+' offset to both objects, so relative second comparisons are consistent.
+' @dateString: string, an ISO-8601 string representing the UTC time
+Function isTomorrow(dateString)
+  if isIso8601String(dateString) = true
+    localNow = CreateObject("roDateTime")
+    localNow.toLocalTime()
+    todayMidnight = localNow.asSeconds() - (localNow.getHours() * 3600 + localNow.getMinutes() * 60 + localNow.getSeconds())
+    tomorrowStart = todayMidnight + 86400
+    tomorrowEnd = todayMidnight + 172800
+
+    inputDatetime = CreateObject("roDateTime")
+    inputDatetime.FromISO8601String(dateString)
+    inputDatetime.toLocalTime()
+
+    return inputDatetime.asSeconds() >= tomorrowStart AND inputDatetime.asSeconds() < tomorrowEnd
+  end if
+
+  return false
+End Function
+
+
 ' Wrapper to support for devices running below 12.0 OS. Returns a localized time string for the given UTC time.
 ' @dateTime: roDateTime, representing the UTC time
 ' @format: string, the format to return the time in. Default is "h:mm a"

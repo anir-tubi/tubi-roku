@@ -1,6 +1,7 @@
-Function init()
+' Initializes the LiveEventsContainer, caching node references, setting up
+' observers, typography, tracking, and the periodic UI refresh timer.
+Function init() as Void
   m.constants = getConstantsFromGlobal()
-  m.nodeHelpers = TubiNodeHelpers()
   topRef = m.top
 
   m.contentSection = topRef.findNode("contentSection")
@@ -9,7 +10,6 @@ Function init()
   m.metadataRow = topRef.findNode("metadataRow")
   m.description = topRef.findNode("description")
   m.descriptionFocusButton = topRef.findNode("descriptionFocusButton")
-  m.descriptionFont = topRef.findNode("descriptionFont")
   m.titleImage = topRef.findNode("titleImage")
   m.titleImage.loadHeight = 249
   m.titleImage.loadWidth = 594
@@ -28,7 +28,8 @@ Function init()
   m.uhdAvailableBadge.text = getTranslation("info_panel_available_in_4k")
 
   topRef.observeFieldScoped("itemContent", "onItemContentChange")
-  topRef.observeField("focusedChild", "onComponentFocusChange")
+  m.buttonList.observeFieldScoped("buttonSelected", "onButtonListSelected")
+  topRef.observeFieldScoped("focusedChild", "onComponentFocusChange")
   topRef.observeFieldScoped("signedIn", "onSignedInChange")
   topRef.observeFieldScoped("didUserSetReminderForEventContent", "onDidSetReminderForEventContentChange")
   topRef.observeFieldScoped("itemHasFocus", "onItemHasFocusChange")
@@ -43,7 +44,11 @@ Function init()
   setTypographyOfLabel(m.titleLabel, typographyConstants.ids.headerMedium)
 
   m.tracking = TubiTrackingInfo(m.constants)
-
+  m.eventConfig = getExternalConfigValueFromGlobal("event", invalid)
+  m.hubConfig = invalid
+  if isAA(m.eventConfig) = true AND isAA(m.eventConfig.hub) = true
+    m.hubConfig = m.eventConfig.hub
+  end if
 
   if m.global <> invalid
     m.global.observeFieldScoped("theme", "onThemeChange")
@@ -56,7 +61,9 @@ Function init()
 End Function
 
 
-Function onThemeChange(msg = invalid)
+' Applies theme colors to labels, badges, and buttons
+' @param msg - Optional message containing theme data
+Function onThemeChange(msg = invalid) as Void
   if msg <> invalid
     theme = msg.getData()
   else
@@ -67,24 +74,27 @@ Function onThemeChange(msg = invalid)
     m.primaryTextColor = theme.primaryTextColor
     m.description.color = theme.primaryTextColor
     m.descriptionFocusButton.blendColor = theme.focusedColor
-    m.uhdAvailableBadge.backgroundColor = theme.defaultDarkTransparentAccent20
-    m.uhdAvailableBadge.textColor = theme.highlightedTextColor
+    m.uhdAvailableBadge.backgroundColor = theme.shadeColor
+    m.uhdAvailableBadge.textColor = theme.primaryTextColor
     m.genres.color = theme.primaryTextColor
     m.titleLabel.color = theme.primaryTextColor
     m.focused2Color = theme.focused2Color
     m.backgroundColor = theme.backgroundColor
+    m.shadeColor = theme.shadeColor
   end if
 End Function
 
 
-Function onComponentFocusChange()
+' Delegates focus to the button list when this component receives focus
+Function onComponentFocusChange() as Void
   if m.top.hasFocus() = true
     m.buttonList.setFocus(true)
   end if
 End Function
 
 
-Function onItemHasFocusChange()
+' Propagates combined focus state to the currently focused CTA button
+Function onItemHasFocusChange() as Void
   itemHasFocus = m.top.itemHasFocus AND m.top.rowHasFocus = true AND m.top.rowListHasFocus = true
   ctaButton = getFocusedButton()
   if ctaButton <> invalid
@@ -93,7 +103,9 @@ Function onItemHasFocusChange()
 End Function
 
 
-Function onItemContentChange()
+' Handles content changes by updating title, description, network logo,
+' badges, genres, and button list.
+Function onItemContentChange() as Void
   itemContent = m.top.itemContent
   if isNode(itemContent) = true
     refreshButtonList()
@@ -105,23 +117,30 @@ Function onItemContentChange()
       m.titleLabel.text = itemContent.title
       m.metadataSection.removeChild(m.titleImage)
     end if
-    scheduleData = itemContent.scheduleData
-    if isAA(scheduleData) AND isNonEmptyString(scheduleData.channelLogo)
-      m.networkLogo.uri = scheduleData.channelLogo
-    else
-      m.networkLogo.uri = ""
+
+    ' Resolve network logo URI and observe the parent container for sponsor changes.
+    ' Unobserve the previous container first to prevent stale observer accumulation
+    ' when the RowList recycles this component for different rows.
+    container = itemContent.getParent()
+    if isNode(m.prevContainer) = true
+      m.prevContainer.unobserveField("sponsor")
     end if
-    isFourK = false
-    if itemContent.videoRenditions <> invalid
-      isFourK = arrayIncludes(itemContent.videoRenditions, m.constants.serverValues.tensorVideoRenditions.fourK)
-    else
-      isFourK = false
+    resolveNetworkLogoUri(container)
+    if isNode(container) = true
+      container.observeField("sponsor", "onSponsorChange")
+      m.prevContainer = container
     end if
+
+    ' Render the 4K badge if the content is 4K.
+    isFourK = (itemContent.videoRenditions <> invalid AND arrayIncludes(itemContent.videoRenditions, m.constants.serverValues.tensorVideoRenditions.fourK))
     m.uhdAvailableBadge.visible = isFourK
     if isFourK = false
       m.metadataRow.removeChild(m.uhdAvailableBadge)
     end if
+
     updateAvailabilityBadge()
+
+    ' Render the genres.
     genres = itemContent.genres
     if isNonEmptyArray(genres) = true
       m.genres.text = genres[0]
@@ -136,109 +155,37 @@ Function onItemContentChange()
 End Function
 
 
-Function refreshButtonList()
+' Rebuilds the CTA button list based on event timing, login state, and hub availability
+Function refreshButtonList() as Void
   itemContent = m.top.itemContent
   buttons = []
   if itemContent <> invalid AND itemContent.scheduleData <> invalid AND isNonEmptyString(itemContent.scheduleData.startTime) = true
-    buttonContent = invalid
-    startTime = itemContent.scheduleData.startTime
-    endTime = itemContent.scheduleData.endTime
     currentDatetime = CreateObject("roDateTime")
     airDatetime = CreateObject("roDateTime")
-    airDatetime.FromISO8601String(startTime)
+    airDatetime.FromISO8601String(itemContent.scheduleData.startTime)
 
     isEventLive = currentDatetime.asSeconds() >= airDatetime.asSeconds()
-    hasEventEnded = isLessThanOrEqualToCurrentTime(endTime)
-    if m.uiRefreshTimer <> invalid
-      secondsUntilAirTime = airDatetime.asSeconds() - currentDatetime.asSeconds()
-      m.uiRefreshTimer.control = "stop"
-      if secondsUntilAirTime > 0
-        m.uiRefreshTimer.control = "start"
-      end if
-    end if
+    hasEventEnded = isLessThanOrEqualToCurrentTime(itemContent.scheduleData.endTime)
 
-    if itemContent.needsLogin = true AND getExternalConfigValueFromGlobal("bypass_registration_gate", false) = false AND hasEventEnded = false
-      translationId = "sign_in_watch"
-      buttonId = "signInWatch"
-      if isEventLive = true
-        translationId = "sign_in_watch_live"
-        buttonId = "signInWatchLive"
-      end if
-      buttonContent = {
-        id: buttonId
-        title: getTranslation(translationId)
-        iconUrl: "pkg:/images/account-icon.webp"
-        badgeText: getTranslation("registration_signup_button_free")
-        isPrimaryButton: true
-      }
-    else if hasEventEnded = true
-      buttonContent = {
-        id: "contentUnavailable"
-        title: getTranslation("content_unavailable")
-        isPrimaryButton: true
-        disabled: true
-      }
-    else if isEventLive = true
-      ' For now using air datetime in future will use listing api information.
-      buttonContent = {
-        id: "watchLive"
-        title: getTranslation("screenHome_button_spotlight_watch_live")
-        iconUrl: "pkg:/images/live-icon.webp"
-        isPrimaryButton: true
-      }
-    end if
+    updateRefreshTimer(airDatetime, currentDatetime)
 
-    ' Only showing set reminder if the game is not happening on the same day as current day.
-    ' Adding a safety check for a use case where start date is older than current day which will never happen real world but added as a safety.
-    bookmark = getBookmark(itemContent.id)
-    didUserSetReminderForEventContent = (bookmark <> invalid)
-
-    if isEventLive = false AND itemContent.needsLogin <> true AND hasEventEnded = false
-      if m.top.isContentDetailsView = true
-        if didUserSetReminderForEventContent = false
-          reminderTranslationId = "screenDetails_button_set_reminder"
-          iconUrl = "pkg:/images/set-reminder.webp"
-        else
-          reminderTranslationId = "screenDetails_button_remove_reminder"
-          iconUrl = "pkg:/images/reminder-set.webp"
-        end if
-
-        buttonContent = {
-          id: "reminder"
-          title: getTranslation(reminderTranslationId)
-          iconUrl: iconUrl
-          ' Making the button primary only if this button is the only button that is being displayed.
-          isPrimaryButton: true
-        }
-      else
-        buttonContent = {
-          id: "details"
-          title: getTranslation("screenDetails_button_details")
-          isPrimaryButton: true
-        }
-      end if
-    end if
-    ' Avoiding unnecessary updates to the onItemContentChange been triggered.
+    ' Avoid re-triggering onItemContentChange when updating actionId below
     m.top.unObserveFieldScoped("itemContent")
     m.top.observeFieldScoped("itemContent", "onItemContentChange")
-    if buttonContent <> invalid
-      itemContent.update({
-        actionId: buttonContent.id
-      }, true)
-      content = CreateObject("roSGNode", "ContentNode")
-      content.update(buttonContent, true)
 
-      button = CreateObject("roSGNode", "EnhancedButton")
-      button.height = 105
-      button.itemContent = content
-      button.id = buttonContent.id
-      button.observeFieldScoped("wasSelected", "onCtaButtonSelected")
-      buttons.push(button)
+    buttonContent = getCtaButtonContent(itemContent, isEventLive, hasEventEnded)
+    if buttonContent <> invalid
+      itemContent.update({ actionId: buttonContent.id }, true)
+      buttons.push(buttonContent)
+    end if
+
+    hubButtonContent = getHubButtonContent(itemContent)
+    if hubButtonContent <> invalid
+      buttons.push(hubButtonContent)
     end if
   end if
 
-  m.nodeHelpers.removeAllChildren(m.buttonList)
-  m.buttonList.appendChildren(buttons)
+  m.buttonList.buttons = buttons
   m.buttonList.visible = isNonEmptyArray(buttons)
 
   if m.top.parentArrayGrid <> invalid
@@ -249,9 +196,111 @@ Function refreshButtonList()
 End Function
 
 
-Function onCtaButtonSelected(msg)
-  ctaButton = msg.getRoSGNode()
-  if ctaButton.id = "reminder"
+' Starts or stops the refresh timer based on seconds until air time
+Function updateRefreshTimer(airDatetime, currentDatetime) as Void
+  if m.uiRefreshTimer <> invalid
+    secondsUntilAirTime = airDatetime.asSeconds() - currentDatetime.asSeconds()
+    m.uiRefreshTimer.control = "stop"
+    if secondsUntilAirTime > 0
+      m.uiRefreshTimer.control = "start"
+    end if
+  end if
+End Function
+
+
+' Determines which CTA button to show based on event state
+' @return assocarray with button content, or invalid if no button needed
+Function getCtaButtonContent(itemContent, isEventLive, hasEventEnded) as Dynamic
+  if itemContent.needsLogin = true AND getExternalConfigValueFromGlobal("bypass_registration_gate", false) = false AND hasEventEnded = false
+    buttonId = "signInWatch"
+    if isEventLive = true
+      buttonId = "signInWatchLive"
+    end if
+    return {
+      id: buttonId
+      title: getTranslation("sign_in_watch_live")
+      iconUrl: "pkg:/images/account-icon.webp"
+      isPrimaryButton: true
+    }
+  else if hasEventEnded = true
+    return {
+      id: "contentUnavailable"
+      title: getTranslation("content_unavailable")
+      isPrimaryButton: true
+      disabled: true
+    }
+  else if isEventLive = true
+    return {
+      id: "watchLive"
+      title: getTranslation("screenHome_button_spotlight_watch_live")
+      iconUrl: "pkg:/images/live-icon.webp"
+      isPrimaryButton: true
+    }
+  end if
+
+  ' Not live, not ended, no login required — show reminder or details
+  if isEventLive = false AND itemContent.needsLogin <> true AND hasEventEnded = false
+    if m.top.isContentDetailsView = true
+      bookmark = getBookmark(itemContent.id)
+      didUserSetReminderForEventContent = (bookmark <> invalid)
+      if didUserSetReminderForEventContent = false
+        reminderTranslationId = "screenDetails_button_set_reminder"
+        iconUrl = "pkg:/images/set-reminder.webp"
+      else
+        reminderTranslationId = "screenDetails_button_remove_reminder"
+        iconUrl = "pkg:/images/reminder-set.webp"
+      end if
+      return {
+        id: "reminder"
+        title: getTranslation(reminderTranslationId)
+        iconUrl: iconUrl
+        isPrimaryButton: true
+      }
+    else
+      return {
+        id: "details"
+        title: getTranslation("screenDetails_button_details")
+        isPrimaryButton: true
+      }
+    end if
+  end if
+
+  return invalid
+End Function
+
+
+' Returns hub button content if creatorTensorApp is present or uiCustomization matches the hub
+Function getHubButtonContent(itemContent) as Dynamic
+  if m.top.isContentDetailsView = false then return invalid
+
+  if isAA(itemContent.creatorTensorApp) = true AND isNonEmptyString(itemContent.creatorTensorApp.id) = true
+    hubTitle = itemContent.creatorTensorApp.title
+    if isNonEmptyString(hubTitle) = true
+      return {
+        id: "hub"
+        title: hubTitle
+        isPrimaryButton: true
+      }
+    end if
+  else if isAA(m.hubConfig) = true AND isAA(itemContent.uiCustomization) = true AND isAA(itemContent.uiCustomization.style) = true AND itemContent.uiCustomization.style.appId = m.hubConfig.id AND isNonEmptyString(m.hubConfig.title) = true
+    return {
+      id: "hub"
+      title: m.hubConfig.title
+      isPrimaryButton: true
+    }
+  end if
+  return invalid
+End Function
+
+
+' Handles button selection, firing analytics for reminder toggles
+' and passing the selected button ID up via ctaButtonSelectedId
+Function onButtonListSelected(msg) as Void
+  buttonData = msg.getData()
+  if buttonData = invalid then return
+
+  buttonId = buttonData.id
+  if buttonId = "reminder"
     trackingPageInfo = m.top.trackingPageInfo
     if trackingPageInfo <> invalid
       itemContent = m.top.itemContent
@@ -276,11 +325,12 @@ Function onCtaButtonSelected(msg)
       }
     end if
   end if
-  m.top.ctaButtonSelectedId = ctaButton.id
+  m.top.ctaButtonSelectedId = buttonId
 End Function
 
 
-Function getFocusedButton()
+' Returns the currently focused button node, defaulting to the first button
+Function getFocusedButton() as Dynamic
   focusedIndex = m.buttonList.focusedIndex
   if focusedIndex = -1
     focusedIndex = 0
@@ -292,42 +342,40 @@ Function getFocusedButton()
 End Function
 
 
-Function onDidSetReminderForEventContentChange(_msg)
+' Refreshes the button list when the reminder state changes
+Function onDidSetReminderForEventContentChange(_msg) as Void
   refreshButtonList()
 End Function
 
 
-Function onUiRefreshTimerFired(_msg)
+' Periodic refresh triggered by the timer to update buttons and badge state
+Function onUiRefreshTimerFired(_msg) as Void
   refreshButtonList()
   updateAvailabilityBadge()
 End Function
 
 
-Function onSignedInChange(_msg)
+' Refreshes the button list when the user's sign-in state changes
+Function onSignedInChange(_msg) as Void
   refreshButtonList()
 End Function
 
 
-Function updateAvailabilityBadge()
+' Updates the availability badge (Live, Replay, Upcoming) based on schedule and replay state
+Function updateAvailabilityBadge() as Void
   itemContent = m.top.itemContent
-  if isAA(itemContent.scheduleData)
-    badgeInfo = getLinearContentBadgeInfo(itemContent.scheduleData)
-    if badgeInfo <> invalid
-      m.availabilityBadge.width = 0
-      m.availabilityBadge.text = ""
-      if badgeInfo.availability = "live"
-        setLinearAvailabilityBadge(m.availabilityBadge, badgeInfo.availability, m.primaryTextColor, m.focused2Color)
-      else
-        setLinearAvailabilityBadge(m.availabilityBadge, badgeInfo.availability, m.backgroundColor, m.primaryTextColor, badgeInfo.badgeText)
-      end if
-    else
-      m.metadataRow.removeChild(m.availabilityBadge)
-    end if
+  m.availabilityBadge.itemContent = itemContent
+  if m.availabilityBadge.isConfigured = false
+    m.metadataRow.removeChild(m.availabilityBadge)
+  else if m.availabilityBadge.getParent() = invalid
+    m.metadataRow.insertChild(m.availabilityBadge, 0)
   end if
 End Function
 
 
-Function adjustMetadataSectionTranslation()
+' Adjusts the vertical position of the content section so metadata aligns
+' to the bottom of the container, shifting up for detail view
+Function adjustMetadataSectionTranslation() as Void
   contentSectionHeight = m.contentSection.boundingRect().height
   isContentDetailsView = m.top.isContentDetailsView
   containerHeight = 690
@@ -338,4 +386,58 @@ Function adjustMetadataSectionTranslation()
   else
     m.contentSection.translation = [0, 0]
   end if
+End Function
+
+
+' Resolves and sets the network logo URI based on the following priority:
+'   0. Ad sponsored title art (sponsoredLiveEventsHero brand logo from container.sponsor)
+'   1. Creator app title art (e.g. studio/network branding)
+'   2. Hub config title art (when container style matches the event hub)
+'   3. Schedule data channel logo (EPG-provided logo)
+'   4. Empty string fallback (no logo)
+' @param container - The parent CategoryContentNode of itemContent
+Function resolveNetworkLogoUri(container) as Void
+  itemContent = m.top.itemContent
+
+  ' Priority 0: Ad sponsored title art
+  if isNode(container) = true AND isNode(container.sponsor) = true AND isNonEmptyString(container.sponsor.titleImageUrl) = true
+    m.networkLogo.uri = container.sponsor.titleImageUrl
+    return
+  end if
+
+  scheduleData = itemContent.scheduleData
+  creatorApp = itemContent.creatorTensorApp
+
+  containerUiCustomization = invalid
+  if isNode(container) = true AND container.hasField("uiCustomization") = true
+    containerUiCustomization = container.uiCustomization
+  end if
+
+  hasHubLogo = false
+  if isAA(containerUiCustomization) = true AND isAA(containerUiCustomization.style) = true
+    if isAA(m.hubConfig) = true AND containerUiCustomization.style.appId = m.hubConfig.id AND isNonEmptyString(m.hubConfig.title_art) = true
+      hasHubLogo = true
+    end if
+  end if
+
+  if isAA(creatorApp) = true AND isAA(creatorApp.images) = true AND isNonEmptyArray(creatorApp.images.title_art) = true
+    m.networkLogo.uri = creatorApp.images.title_art[0]
+  else if hasHubLogo = true
+    m.networkLogo.uri = m.hubConfig.title_art
+  else if isAA(scheduleData) = true AND isNonEmptyString(scheduleData.channelLogo) = true
+    m.networkLogo.uri = scheduleData.channelLogo
+  else
+    m.networkLogo.uri = ""
+  end if
+End Function
+
+
+' Called when the parent container's sponsor field changes (sponsor applied or removed).
+' Re-evaluates the network logo priority so priority 0 (brand logo) takes or releases the slot.
+Function onSponsorChange() as Void
+  itemContent = m.top.itemContent
+  if isNode(itemContent) = false
+    return
+  end if
+  resolveNetworkLogoUri(itemContent.getParent())
 End Function

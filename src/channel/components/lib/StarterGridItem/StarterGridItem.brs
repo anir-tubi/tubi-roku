@@ -83,6 +83,7 @@ Function setThemeColors(msg = invalid)
     m.backgroundColor = theme.backgroundColor
     m.primaryTextColor = theme.primaryTextColor
     m.shadeColor = theme.shadeColor
+    m.blueBadgeColor = theme.blueBadgeColor
   end if
 End Function
 
@@ -182,7 +183,7 @@ Function onItemContentChange(msg)
     childGridItemComponent = invalid
     row = itemContent.getParent()
 
-    if gridItemType = "episodeItem" OR gridItemType = "episodeItemLatestEpisodes" then
+    if gridItemType = "episodeItem" OR gridItemType = "episodeItemLatestEpisodes" OR gridItemType = "landscapeSeries" OR gridItemType = "landscapeSeriesMultiple" then
       childGridItemComponent = "EpisodeItem"
     else if gridItemType = "emptyContainer" then
       if row <> invalid AND row.useVideoTilesFormat = true
@@ -214,7 +215,9 @@ Function onItemContentChange(msg)
       childGridItemComponent = "LiveEventsContainer"
     else if gridItemType = "liveEventBanner"
       childGridItemComponent = "Banner"
-    else if gridItemType = "appItem"
+    else if gridItemType = "hubRowLockup"
+      childGridItemComponent = "HubRowLockup"
+    else if gridItemType = "eventHubTile" OR gridItemType = "appItem"
       childGridItemComponent = "AppItem"
     else if itemContent.needsLogin = true
       childGridItemComponent = "CategoryGridPoster"
@@ -232,11 +235,6 @@ Function onItemContentChange(msg)
       m.availabilityBadge = invalid
     end if
 
-    if m.titleLabelGroup <> invalid
-      m.top.removeChild(m.titleLabelGroup)
-      m.titleLabelGroup = invalid
-    end if
-
     if childGridItemComponent = invalid then
       ' If we're only using the starter component then we want to unobserve all of the conditionally observed fields
       if m.childGridItem <> invalid then
@@ -245,17 +243,8 @@ Function onItemContentChange(msg)
         m.delete("childGridItem")
       end if
 
-      if row <> invalid AND row.isControlLandscape = true
-        sPosterURL = itemContent.controlLandscape
-      else
-        sPosterURL = itemContent.HDGRIDPOSTERURL
-      end if
-      m.poster.uri = sPosterURL
+      m.poster.uri = itemContent.HDGRIDPOSTERURL
       m.poster.visible = true
-
-      if row <> invalid AND row.isControlLandscape = true
-        createTitleLabel()
-      end if
     else
       m.poster.visible = false
       if m.childGridItem = invalid then
@@ -288,17 +277,15 @@ Function onItemContentChange(msg)
       end if
     end if
 
-    if itemContent.scheduleData <> invalid AND gridItemType <> "liveEventSpotlight" AND gridItemType <> "liveEventBanner"
-      badgeInfo = getLinearContentBadgeInfo(itemContent.scheduleData)
-      if badgeInfo <> invalid
-        m.availabilityBadge = createObject("roSGNode", "Badge")
-        if badgeInfo.availability = "live"
-          setLinearAvailabilityBadge(m.availabilityBadge, badgeInfo.availability, m.primaryTextColor, m.focused2Color)
-        else
-          setLinearAvailabilityBadge(m.availabilityBadge, badgeInfo.availability, m.backgroundColor, m.primaryTextColor, badgeInfo.badgeText)
-        end if
-        m.availabilityBadge.translation = [6, 6]
+    if (itemContent.scheduleData <> invalid OR itemContent.type = "linear") AND gridItemType <> "liveEventSpotlight" AND gridItemType <> "liveEventBanner"
+      m.availabilityBadge = createObject("roSGNode", "AvailabilityBadge")
+      m.availabilityBadge.itemContent = itemContent
+
+      if m.availabilityBadge.isConfigured = true
+        m.availabilityBadge.translation = [6, 9]
         m.top.appendChild(m.availabilityBadge)
+      else
+        m.availabilityBadge = invalid
       end if
     end if
 
@@ -322,12 +309,6 @@ Function onItemContentChange(msg)
       badgeTextFont = m.bodySmall
       translation = [15, 15]
       backgroundUri = "pkg:/images/rounded-background-$$RES$$.9.png"
-      if getStatsigExperimentResource("roku_sot_reverse_ui_test", "roku_sot_reverse_ui_test_v1", false).enabled = true
-        textColor = m.focusedTextColor
-        badgeTextFont = m.bodySmallStrong
-        backgroundUri = "pkg:/images/badge-background-$$RES$$.9.png"
-        translation = [4, 4]
-      end if
 
       config = {
         textColor: textColor
@@ -413,7 +394,43 @@ Function onItemContentChange(msg)
         personalizationId: personalizationId
       }
     end if
+
+    registerListingForRefresh(itemContent, m.top.rowIndex, m.top.index)
   end if
+End Function
+
+
+' Registers a content item's schedule data in the global pendingListingRefreshData field
+' so that ContentController can make a bulk listing API call when the screen becomes current.
+' @param itemContent - The content node to check for scheduleData
+' @param rowIndex - The row index of the item in the content tree
+' @param columnIndex - The column index of the item within the row
+Function registerListingForRefresh(itemContent, rowIndex, columnIndex) as Void
+  if isAA(itemContent.scheduleData) = false OR itemContent.scheduleData.id = invalid then return
+  if isNonEmptyString(m.parentScreenId) = false OR itemContent.gridItemType = "liveEventSpotlight" then return
+
+  scheduleId = itemContent.scheduleData.id.toStr()
+  contentId = itemContent.id
+  pendingData = m.global.pendingListingRefreshData
+  if pendingData = invalid then pendingData = {}
+  if pendingData[m.parentScreenId] = invalid then pendingData[m.parentScreenId] = {}
+  if pendingData[m.parentScreenId][scheduleId] = invalid then pendingData[m.parentScreenId][scheduleId] = []
+
+  ' Deduplicate — RowList item recycling can trigger setGridItemContent
+  ' multiple times for the same position, causing duplicate entries
+  positions = pendingData[m.parentScreenId][scheduleId]
+  for each entry in positions
+    if entry.rowIndex = rowIndex AND entry.columnIndex = columnIndex AND entry.contentId = contentId
+      return
+    end if
+  end for
+
+  positions.push({
+    rowIndex: rowIndex
+    columnIndex: columnIndex
+    contentId: contentId
+  })
+  m.global.pendingListingRefreshData = pendingData
 End Function
 
 
@@ -456,14 +473,6 @@ Function onRenderTrackingChange(msg)
   topRef = m.top
   content = topRef.itemContent
 
-  if content <> invalid AND (state = "full" OR state = "partial")
-    ' Check if badge exists in StarterGridItem
-    badgeExist = m.sotBadge <> invalid
-    if badgeExist = true OR (isAA(content.sotPosterLabels) = true AND content.sotPosterLabels.count() > 0)
-      getStatsigExperimentResource("roku_sot_reverse_ui_test", "roku_sot_reverse_ui_test_v1", true)
-    end if
-  end if
-
   MIN_VISIBLE_THRESHOLD = 1000
 
   ' Checking the item is of a certain type that we want to track viewable impression event for.
@@ -500,40 +509,3 @@ Function onRenderTrackingChange(msg)
   end if
 End Function
 
-
-Function createTitleLabel()
-  titleLabelGroup = createObject("roSGNode", "Group")
-  titleLabelGroup.id = "titleLabelGroup"
-
-  gradient = createObject("roSGNode", "Poster")
-  gradient.update({
-    id: "titleLabelGradient"
-    uri: "pkg:/images/video_in_grid_gradient_$$RES$$.9.png"
-    translation: [0, m.poster.height - 120]
-    width: m.poster.width
-    height: 120
-    loadDisplayMode: "scaleToFill"
-    loadSync: true
-  })
-  titleLabelGroup.appendChild(gradient)
-
-  titleLabel = createObject("roSGNode", "Label")
-  setTypographyOfLabel(titleLabel, m.subheaderSmallFont)
-  titleLabel.update({
-    id: "titleLabel"
-    color: m.primaryTextColor
-    maxLines: 2
-    numLines: 2
-    height: 80
-    lineSpacing: 6
-    width: m.poster.width - 35
-    wrap: true
-    vertAlign: "bottom"
-    text: m.top.itemContent.title
-    translation: [15, m.poster.height - 86]
-  })
-
-  titleLabelGroup.appendChild(titleLabel)
-  m.top.appendChild(titleLabelGroup)
-  m.titleLabelGroup = titleLabelGroup
-End Function

@@ -21,8 +21,11 @@ Function init() as Void
   ' Cache node references
   m.pageGroup = topRef.findNode("PageGroup")
   m.pivotTitleLabel = topRef.findNode("pivotTitleLabel")
+  m.titleGroup = topRef.findNode("titleGroup")
+  m.pivotLogo = topRef.findNode("pivotLogo")
+  m.backgroundPoster = topRef.findNode("backgroundPoster")
+  m.sponsorshipPoster = topRef.findNode("sponsorshipPoster")
   m.rowList = topRef.findNode("rowList")
-
   ' Configure RowList focus bitmap
   m.rowList.focusBitmapUri = "pkg:/images/selectorRoundedCorners-$$RES$$.9.png"
 
@@ -34,6 +37,7 @@ Function init() as Void
   topRef.cursorPosition = [-1, -1]
 
   ' Set up observers
+  m.rowList.observeFieldScoped("currFocusRow", "onCurrFocusRowChange")
   m.rowList.observeFieldScoped("rowItemFocused", "onRowItemFocused")
   m.rowList.observeFieldScoped("rowItemSelected", "onRowItemSelected")
   m.rowList.observeFieldScoped("navigateWithinPageInfo", "onRowListNavigateWithinPageInfoChange")
@@ -42,6 +46,10 @@ Function init() as Void
   topRef.observeFieldScoped("pivotId", "onPivotIdChange")
   topRef.observeFieldScoped("trackingPageInfo", "onTrackingPageInfoChange")
   topRef.observeFieldScoped("containerAppendMoreTilesStatus", "onContainerAppendMoreTilesStatusChange")
+  topRef.observeFieldScoped("refreshContent", "onContentRefreshNeeded")
+  topRef.observeFieldScoped("focusedChild", "onPivotScreenFocusChange")
+  topRef.enableContentRefresh = true
+  topRef.enableContainerRefresh = true
   m.pageGroup.translation = [-3, 153]
 
   ' Initialize video tiles support using mixin
@@ -72,11 +80,32 @@ Function onThemeChange(msg = invalid) as Void
 End Function
 
 
+' Handles content refresh signal from VideoTilesScreen
+' Re-fetches collection data when content has expired
+Function onContentRefreshNeeded(_msg) as Void
+  fetchCollectionData(m.top.pivotId)
+End Function
+
+
+' Manages sponsored hub ad refresh on focus changes
+' Re-fetches ad when screen gains focus and ad has expired (only if content
+' itself isn't expired, since onFetchCollectionSuccess handles ad fetch after content refresh)
+Function onPivotScreenFocusChange() as Void
+  if m.top.hasFocus() = true
+    contentExpired = m.top.content <> invalid AND shouldRefresh(m.top.content)
+    if contentExpired = false AND shouldRefresh(m.top.sponsoredHubAdContent)
+      fetchSponsoredHubAd()
+    end if
+  end if
+End Function
+
+
 ' Handles pivotId field changes - triggers API call to fetch collection data
 Function onPivotIdChange(msg = invalid) as Void
   pivotId = m.top.pivotId
   if isNonEmptyString(pivotId) = false then return
 
+  m.top.containerRefreshAppId = pivotId
   fetchCollectionData(pivotId)
 End Function
 
@@ -88,6 +117,7 @@ Function fetchCollectionData(pivotId) as Void
     apiUtilsLib = ApiUtils(m.constants, m.top.serverPersistentData)
     experimentsInterface = StatsigExperimentsInterface(getStatsigExperimentsInfoFromGlobal())
     m.cmsApi = CmsApi(m.constants, apiUtilsLib, invalid, experimentsInterface)
+    m.adsApi = AdsApi(m.constants, apiUtilsLib)
   end if
 
   ' Build request options with pagination params
@@ -106,6 +136,7 @@ Function fetchCollectionData(pivotId) as Void
     "background"
     "title"
     "featured"
+    "episodeLandscape"
   ]
 
   reqInfo = m.cmsApi.createGetCollectionInfo(pivotId, options, imageParamTypes)
@@ -132,7 +163,8 @@ Function onFetchCollectionSuccess(response) as Void
   end if
   setRowHeights(response)
   m.top.content = response
-  m.pivotTitleLabel.visible = true
+  m.titleGroup.visible = true
+
   m.rowList.update({
     parentScreenId: m.top.id
     parentScreenTrackingPageInfo: m.top.trackingPageInfo
@@ -140,6 +172,78 @@ Function onFetchCollectionSuccess(response) as Void
     shouldTrackViewableImpressionEvent: m.top.shouldTrackViewableImpressionEvent
   }, true)
   m.top.pageLoadComplete = true
+
+  if m.top.rowCurrFocusColumn = -1 then
+    m.top.rowCurrFocusColumn = 0
+  end if
+
+  fetchSponsoredHubAd()
+End Function
+
+
+' Sets app-level images from either ad data or the collection API response
+' Priority: ad content > API response > event hub config fallback (when pivotId matches hub.id)
+' @param adContent - Optional ad response AA with smallLogoLockupUrl, brandBackgroundUrl, brandGraphicUrl
+Function setAppImages(adContent = invalid) as Void
+  response = m.top.content
+  if response = invalid then return
+
+  hubConfig = getEventHubConfig()
+
+  if adContent <> invalid AND isNonEmptyString(adContent.smallLogoLockupUrl)
+    m.pivotLogo.uri = adContent.smallLogoLockupUrl
+    m.pivotLogo.visible = true
+  else if isNonEmptyString(response.titleArt)
+    m.pivotLogo.uri = response.titleArt
+    m.pivotLogo.visible = true
+  else if hubConfig <> invalid AND isNonEmptyString(hubConfig.title_art)
+    m.pivotLogo.uri = hubConfig.title_art
+    m.pivotLogo.visible = true
+  end if
+
+  backgroundUrl = invalid
+  if adContent <> invalid AND isNonEmptyString(adContent.brandBackgroundUrl)
+    backgroundUrl = adContent.brandBackgroundUrl
+  else if isNonEmptyString(response.background)
+    backgroundUrl = response.background
+  else if hubConfig <> invalid AND isNonEmptyString(hubConfig.background)
+    backgroundUrl = hubConfig.background
+  end if
+
+  if backgroundUrl <> invalid
+    m.backgroundPoster.opacity = 0.0
+    m.backgroundPoster.unobserveFieldScoped("loadStatus")
+    m.backgroundPoster.observeFieldScoped("loadStatus", "onBackgroundPosterLoaded")
+    m.backgroundPoster.uri = backgroundUrl
+  end if
+
+  if adContent <> invalid AND isNonEmptyString(adContent.brandGraphicUrl)
+    m.sponsorshipPoster.uri = adContent.brandGraphicUrl
+    m.sponsorshipPoster.visible = true
+  end if
+End Function
+
+
+' Fades in the background poster once the image has finished loading
+Function onBackgroundPosterLoaded(msg) as Void
+  if msg.getData() = "ready"
+    m.backgroundPoster.visible = true
+    fade(m.backgroundPoster, "in", 0.3)
+  end if
+End Function
+
+
+' Returns the event hub config if the current pivotId matches the hub id, otherwise invalid
+' This is specific to solar bear event hub.
+Function getEventHubConfig() as Dynamic
+  eventConfig = getExternalConfigValueFromGlobal("event", invalid)
+  if eventConfig = invalid OR eventConfig.hub = invalid then return invalid
+
+  hub = eventConfig.hub
+  if hub.id = m.top.pivotId
+    return hub
+  end if
+  return invalid
 End Function
 
 
@@ -182,15 +286,32 @@ Function setRowHeights(content) as Void
 
   rowItemSize = []
   rowHeights = []
-  videoTilesPortraitSize = m.constants.ui.imageSizes.videoTilesPortrait
+  variableWidthItems = []
+  imageSizes = m.constants.ui.imageSizes
+  videoTilesPortraitSize = imageSizes.videoTilesPortrait
 
   for i = 0 to content.getChildCount() - 1
     category = content.getChild(i)
-    rowItemSize.push([videoTilesPortraitSize[0], videoTilesPortraitSize[1]])
-    rowHeights.push(getVideoTileRowHeight(category.sponsorImages))
+    gridItemType = category.gridItemType
+    if gridItemType = m.constants.ui.gridItemTypes.landscapeSeries OR gridItemType = m.constants.ui.gridItemTypes.landscapeSeriesMultiple
+      rowItemSize.push(imageSizes.episodeLandscape)
+      rowHeights.push(648)
+    else
+      rowItemSize.push(videoTilesPortraitSize)
+      rowHeights.push(getVideoTileRowHeight(category.sponsorImages))
+    end if
+
+    hasHubLockup = category.hasField("hasHubRowLockup") = true AND category.hasHubRowLockup = true
+    variableWidthItems.push(hasHubLockup)
   end for
 
-  configureRowHeights(m.rowList, rowItemSize, rowHeights, content)
+  configureRowHeights(m.rowList, rowItemSize, rowHeights, content, variableWidthItems)
+End Function
+
+
+' Hides focus feedback immediately on row change to prevent stale feedback
+Function onCurrFocusRowChange(_msg) as Void
+  m.rowList.drawFocusFeedback = false
 End Function
 
 
@@ -210,6 +331,12 @@ Function onRowItemFocused(msg) as Void
   if tubiContentNode = invalid then return
 
   m.top.contentFocused = tubiContentNode
+  m.top.contentFocusedUpdated = true
+
+  category = m.top.content.getChild(rowIndex)
+  gridItemType = invalid
+  if category <> invalid then gridItemType = category.gridItemType
+  m.rowList.drawFocusFeedback = (gridItemType = m.constants.ui.gridItemTypes.landscapeSeries OR gridItemType = m.constants.ui.gridItemTypes.landscapeSeriesMultiple)
 
   updateFocusForItem(m.rowList, rowIndex)
 End Function
@@ -241,6 +368,72 @@ Function onKeyEvent(key as String, press as Boolean) as Boolean
   end if
 
   return false
+End Function
+
+
+' Fetches sponsored hub ad content for the pivot detail screen
+Function fetchSponsoredHubAd() as Void
+  authInfo = TubiAuth(m.constants).getAuthInfo()
+  userId = ""
+  if authInfo <> invalid AND authInfo.userId <> invalid
+    userId = authInfo.userId.toStr()
+  end if
+
+  adReqInfo = m.adsApi.createSponsoredHubAdReqInfo(userId, m.top.isKidsMode)
+  reqInfo = {
+    url: adReqInfo.url
+    requestType: m.constants.reqNames.getSponsoredHubAds
+    options: adReqInfo.options
+    successCallback: onSponsoredHubAdSuccess
+    errorCallback: onSponsoredHubAdError
+    responseType: "assocarray"
+    screenId: m.top.id
+    timeoutInMilliSec: adReqInfo.timeoutInMilliSec
+  }
+  makeNetworkRequest(reqInfo)
+End Function
+
+
+' Handles successful sponsored hub ad response
+' Overrides app images with ad assets when present
+' Fires sponsored_hub impression pixels on load
+' validUntil is set at the parser level (AdParsers.parseSponsoredHubAdsSuccess)
+' @param response - Parsed ad data with assets, trackers, ad ID, and validUntil
+Function onSponsoredHubAdSuccess(response) as Void
+  if response = invalid then return
+
+  m.top.sponsoredHubAdContent = response
+  setAppImages(response)
+
+  if isNonEmptyArray(response.imageImpTracking) = true
+    fireSponsoredHubPixels(response.imageImpTracking)
+  end if
+End Function
+
+
+' Fires impression pixels for the sponsored_hub ad
+' @param aPixelURLs - Array of impression pixel URLs to fire
+Function fireSponsoredHubPixels(aPixelURLs) as Void
+  if isNonEmptyArray(aPixelURLs) = false then return
+
+  for each pixelURL in aPixelURLs
+    encodedUrl = replaceCacheBusterMacro(pixelURL)
+    if isNonEmptyString(encodedUrl) = true
+      makeNetworkRequest({
+        url: encodedUrl
+        requestType: m.constants.reqNames.generic
+        responseType: "assocarray"
+        silenceCallbackWarnings: true
+      })
+    end if
+  end for
+End Function
+
+
+' Handles error when fetching sponsored hub ad — falls back to collection images
+Function onSponsoredHubAdError(_error) as Void
+  tubiLog("PivotDetailScreen.onSponsoredHubAdError")
+  setAppImages()
 End Function
 
 

@@ -74,6 +74,10 @@ Function init()
     pageValues: {}
   }
   m.epgTimeGrid.trackingPageInfo = m.top.trackingPageInfo
+  m.epgBanner = m.top.findNode("epgBanner")
+  m.epgBanner.observeFieldScoped("focusedChild", "onEpgBannerFocusChange")
+  m.activeBannerData = invalid
+
   'ChannelRefreshTimer
   m.channelRefreshTimer = m.top.findNode("channelRefreshTimer")
   'If channelRefreshTimer needs to be different than categoryContentRefreshTimeout then we need to add a constant
@@ -89,6 +93,47 @@ Function onVisibleChange()
     m.clock.control = "stop"
   end if
 End Function
+
+' Checks external config for an active EPG banner and displays it.
+' Shifts the ProgramGuide down to make room when a banner is shown.
+Function setupEpgBanner() as Void
+  config = getExternalConfigInfoFromGlobal()
+  if config = invalid OR config.event = invalid OR config.event.epg_banner = invalid
+    return
+  end if
+
+  banners = config.event.epg_banner
+  if isArray(banners) = false then return
+
+  for each banner in banners
+    if isAA(banner) AND isNonEmptyString(banner.background) AND isNowWithinTimePeriod(banner.start_time, banner.end_time)
+      category = CreateObject("roSGNode", "ContentNode")
+      category.update({
+        uiCustomization: {
+          style: {
+            bannerBackground: banner.background
+            bannerTextRegistered: banner.text
+          }
+        }
+      }, true)
+      itemContent = CreateObject("roSGNode", "ContentNode")
+      category.appendChild(itemContent)
+      m.epgBanner.itemContent = itemContent
+      m.epgBanner.visible = true
+      m.activeBannerData = banner
+      return
+    end if
+  end for
+End Function
+
+
+' Forwards focus state to the Banner component so it can show/hide its border
+Function onEpgBannerFocusChange(msg = invalid) as Void
+  hasFocus = m.epgBanner.hasFocus()
+  m.epgBanner.itemHasFocus = hasFocus
+  m.epgBanner.rowListHasFocus = hasFocus
+End Function
+
 
 Function onScreenFocusChange()
   tubiLog("EPGHomeScreen.onScreenFocusChange")
@@ -487,6 +532,7 @@ Function onTimeContentChange()
     m.epgTimeGrid.contentUpdated = true
     m.top.contentReady = true
     m.InfoPanel.visible = true
+    setupEpgBanner()
 
     getStatsigExperimentResource("roku_linear_epg_categories", "roku_linear_epg_categories_v1", true)
   end if
@@ -664,6 +710,21 @@ Function onKeyEvent(key as String, press as Boolean) as Boolean
         sendEPGCategoryToChannelNavigateWithinPageEvent()
         m.epgTimeGrid.isChannelGridFocused = true
         m.epgTimeGrid.setFocus(true)
+        return true
+      end if
+    end if
+
+    if m.epgBanner.visible = true
+      if key = "up" AND m.epgTimeGrid.isInFocusChain() = true
+        m.epgBanner.setFocus(true)
+        return true
+      else if key = "down" AND m.epgBanner.hasFocus() = true
+        setFocusOnEpgTimeGrid()
+        return true
+      else if key = "OK" AND m.epgBanner.hasFocus() = true
+        if m.activeBannerData <> invalid
+          m.top.epgBannerSelected = m.activeBannerData
+        end if
         return true
       end if
     end if

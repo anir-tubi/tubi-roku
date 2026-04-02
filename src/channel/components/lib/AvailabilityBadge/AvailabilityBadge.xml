@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<component name="AvailabilityBadge" extends="Badge">
+  <script type="text/brightscript" uri="AvailabilityBadge.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/TimeUtils.brs" />
+  <script type="text/brightscript" uri="pkg:/source/3rdparty/roku/generalUtils.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/EPGMixin.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/GlobalMixin.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/StatsigExperimentMixin.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/StatsigExperiments.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/StatsigLib.brs" />
+
+  <interface>
+    <field id="itemContent" type="node" alwaysNotify="true" />
+    <field id="isConfigured" type="boolean" value="false" />
+  </interface>
+</component>

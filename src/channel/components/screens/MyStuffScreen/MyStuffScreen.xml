@@ -2,7 +2,6 @@
 <component name="MyStuffScreen" extends="VideoTilesScreen">
 
   <script type="text/brightscript" uri="MyStuffScreen.brs" />
-  <script type="text/brightscript" uri="pkg:/components/lib/CacheValidationMixin.brs" />
   <script type="text/brightscript" uri="pkg:/components/lib/InfoPanelMixin.brs" />
   <script type="text/brightscript" uri="pkg:/components/lib/AnimationMixin.brs" />
   <script type="text/brightscript" uri="pkg:/source/lib/TubiMetadataTranslate.brs" />
@@ -53,9 +52,6 @@
     <!-- set to true when the user wants to go to the home screen -->
     <field id="homeButtonSelected" type="boolean" alwaysNotify="true" />
 
-    <!-- tells ContentController/Helpers that the content metadata is
-            out of the cache window and should be updated -->
-    <field id="refreshContent" type="boolean" alwaysNotify="true" />
   </interface>
 
   <children>

@@ -16,7 +16,6 @@ Function CmsApi(constants, apiUtilsLib, experiments = invalid, experimentsInterf
     createSeriesEpisodesBySeasonReqInfo: cmsApi_createSeriesEpisodesBySeasonReqInfo
     createThumbnailsReqInfo: cmsApi_createThumbnailsReqInfo
     createCategoriesListReqInfo: cmsApi_createCategoriesListReqInfo
-    createAdHomescreenDisplayContainerReqInfo: cmsApi_createAdHomescreenDisplayContainerReqInfo
     createHomeScreenReqInfo: cmsApi_createHomeScreenReqInfo
     createMiniHomeScreenOnPlayerReqInfo: cmsApi_createMiniHomeScreenOnPlayerReqInfo
     createGetCollectionInfo: cmsApi_createGetCollectionInfo
@@ -25,7 +24,7 @@ Function CmsApi(constants, apiUtilsLib, experiments = invalid, experimentsInterf
     createAutocompleteReqInfo: cmsApi_createAutocompleteReqInfo
     createHomeScreenBatchReqInfo: cmsApi_createHomeScreenBatchReqInfo
     createMyStuffScreenBatchReqInfo: cmsApi_createMyStuffScreenBatchReqInfo
-    createHomeScreenBatchReqInfoForContainers: cmsApi_createHomeScreenBatchReqInfoForContainers
+    createBatchReqInfoForContainers: cmsApi_createBatchReqInfoForContainers
     createGetContainerContentsReqInfo: cmsApi_createGetContainerContentsReqInfo
     createGetSeasonListBySeriesIdReqInfo: cmsApi_createGetSeasonListBySeriesIdReqInfo
     createGetAllPivotsReqInfo: cmsApi_createGetAllPivotsReqInfo
@@ -39,7 +38,6 @@ Function CmsApi(constants, apiUtilsLib, experiments = invalid, experimentsInterf
     setTupianBackgroundParam: cmsApi_setTupianBackgroundParam
     getWindowInfo: cmsApi_getWindowInfo
     getFullCategoryId: cmsApi_getFullCategoryId
-    generateAdUnitFromAdType: cmsApi_generateAdUnitFromAdType
     convertImageSizeFor720p: cmsApi_convertImageSizeFor720p
   }
 
@@ -136,6 +134,11 @@ Function cmsApi_createSingleContentReqInfo(contentId, includeChannels = false, b
   w = Int(creatorDetailScreenLogo[0] * m.constants.ui.imageSizeMultiplier)
   h = Int(creatorDetailScreenLogo[1] * m.constants.ui.imageSizeMultiplier)
   options.params["creator_tensor_app_images[logo]"] = "w" + w.toStr() + "h" + h.toStr() + "_logo"
+
+  creatorDetailScreenTitleArt = m.constants.ui.imageSizes.creatorDetailScreenTitleArt
+  tW = Int(creatorDetailScreenTitleArt[0] * m.constants.ui.imageSizeMultiplier)
+  tH = Int(creatorDetailScreenTitleArt[1] * m.constants.ui.imageSizeMultiplier)
+  options.params["creator_tensor_app_images[title_art]"] = "w" + tW.toStr() + "h" + tH.toStr() + "_title"
 
   options.params = m.setImageParams(["title", "landscape", "background"], options.params)
 
@@ -251,126 +254,6 @@ Function cmsApi_createCategoriesListReqInfo(bKidsMode = false)
     url: m.constants.urls.tensor.cdn.browserList
     options: options
   }
-End Function
-
-
-'''''''''''''''''''''
-' cmsApi_createAdHomescreenDisplayContainerReqInfo()
-' @adTypes: array, An array of ad types to be requested.  The ad types are defined in m.constants.adTypes.
-' @appMode: string, the app mode for which the ad request is being made: i.e. "KIDS_MODE" "DEFAULT_MODE", "LATINO_MODE"
-' @userId: string, the user id for which the ad request is being made.
-' @bKidsMode: boolean Are we in kids mode?
-'
-Function cmsApi_createAdHomescreenDisplayContainerReqInfo(adTypes = [], appMode = "DEFAULT_MODE", userId = "", bKidsMode = false)
-  headers = {}
-
-  headers.append(m.getCommonOptions().headers)
-  headers.append({
-    "user-agent": m.constants.deviceInfo.userAgent
-  })
-
-  nResolution = m.constants.deviceInfo.videoMode.toInt()
-  videoResolutionID = m.constants.player.videoResolution[nResolution.toStr()]
-  if videoResolutionID = invalid OR videoResolutionID = m.constants.player.videoResolution.unknown OR videoResolutionID = m.constants.player.videoResolution["AUTO"]
-    '//set to default resolution if the video resolution is unknown or auto
-    nResolution = 720
-  end if
-  sResolution = nResolution.toStr() + "p"
-
-  ifaValue = ""
-  if bKidsMode = false
-    '//do to data protection rules, do not send IFA value while in kids mode
-    ifaValue = m.constants.deviceInfo.deviceAdId
-  end if
-
-  body = {
-    viewer: {
-      viewer_id: userId
-    }
-    app: {
-      app_install_id: m.constants.deviceInfo.deviceId
-      ifa: ifaValue
-      video_resoln: sResolution
-    }
-    device: {
-      platform: UCase(m.constants.platform)
-      os: m.constants.deviceInfo.operatingSystem
-      os_version: m.constants.deviceInfo.firmwareVersion
-      make: m.constants.deviceInfo.vendorName
-      width: m.constants.deviceInfo.displayWidth
-      height: m.constants.deviceInfo.displayHeight
-    }
-    custom_kvps: {
-      app_mode: appMode
-    }
-
-  }
-
-  '//Add the ad units to the request body
-  adUnits = {}
-  for each adType in adTypes
-    adUnits = m.generateAdUnitFromAdType(adType, adUnits)
-  end for
-  body.ad_units = adUnits
-
-  bodyJson = FormatJSON(body)
-  return {
-    url: m.constants.urls.adShowcase
-    options: {
-      body: bodyJson
-      headers: headers
-      method: m.constants.reqTypes.post
-    }
-    timeoutInMilliSec: 5000
-  }
-End Function
-
-
-' Generates an ad unit based on the specified ad type. Helper function for cmsApi_createAdHomescreenDisplayContainerReqInfo()
-'
-' @param sAdType, string: The type of ad to generate the ad unit for.
-' @param aaAdUnits, assocArray: The list of available ad units.
-' @return assocArray: returns the passed aaAdUnits but with the ad unit for the specified sAdType added to it.
-Function cmsApi_generateAdUnitFromAdType(sAdType, aaAdUnits)
-  if sAdType = m.constants.adTypes.skinAd
-    aaAdUnits.tubi_app_homepage = {
-      sizes: {
-        rendering_codes: ["wrapper"]
-      }
-    }
-    aaAdUnits.homepage_video = {
-      sizes: {
-        rendering_codes: ["wrapper_video"]
-      }
-    }
-  else if sAdType = m.constants.adTypes.adRowlistSpotlight OR sAdType = m.constants.adTypes.adRowlistCarousel
-    if sAdType = m.constants.adTypes.adRowlistCarousel
-      renderingCode = m.constants.ui.categoryIds.adRowlistCarousel
-    else
-      renderingCode = m.constants.ui.categoryIds.adRowlistSpotlight
-    end if
-
-    if aaAdUnits <> invalid AND aaAdUnits.hdc_row <> invalid AND aaAdUnits.hdc_row.sizes <> invalid AND aaAdUnits.hdc_row.sizes.rendering_codes <> invalid
-      aaAdUnits.hdc_row.sizes.rendering_codes.push(renderingCode)
-    else
-      aaAdUnits.hdc_row = {
-        sizes: {
-          rendering_codes: [renderingCode]
-        }
-      }
-    end if
-  else if sAdType = m.constants.adTypes.thematicTakeover
-    nThematicTakeoverAdUnits = 7 ' this is the max number of different thematic takeover ad units that the backend supports currently
-    for i = 1 to nThematicTakeoverAdUnits
-      aaAdUnits["thematic_takeover_" + i.toStr()] = {
-        sizes: {
-          rendering_codes: ["thematic_takeover_row"]
-        }
-      }
-    end for
-  end if
-
-  return aaAdUnits
 End Function
 
 
@@ -715,8 +598,7 @@ Function cmsApi_createSearchReqInfo(searchText, bKidsMode = false, sAutoComplete
   options.params["feature_flags[include_coming_soon]"] = "true"
 
   if includeApps = true
-    url = m.constants.urls.searchV3
-    options.params["include_creator_apps"] = true
+    options.params["include_apps"] = true
     options.params = m.setAppImageParams(options.params)
   end if
 
@@ -785,7 +667,7 @@ Function cmsApi_setImageParams(imageTypes, existingParams = {}, screenId = "", c
   fullScreenBackground = imageSizes.fullScreenBackground
   featuredRowPoster = imageSizes.featuredRowPoster
   videoTilesPortrait = imageSizes.videoTilesPortrait
-  controlLandscape = imageSizes.controlLandscape
+  episodeLandscape = imageSizes.episodeLandscape
 
   '//For now, ensure the large posters do not show up on the search screen
   isNonLargePostersScreen = (isNonEmptyString(screenId) = true AND screenId = m.constants.ui.screenIds.searchScreen)
@@ -805,7 +687,7 @@ Function cmsApi_setImageParams(imageTypes, existingParams = {}, screenId = "", c
     videoTilesPortrait = m.convertImageSizeFor720p(videoTilesPortrait)
     fullScreenBackground = m.convertImageSizeFor720p(fullScreenBackground)
     skinAdLandscape = m.convertImageSizeFor720p(skinAdLandscape)
-    controlLandscape = m.convertImageSizeFor720p(controlLandscape)
+    episodeLandscape = m.convertImageSizeFor720p(episodeLandscape)
   end if
 
   gridItemTypes = m.constants.ui.gridItemTypes
@@ -823,7 +705,6 @@ Function cmsApi_setImageParams(imageTypes, existingParams = {}, screenId = "", c
     else if imageType = "featured"
       existingParams["images[hero_tb]"] = "w" + featuredRowPoster[0].ToStr() + "h" + featuredRowPoster[1].ToStr() + "_hero"
       existingParams["images[video_tiles_portrait_tb]"] = "w" + videoTilesPortrait[0].ToStr() + "h" + videoTilesPortrait[1].ToStr() + "_poster"
-      existingParams["images[control_landscape_tb]"] = "w" + controlLandscape[0].ToStr() + "h" + controlLandscape[1].ToStr() + "_hero"
     else if imageType = "background"
       if containerGridItemType <> gridItemTypes.skinAd
         existingParams["images[background_tb]"] = "w" + background[0].ToStr() + "h" + background[1].ToStr() + "_background"
@@ -834,6 +715,8 @@ Function cmsApi_setImageParams(imageTypes, existingParams = {}, screenId = "", c
       existingParams["images[title_art]"] = "w0h" + title[1].ToStr() + "_title"
     else if imageType = "skinAdLandscape"
       existingParams["images[skinAd_landscape_tb]"] = "w" + skinAdLandscape[0].ToStr() + "h" + skinAdLandscape[1].ToStr() + "_landscape"
+    else if imageType = "episodeLandscape"
+      existingParams["images[episode_landscape_tb]"] = "w" + episodeLandscape[0].ToStr() + "h" + episodeLandscape[1].ToStr() + "_landscape"
     end if
   end for
 
@@ -885,7 +768,14 @@ Function cmsApi_createHomeScreenBatchReqInfo(homeScreen, index, bKidsMode = fals
     if windowInfo.start = 0 AND homeScreen.content <> invalid
       featuredCategory = homeScreen.content.getChild(0)
       if featuredCategory <> invalid
-        categoryReqInfo = m.createGetContainerContentsReqInfo(featuredCategory, homeScreen, bKidsMode, isSignedInUser, uiMode, true)
+        categoryReqInfo = m.createGetContainerContentsReqInfo({
+          category: featuredCategory
+          screen: homeScreen
+          bKidsMode: bKidsMode
+          isSignedInUser: isSignedInUser
+          uiMode: uiMode
+          isVerticalLoad: true
+        })
 
         if categoryReqInfo <> invalid
           requests.push(categoryReqInfo)
@@ -899,7 +789,14 @@ Function cmsApi_createHomeScreenBatchReqInfo(homeScreen, index, bKidsMode = fals
     for i = windowInfo.start to (windowInfo.start + windowInfo.size) - 1
       category = homeScreen.content.getChild(i)
       if category <> invalid
-        categoryReqInfo = m.createGetContainerContentsReqInfo(category, homeScreen, bKidsMode, isSignedInUser, uiMode, true)
+        categoryReqInfo = m.createGetContainerContentsReqInfo({
+          category: category
+          screen: homeScreen
+          bKidsMode: bKidsMode
+          isSignedInUser: isSignedInUser
+          uiMode: uiMode
+          isVerticalLoad: true
+        })
 
         if categoryReqInfo <> invalid then
           requests.push(categoryReqInfo)
@@ -1046,17 +943,32 @@ End Function
 
 
 
-' This Function will pull the contents for container array
-' @containerIds: Array of container ids
-' @contentMode: one of enum values constants.ui.contentMode
-' @bKidsMode : boolean
-' @isSignedInUser: boolean, value based on user loggedIn or not
-' @uiMode: string, one of the allowed values from constants.ui.modes
-' returns batch requests
-Function cmsApi_createHomeScreenBatchReqInfoForContainers(containerIds, contentMode = "", bKidsMode = false, isSignedInUser = false, uiMode = "standard", screenId = "")
+' Builds batch request infos for fetching container contents
+' @param params: AssocArray with the following keys:
+'   containerIds (Array, required): Array of container IDs to fetch
+'   contentMode (String, optional, default ""): one of constants.ui.contentMode values
+'   bKidsMode (Boolean, optional, default false): whether kids mode is active
+'   isSignedInUser (Boolean, optional, default false): whether user is logged in
+'   uiMode (String, optional, default "standard"): one of constants.ui.modes values
+'   screenId (String, optional): screen ID for the request, defaults to homeScreen if not provided
+'   appId (String, optional): app/collection ID to include as app_id param
+' @return Array of request info objects
+Function cmsApi_createBatchReqInfoForContainers(params)
+  containerIds = params.containerIds
+  contentMode = params.contentMode
+  bKidsMode = params.bKidsMode
+  isSignedInUser = params.isSignedInUser
+  uiMode = params.uiMode
+  screenId = params.screenId
+  appId = params.appId
+
+  if contentMode = invalid then contentMode = ""
+  if bKidsMode = invalid then bKidsMode = false
+  if isSignedInUser = invalid then isSignedInUser = false
+  if uiMode = invalid then uiMode = "standard"
 
   reqName = m.constants.reqNames.getCategory
-  if screenId = ""
+  if isNonEmptyString(screenId) = false
     screenId = m.constants.ui.screenIds.homeScreen
   end if
 
@@ -1068,14 +980,13 @@ Function cmsApi_createHomeScreenBatchReqInfoForContainers(containerIds, contentM
       options = {
         params: {
           contents_limit: m.constants.performance.categoryGridList.lazyLoadItemsPerBatch
+          "content_mode": contentMode
         }
       }
 
-      contentModeParam = {
-        "content_mode": contentMode
-      }
-
-      options.params.append(contentModeParam)
+      if isNonEmptyString(appId)
+        options.params["app_id"] = appId
+      end if
 
       categoryReqInfo = m.createCategoryReqInfo(containerId, bKidsMode, options, invalid, screenId)
       categoryReqInfo.requestType = reqName
@@ -1095,7 +1006,30 @@ Function cmsApi_createHomeScreenBatchReqInfoForContainers(containerIds, contentM
 End Function
 
 
-Function cmsApi_createGetContainerContentsReqInfo(category, homeScreen, bKidsMode, isSignedInUser, uiMode, isVerticalLoad = false)
+' Builds request info for fetching container contents (horizontal pagination or vertical lazy load)
+' @param params: AssocArray with the following keys:
+'   category (roSGNode, required): the category node to fetch contents for
+'   screen (roSGNode, required): the screen node (used for contentMode)
+'   bKidsMode (Boolean, optional, default false): whether kids mode is active
+'   isSignedInUser (Boolean, optional, default false): whether user is logged in
+'   uiMode (String, optional, default "standard"): one of constants.ui.modes values
+'   isVerticalLoad (Boolean, optional, default false): whether this is a vertical lazy load
+'   appId (String, optional): app/collection ID to include as app_id param
+' @return request info AA or invalid
+Function cmsApi_createGetContainerContentsReqInfo(params)
+  category = params.category
+  screen = params.screen
+  bKidsMode = params.bKidsMode
+  isSignedInUser = params.isSignedInUser
+  uiMode = params.uiMode
+  isVerticalLoad = params.isVerticalLoad
+  appId = params.appId
+
+  if bKidsMode = invalid then bKidsMode = false
+  if isSignedInUser = invalid then isSignedInUser = false
+  if uiMode = invalid then uiMode = "standard"
+  if isVerticalLoad = invalid then isVerticalLoad = false
+
   categoryReqInfo = invalid
   paginationInfo = category.paginationInfo
   ' Adding a check to allow only on horizontal scroll or initial vertical scroll if we have not fetched the container.
@@ -1107,20 +1041,24 @@ Function cmsApi_createGetContainerContentsReqInfo(category, homeScreen, bKidsMod
     if isNonEmptyString(categoryId) = true
       tubiLog("CategoryGridList.fetch whole: Asking GeneralTask for " + categoryId)
 
-      params = {
+      reqParams = {
         contents_limit: m.constants.performance.categoryGridList.lazyLoadItemsPerBatch
       }
 
-      if homeScreen.contentMode = m.constants.ui.contentMode.homescreen
+      if screen.contentMode = m.constants.ui.contentMode.homescreen
         contentModeValue = ""
       else
-        contentModeValue = homeScreen.contentMode
+        contentModeValue = screen.contentMode
       end if
 
-      params["content_mode"] = contentModeValue
+      reqParams["content_mode"] = contentModeValue
+
+      if isNonEmptyString(appId)
+        reqParams["app_id"] = appId
+      end if
 
       options = {
-        "params": params
+        "params": reqParams
       }
 
       imageTypes = invalid
@@ -1197,7 +1135,7 @@ Function cmsApi_createGetAllPivotsReqInfo()
   params = options.params
 
   params.append({
-    "type": "PIVOT"
+    "type": UCase(m.constants.ui.appTypes.pivot)
     "limit_resolutions": m.constants.player.limitResolutions
     "video_resources": m.constants.player.drmOrderWithHlsWidevine
   })

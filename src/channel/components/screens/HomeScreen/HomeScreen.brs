@@ -9,7 +9,10 @@ Function init()
   topRef = m.top
   topRef.shouldShowSideNav = true
 
-  m.dimMask = topRef.findNode("dimMask")
+  m.containerBackgroundPoster = topRef.findNode("containerBackgroundPoster")
+  m.hubFocusGradient = topRef.findNode("hubFocusGradient")
+  m.hubPeekGradient = topRef.findNode("hubPeekGradient")
+  m.rowListNode = topRef.findNode("CategoryGridList").findNode("RowList")
   m.PageGroup = topRef.findNode("PageGroup")
   m.PageGroup.translation = [m.constants.ui.translations.marginX, 0]
   m.ContentAreaParent = topRef.findNode("ContentAreaParent")
@@ -45,10 +48,12 @@ Function init()
   topRef.observeFieldScoped("batchResponse", "onBatchResponseChanged")
   topRef.observeFieldScoped("batchAdResponse", "onBatchAdResponseChanged")
   topRef.observeFieldScoped("adImpressionUpdates", "onAdImpressionUpdatesChanged")
+  topRef.observeFieldScoped("hubLockupAdUpdate", "onHubLockupAdUpdate")
   topRef.observeFieldScoped("allowCarouselAutoRotate", "onAllowCarouselAutoRotateChange")
   topRef.observeFieldScoped("kidsMode", "onKidsModeChange")
   topRef.observeFieldScoped("enableVideoTiles", "onEnableVideoTilesChange")
   topRef.observeFieldScoped("isVideoPreviewOn", "onIsVideoPreviewOnChange")
+  topRef.observeFieldScoped("listingRefreshData", "onListingRefreshData")
   m.CategoryRefreshTimer = topRef.findNode("CategoryRefreshTimer")
   m.CategoryRefreshTimer.duration = m.constants.timers.categoryContentRefreshTimeout
   m.CategoryRefreshTimer.observeFieldScoped("fire", "onCategoryRefreshTimer")
@@ -62,7 +67,7 @@ Function init()
   'Content area
   m.CategoryGridList = topRef.findNode("CategoryGridList")
   m.CategoryGridList.observeFieldScoped("itemSelected", "onGridItemSelected")
-  m.CategoryGridList.observeFieldScoped("itemSelectedFromRowList", "onFeaturedItemSelected")
+  m.CategoryGridList.observeFieldScoped("selectedPosition", "onFeaturedItemSelected")
   m.CategoryGridList.observeFieldScoped("reloadedItemToBeFocused", "onItemToBeFocusedChange")
   m.CategoryGridList.observeFieldScoped("rowFocused", "onRowFocused")
   m.CategoryGridList.observeFieldScoped("gridContentIsReady", "onGridContentIsReadyChange")
@@ -104,6 +109,9 @@ Function init()
   m.videoTilesListTranslation = m.constants.ui.videoTilesListTranslation
 
   setContentAreaState()
+
+  screenStack = m.global.screenStackGroup
+  screenStack.observeFieldScoped("translation", "onScreenStackTranslationChange")
 End Function
 
 
@@ -117,6 +125,13 @@ Function onEnableVideoTilesChange()
   end if
   m.ContentArea.maskUri = m.maskUri
   setContentAreaState()
+End Function
+
+
+' Observer callback for listingRefreshData field — delegates to BaseScreen's processListingRefreshData
+' @param msg - Message containing AA keyed by scheduleId with listing data from the EPG API
+Function onListingRefreshData(msg) as Void
+  processListingRefreshData(msg.getData())
 End Function
 
 
@@ -248,6 +263,18 @@ Function onContentUpdated()
     ' Apply thematic takeover themes to matching containers
     applyThematicTakeoverThemes(content)
 
+    ' Apply hub lockup ad data to hub row lockup tiles
+    aHubLockupAds = []
+    adContent = m.top.adContent
+    if isArray(adContent) = true
+      for each adItem in adContent
+        if adItem <> invalid AND adItem.type = m.constants.ui.contentTypes.hubRowLockupAd
+          aHubLockupAds.push(adItem)
+        end if
+      end for
+    end if
+    applyHubRowLockupAdToContent(content, aHubLockupAds)
+
     ' Recalculate row heights after themes applied (must happen after both content and ads ready)
     m.CategoryGridList.recalculateRowHeights = true
 
@@ -317,6 +344,7 @@ Function onBatchAdResponseChanged(msg)
   aResponse = msg.getData()
   if isNonEmptyArray(aResponse) = true
     aThematicTakeovers = []
+    aHubLockupAds = []
     aAllRefreshedAds = [] '// Collect all refreshed ads to update adContent cache
     for i = aResponse.Count() - 1 to 0 step -1
       adContent = aResponse[i]
@@ -341,6 +369,21 @@ Function onBatchAdResponseChanged(msg)
           '// Remove from array so it's not processed by CategoryGridList (it's applied to existing containers, not inserted as rows)
           aResponse.delete(i)
           aAllRefreshedAds.push(adContent)
+        else if sContentType = m.constants.ui.contentTypes.hubRowLockupAd
+          aHubLockupAds.push(adContent)
+          aResponse.delete(i)
+          aAllRefreshedAds.push(adContent)
+        else if sContentType = m.constants.ui.contentTypes.sponsoredLiveEventsHero
+          '// Sponsored Live Events Hero: refresh only impression pixels on the stored AdContentNode.
+          '// The brand logo itself does not change; no row insertion needed.
+          if m.top.sponsoredLiveEventsHeroAdContent <> invalid AND m.top.sponsoredLiveEventsHeroAdContent.id = adContent.id
+            m.top.sponsoredLiveEventsHeroAdContent.imageImpTracking = adContent.imageImpTracking
+          end if
+          aResponse.delete(i)
+          '// Do NOT push to aAllRefreshedAds: sponsoredLiveEventsHero is managed via
+          '// sponsoredLiveEventsHeroAdContent and applySponsoredLiveEventsHeroAdToLiveEventsContainer,
+          '// not via adContent. Adding it to adContent would cause it to be incorrectly
+          '// inserted as a grid row if checkIfHomeScreenContentIsReady runs again.
         else if sContentType = m.constants.ui.contentTypes.adRowlistSpotlight
           aAllRefreshedAds.push(adContent)
         end if
@@ -365,6 +408,11 @@ Function onBatchAdResponseChanged(msg)
         end for
         m.CategoryGridList.categoryResponseInBatch = batchResponseForThemedContainers
       end if
+    end if
+
+    '// Apply hub lockup ad data to hub row lockup containers on refresh
+    if isNonEmptyArray(aHubLockupAds) = true
+      applyHubRowLockupAdToContent(m.top.content, aHubLockupAds)
     end if
 
     '// Update adContent cache with all refreshed ads so that onContentUpdated
@@ -468,6 +516,12 @@ Function onAdImpressionUpdatesChanged(msg) as Void
         if m.CategoryGridList.skinAdContent <> invalid AND m.CategoryGridList.skinAdContent.id = sId AND m.CategoryGridList.skinAdContent.getChildCount() > 0
           m.CategoryGridList.skinAdContent.getChild(0).imageImpTracking = aPixels
         end if
+      else if sType = m.constants.ui.contentTypes.sponsoredLiveEventsHero
+        ' Sponsored Live Events Hero: refresh imageImpTracking on the AdContentNode.
+        ' container.sponsor points to the same AdContentNode, so it is automatically updated.
+        if m.top.sponsoredLiveEventsHeroAdContent <> invalid AND m.top.sponsoredLiveEventsHeroAdContent.id = sId
+          m.top.sponsoredLiveEventsHeroAdContent.imageImpTracking = aPixels
+        end if
       else if m.CategoryGridList.content <> invalid
         ' For carousel and spotlight, find the container in content and update the impression tracking info
         for i = 0 to m.CategoryGridList.content.getChildCount() - 1
@@ -523,6 +577,7 @@ Function onLoadingChange()
     m.CategoryGridList.content = invalid
     m.CategoryGridList.skinAdContentUpdated = true
     m.top.content = invalid
+    m.top.sponsoredLiveEventsHeroAdContent = invalid
     m.CategoryGridList.resetRowList = true
 
     ' Resetting the previous state variables.
@@ -568,7 +623,9 @@ Function onScreenFocusChange()
       focusedContent = m.CategoryGridList.rowFocusedItem
       if focusedContent <> invalid AND focusedContent.gridItemType = m.constants.ui.gridItemTypes.skinAd
         m.top.contentFocused = focusedContent
+        m.top.contentFocusedUpdated = true
       end if
+      m.top.backgroundUriList = determineBackgroundImage(focusedContent)
       m.pivotList.setFocus(true)
       ' Fire NavigateWithinPage from side nav to pivot when coming from side nav
       if m.top.sideNavFocusedPosition = 0
@@ -606,23 +663,31 @@ End Function
 ' Handles row focus changes in CategoryGridList
 ' Manages ad focus timer for sponsored and ad rows
 ' @param msg - Message containing newly focused row
-Function onRowFocused(msg)
+Function onRowFocused(msg) as Void
   tubiLog("HomeScreen.onRowFocused")
   row = msg.getData()
   oldRow = m.CategoryGridList.oldRowFocused
   isRowAdContainerContainer = false
   if row <> invalid
+    ' Guard: when rowFocused re-fires for the same row (e.g., the RowList defers a
+    ' re-render after a content-tree field change such as imageImpTracking being cleared
+    ' on a sponsor node), there is no actual row transition. Leave the ad focus timer
+    ' in its current state — stopping it here would cancel a pending impression pixel fire.
+    if oldRow <> invalid AND row.id = oldRow.id then return
+
     '//Check if we need to refresh impression pixels for the old row
     '//For skin ads, refresh immediately when losing focus as they hide themselves
-    if isAdSkinRow(oldRow) = true AND oldRow.id <> row.id
-      '//Skin ad loses visibility immediately when focus changes
+    if (isAdSkinRow(oldRow) = true OR isLiveEventsSponsoredHeroRow(oldRow) = true) AND oldRow.id <> row.id
+      '//Hero ads (i.e. skin ad wrapper, sponsored live events) loses visibility immediately when focus changes
       m.top.requestAdPixelRefresh = true
     end if
 
     if isSponsoredRow(row) = true
       m.top.sponsoredRowFocused = true
-    else if oldRow = invalid OR row.id <> oldRow.id '//If the oldRow is the same as the new row, then do not check if the adFocusTimer should be started. This is to prevent sending too many pixel impressions.
+    else
       if (isAdDisplayContainerRow(row) = true OR isAdDisplayCarouselRow(row) = true OR isAdSkinRow(row) = true) AND isNonEmptyArray(row.imageImpTracking) = true
+        isRowAdContainerContainer = true
+      else if isLiveEventsSponsoredHeroRow(row) = true AND isNode(row.sponsor) = true AND isNonEmptyArray(row.sponsor.imageImpTracking) = true
         isRowAdContainerContainer = true
       end if
     end if
@@ -634,17 +699,104 @@ Function onRowFocused(msg)
 
   end if
 
-
   if isRowAdContainerContainer = false OR m.top.visible = false
     m.adFocusTimer.control = "stop"
   else
-    if isAdSkinRow(row) = true
-      '//For skin ads, we want to fire pixels at a different time than other ad types
-      m.adFocusTimer.duration = m.constants.timers.skinAdFocusPixelFire
+    if isAdSkinRow(row) = true OR isLiveEventsSponsoredHeroRow(row) = true
+      '//For hero ads (skin ad wrapper, sponsored live events), fire pixels near-immediately on focus
+
+      m.adFocusTimer.duration = m.constants.timers.heroAdFocusPixelFire
     else
       m.adFocusTimer.duration = m.constants.timers.adFocusPixelFire
     end if
+
     m.adFocusTimer.control = "start"
+  end if
+
+  updateHubContainerGradient()
+End Function
+
+
+' Returns the effective background URL for a container row.
+' Prefers hubLockupAd.background (ad), falls back to containerBackground (uiCustomization).
+Function getContainerBackground(row) as String
+  if isNode(row) = false then return ""
+
+  if isAA(row.hubLockupAd) AND isNonEmptyString(row.hubLockupAd.background)
+    return row.hubLockupAd.background
+  end if
+
+  if isNonEmptyString(row.containerBackground)
+    return row.containerBackground
+  end if
+
+  return ""
+End Function
+
+
+' Manages gradient overlays and container background for rows containing a HubRowLockup.
+' Two dedicated posters handle focus and peek states independently:
+'   - hubFocusGradient: shown when the focused row contains a HubRowLockup
+'   - hubPeekGradient: shown when the row below (peek) contains a HubRowLockup
+' containerBackgroundPoster shows the background image when either row has containerBackground.
+' Focus and peek are mutually exclusive — focus takes priority.
+' Transitions cross-fade in parallel (outgoing fades out while incoming fades in).
+Function updateHubContainerGradient() as Void
+  currFocusRowFloat = m.CategoryGridList.listCurrFocusRow
+  if currFocusRowFloat = invalid OR currFocusRowFloat < 0 then return
+
+  currRowIndex = Int(currFocusRowFloat)
+  isScrolling = (currFocusRowFloat <> currRowIndex)
+  scrollDirection = m.CategoryGridList.listScrollDirection
+  if isScrolling AND scrollDirection <> "up"
+    nextRowIndex = currRowIndex + 2
+  else
+    nextRowIndex = currRowIndex + 1
+  end if
+  gridContent = m.CategoryGridList.content
+
+  ' Use content nodes from integer indices to anticipate focus during scroll animation
+  currentRow = invalid
+  peekRow = invalid
+  if isNode(gridContent) = true
+    currentRow = gridContent.getChild(currRowIndex)
+    peekRow = gridContent.getChild(nextRowIndex)
+  end if
+
+  currentBg = getContainerBackground(currentRow)
+  peekBg = getContainerBackground(peekRow)
+  hasCurrentBackground = isNonEmptyString(currentBg)
+  hasPeekBackground = isNonEmptyString(peekBg)
+
+  showFocus = hasCurrentBackground
+  showPeek = (showFocus = false AND hasPeekBackground = true)
+
+  ' Cross-fade: fade out the inactive gradient while fading in the active one
+  if showFocus = true
+    fade(m.hubPeekGradient, "out", 0.3)
+    m.hubFocusGradient.visible = true
+    fade(m.hubFocusGradient, "in", 0.3)
+  else if showPeek = true
+    fade(m.hubFocusGradient, "out", 0.3)
+    m.hubPeekGradient.visible = true
+    fade(m.hubPeekGradient, "in", 0.3)
+  else
+    fade(m.hubFocusGradient, "out", 0.3)
+    fade(m.hubPeekGradient, "out", 0.3)
+  end if
+
+  ' Set container background only for peek state; fade out otherwise
+  if showPeek = true
+    m.containerBackgroundPoster.uri = peekBg
+    if m.rowListNode <> invalid AND nextRowIndex >= 0
+      peekBoundingRect = m.rowListNode.sceneSubBoundingRect("item" + nextRowIndex.toStr() + "_0")
+      if peekBoundingRect <> invalid
+        m.containerBackgroundPoster.translation = [0, peekBoundingRect.y - 48]
+        fade(m.containerBackgroundPoster, "in", 0.3)
+      end if
+    end if
+  else
+    m.containerBackgroundPoster.opacity = 0.0
   end if
 End Function
 
@@ -658,6 +810,8 @@ Function onListCurrFocusRowChange(msg)
 
   '//Check if any tracked ad rows are no longer in viewport
   checkAdRowsInViewport(currFocusRow)
+
+  updateHubContainerGradient()
 End Function
 
 
@@ -714,6 +868,10 @@ Function isSponsoredRow(row)
     return true
   end if
 
+  if row.hubLockupAd <> invalid AND isNonEmptyArray(row.hubLockupAd.impTracking) = true
+    return true
+  end if
+
   return false
 End Function
 
@@ -742,6 +900,15 @@ Function isAdDisplayContainerRow(row)
 End Function
 
 
+' Checks if row is a Live Events Sponsored Hero ad row.
+' This row carries a brand logo overlay served from the Showcase endpoint.
+' @param row - CategoryContentNode to check
+' @return Boolean - True if row is a liveEventSpotlight container with an active sponsoredLiveEventsHero ad
+Function isLiveEventsSponsoredHeroRow(row)
+  return (row <> invalid AND row.gridItemType = m.constants.ui.gridItemTypes.liveEventSpotlight AND row.sponsor <> invalid AND isNonEmptyString(row.sponsor.titleImageUrl) = true)
+End Function
+
+
 ' Handles ad carousel content focus changes
 ' Updates background and content focused fields
 ' @param msg - Message containing focused content
@@ -749,6 +916,7 @@ Function onAdDisplayCarouselContentFocusedChanged(msg)
   contentFocused = msg.getData()
   if contentFocused <> invalid
     m.top.contentFocused = contentFocused
+    m.top.contentFocusedUpdated = true
     m.top.backgroundUriList = contentFocused.backgrounds
   end if
 End Function
@@ -905,7 +1073,7 @@ End Function
 ' Handles featured item selection from CategoryGridList
 Function onFeaturedItemSelected()
   selectedItem = m.CategoryGridList.itemSelectedFromRowList
-  handleItemSelected(selectedItem, m.top.selectedPosition)
+  handleItemSelected(selectedItem, m.CategoryGridList.selectedPosition)
 End Function
 
 
@@ -927,6 +1095,7 @@ Function onRowFocusedItemChange(msg) as Void
   m.top.trackingComponentInfo = getTrackingComponentInfoOfCategoryGridList(focusedContent, m.categoryGridList.focusedPosition)
   ' Update focused content
   m.top.contentFocused = focusedContent
+  m.top.contentFocusedUpdated = true
 
   ' Handle content based on grid item type
   gridItemType = focusedContent.gridItemType
@@ -1080,7 +1249,7 @@ End Function
 Function onGridItemSelected() as Void
   tubiLog("HomeScreen.onGridItemSelected")
   selectedItem = m.CategoryGridList.itemSelected
-  handleItemSelected(selectedItem, m.top.selectedPosition)
+  handleItemSelected(selectedItem, m.CategoryGridList.selectedPosition)
 End Function
 
 
@@ -1100,6 +1269,7 @@ Function handleItemSelected(item, position)
       if isScrolling = false
         ' If the row is still scrolling, do not select the item.
         m.top.contentSelected = item
+        m.top.tileSelected = true
         m.adFocusTimer.control = "stop" '//Stop the ad focus timer when an item is selected to prevent any potential conflicts with sponsored rows or ad rows. Do this after contentSelected is set to ensure that if there are any observers that trigger on contentSelected, the timer is stopped after those are triggered.
       end if
     end if
@@ -1152,6 +1322,7 @@ Function onItemToBeFocusedChange()
   'We are updating the infopanel for updated focused content, but not updating the contentFocused.
   'Here we are updating the contentFocused, so it will play correct video preview when the content is updated.
   m.top.contentFocused = reloadedItemToBeFocused
+  m.top.contentFocusedUpdated = true
 
   if reloadedItemToBeFocused <> invalid AND reloadedItemToBeFocused.gridItemType <> m.constants.ui.gridItemTypes.skinAd AND reloadedItemToBeFocused.gridItemType <> m.constants.ui.gridItemTypes.adRowlistSpotlight
     ' Covers use cases where info panel was hidden but due to home screen container changes purple carpet is removed and info panel was reset.
@@ -1238,7 +1409,7 @@ Function onAdFocusTimer()
   tubiLog("HomeScreen.onAdFocusTimer")
   focusedContent = m.CategoryGridList.rowFocused
 
-  if isAdDisplayContainerRow(focusedContent) = true OR isAdDisplayCarouselRow(focusedContent) = true OR isAdSkinRow(focusedContent) = true
+  if isAdDisplayContainerRow(focusedContent) = true OR isAdDisplayCarouselRow(focusedContent) = true OR isAdSkinRow(focusedContent) = true OR isLiveEventsSponsoredHeroRow(focusedContent) = true
     m.top.adTimerImpressionFire = true
   end if
 End Function
@@ -1861,4 +2032,77 @@ Function applyThematicTakeoverThemesToContainers(containers, aThematicTakeovers)
   end for
 
   return affectedContainers
+End Function
+
+
+' Finds the container with hasHubRowLockup in the homescreen content
+' @param content: roSGNode, the homescreen content with containers
+' @return roSGNode or invalid
+Function findHubRowLockupContainer(content) as Object
+  if content = invalid then return invalid
+
+  for i = 0 to content.getChildCount() - 1
+    category = content.getChild(i)
+    if category <> invalid AND category.hasField("hasHubRowLockup") = true AND category.hasHubRowLockup = true
+      return category
+    end if
+  end for
+
+  return invalid
+End Function
+
+
+' Applies hub lockup ad data to the hub row lockup container
+' Sets hubLockupAd on the matching container
+' @param content: roSGNode, the homescreen content with containers
+' @param hubRowLockupAds: array, fresh hub row lockup ad data
+Function applyHubRowLockupAdToContent(content, hubRowLockupAds) as Void
+  if isNonEmptyArray(hubRowLockupAds) = false OR content = invalid
+    return
+  end if
+
+  hubRowLockupAd = hubRowLockupAds[0]
+  container = findHubRowLockupContainer(content)
+  if container <> invalid
+    container.update({
+      hubLockupAd: {
+        adId: hubRowLockupAd.adId
+        logoUri: hubRowLockupAd.heroLogoUrl
+        impTracking: hubRowLockupAd.imageImpTracking
+        background: hubRowLockupAd.brandBackgroundUrl
+      }
+    }, true)
+  end if
+End Function
+
+
+' Handles hubLockupAdUpdate field changes
+' Updates, merges, or clears hubLockupAd on the hub row lockup container
+' @param msg - Message containing AA with fields to update, or invalid to clear
+Function onHubLockupAdUpdate(msg) as Void
+  if m.top.content = invalid then return
+
+  updateData = msg.getData()
+  container = findHubRowLockupContainer(m.top.content)
+  if container = invalid then return
+
+  if updateData = invalid
+    container.removeField("hubLockupAd")
+    return
+  end if
+
+  existing = container.hubLockupAd
+  if existing <> invalid then existing.append(updateData) else existing = updateData
+  container.update({ hubLockupAd: existing }, true)
+End Function
+
+
+Function onScreenStackTranslationChange(msg) as Void
+  translation = msg.getData()
+  if translation = invalid then return
+
+  m.hubFocusGradient.translation = [-translation[0], 0]
+  m.hubPeekGradient.translation = [-translation[0], 0]
+  containerTranslation = m.containerBackgroundPoster.translation
+  m.containerBackgroundPoster.translation = [-translation[0], containerTranslation[1]]
 End Function

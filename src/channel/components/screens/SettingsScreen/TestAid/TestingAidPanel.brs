@@ -61,6 +61,11 @@ Function onItemFocused(msg)
     m.branchBuildsPanel.visible = false
   end if
 
+  ' Hide Ads list when navigating away from it
+  if item.id <> "rokuAds" AND m.rokuAdsList <> invalid AND m.rokuAdsList.visible = true
+    m.rokuAdsList.visible = false
+  end if
+
   if item.id = "viewRegistry"
     m.infoArea.text = "Current Registry values are printed by each section. Press OK to see full registry."
   else if item.id = "clearRegistry"
@@ -77,12 +82,32 @@ Function onItemFocused(msg)
     else
       m.infoArea.text = proxyInfo + chr(10) + "Current Proxy: None"
     end if
+  else if item.id = "mockServer"
+    mockServerInfo = "Select a profile to enable mock server. Select Reset to disable. Requires app restart."
+
+    registrySection = CreateObject("roRegistrySection", m.constants.registrySectionIDs.settingsOverride)
+    currentProfile = registrySection.read("mockServerProfile")
+
+    if currentProfile <> invalid AND currentProfile <> ""
+      m.infoArea.text = mockServerInfo + chr(10) + "Status: Enabled" + chr(10) + "Phase: " + currentProfile
+    else
+      m.infoArea.text = mockServerInfo + chr(10) + "Status: Disabled"
+    end if
   else if item.id = "changeCountry"
     m.infoArea.text = "Select the country. It will work for White listed IPs only. Contact CSS for whitelisting" + chr(10) + "Current Country: " + m.constants.deviceInfo.countryCode
   else if item.id = "changeLanguage"
     m.infoArea.text = "Select the language for testing." + chr(10) + "Current Locale: " + m.constants.deviceInfo.locale
   else if item.id = "playerStats"
     m.infoArea.text = "This toggles the display of player stats within the video player, helping QA and developers understand the current playback."
+  else if item.id = "rokuAds"
+    registrySection = CreateObject("roRegistrySection", m.constants.registrySectionIDs.settingsOverride)
+    currentAdTypes = registrySection.read("mockServerAdTypes")
+    rokuAdsInfo = "Toggle ad types to whitelist on the mock server. Selections are persisted across restarts."
+    if currentAdTypes <> invalid AND currentAdTypes <> ""
+      m.infoArea.text = rokuAdsInfo + chr(10) + "Active: " + currentAdTypes
+    else
+      m.infoArea.text = rokuAdsInfo + chr(10) + "Active: None"
+    end if
   else if item.id = "branchBuilds"
     m.infoArea.text = "Select a remote component library from a feature branch. Changes require an app restart."
     if m.branchBuildsPanel = invalid
@@ -101,6 +126,8 @@ Function onItemFocused(msg)
   showCountryList(item.id = "changeCountry")
   showLanguageList(item.id = "changeLanguage")
   displayProxyKB(item.id = "addProxy")
+  showMockServerProfileList(item.id = "mockServer")
+  showRokuAdsList(item.id = "rokuAds")
 End Function
 
 
@@ -156,12 +183,255 @@ Function addProxy(msg)
 End Function
 
 
+' Creates a standard MarkupList for test aid selection panels
+Function createTestAidList(listId as String, selectionCallback as String, numRows = 10 as Integer, translation = "[350,81]" as String) as Object
+  list = createObject("roSGNode", "markupList")
+  list.update({
+    id: listId
+    numRows: numRows.toStr()
+    itemSize: "[450,72]"
+    itemSpacing: "[0,8]"
+    itemComponentName: "CheckButton"
+    vertFocusAnimationStyle: "floatingFocus"
+    translation: translation
+  }, true)
+  list.focusBitmapBlendColor = m.focusedColor
+  m.top.appendChild(list)
+  list.observeFieldScoped("itemSelected", selectionCallback)
+  return list
+End Function
+
+
+Function showMockServerProfileList(show = false)
+  if show = true
+    if m.mockServerProfileList = invalid
+      m.mockServerProfileList = createTestAidList("mockServerProfileList", "onMockServerProfileSelected", 7, "[350,185]")
+
+      registrySection = CreateObject("roRegistrySection", m.constants.registrySectionIDs.settingsOverride)
+      currentPhase = registrySection.read("mockServerProfile")
+      profileListContent = createObject("roSGNode", "ContentNode")
+      profileListContent.update({
+        id: "mockServerProfileListContent"
+        children: [
+          { id: "resetMockServer", title: "Reset", checked: (currentPhase = invalid OR currentPhase = "") }
+          { id: "30days", title: "Solar Bear - 30 Days", checked: (currentPhase = "30days") }
+          { id: "5days", title: "Solar Bear - 5 Days", checked: (currentPhase = "5days") }
+          { id: "2days", title: "Solar Bear - 2 Days", checked: (currentPhase = "2days") }
+          { id: "live", title: "Solar Bear - Live (2 min)", checked: (currentPhase = "live") }
+          { id: "replay", title: "Solar Bear - Replay", checked: (currentPhase = "replay") }
+        ]
+      }, true)
+
+      m.mockServerProfileList.content = profileListContent
+    end if
+    m.mockServerProfileList.visible = true
+  else
+    if m.mockServerProfileList <> invalid
+      m.mockServerProfileList.visible = false
+    end if
+  end if
+End Function
+
+
+' Handles phase selection - selecting a phase enables mocking with the
+' Roku profile and the chosen phase, selecting Reset clears only the phase.
+' Uses syncDeviceWithMockServer to send a combined PUT with both phase and ad params.
+Function onMockServerProfileSelected(msg) as Void
+  itemSelected = msg.getData()
+  if itemSelected = invalid OR itemSelected < 0 then return
+
+  selectedItem = m.mockServerProfileList.content.getChild(itemSelected)
+  if selectedItem = invalid then return
+
+  registrySection = CreateObject("roRegistrySection", m.constants.registrySectionIDs.settingsOverride)
+
+  if selectedItem.id = "resetMockServer"
+    registrySection.delete("mockServerProfile")
+  else
+    registrySection.write("mockServerProfile", selectedItem.id)
+  end if
+
+  registrySection.flush()
+  syncDeviceWithMockServer()
+  m.top.appRestartRequested = true
+End Function
+
+
+' Syncs the device registration with the mock server using combined params from registry.
+' Reads both mockServerProfile (phase) and mockServerAdTypes (ads) from registry
+' and sends a single PUT with all params under one profile, or DELETE if both are cleared.
+Function syncDeviceWithMockServer() as Void
+  mockServerUrl = m.constants.settings.mockServerUrl
+  if mockServerUrl = invalid OR mockServerUrl = "" then return
+
+  deviceId = m.constants.deviceInfo.deviceId
+  if deviceId = invalid OR deviceId = "" then return
+
+  registrySection = CreateObject("roRegistrySection", m.constants.registrySectionIDs.settingsOverride)
+  phase = registrySection.read("mockServerProfile")
+  adTypes = registrySection.read("mockServerAdTypes")
+
+  hasPhase = isNonEmptyString(phase)
+  hasAds = isNonEmptyString(adTypes)
+
+  url = mockServerUrl + "api/devices/" + deviceId
+
+  if hasPhase OR hasAds
+    params = {}
+    if hasPhase then params["phase"] = phase
+    if hasAds then params["ads"] = adTypes
+
+    body = {
+      "profileName": "Roku"
+      "params": params
+    }
+
+    reqInfo = {
+      url: url
+      requestType: m.constants.reqNames.registerMockDevice
+      options: {
+        "method": "PUT"
+        "headers": { "Content-Type": "application/json" }
+        "body": FormatJson(body)
+      }
+      silenceCallbackWarnings: true
+    }
+  else
+    reqInfo = {
+      url: url
+      requestType: m.constants.reqNames.registerMockDevice
+      options: {
+        "method": "DELETE"
+        "headers": { "Content-Type": "application/json" }
+      }
+      silenceCallbackWarnings: true
+    }
+  end if
+
+  makeNetworkRequest(reqInfo)
+End Function
+
+
+' Shows the Ads multi-select list with ad type options.
+' Restores previously persisted selections from registry.
+Function showRokuAdsList(show = false)
+  if show = true
+    if m.rokuAdsList = invalid
+      m.rokuAdsList = createTestAidList("rokuAdsList", "onRokuAdsItemSelected", 7, "[350,185]")
+
+      registrySection = CreateObject("roRegistrySection", m.constants.registrySectionIDs.settingsOverride)
+      savedAdTypes = registrySection.read("mockServerAdTypes")
+      savedMap = {}
+      if savedAdTypes <> invalid AND savedAdTypes <> ""
+        parts = savedAdTypes.split(",")
+        for each part in parts
+          savedMap[part] = true
+        end for
+      end if
+
+      rokuAdsContent = createObject("roSGNode", "ContentNode")
+      rokuAdsContent.update({
+        id: "rokuAdsContent"
+        children: [
+          { id: "hdc_carousel", title: "Carousel", checked: savedMap.doesExist("hdc_carousel") }
+          { id: "hdc_spotlight", title: "Spotlight", checked: savedMap.doesExist("hdc_spotlight") }
+          { id: "wrapper", title: "Wrapper", checked: savedMap.doesExist("wrapper") }
+          { id: "sponsored_container", title: "SponsoredContainer", checked: savedMap.doesExist("sponsored_container") }
+          { id: "sponsored_hero", title: "SponsoredHero", checked: savedMap.doesExist("sponsored_hero") }
+          { id: "sponsored_hub", title: "SponsoredHub", checked: savedMap.doesExist("sponsored_hub") }
+          { id: "restartApp", title: "Restart App", checked: false }
+        ]
+      }, true)
+
+      m.rokuAdsList.content = rokuAdsContent
+    end if
+    m.rokuAdsList.visible = true
+  else
+    if m.rokuAdsList <> invalid
+      m.rokuAdsList.visible = false
+    end if
+  end if
+End Function
+
+
+' Handles toggling ad types on/off in the Ads list
+' Selecting whitelists the ad type, unselecting sends a DELETE to remove the device
+Function onRokuAdsItemSelected(msg) as Void
+  itemSelectedIndex = msg.getData()
+  if itemSelectedIndex = invalid OR itemSelectedIndex < 0 then return
+
+  selectedItem = m.rokuAdsList.content.getChild(itemSelectedIndex)
+  if selectedItem = invalid then return
+
+  if selectedItem.id = "restartApp"
+    m.top.appRestartRequested = true
+    return
+  end if
+
+  selectedItem.checked = not selectedItem.checked
+
+  if selectedItem.checked = true
+    whitelistRokuAdTypes()
+  else
+    hasChecked = false
+    for i = 0 to m.rokuAdsList.content.getChildCount() - 1
+      child = m.rokuAdsList.content.getChild(i)
+      if child.checked = true
+        hasChecked = true
+        exit for
+      end if
+    end for
+
+    if hasChecked = true
+      whitelistRokuAdTypes()
+    else
+      unwhitelistRokuAds()
+    end if
+  end if
+End Function
+
+
+' Persists selected ad types to registry and syncs combined state with the mock server
+Function whitelistRokuAdTypes() as Void
+  selectedTypes = []
+  for i = 0 to m.rokuAdsList.content.getChildCount() - 1
+    child = m.rokuAdsList.content.getChild(i)
+    if child.checked = true AND child.id <> "restartApp"
+      selectedTypes.push(child.id)
+    end if
+  end for
+
+  adsParam = selectedTypes.join(",")
+  registrySection = CreateObject("roRegistrySection", m.constants.registrySectionIDs.settingsOverride)
+  registrySection.write("mockServerAdTypes", adsParam)
+  registrySection.flush()
+
+  syncDeviceWithMockServer()
+End Function
+
+
+' Clears persisted ad types from registry and syncs combined state with the mock server
+Function unwhitelistRokuAds() as Void
+  registrySection = CreateObject("roRegistrySection", m.constants.registrySectionIDs.settingsOverride)
+  registrySection.delete("mockServerAdTypes")
+  registrySection.flush()
+
+  syncDeviceWithMockServer()
+End Function
+
+
 Function onKeyEvent(key as String, press as Boolean) as Boolean
   handled = false
   if press = true
     if key = "left"
       if m.proxyinputDialog <> invalid AND m.proxyinputDialog.isInFocusChain() = true
         m.Menu.setfocus(true)
+        handled = true
+      else if m.mockServerProfileList <> invalid AND m.mockServerProfileList.isInFocusChain() = true
+        m.Menu.setFocus(true)
+        handled = true
+      else if m.rokuAdsList <> invalid AND m.rokuAdsList.isInFocusChain() = true
+        m.Menu.setFocus(true)
         handled = true
       else if m.countryListMenu <> invalid AND m.countryListMenu.isInFocusChain() = true
         m.Menu.setFocus(true)
@@ -180,6 +450,12 @@ Function onKeyEvent(key as String, press as Boolean) as Boolean
       if m.Menu.hasFocus() = true
         if m.proxyinputDialog <> invalid AND m.proxyinputDialog.visible = true
           m.proxyinputDialog.setFocus(true)
+          handled = true
+        else if m.rokuAdsList <> invalid AND m.rokuAdsList.visible = true
+          m.rokuAdsList.setFocus(true)
+          handled = true
+        else if m.mockServerProfileList <> invalid AND m.mockServerProfileList.visible = true
+          m.mockServerProfileList.setFocus(true)
           handled = true
         else if m.countryListMenu <> invalid AND m.countryListMenu.visible = true
           m.countryListMenu.setFocus(true)
@@ -274,6 +550,8 @@ Function onTestingAidPanelItemSelected(msg)
     else
       displayProxyKB(true)
     end if
+  else if item.id = "mockServer"
+    showMockServerProfileList(true)
   else if item.id = "playerStats"
     showPlayerStats = getPlayerStats()
 
@@ -425,81 +703,28 @@ End Function
 Function showCountryList(show = false)
   if show = true
     if m.countryListMenu = invalid
-      m.countryListMenu = createObject("roSGNode", "markupList")
-      m.countryListMenu.numRows = "5"
-      m.countryListMenu.itemSize = "[585,72]"
-      m.countryListMenu.itemSpacing = "[0,8]"
-      m.countryListMenu.focusBitmapBlendColor = m.focusedColor
-      m.countryListMenu.itemComponentName = "CheckButton"
-      m.countryListMenu.vertFocusAnimationStyle = "floatingFocus"
-      m.countryListMenu.translation = "[700,200]"
-      m.countryListMenu.id = "countryListMenu"
+      m.countryListMenu = createTestAidList("countryListMenu", "onCountryListMenuChanged")
+
       countryList = createObject("roSGNode", "ContentNode")
-      countryList.id = "countryList"
-      item = createObject("roSGNode", "ContentNode")
-      item.id = "US"
-      item.title = "United States"
-      countryList.appendChild(item)
-
-      item = createObject("roSGNode", "ContentNode")
-      item.id = "GB"
-      item.title = "United Kingdom"
-      countryList.appendChild(item)
-
-      item = createObject("roSGNode", "ContentNode")
-      item.id = "AU"
-      item.title = "Australia"
-      countryList.appendChild(item)
-
-      item = createObject("roSGNode", "ContentNode")
-      item.id = "CA"
-      item.title = "Canada"
-      countryList.appendChild(item)
-
-      item = createObject("roSGNode", "ContentNode")
-      item.id = "NZ"
-      item.title = "New Zealand"
-      countryList.appendChild(item)
-
-      item = createObject("roSGNode", "ContentNode")
-      item.id = "MX"
-      item.title = "Mexico"
-      countryList.appendChild(item)
-
-      item = createObject("roSGNode", "ContentNode")
-      item.id = "CR"
-      item.title = "Costa Rica"
-      countryList.appendChild(item)
-
-      item = createObject("roSGNode", "ContentNode")
-      item.id = "GT"
-      item.title = "Guatemala"
-      countryList.appendChild(item)
-
-      item = createObject("roSGNode", "ContentNode")
-      item.id = "EC"
-      item.title = "Ecuador"
-      countryList.appendChild(item)
-
-      item = createObject("roSGNode", "ContentNode")
-      item.id = "PA"
-      item.title = "Panama"
-      countryList.appendChild(item)
-
-      item = createObject("roSGNode", "ContentNode")
-      item.id = "SV"
-      item.title = "El Salvador"
-      countryList.appendChild(item)
-
-      item = createObject("roSGNode", "ContentNode")
-      item.id = "OTHER"
-      item.title = "Other"
-      countryList.appendChild(item)
+      countryList.update({
+        id: "countryList"
+        children: [
+          { id: "US", title: "United States" }
+          { id: "GB", title: "United Kingdom" }
+          { id: "AU", title: "Australia" }
+          { id: "CA", title: "Canada" }
+          { id: "NZ", title: "New Zealand" }
+          { id: "MX", title: "Mexico" }
+          { id: "CR", title: "Costa Rica" }
+          { id: "GT", title: "Guatemala" }
+          { id: "EC", title: "Ecuador" }
+          { id: "PA", title: "Panama" }
+          { id: "SV", title: "El Salvador" }
+          { id: "OTHER", title: "Other" }
+        ]
+      }, true)
 
       m.countryListMenu.content = countryList
-
-      m.top.appendChild(m.countryListMenu)
-      m.countryListMenu.observeFieldScoped("itemSelected", "onCountryListMenuChanged")
     end if
     m.countryListMenu.visible = true
   else
@@ -531,18 +756,10 @@ End Function
 Function showLanguageList(show = false)
   if show = true
     if m.languageListMenu = invalid
-      m.languageListMenu = createObject("roSGNode", "markupList")
-      m.languageListMenu.numRows = "5"
-      m.languageListMenu.itemSize = "[585,72]"
-      m.languageListMenu.itemSpacing = "[0,8]"
-      m.languageListMenu.focusBitmapBlendColor = m.focusedColor
-      m.languageListMenu.itemComponentName = "CheckButton"
-      m.languageListMenu.vertFocusAnimationStyle = "floatingFocus"
-      m.languageListMenu.translation = "[700,200]"
-      m.languageListMenu.id = "languageListMenu"
+      m.languageListMenu = createTestAidList("languageListMenu", "onLanguageListMenuChanged")
 
-      languageList = createObject("roSGNode", "ContentNode")
       currentLocale = m.constants.deviceInfo.locale
+      languageList = createObject("roSGNode", "ContentNode")
       languageList.update({
         id: "languageList"
         children: [
@@ -555,8 +772,6 @@ Function showLanguageList(show = false)
       }, true)
 
       m.languageListMenu.content = languageList
-      m.top.appendChild(m.languageListMenu)
-      m.languageListMenu.observeFieldScoped("itemSelected", "onLanguageListMenuChanged")
     end if
     m.languageListMenu.visible = true
   else

@@ -14,7 +14,7 @@ Function showPivotDetailScreen(pivot as Dynamic, destTrackingComponentInfo = inv
   screen = createScreen("PivotDetailScreen")
   screen.shouldTrackViewableImpressionEvent = (isUserInAdultsMode() = true AND isKidsUIOn() = false)
   ' Set up observers
-  screen.observeFieldScoped("contentSelectedIndex", "onContentSelected")
+  screen.observeFieldScoped("contentSelectedIndex", "onPivotDetailContentSelectedChange")
   screen.observeFieldScoped("playContentIndex", "onPivotDetailPlayContentIndexChanged")
   screen.observeFieldScoped("backButtonPressed", "onPivotDetailBackButtonPressed")
   ' Set up video tiles observers
@@ -27,7 +27,7 @@ Function showPivotDetailScreen(pivot as Dynamic, destTrackingComponentInfo = inv
   screen.trackingPageInfo = {
     pageType: "collection_page"
     pageValues: {
-      section: "PIVOT"
+      section: UCase(m.constants.ui.appTypes.pivot)
       id: pivot.id
     }
   }
@@ -35,6 +35,7 @@ Function showPivotDetailScreen(pivot as Dynamic, destTrackingComponentInfo = inv
   ' Set screen data
   screen.isSignedInUser = isLoggedInUser()
   screen.uiMode = m.uiMode
+  screen.isKidsMode = shouldKidsModeBeSentToServer()
   screen.serverPersistentData = m.pub_serverPersistentData
   screen.pivotTitle = pivot.title
   screen.pivotId = pivot.id
@@ -75,4 +76,23 @@ Function onPivotDetailPlayContentIndexChanged(msg) as Void
   }
 
   processUserPlayAction(content, screen, playbackSource)
+End Function
+
+
+' Handles content selection change on PivotDetailScreen
+' @param msg - Message containing the content selection data [row, column]
+Function onPivotDetailContentSelectedChange(msg) as Void
+  screen = msg.getRoSGNode()
+  content = screen.contentFocused
+
+  if content = invalid then return
+
+  containerId = getCurrentFocusedContainerId(screen, content)
+  m.autoplayContext = containerId
+  playbackSource = {
+    "srcForAnalytic": m.constants.player.playbackSource.unknown
+    "srcForAds": m.constants.player.playbackOrigin.container
+    "playbackContainer": containerId
+  }
+  processUserContentSelection(content, screen, playbackSource)
 End Function

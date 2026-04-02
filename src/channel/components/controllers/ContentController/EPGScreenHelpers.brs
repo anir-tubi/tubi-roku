@@ -31,6 +31,7 @@ Function showEPGScreen(constants, screenID = "")
     epgScreen.observeFieldScoped("categoryGridScrollingStatus", "onEPGScrollingStatusChange")
     epgScreen.observeFieldScoped("refreshEPGScreenVideoPlay", "onRefreshEPGScreenVideoPlay")
     epgScreen.observeFieldScoped("epgScreenOkPressed", "onEPGScreenOKPressed")
+    epgScreen.observeFieldScoped("epgBannerSelected", "onEpgBannerSelected")
     epgScreen.observeFieldScoped("channelIdSelected", "onChannelSelected")
     epgScreen.signedIn = isLoggedInUser()
 
@@ -686,6 +687,77 @@ Function onEPGScreenOKPressed()
       end if
     end if
   end if
+End Function
+
+
+' Handles EPG banner selection - navigates to the banner's associated content
+' Fires ComponentInteractionEvent (top_nav_component + CONFIRM) and sets
+' trackingComponentInfo so the subsequent NavigateToPageEvent has correct context.
+' @param msg - Message containing the banner data (game_id, image, start_time, end_time)
+Function onEpgBannerSelected(msg) as Void
+  bannerData = msg.getData()
+  if bannerData = invalid OR isNonEmptyString(bannerData.game_id) = false then return
+
+  epgScreen = getCurrentScreen()
+  if epgScreen <> invalid AND epgScreen.trackingPageInfo <> invalid
+    pageOneof = m.Tracking.getAnalyticsPage(epgScreen.trackingPageInfo.pageType, epgScreen.trackingPageInfo.pageValues)
+    componentOneof = m.Tracking.getAnalyticsComponent("top_nav_component", {})
+
+    fireUserTrackingEvent({
+      type: "component_interaction"
+      values: {
+        pageOneof: pageOneof
+        componentOneof: componentOneof
+        user_interaction: "CONFIRM"
+      }
+    })
+
+    epgScreen.trackingComponentInfo = {
+      componentType: "top_nav_component"
+      componentValues: {}
+    }
+  end if
+
+  getSingleContentFromServer({ id: bannerData.game_id }, onEpgBannerContentSuccess, onEpgBannerContentError)
+End Function
+
+
+' Handles successful content fetch for EPG banner selection
+' Plays the event live if currently airing, otherwise shows the linear detail screen
+Function onEpgBannerContentSuccess(content) as Void
+  if content = invalid OR isAA(content.scheduleData) = false
+    return
+  end if
+
+  scheduleData = content.scheduleData
+  if isNonEmptyString(scheduleData.startTime) AND (isLoggedInUser() = true OR content.needsLogin = false)
+    isEventLive = isLessThanOrEqualToCurrentTime(scheduleData.startTime) AND isGreaterThanCurrentTime(scheduleData.endTime)
+    if isEventLive = true
+      playerType = scheduleData.playerType
+      if playerType = m.constants.ui.playerTypes.fox
+        playLinearVideoWithFoxPlayer(content)
+      else
+        playerLinearChannel(content)
+      end if
+      return
+    end if
+  end if
+
+  playbackSource = {
+    "srcForAnalytic": m.constants.player.playbackSource.unknown
+    "srcForAds": m.constants.player.playbackOrigin.epg
+  }
+  showLinearDetailScreen(content, playbackSource)
+End Function
+
+
+' Handles error when fetching EPG banner content - shows a default error modal
+Function onEpgBannerContentError(error) as Void
+  modalInfo = {
+    message: getErrorMessage(getTranslation("dialog_errorOops_title"), invalid)
+    trackingTask: m.trackingLoggingTask
+  }
+  showErrorModal(modalInfo)
 End Function
 
 

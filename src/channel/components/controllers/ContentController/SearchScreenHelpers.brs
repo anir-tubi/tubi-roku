@@ -211,6 +211,8 @@ Function onSearchDefaultSuccessResponse(response)
   tubiLog("SearchScreenHelpers.onSearchDefaultSuccessResponse")
   searchScreen = getSearchScreen()
   if searchScreen <> invalid AND response <> invalid
+    prependEventHubTileToSearchResults(response)
+
     searchScreen.content = response
     searchScreen.contentUpdated = true
   end if
@@ -298,4 +300,20 @@ Function updateSearchContentNode(searchScreen)
     searchScreen.contentUpdated = true
   end if
 
+End Function
+
+
+' Prepends the event hub tile as the first search result on the default search screen.
+' Uses bodyExtraSmallStrong typography for the title to match search result tile styling.
+' @param response - The search API response containing a results ContentNode
+Function prependEventHubTileToSearchResults(response) as Void
+  if response.results = invalid then return
+
+  eventHubTileAA = getEventHubTileAA()
+  if eventHubTileAA = invalid then return
+
+  eventHubTileAA.titleTypography = getTypographyConstants().ids.bodyExtraSmallStrong
+  eventHubTileNode = CreateObject("roSGNode", "ContentNode")
+  eventHubTileNode.update(eventHubTileAA, true)
+  response.results.insertChild(eventHubTileNode, 0)
 End Function

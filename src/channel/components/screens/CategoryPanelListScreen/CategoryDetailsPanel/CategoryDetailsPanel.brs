@@ -320,6 +320,16 @@ Function populateInfoPanel(infoPanel, content)
       infoPanel.mode = m.constants.ui.infoPanelModes.channel
       infoPanel.title = content.title
       infoPanel.description = content.description
+    else if m.constants.ui.appTypes.doesExist(content.type) = true
+      infoPanel.mode = m.constants.ui.infoPanelModes.app
+      infoPanel.title = content.title
+      infoPanel.description = content.description
+      infoPanel.titleLogoUri = content.logo
+      if isNonEmptyString(content.titleImageUri)
+        infoPanel.eventLogoUri = content.titleImageUri
+      else
+        infoPanel.eventLogoUri = ""
+      end if
     else
       populateInfoPanelWithHomescreenStyleItemMode(content, infoPanel)
     end if

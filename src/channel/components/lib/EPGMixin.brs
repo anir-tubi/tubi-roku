@@ -54,78 +54,62 @@ End Function
 ' This function requires the importation of TimeUtils.brs, typeUtils.brs, Log.brs
 ' @param schedule: roSGNode, EPG program node
 ' @return: object, containing the badge info.
-Function getLinearContentBadgeInfo(schedule)
+Function getLinearContentBadgeInfo(schedule, isReplay = false)
   currentDatetime = CreateObject("roDateTime")
   airDatetime = CreateObject("roDateTime")
   if schedule.startTime <> invalid AND schedule.endTime <> invalid
     airDatetime.FromISO8601String(schedule.startTime)
 
-    ' Calculating the seconds until the air time.
-    secondsUntilAirTime = airDatetime.asSeconds() - currentDatetime.asSeconds()
     hasEventEnded = isLessThanOrEqualToCurrentTime(schedule.endTime)
 
-    if airDatetime.asSeconds() <= currentDatetime.asSeconds() AND hasEventEnded = false
-      ' Not using constants to avoid having to access global.
+    ' Replays always show the Replay badge regardless of timing state
+    if isReplay = true
+      return {
+        availability: "replay",
+        badgeText: getTranslation("replay")
+      }
+    else if airDatetime.asSeconds() <= currentDatetime.asSeconds() AND hasEventEnded = false
       return { availability: "live" }
-    else if secondsUntilAirTime > (7 * 24 * 60 * 60) AND FindMemberFunction(airDatetime, "asDateStringLoc") <> invalid
-      airDatetime.toLocalTime()
-      formattedDate = airDatetime.asDateStringLoc("MMM d")
-      badgeText = getTranslation("starts_date", { "date": formattedDate })
-      return {
-        availability: "upcoming",
-        badgeText: UCase(badgeText)
-      }
     else if hasEventEnded = false
-      remainingDays = Cint(secondsUntilAirTime / 86400)
-      remainingHours = Cint(secondsUntilAirTime / 3600)
-      remainingMinutes = Cint(secondsUntilAirTime / 60)
+      secondsUntilAirTime = airDatetime.asSeconds() - currentDatetime.asSeconds()
+      if secondsUntilAirTime < (24 * 60 * 60)
+        remainingHours = Int(secondsUntilAirTime / 3600)
+        remainingMinutes = Int(secondsUntilAirTime / 60)
 
-      ' If the total time remaining is less than 60 seconds, display 1 minute since we don't have seconds component
-      if secondsUntilAirTime < 60
-        remainingMinutes = 1
-      end if
+        if secondsUntilAirTime < 60
+          remainingMinutes = 1
+        end if
 
-      if remainingMinutes < 60
-        timeString = getTranslation("m_duration", { "minutes": remainingMinutes.toStr() })
-      else if remainingHours < 24
-        timeString = getTranslation("h_duration", { "hours": remainingHours.toStr() })
+        if remainingMinutes < 60
+          timeString = getTranslation("m_duration", { "minutes": remainingMinutes.toStr() })
+        else
+          timeString = getTranslation("h_duration", { "hours": remainingHours.toStr() })
+        end if
+
+        badgeText = getTranslation("live_in_date", { "timeString": timeString })
+        return {
+          availability: "upcoming",
+          badgeText: badgeText
+        }
+      else if isTomorrow(schedule.startTime)
+        return {
+          availability: "upcoming",
+          badgeText: getTranslation("liveTomorrow")
+        }
       else
-        timeString = getTranslation("d_duration", { "days": remainingDays.toStr() })
+        airDatetime.toLocalTime()
+        if FindMemberFunction(airDatetime, "asDateStringLoc") <> invalid
+          formattedDate = airDatetime.asDateStringLoc("MMM d")
+        else
+          formattedDate = airDatetime.asDateString("short-date")
+        end if
+        return {
+          availability: "upcoming",
+          badgeText: getTranslation("live_date", { "date": formattedDate })
+        }
       end if
-
-      badgeText = getTranslation("live_in_date", { "timeString": timeString })
-      return {
-        availability: "upcoming",
-        badgeText: UCase(badgeText)
-      }
     end if
   end if
 
   return invalid
-End Function
-
-
-'@badge - node, Badge Component.
-'@availability - string, Indicating availability of the event. Possible values of type "live" or "upcoming".
-'@textColor - string, Indicating text color of the badge.
-'@backgroundColor - string, Indicating background color of the badge.
-'@badgeText - string, Indicating text on the badge. Should be passed when we want to use "today" badge type.
-Function setLinearAvailabilityBadge(badge, availability, textColor, backgroundColor = invalid, badgeText = "")
-  if availability = "live"
-    badge.text = UCase(getTranslation("screenSearch_liveText"))
-    badge.iconUri = "pkg:/images/live-icon-filled.webp"
-    badge.backgroundUri = "pkg:/images/rounded-rect-live-$$RES$$.9.png"
-  else
-    badge.text = badgeText
-    badge.iconUri = ""
-    if availability = "onNow"
-      badge.backgroundUri = "pkg:/images/rounded-rect-on-now-$$RES$$.9.png"
-    else
-      badge.backgroundColor = backgroundColor
-    end if
-  end if
-
-  badge.borderUri = ""
-
-  badge.textColor = textColor
 End Function

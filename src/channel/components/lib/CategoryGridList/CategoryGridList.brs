@@ -3,6 +3,7 @@
 Function init()
   tubiLog("CategoryGridList.init")
   m.constants = getConstantsFromGlobal()
+  m.nodeHelpers = TubiNodeHelpers()
 
   m.top.observeFieldScoped("categoryResponseInBatch", "onCategoryResponseInBatch")
   m.top.observeFieldScoped("adResponseInBatch", "onAdResponseInBatch")
@@ -15,6 +16,7 @@ Function init()
   m.top.observeFieldScoped("animateToItem", "onAnimateToItemChange")
   m.top.observeFieldScoped("hasNewContainers", "onHasNewContainersChange")
   m.top.observeFieldScoped("requestFocusXOffsetUpdate", "onRequestFocusXOffsetUpdate")
+  m.top.observeFieldScoped("rowCurrFocusColumn", "onRowCurrFocusColumnUpdate")
   m.top.observeFieldScoped("requestRowHeightReset", "onRequestRowHeightReset")
   m.top.observeFieldScoped("resetCategoryGridState", "onResetCategoryGridState")
   m.top.observeFieldScoped("recalculateRowHeights", "onRecalculateRowHeights")
@@ -114,12 +116,12 @@ End Function
 ' @param msg - Message containing the selected item position [row, column]
 Function onRowItemSelected(msg)
   tubiLog("CategoryGridList.onRowItemSelected")
-  itemSelectedFromRowList = msg.getData()
-  m.top.selectedPosition = itemSelectedFromRowList
+  rowItemSelected = msg.getData()
 
-  itemSelected = resolveAbbreviatedContent(m.top.content, itemSelectedFromRowList)
+  itemSelected = resolveAbbreviatedContent(m.top.content, rowItemSelected)
   if itemSelected <> invalid
     m.top.itemSelectedFromRowList = itemSelected
+    m.top.selectedPosition = rowItemSelected
   end if
 End Function
 
@@ -134,6 +136,7 @@ Function onContainerAppendMoreTilesStatusChange(msg)
   ' NOTE: This is to handle an edge case bug only when we fast scroll by press and hold.
   ' The idea is to handle the case where when we append more tiles to the row list, we need to reset the focus to the correct item.
   ' This is required because whenever we append more children to the row list, the focus position is reset to zero.
+  m.ignoreRowColumnChange = true
   if status = "start" AND isNonEmptyArray(m.rowList.rowItemFocused) = true AND (m.rowList.rowItemFocused[0] = m.rowList.currFocusRow AND m.rowList.rowItemFocused[1] <> m.top.rowCurrFocusColumn)
     m.resetListPositionOnRepopulateToIndex = [m.rowList.currFocusRow, m.top.rowCurrFocusColumn]
   else if isNonEmptyArray(m.resetListPositionOnRepopulateToIndex) = true
@@ -405,6 +408,7 @@ Function setRowHeights()
     heights = []
     rowItemSize = []
     showRowLabel = []
+    variableWidthItems = []
     for i = 0 to rowContent.getChildCount() - 1
       category = rowContent.getChild(i)
       gridItemType = category.gridItemType
@@ -418,6 +422,10 @@ Function setRowHeights()
 
       shouldDisplayHeader = arrayIncludes(m.constants.ui.noHeaderGridTypes, category.gridItemType) = false
       showRowLabel.push(shouldDisplayHeader)
+
+      ' Enable variable width items for rows that contain a hub lockup tile
+      hasHubLockup = category.hasField("hasHubRowLockup") = true AND category.hasHubRowLockup = true
+      variableWidthItems.push(hasHubLockup)
 
       if gridItemType = gridItemTypes.liveEventSpotlight
         rowItemSize.push(liveEventsContainerSize)
@@ -460,8 +468,8 @@ Function setRowHeights()
       "showRowLabel": showRowLabel
       "rowItemSize": rowItemSize
       "rowHeights": heights
-      "focusXOffset": [0]
       "numRows": numRows
+      "variableWidthItems": variableWidthItems
     })
 
     if m.top.rowFocusedItem = invalid AND m.skinAdRow.content = invalid
@@ -487,37 +495,33 @@ End Function
 ' @param rowItemIndex - 2D array of [rowIndex, itemIndex] from RowList.rowItemSelected or m.rowList.rowItemFocused
 ' @return TubiContentNode or invalid if content not found
 Function resolveAbbreviatedContent(content, rowItemIndex)
-  itemContent = invalid
-  if content <> invalid AND rowItemIndex[0] <> invalid AND rowItemIndex[1] <> invalid
-    contentId = invalid
-    category = content.getChild(rowItemIndex[0])
-    if category <> invalid
-      itemContent = category.getChild(rowItemIndex[1])
-      if itemContent <> invalid
-        if itemContent.type = m.constants.ui.contentTypes.adRowlistSpotlight OR itemContent.type = m.constants.ui.contentTypes.adRowlistCarousel
-          ' adRowlistSpotlight and adRowlistCarousel are not regular video content items so they were never abbreviated
-          return itemContent
-        end if
-        contentId = itemContent.id
-      end if
-    end if
+  itemContent = m.nodeHelpers.getNodeFromPosition(content, rowItemIndex)
+  if itemContent = invalid then return invalid
 
-    if isNonEmptyString(contentId) = true
-      singleContent = m.metadataTranslate.getContentFromCategoryJson(category, contentId, m.top.signedIn) ' can return invalid
-      ' Adding additional temporary field to the content to handle the actionId for the live events.
-      if isNonEmptyString(itemContent.actionId) = true
-        singleContent.update({
-          actionId: itemContent.actionId
-        }, true)
-      end if
-      ' Since we are refreshing the tensor data from schedule endpoint we need to use node info rather than from category json
-      if isAA(itemContent.scheduleData)
-        singleContent.update({
-          scheduleData: itemContent.scheduleData
-        }, true)
-      end if
-      return singleContent
+  contentType = itemContent.type
+  gridItemType = itemContent.gridItemType
+  isAdContent = (contentType = m.constants.ui.contentTypes.adRowlistSpotlight OR contentType = m.constants.ui.contentTypes.adRowlistCarousel)
+  isNonResolvableGridItem = arrayIncludes(m.constants.ui.nonVideoTileGridItemTypes, gridItemType) = true AND arrayIncludes(m.constants.ui.liveEventsGridTypes, gridItemType) = false
+
+  if isAdContent OR isNonResolvableGridItem
+    return itemContent
+  end if
+
+  contentId = itemContent.id
+  if isNonEmptyString(contentId) = true
+    category = content.getChild(rowItemIndex[0])
+    singleContent = m.metadataTranslate.getContentFromCategoryJson(category, contentId, m.top.signedIn)
+    if isNonEmptyString(itemContent.actionId) = true
+      singleContent.update({
+        actionId: itemContent.actionId
+      }, true)
     end if
+    if isAA(itemContent.scheduleData)
+      singleContent.update({
+        scheduleData: itemContent.scheduleData
+      }, true)
+    end if
+    return singleContent
   end if
 
   return invalid
@@ -820,8 +824,13 @@ Function setRowListFocus()
       if m.top.content <> invalid
         rowItemFocused = m.rowList.rowItemFocused
         if isNonEmptyArray(rowItemFocused) = true
-          m.top.oldRowFocused = m.top.rowFocused
-          m.top.rowFocused = m.top.content.getChild(rowItemFocused[0])
+          newRowFocused = m.top.content.getChild(rowItemFocused[0])
+          ' Only write rowFocused if the row has actually changed.
+          ' rowFocused uses alwaysNotify, so writing the same value triggers onRowFocused again.
+          if newRowFocused <> invalid AND (m.top.rowFocused = invalid OR m.top.rowFocused.id <> newRowFocused.id)
+            m.top.oldRowFocused = m.top.rowFocused
+            m.top.rowFocused = newRowFocused
+          end if
         end if
       end if
       m.rowList.setFocus(true)
@@ -987,17 +996,24 @@ End Function
 
 ' Updates focus X offset for video tile expansion effect
 ' @param currFocusRow - Current focused row index
-Function updateFocusXOffset(currFocusRow)
+Function updateFocusXOffset(currFocusRow, currFocusColumn = -1)
   rowContent = m.top.content
-  focusXOffsets = m.rowList.focusXOffset
   isComponentInFocusChain = m.top.isInFocusChain() = true
-  if isNode(rowContent) = true AND isNonEmptyArray(focusXOffsets) = true
+  if isNode(rowContent) = true
     focusXOffset = []
     for i = 0 to rowContent.getChildCount() - 1
       category = rowContent.getChild(i)
       gridItemType = category.gridItemType
       if i = currFocusRow AND isVideoTileEnabledContainer(gridItemType) = true AND isComponentInFocusChain = true
-        focusXOffset.push(m.expandedTileFocusXOffset)
+        columnIndex = currFocusColumn
+        if columnIndex < 0 then columnIndex = category.focusIndex
+        if columnIndex = invalid OR columnIndex < 0 then columnIndex = 0
+        focusedItem = m.nodeHelpers.getNodeFromPosition(rowContent, [i, columnIndex])
+        if focusedItem <> invalid AND arrayIncludes(m.constants.ui.nonVideoTileGridItemTypes, focusedItem.gridItemType) = true
+          focusXOffset.push(0)
+        else
+          focusXOffset.push(m.expandedTileFocusXOffset)
+        end if
       else
         focusXOffset.push(0)
       end if
@@ -1005,6 +1021,7 @@ Function updateFocusXOffset(currFocusRow)
     ' To Avoid unnecessary updates to the focusXOffset field, doing a simple array comparison.
     if FormatJson(focusXOffset) <> FormatJson(m.rowList.focusXOffset)
       m.ignoreCurrColumnChange = true
+      m.lastFocusColumnIndex = currFocusColumn
       m.rowList.focusXOffset = focusXOffset
       m.ignoreCurrColumnChange = false
     end if
@@ -1033,16 +1050,15 @@ Function onListCurrFocusRowChange(_msg)
     else if currFocusRow > 0
       nextFocusRow = currFocusRow - 1
     end if
-    updateFocusXOffset(nextFocusRow)
-
-    updateCurrentFocusedItemBoundingRect()
-
     category = rowContent.getChild(nextFocusRow)
     if category <> invalid AND category.focusIndex > 0
       m.lastFocusColumnIndex = category.focusIndex
     else
       m.lastFocusColumnIndex = 0
     end if
+    updateFocusXOffset(nextFocusRow)
+
+    updateCurrentFocusedItemBoundingRect()
   end if
 End Function
 
@@ -1138,9 +1154,13 @@ End Function
 Function translateListAndSetFocus()
   m.rowList.translation = [0, 0]
   m.top.lastFocusedList = "rowList"
+  ' setFocus(true) synchronously fires rowItemFocused, which calls updateRowItemFocused()
+  ' via the onRowItemFocused observer. Calling updateRowItemFocused() explicitly here
+  ' would set rowFocused a second time with the same value, triggering onRowFocused twice
+  ' on the same row. The second call would have oldRow == row (same id), making
+  ' isRowAdContainerContainer = false.
   m.rowList.setFocus(true)
   m.top.hideInfoPanel = false
-  updateRowItemFocused()
 End Function
 
 
@@ -1202,6 +1222,22 @@ End Function
 Function onRequestFocusXOffsetUpdate(msg) as Void
   currFocusRow = msg.getData()
   updateFocusXOffset(currFocusRow)
+End Function
+
+
+' Recalculates focus X offset when the focused column changes within a row
+Function onRowCurrFocusColumnUpdate(msg) as Void
+  rowItemFocused = m.rowList.rowItemFocused
+  ' Triggering the updateFocusXOffset when the user is scrolling left.
+  ' This is skip animation when the user is scrolling left,
+  ' so that we immediately update the focusXOffset and hide the video tile metadata overlay if not required.
+  if rowItemFocused <> invalid AND m.ignoreRowColumnChange = false AND m.top.listScrollDirection = "left"
+    columnFocused = msg.getData()
+    if columnFocused < 0 then columnFocused = 0
+    updateFocusXOffset(rowItemFocused[0], columnFocused)
+  else
+    m.ignoreRowColumnChange = false
+  end if
 End Function
 
 

@@ -1,6 +1,7 @@
 ' @airDateTime: string, airdatetime from backend
 ' @hasVideoResources: boolean, true means it has manifest urls
-Function getAvailabilityTypeBadgeAndMatchTimeValues(airDateTime = "", hasVideoResources = false)
+' @isReplay: boolean, when true forces availabilityType to "replay" regardless of hasVideoResources
+Function getAvailabilityTypeBadgeAndMatchTimeValues(airDateTime = "", hasVideoResources = false, isReplay = false)
 
   dateTimeString = ""
   if isNonEmptyString(airDateTime) = true
@@ -34,7 +35,7 @@ Function getAvailabilityTypeBadgeAndMatchTimeValues(airDateTime = "", hasVideoRe
     tomorrow = tomorrowDate.asDateString("short-date")
 
     availabilityType = ""
-    if (hasVideoResources = true)
+    if isReplay = true OR hasVideoResources = true
       availabilityType = "replay"
     else
       availabilityType = "upcoming"

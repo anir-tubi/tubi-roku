@@ -25,6 +25,11 @@ Function populateInfoPanelWithHomescreenStyleItemMode(content, infoPanel, isHome
 
   infoPanel.mode = mode
   infoPanel.title = content.title
+  if isNonEmptyString(content.titleImageUri)
+    infoPanel.titleLogoUri = content.titleImageUri
+  else
+    infoPanel.titleLogoUri = ""
+  end if
 
   sotInfo = content.sotInfo
   if isAA(sotInfo) = true
@@ -186,7 +191,6 @@ Function populateInfoPanelWithLinearProgramHomescreenMode(content, infoPanel)
         duration = getTranslation("epg_started_at") + " " + startTime
       end if
     else
-      infoPanel.liveBadgeHeaderText = ""
       if currentProgram.epgProgramType = m.constants.ui.contentTypes.sportsEvent AND currentProgram.live = true
         if currentProgram.hoursOfAiring <> invalid AND currentProgram.hoursOfAiring <> ""
           startTime = currentProgram.hoursOfAiring.tokenize(" - ")[0]
@@ -243,7 +247,7 @@ End Function
 Function populateInfoPanelForLiveEvent(content, infoPanel)
   infoPanel.mode = m.constants.ui.infoPanelModes.item
   badgeText = getTranslation("screenSearch_liveText")
-  badgeInfo = getLinearContentBadgeInfo(content.scheduleData)
+  badgeInfo = getLinearContentBadgeInfo(content.scheduleData, content.isReplay = true)
   if badgeInfo <> invalid AND isNonEmptyString(badgeInfo.badgeText)
     badgeText = badgeInfo.badgeText
   end if

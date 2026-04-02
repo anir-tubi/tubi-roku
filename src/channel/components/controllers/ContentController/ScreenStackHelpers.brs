@@ -304,6 +304,8 @@ Function onScreenChange()
     end if
   end if
 
+  fetchPendingListings(currentScreen)
+
   m.performanceMetricsTracker.logMetric("horizontal_scroll_performance")
   m.performanceMetricsTracker.logMetric("vertical_scroll_performance")
 End Function

@@ -103,8 +103,12 @@ Function parsePivotApp(appAA) as Dynamic
   tags = []
   if isArray(appAA.tags) then tags = appAA.tags
 
-  images = {}
-  if isAA(appAA.images) then images = appAA.images
+  images = {
+    "background": "pkg:/images/pivot-background-$$RES$$.9.png"
+  }
+  if isAA(appAA.images)
+    images.append(appAA.images)
+  end if
 
   return {
     "id": pivotId
@@ -134,4 +138,35 @@ Function createSearchPivotNode() as Dynamic
     "isPrimaryButton": true
     "iconUrl": "pkg:/images/sideNavSearch.webp"
   }
+End Function
+
+
+' Parses pivot container responses, delegating to parseHomeScreenContentSuccess
+' for standard translation and extracting optional app.images for the screen
+' @fullResponse: assocArray, raw response with .response.data containing the parsed JSON
+' @reqInfo: AA, request context
+Function parsePivotContainersSuccess(fullResponse, reqInfo)
+  convertedMetadata = parseHomeScreenContentSuccess(fullResponse, reqInfo)
+
+  parsedResponse = fullResponse.response.data
+  if parsedResponse.app <> invalid AND parsedResponse.app.images <> invalid
+    appImages = parsedResponse.app.images
+
+    logo = ""
+    if isNonEmptyArray(appImages.logo) then logo = appImages.logo[0]
+
+    background = ""
+    if isNonEmptyArray(appImages.hero) then background = appImages.hero[0]
+
+    titleArt = ""
+    if isNonEmptyArray(appImages.title_art) then titleArt = appImages.title_art[0]
+
+    convertedMetadata.update({
+      logo: logo
+      background: background
+      titleArt: titleArt
+    }, true)
+  end if
+
+  return convertedMetadata
 End Function

@@ -61,7 +61,7 @@
           layoutDirection="horizontal"
           vertAlignment="center"
           itemSpacings="[12]">
-          <Badge
+          <AvailabilityBadge
             height="36"
             id="availabilityBadge" />
           <Badge
@@ -102,11 +102,11 @@
         </Group>
       </LayoutGroup>
 
-      <FocusControlLayoutGroup
+      <EnhancedButtonList
         id="buttonList"
+        layoutDirection="horiz"
         translation="[0,39]"
-        itemSpacings="[12]">
-      </FocusControlLayoutGroup>
+        buttonSpacing="[12]" />
     </LayoutGroup>
 
     <Timer id="uiRefreshTimer" />

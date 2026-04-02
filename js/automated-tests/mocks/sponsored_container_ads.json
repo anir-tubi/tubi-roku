@@ -1,0 +1,27 @@
+{
+  "_comment": "Mock data for SPONSORED CONTAINER ADS - Used for sponsored container ad tests",
+  "ads": {
+    "ad_units": {
+      "sponsored_container": {
+        "trackers": {
+          "imp": [
+            "https://ads.production-public.tubi.io/pixel/v3/spotlight/container/ROKU?id=SponsoredContainerTest&data=test-impression-pixel-container"
+          ]
+        },
+        "ad": {
+          "assets": {
+            "hero_logo": {
+              "url": "https://dq22kh8qxu6kh.cloudfront.net/cc64be02-3f41-4ad3-b05d-df83cdbe63d1/sponsored_container/hero_logo_tv.png"
+            },
+            "brand_background": {
+              "url": "https://dq22kh8qxu6kh.cloudfront.net/cc64be02-3f41-4ad3-b05d-df83cdbe63d1/sponsored_hub/brand_background_tv.jpg"
+            }
+          },
+          "id": 195887
+        },
+        "valid_duration": 60,
+        "rendering_code": "sponsored_container"
+      }
+    }
+  }
+}

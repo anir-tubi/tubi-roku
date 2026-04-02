@@ -49,6 +49,7 @@
   <script type="text/brightscript" uri="../../../source/lib/GeneralTaskModule.brs" />
   <script type="text/brightscript" uri="../../../source/lib/ApiUtils.brs" />
   <script type="text/brightscript" uri="../../../source/lib/CmsApi.brs" />
+  <script type="text/brightscript" uri="../../../source/lib/AdsApi.brs" />
   <script type="text/brightscript" uri="../../../source/lib/TensorApi.brs" />
   <script type="text/brightscript" uri="../../../source/lib/UserDeviceApi.brs" />
   <script type="text/brightscript" uri="../../../source/lib/RainmakerApi.brs" />

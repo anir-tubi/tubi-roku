@@ -15,6 +15,7 @@
   <interface>
     <!-- INPUTS -->
     <field id="itemContent" type="node" />
+    <field id="width" type="float" />
   </interface>
 
   <children>

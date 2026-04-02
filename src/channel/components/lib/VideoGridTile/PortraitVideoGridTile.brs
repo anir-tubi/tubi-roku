@@ -19,12 +19,6 @@ Function init()
 
   setThemeColors()
 
-  m.linearBadge = invalid
-  m.badgeTypes = {
-    live: "live"
-    onNow: "onNow"
-    sot: "sot"
-  }
 End Function
 
 
@@ -41,12 +35,7 @@ Function setThemeColors(msg = invalid)
     m.progressBar.trackColor = theme.neutralColor
     m.progressBar.unfocusColor = theme.focusedColor
     m.timeLeftLabel.color = theme.primaryTextColor
-    m.backgroundColor = theme.neutralSolidColor
-    m.shadeColor = theme.shadeColor
-
     m.primaryTextColor = theme.primaryTextColor
-    m.focused2Color = theme.focused2Color
-    m.blueBadgeColor = theme.blueBadgeColor
   end if
 End Function
 
@@ -81,11 +70,6 @@ Function onItemContentChange(msg)
       m.sotBadge = invalid
     end if
 
-    if m.linearBadge <> invalid
-      m.top.removeChild(m.linearBadge)
-      m.linearBadge = invalid
-    end if
-
     sotPosterLabels = itemContent.sotPosterLabels
     if isAA(sotPosterLabels) = true AND sotPosterLabels.count() > 0
 
@@ -93,12 +77,6 @@ Function onItemContentChange(msg)
       textColor = m.primaryTextColor
       translation = [12, 12]
       backgroundUri = "pkg:/images/rounded-background-$$RES$$.9.png"
-      if getStatsigExperimentResource("roku_sot_reverse_ui_test", "roku_sot_reverse_ui_test_v1", false).enabled = true
-        badgeTextFont = m.bodySmallStrong
-        textColor = m.focusedTextColor
-        translation = [4, 4]
-        backgroundUri = "pkg:/images/badge-background-$$RES$$.9.png"
-      end if
 
       config = {
         badgeTextFont: badgeTextFont
@@ -111,16 +89,6 @@ Function onItemContentChange(msg)
       showPosterLabesls(m.sotBadge, m.top)
     end if
 
-    if itemContent.type = "linear"
-      currentProgram = getCurrentLiveProgram(itemContent)
-      ' Only add the onNow badge if there is no live program or the live program is not live.
-      if currentProgram = invalid OR currentProgram.live = false
-        setLinearBadge(m.badgeTypes.onNow)
-      else
-        setLinearBadge(m.badgeTypes.live)
-      end if
-    end if
-
     categoryContent = itemContent.getParent()
     if categoryContent <> invalid AND categoryContent.id = "continue_watching"
       drawHistoryProgressBar()
@@ -129,56 +97,6 @@ Function onItemContentChange(msg)
 End Function
 
 
-Function setLinearBadge(badgeType = "live")
-  badge = invalid
-  isSotReverseUiExperimentEnabled = getStatsigExperimentResource("roku_sot_reverse_ui_test", "roku_sot_reverse_ui_test_v1", false).enabled = true
-
-  if badgeType = m.badgeTypes.live
-    badge = createObject("roSGNode", "Badge")
-    badge.badgeTextWidth = 0.0
-    badge.textColor = m.primaryTextColor
-    badge.iconUri = "pkg:/images/live-icon-filled.webp"
-    badge.height = 40
-
-    if isSotReverseUiExperimentEnabled = true
-      badge.backgroundColor = m.focused2Color
-      badge.backgroundUri = "pkg:/images/badge-background-$$RES$$.9.png"
-      badge.translation = [4, 4]
-      badge.badgeTextFont = m.bodySmallStrong
-    else
-      badge.badgeTextFont = m.bodySmall
-      badge.borderUri = ""
-      badge.backgroundUri = "pkg:/images/rounded-rect-live-$$RES$$.9.png"
-      badge.translation = [15, 15]
-    end if
-
-    badge.text = getTranslation("screenSearch_liveText")
-  else if badgeType = m.badgeTypes.onNow
-    badge = createObject("roSGNode", "Badge")
-    badge.badgeTextWidth = 0.0
-    badge.height = 40
-
-    if isSotReverseUiExperimentEnabled = true
-      badge.backgroundColor = m.blueBadgeColor
-      badge.backgroundUri = "pkg:/images/badge-background-$$RES$$.9.png"
-      badge.translation = [4, 4]
-      badge.badgeTextFont = m.bodySmallStrong
-    else
-      badge.badgeTextFont = m.bodySmall
-      badge.borderUri = ""
-      badge.backgroundUri = "pkg:/images/rounded-rect-on-now-$$RES$$.9.png"
-      badge.translation = [15, 15]
-    end if
-
-    badge.textColor = m.primaryTextColor
-    badge.text = getTranslation("onNow")
-  end if
-
-  if badge <> invalid
-    m.linearBadge = badge
-    m.top.appendChild(m.linearBadge)
-  end if
-End Function
 
 
 Function drawHistoryProgressBar()

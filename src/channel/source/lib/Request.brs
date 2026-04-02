@@ -18,6 +18,9 @@ Function TubiRequest(settings = { mode: "production", CharlesProxyEnabled: false
     getLocale: tubihttp_getLocale_
     passThroughCharlesProxy: tubihttp_passThroughCharlesProxy
     removeCharlesProxy: tubihttp_removeCharlesProxy
+    mockServerProxyUrl: settings.mockServerProxyUrl
+    mockServerEnabled: settings.mockServerEnabled = true
+    passThroughMockServer: tubihttp_passThroughMockServer
     sudoCountry: settings.sudoCountry
   }
 End Function
@@ -93,7 +96,7 @@ Function createAsyncHTTPRequest(url as String, name = "" as String, options = {}
   o = {
     ' public
     isHttps: m.isHttps(url) ' boolean, not member function
-    url: m.passThroughCharlesProxy(url)
+    url: url
     start: m.start
     handleEvent: m.handleEvent
     hasData: m.hasData
@@ -114,6 +117,9 @@ Function createAsyncHTTPRequest(url as String, name = "" as String, options = {}
     charlesProxyEnabled: m.charlesProxyEnabled
     charlesProxyUrl: m.charlesProxyUrl
     passThroughCharlesProxy: m.passThroughCharlesProxy
+    mockServerProxyUrl: m.mockServerProxyUrl
+    mockServerEnabled: m.mockServerEnabled
+    passThroughMockServer: m.passThroughMockServer
   }
   o.Append(mergedOptions)
   return o
@@ -147,13 +153,12 @@ Function tubihttp_start(urltransfer_or_messageport as Object) as Boolean
   end if
 
   if m.params.Count() > 0 then
-    fullUrl = m.addParamsToUrl_(m.url, m.params)
-    fullProxyUrl = m.passThroughCharlesProxy(fullUrl)
-    m.urltransfer.setUrl(fullProxyUrl)
-    m.url = fullProxyUrl
-  else
-    m.urltransfer.setUrl(m.url)
+    m.url = m.addParamsToUrl_(m.url, m.params)
   end if
+
+  m.url = m.passThroughMockServer(m.url)
+  m.url = m.passThroughCharlesProxy(m.url)
+  m.urltransfer.setUrl(m.url)
 
   if m.url <> m.urltransfer.getUrl() then
     message = "Was not able to set url '" + m.url + "'"
@@ -163,7 +168,7 @@ Function tubihttp_start(urltransfer_or_messageport as Object) as Boolean
 
   m.urltransfer.EnableEncodings(true)
   m.urlTransfer.RetainBodyOnError(true)
-  if m.isHttps then
+  if m.isHttps OR m.mockServerEnabled = true then
     m.urltransfer.SetCertificatesFile("common:/certs/ca-bundle.crt")
   end if
 
@@ -432,6 +437,18 @@ Function tubihttp_removeCharlesProxy(proxiedUrl as String) as String
     end if
   end if
   return returnUrl
+End Function
+
+
+' Rewrites URLs to route through the mock server proxy for API response mocking.
+Function tubihttp_passThroughMockServer(url as String) as String
+  if m.mockServerEnabled = true AND m.mockServerProxyUrl <> invalid then
+    if url.instr(m.mockServerProxyUrl) = -1 then
+      mockUrl = m.mockServerProxyUrl + "&url=" + url.EncodeUriComponent()
+      return mockUrl
+    end if
+  end if
+  return url
 End Function
 
 

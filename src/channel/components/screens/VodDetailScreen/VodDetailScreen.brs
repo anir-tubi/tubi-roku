@@ -657,9 +657,13 @@ Function addPlayOrResumeButtons(buttons, content, history) as Void
     })
   else
     ' Regular play button when no resume point
+    playTitle = getTranslation("screenDetails_button_play")
+    if content.isReplay = true
+      playTitle = getTranslation("screenDetails_button_watch_replay")
+    end if
     buttons.push({
       id: "play"
-      title: getTranslation("screenDetails_button_play") + playButtonSuffix
+      title: playTitle + playButtonSuffix
       iconUrl: "pkg:/images/icon-play.webp"
       isPrimaryButton: true
       trackingContext: createButtonAnalytics("play")

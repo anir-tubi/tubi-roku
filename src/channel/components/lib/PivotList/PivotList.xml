@@ -23,6 +23,8 @@
   <script type="text/brightscript" uri="pkg:/source/lib/GeneralTaskModule.brs" />
   <script type="text/brightscript" uri="pkg:/source/lib/TubiTracking.brs" />
   <script type="text/brightscript" uri="pkg:/source/lib/TubiNodeHelpers.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/TubiLanguageTranslate.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/TimeUtils.brs" />
   <script type="text/brightscript" uri="PivotList.brs" />
 
   <interface>

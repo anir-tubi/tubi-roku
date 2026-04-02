@@ -67,6 +67,15 @@ Function onContentChange()
     m.CategoryName.width = 1000
     m.subText.visible = false
 
+    if item.hasField("hasHubRowLockup") = true AND item.hasHubRowLockup = true
+      item.unobserveFieldScoped("focusIndex")
+      item.observeFieldScoped("focusIndex", "onFocusIndexChange")
+      m.hasHubRowLockup = true
+      onFocusIndexChange()
+    else
+      m.hasHubRowLockup = false
+    end if
+
     if item.subtext <> invalid AND item.subtext <> ""
       ' Purposely passing in invalid constants for each row label to avoid having to pull in constants for each row label
       authInfo = TubiAuth(invalid).getAuthInfo()
@@ -123,4 +132,18 @@ Function onContentChange()
       m.SponsoredBy.translation = [m.SponsoredBy.translation[0], 0]
     end if
   end if
+End Function
+
+
+' Hides the category name when the HubRowLockup tile is focused (focusIndex = 0).
+' focusIndex defaults to -1 before the row receives focus, which means the first
+' item (the HubRowLockup at index 0) is visually focused, so treat -1 the same as 0.
+Function onFocusIndexChange(msg = invalid) as Void
+  if m.hasHubRowLockup <> true then return
+
+  item = m.top.content
+  if item = invalid then return
+
+  isHubLockupFocused = (item.focusIndex <= 0)
+  m.CategoryName.visible = (isHubLockupFocused = false)
 End Function

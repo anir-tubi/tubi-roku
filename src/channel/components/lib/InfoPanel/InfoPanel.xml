@@ -1,9 +1,10 @@
-<?xml version="1.0" encoding="utf-8" ?>
+<?xml version="1.0" encoding="utf-8"?>
 <!--
  - InfoPanel
  -
  - This is a panel of metadata about a piece of content or
- - a content category.  There are 10 modes, which are secified as emun in constants (constants.ui.infoPanelModes):
+ - a content category.  There are 10 modes, which are secified as emun in constants
+(constants.ui.infoPanelModes):
  -    1) 'category' - shows only title and description
  -    2) 'item' - shows short content item description with releasedate, rating, etc.
  -    3) 'movie' - shows full details including cast and crew
@@ -12,7 +13,8 @@
  -    6) 'episode' - shows full details including cast and crew
  -    7) 'continue_watching' - shows title and description
  -    8) 'linear' - shows title and description
- -    9) 'epg' - shows image, title, description, year aired, program timings, cc, ratings, genre and tags
+ -    9) 'epg' - shows image, title, description, year aired, program timings, cc, ratings, genre and
+tags
  -    10) 'sportsEvent' - show top logo, title, episode title, date infomation, cc, description
  -
  -
@@ -20,7 +22,8 @@
  -    Title - Uses content.title
  -    Episode - Uses content.episode_title
  -    CategoryDetails - uses content.getChildCount()
- -    TwoLineInfo - uses content.releasedate, content.length, content.rating, content.category/categories,
+ -    TwoLineInfo - uses content.releasedate, content.length, content.rating,
+content.category/categories,
  -    Description - uses content.description
  -    DirectorGroup - uses content.director/directors
  -    StarringGroup - uses content.actor/actors
@@ -36,7 +39,7 @@
   <script type="text/brightscript" uri="pkg:/source/lib/TubiNodeHelpers.brs" />
   <script type="text/brightscript" uri="pkg:/source/lib/Log.brs" />
   <script type="text/brightscript" uri="pkg:/source/lib/TubiLanguageTranslate.brs" />
-  <script type="text/brightscript" uri="pkg:/components/lib/TypographyMixin.brs"/>
+  <script type="text/brightscript" uri="pkg:/components/lib/TypographyMixin.brs" />
   <script type="text/brightscript" uri="pkg:/source/3rdparty/rta/typeUtils.brs" />
   <script type="text/brightscript" uri="pkg:/components/lib/SOTBadgeMixin.brs" />
   <script type="text/brightscript" uri="pkg:/components/lib/ComingSoonMixin.brs" />
@@ -47,32 +50,33 @@
   <interface>
     <!-- INPUTS -->
     <!-- a list of allowed modes can be found at constants.ui.infoPanelModes -->
-    <field id="mode" type="string"/>
+    <field id="mode" type="string" />
 
     <field id="title" alias="Title.text" />
     <field id="titleImageUri" type="string" alwaysNotify="true" />
     <field id="titleLogoUri" type="string" alwaysNotify="true" />
+    <field id="eventLogoUri" type="string" alwaysNotify="true" />
     <field id="titleTypography" type="string" alwaysNotify="true" />
     <field id="leftHeaderImageUri" type="string" />
-    <field id="liveBadgeHeaderText" type="string" />
     <field id="channelNameHeader" type="string" alias="channelNameHeader.text" />
     <field id="episodeTitle" type="string" />
     <field id="description" type="string" />
     <field id="directors" type="stringarray" />
     <field id="starring" type="stringarray" />
     <field id="seasonEpisodeCount" type="integer" />
-    <field id="fullscreenCountdown" type="integer" value="0"/>
-        <!--Set this field before setting needsLogin-->
+    <field id="fullscreenCountdown" type="integer" value="0" />
+    <!--Set
+    this field before setting needsLogin-->
     <field id="loginReason" type="string" />
     <field id="needsLogin" type="boolean" />
     <field id="isTubiOriginal" type="boolean" />
     <field id="reminderIsSet" type="boolean" />
     <field id="calculateHeight" type="boolean" alwaysNotify="true" />
     <!-- availability_starts: eg. "2019-03-31T00:00:00Z" -->
-    <field id="availabilityStarts" type="string" alwaysNotify="true"/>
+    <field id="availabilityStarts" type="string" alwaysNotify="true" />
     <field id="sotMarkers" type="assocarray" />
     <field id="sotMetaData" type="array" />
-    <field id="sotTopLabelSignals" type="array" alwaysNotify="true"/>
+    <field id="sotTopLabelSignals" type="array" alwaysNotify="true" />
 
     <!-- handles changes to FirstLineGroup, has a structure like
       {
@@ -103,17 +107,18 @@
       Handling these at once is more efficient than handling them all individually
     -->
     <field id="lineTwoData" type="assocarray" />
+    <field id="itemContent" type="node" alwaysNotify="true" />
 
     <!-- maxHeight is the area in which the content should be centered -->
     <field id="maxHeight" type="int" value="0" />
-    <field id="maxTitleLines" alias="Title.maxLines"/>
-    <field id="numTitleLines" alias="Title.numLines"/>
-    <field id="titleFontSize" alias="TitleFont.size"/>
+    <field id="maxTitleLines" alias="Title.maxLines" />
+    <field id="numTitleLines" alias="Title.numLines" />
+    <field id="titleFontSize" alias="TitleFont.size" />
     <field id="width" type="float" value="960" />
-    <field id="ratingVisible" alias="Rating.visible"/>
+    <field id="ratingVisible" alias="Rating.visible" />
     <field id="airDateTime" type="string" />
 
-    <field id="vertAlignment" alias="infoPanelGroup.vertAlignment"/>
+    <field id="vertAlignment" alias="infoPanelGroup.vertAlignment" />
 
     <field id="maxDescriptionLines" alias="Description.maxLines" />
 
@@ -121,8 +126,9 @@
     <field id="descriptionSelected" type="boolean" alwaysNotify="true" />
 
 
-    <!-- This is the height of the infoPanel. It re-calculated whenever calculateHeight is set to true.  -->
-    <field id="calculatedHeight" type="float"/>
+    <!-- This is the height of the infoPanel. It re-calculated whenever calculateHeight is set to
+    true.  -->
+    <field id="calculatedHeight" type="float" />
 
     <!-- Parent can use this to determine whether it makes sense to give InfoPanel focus -->
     <field id="isDescriptionEllipsized" alias="Description.isTextEllipsized" />
@@ -143,7 +149,7 @@
         width="186"
         height="264"
         translation="[0,0]"
-        loadDisplayMode="scaleToFit"/>
+        loadDisplayMode="scaleToFit" />
 
       <LayoutGroup
         id="Offset"
@@ -153,18 +159,15 @@
 
 
         <LayoutGroup
-            layoutDirection="horiz"
-            id="sotTopLabelGroup"
-            itemSpacings="[9]" />
+          layoutDirection="horiz"
+          id="sotTopLabelGroup"
+          itemSpacings="[9]" />
         <LayoutGroup
           id="topHeaderGroup"
           layoutDirection="horiz"
           horizAlignment="left"
           translation="[0,0]"
           itemSpacings="[12]">
-          <Badge
-            visible="false"
-            id="liveBadgeHeader"/>
           <Label
             id="channelNameHeader">
           </Label>
@@ -176,12 +179,16 @@
           width="248"
           height="44"
           visible="false"
-          loadDisplayMode="scaleToFit"/>
-
+          loadDisplayMode="scaleToFit" />
+        <Poster
+          id="eventLogo"
+          loadHeight="102"
+          loadWidth="192"
+          loadDisplayMode="limitSize" />
         <Poster
           id="TitleImage"
-          loadDisplayMode="limitSize"/>
-        
+          loadDisplayMode="limitSize" />
+
         <Poster
           id="TitleLogo"
           loadDisplayMode="limitSize" />
@@ -200,14 +207,14 @@
             vertAlign="bottom">
             <Font
               id="TitleFont"
-              role="font"/>
+              role="font" />
           </Label>
         </LayoutGroup>
 
         <Label
           id="Episode">
           <Font
-            role="font"/>
+            role="font" />
         </Label>
 
         <LayoutGroup
@@ -215,7 +222,7 @@
           layoutDirection="vert"
           itemSpacings="[2]"
           vertAlignment="bottom"
-          visible="false" >
+          visible="false">
           <LayoutGroup
             id="FirstLineGroup"
             layoutDirection="horiz"
@@ -223,7 +230,7 @@
             vertAlignment="center"
             addItemSpacingAfterChild="true">
             <Badge
-              id="FirstLineAvailabilityBadge"/>
+              id="FirstLineAvailabilityBadge" />
             <Label
               id="Line1"
               opacity="0.5">
@@ -234,21 +241,21 @@
               id="Line1Bold"
               opacity="0.5">
               <Font
-                role="font"/>
+                role="font" />
             </Label>
             <Poster
               id="ClosedCaptionPoster"
               height="36"
               width="36"
               loadDisplayMode="scaleToFit"
-              loadSync="true"/>
+              loadSync="true" />
             <Poster
               id="AudioDescriptionPoster"
               uri="pkg:/images/icon-audio-description.webp"
               height="36"
               width="57"
               loadDisplayMode="scaleToFit"
-              loadSync="true"/>
+              loadSync="true" />
             <Badge
               id="uhdAvailableBadge" />
             <Group
@@ -258,7 +265,7 @@
                 height="36"
                 uri="pkg:/images/ratingBackground.9.png"
                 loadDisplayMode="scaleToFit"
-                loadSync="true"/>
+                loadSync="true" />
               <Label
                 id="RatingLabel"
                 height="36"
@@ -269,29 +276,29 @@
                 horizAlign="center"
                 vertAlign="center">
                 <Font
-                  role="font"/>
+                  role="font" />
               </Label>
             </Group>
             <Label
               id="DescriptorCode">
               <Font
-              role="font"/>
+                role="font" />
             </Label>
             <Label
               id="ExpireWarning">
               <Font
-                role="font"/>
+                role="font" />
             </Label>
             <Poster
               id="PartnerLogo"
               height="36"
               loadHeight="36"
-              loadDisplayMode="scaleToFit"/>
+              loadDisplayMode="scaleToFit" />
             <Poster
               id="tubiPresentsLogo"
               height="27"
               translation="[0,5]"
-              loadDisplayMode="scaleToFit"/>  
+              loadDisplayMode="scaleToFit" />
           </LayoutGroup>
           <LayoutGroup
             id="SecondLineGroup"
@@ -299,16 +306,19 @@
             vertAlignment="center"
             itemSpacings="[10]">
             <Badge
-              id="SecondLineAvailabilityBadge"/>
+              id="SecondLineAvailabilityBadge" />
+            <AvailabilityBadge
+              id="linearAvailabilityBadge"
+              visible="false" />
             <Label
               id="Line2"
               opacity="0.5"
               ellipsizeOnBoundary="true">
               <Font
-                role="font"/>
+                role="font" />
             </Label>
             <Badge
-              id="rottenTomatoBadge"/>
+              id="rottenTomatoBadge" />
           </LayoutGroup>
         </LayoutGroup>
 
@@ -321,7 +331,7 @@
             translation="[25,0]"
             width="1140"
             height="120"
-            visible="false"/>
+            visible="false" />
           <Label
             id="Description"
             width="1140"
@@ -331,7 +341,7 @@
             visible="false">
             <Font
               id="DescriptionFont"
-              role="font"/>
+              role="font" />
           </Label>
         </Group>
 
@@ -347,7 +357,7 @@
             width="200"
             height="43"
             translation="[0,0]"
-            uri="pkg:/images/sign-in-gate-banner.webp"/>
+            uri="pkg:/images/sign-in-gate-banner.webp" />
           <Poster
             id="SignInLock"
             width="24"
@@ -362,7 +372,7 @@
             translation="[0,6]">
             <Font
               id="SignInFont"
-              role="font"/>
+              role="font" />
           </Label>
         </LayoutGroup>
 
@@ -388,19 +398,19 @@
             translation="[0,6]">
             <Font
               id="ReminderFont"
-              role="font"/>
+              role="font" />
           </Label>
         </LayoutGroup>
 
         <Badge
-          id="SotMarker"/>
+          id="SotMarker" />
 
         <LayoutGroup
           id="StarringGroup"
           layoutDirection="horiz"
           vertAlignment="bottom"
           itemSpacings="[5]"
-          visible="false" >
+          visible="false">
           <LayoutGroup
             id="StarringPrefix"
             layoutDirection="horiz"
@@ -410,7 +420,7 @@
               id="StarringTag"
               opacity="0.5">
               <Font
-                role="font"/>
+                role="font" />
             </Label>
             <LayoutGroup
               layoutDirection="vert">
@@ -418,11 +428,11 @@
                 id="StarringRect"
                 visible="false"
                 width="84"
-                height="2"/>
+                height="2" />
               <Rectangle
                 opacity="0.0"
                 width="1"
-                height="5"/>
+                height="5" />
             </LayoutGroup>
           </LayoutGroup>
           <Label
@@ -430,7 +440,7 @@
             ellipsizeOnBoundary="true"
             width="710">
             <Font
-              role="font"/>
+              role="font" />
           </Label>
         </LayoutGroup>
 
@@ -449,19 +459,19 @@
               id="DirectorTag"
               opacity="0.5">
               <Font
-                role="font"/>
+                role="font" />
             </Label>
             <!-- this layout group pushes the separator rectangle up 2 pixels -->
             <LayoutGroup
               layoutDirection="vert">
               <Rectangle
                 id="DirectorRect"
-                visible = "false"
+                visible="false"
                 width="32"
-                height="2"/>
+                height="2" />
               <Rectangle
                 opacity="0.0"
-                height="5"/>
+                height="5" />
             </LayoutGroup>
           </LayoutGroup>
           <Label
@@ -469,13 +479,13 @@
             ellipsizeOnBoundary="true"
             width="710">
             <Font
-              role="font"/>
+              role="font" />
           </Label>
         </LayoutGroup>
       </LayoutGroup>
     </LayoutGroup>
 
     <CountdownTimer
-      id="PlayerCountdownGroup"/>
+      id="PlayerCountdownGroup" />
   </children>
 </component>

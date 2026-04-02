@@ -688,6 +688,7 @@ Function onItemFocused(msg)
 
     lineOneData = {}
     lineTwoData = {}
+    m.searchScreenInfoPanel.itemContent = invalid
 
     ' Live Events can be of type sportsEvent or video. So basing the info panel mode on presence of scheduleData.
     ' If scheduleData is present, then it is a live event.
@@ -696,8 +697,8 @@ Function onItemFocused(msg)
     else if focusedContent.type = "linear"
       m.searchScreenInfoPanel.mode = m.constants.ui.infoPanelModes.linearSearch
       lineOneData = {}
+      m.searchScreenInfoPanel.itemContent = focusedContent
       lineTwoData = {
-        badgeText: getTranslation("screenSearch_liveText")
         genres: focusedContent.genres
       }
       ' Always set needsLogin = false for linear content in infoPanel
@@ -734,15 +735,23 @@ Function onItemFocused(msg)
         m.searchScreenInfoPanel.needsLogin = false
       end if
 
-    else if focusedContent.type = m.constants.ui.contentTypes.app
+    else if arrayIncludes(m.constants.ui.appTypes.keys(), focusedContent.type) = true
       m.searchScreenInfoPanel.mode = m.constants.ui.infoPanelModes.app
       m.searchScreenInfoPanel.titleLogoUri = focusedContent.logo
-
+      if isNonEmptyString(focusedContent.titleImageUri)
+        m.searchScreenInfoPanel.eventLogoUri = focusedContent.titleImageUri
+      else
+        m.searchScreenInfoPanel.eventLogoUri = ""
+      end if
     else
       m.searchScreenInfoPanel.mode = m.constants.ui.infoPanelModes.item
+      descriptorCode = ""
+      if focusedContent.descriptorCode <> invalid
+        descriptorCode = UCase(focusedContent.descriptorCode)
+      end if
       lineOneData = {
         releasedate: focusedContent.releaseDate
-        descriptorCode: UCase(focusedContent.descriptorCode)
+        descriptorCode: descriptorCode
         length: focusedContent.length
         hasCC: (focusedContent.hasSubtitles = true OR m._.empty(focusedContent.subtitleTracks) = false)
         rating: focusedContent.rating

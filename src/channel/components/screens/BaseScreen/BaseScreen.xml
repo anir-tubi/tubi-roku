@@ -129,6 +129,9 @@
       <!-- Destination tracking component info for NavigateToPageEvent when backing out of this screen.
            Stores the dest_componentOneof (e.g. pivot collection component) to include in the event. -->
       <field id="destTrackingComponentInfo" type="assocarray" />
+
+      <!-- Listing refresh response data set by ContentController for the screen to process -->
+      <field id="listingRefreshData" type="assocarray" alwaysNotify="true" />
   </interface>
 
   <children>

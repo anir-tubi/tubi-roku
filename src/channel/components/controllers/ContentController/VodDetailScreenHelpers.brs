@@ -494,8 +494,8 @@ Function resolveSeasonNum(seriesId, seasonData) as Object
   history = getHistory(seriesId)
 
   ' 1. Deeplink episode takes priority
-  if m.deepLinkContent <> invalid AND m.deepLinkContent.deeplinkType = "episode"
-    deeplinkEpisodeId = m.deepLinkContent.id
+  if m.deeplinkContent <> invalid AND m.deeplinkContent.deeplinkType = "episode"
+    deeplinkEpisodeId = m.deeplinkContent.id
     if deeplinkEpisodeId <> invalid AND seasonData.episodeSeasonMap <> invalid
       deeplinkSeasonMap = seasonData.episodeSeasonMap[deeplinkEpisodeId.toStr()]
       if deeplinkSeasonMap <> invalid

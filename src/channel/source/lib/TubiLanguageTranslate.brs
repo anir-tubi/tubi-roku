@@ -1103,7 +1103,11 @@ Function getTranslation_en_US()
     },
     "onNow": {
       "description": "badge text to show program is not live but on now",
-      "message": "ON NOW"
+      "message": "On Now"
+    },
+    "liveTomorrow": {
+      "description": "badge text for live content scheduled for tomorrow",
+      "message": "Live Tomorrow"
     },
     "day_1": {
       "description": "shortened version Monday, formatted with , and a space",
@@ -1272,6 +1276,10 @@ Function getTranslation_en_US()
     "screenDetails_button_play": {
       "description": "Label of button to allow users to play the current video title",
       "message": "Play"
+    },
+    "screenDetails_button_watch_replay": {
+      "description": "Label of button to allow users to watch a replay of a live event",
+      "message": "Watch Replay"
     },
     "screenDetails_button_startOver": {
       "description": "Label of button to allow users to start over and play the current video title",
@@ -2407,13 +2415,17 @@ Function getTranslation_en_US()
       "description": "date label used in air date countdown timer",
       "message": "STARTS {date}"
     },
+    "live_date": {
+      "description": "date label for upcoming live event badge with date",
+      "message": "Live {date}"
+    },
     "screenDetails_button_details": {
       "description": "Details button label used in linear detail screen",
       "message": "More Details"
     },
     "sign_in_watch_live": {
       "description": "Sign in to watch live button label.",
-      "message": "Sign in to Watch Live"
+      "message": "Sign In to Watch Free"
     },
     "content_unavailable": {
       "description": "Button label when the content is unavailable",
@@ -2823,6 +2835,10 @@ Function getTranslation_en_US()
     "restricted_content_title": {
       "description": "Title of the dialog window that is shown when a content is restricted",
       "message": "Restricted Content"
+    },
+    "explore": {
+      "description": "Button text for exploring a hub or collection",
+      "message": "Explore"
     }
   }
 End Function

@@ -12,6 +12,8 @@
 
 <component name="VideoTilesScreen" extends="BaseScreen">
   <script type="text/brightscript" uri="VideoTilesScreen.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/TubiNodeHelpers.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/CacheValidationMixin.brs" />
 
   <interface>
     <!-- Video Tiles Required Fields -->
@@ -35,7 +37,7 @@
     <field id="listScrollingStatus" type="boolean" value="false" />
 
     <!-- Current focus column for scroll tracking (calculated by mixin, not aliased) -->
-    <field id="rowCurrFocusColumn" type="float" />
+    <field id="rowCurrFocusColumn" type="integer" value="-1" />
 
     <!-- List scroll direction (up, down, left, right, none) -->
     <field id="listScrollDirection" type="string" value="none" />
@@ -54,6 +56,9 @@
 
     <!-- UI mode (normal, kids, etc.) -->
     <field id="uiMode" type="string" />
+
+    <!-- Whether kids mode is active (suppresses IFA in ad requests, container refresh) -->
+    <field id="isKidsMode" type="boolean" value="false" />
 
     <!-- Communicates to parent what was the last focused list was. -->
     <field id="lastFocusedList" type="string" value="rowList" />
@@ -77,7 +82,27 @@
     <!-- Set to the contentNode of the RowList item which was focused -->
     <field id="contentFocused" type="node" />
 
+    <!-- Boolean signal that fires after contentFocused is updated -->
+    <field id="contentFocusedUpdated" type="boolean" alwaysNotify="true" />
+
     <!-- Content is loaded and ready to display -->
     <field id="contentReady" type="boolean" value="false" alwaysNotify="true" />
+
+    <!-- Content Refresh Fields -->
+
+    <!-- Enables content-level refresh checking (top-level content expiry) -->
+    <field id="enableContentRefresh" type="boolean" value="false" />
+
+    <!-- Enables container-level refresh checking (individual container expiry) -->
+    <field id="enableContainerRefresh" type="boolean" value="false" />
+
+    <!-- App/collection ID passed as app_id param in container refresh requests -->
+    <field id="containerRefreshAppId" type="string" />
+
+    <!-- Signal fired when top-level content needs refresh -->
+    <field id="refreshContent" type="boolean" alwaysNotify="true" />
+
+    <!-- Signal fired with IDs of expired containers needing refresh -->
+    <field id="expiredContainerIds" type="array" alwaysNotify="true" />
   </interface>
 </component>

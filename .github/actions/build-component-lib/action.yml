@@ -53,6 +53,12 @@ runs:
           exit 1
         fi
 
+    - name: Add missing images to remote library
+      shell: bash
+      run: npx gulp addMissingImages
+      env:
+        GITHUB_PAT: ${{ github.token }}
+
     - name: Build and package remote component library
       shell: bash
       run: npx gulp createFeatureBranch --staging

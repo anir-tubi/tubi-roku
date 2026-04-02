@@ -1,0 +1,24 @@
+{
+  "_comment": "Mock data for Sponsored Live Events Hero ad - Used for unit tests of processSponsoredLiveEventsHeroAdContent(). The ad unit key is sponsored_hero and rendering_code is also sponsored_hero. This is distinct from the existing sponsoredHub (hub screen) feature which uses sponsored_hub.",
+  "ads": {
+    "ad_units": {
+      "sponsored_hero": {
+        "ad": {
+          "assets": {
+            "brand_logo": {
+              "url": "https://dq22kh8qxu6kh.cloudfront.net/cc64be02-3f41-4ad3-b05d-df83cdbe63d1/sponsored_hub/small_logo_lockup_tv.png"
+            }
+          },
+          "id": 195886
+        },
+        "valid_duration": 21600,
+        "rendering_code": "sponsored_hero",
+        "trackers": {
+          "imp": [
+            "https://example-imp-tracker.com/pixel?id=195886&cb=__CACHEBUSTER__"
+          ]
+        }
+      }
+    }
+  }
+}

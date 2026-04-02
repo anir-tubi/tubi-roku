@@ -870,6 +870,8 @@ function extractPrIdFromCommitInfo(commitInfo) {
 
 
 async function addMissingImagesToRemoteLibrary(done) {
+  execShellCommand(done, 'git fetch --tags', 'Failed to fetch tags');
+
   // First we need to find our last submission release
   const releases = await octokit().repos.listReleases({
     owner: ghInfo.owner,
@@ -935,12 +937,18 @@ async function addMissingImagesToRemoteLibrary(done) {
   if (imagesToAdd.length > 0) {
     const formattedNewImageContents = imagesToAdd.join('\n');
     log(`The following images were found that are not included in ${newImagesSinceFilePath} already:\n${formattedNewImageContents}`);
-    // Prompt if the dev wants to add these images to new images since file
-    const { addToFile } = await prompts({
-      type: 'confirm',
-      name: 'addToFile',
-      message: `Do you want add these to ${newImagesSinceFilePath}?`,
-    });
+
+    let addToFile = true;
+    if (process.env.CI) {
+      log('CI detected — auto-adding missing images');
+    } else {
+      const response = await prompts({
+        type: 'confirm',
+        name: 'addToFile',
+        message: `Do you want add these to ${newImagesSinceFilePath}?`,
+      });
+      addToFile = response.addToFile;
+    }
     if (addToFile) {
       newImagesSinceFileContents += '\n' + formattedNewImageContents;
       fs.writeFileSync(newImagesSinceFilePath, newImagesSinceFileContents);

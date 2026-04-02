@@ -54,7 +54,7 @@ Function showHomeScreen(constants, screenID = "")
     homeScreen.observeFieldScoped("loadAllCategoriesViaRefreshTimer", "onLoadAllCategoriesAfterRefreshTimer")
     homeScreen.observeFieldScoped("focusLost", "onHomeScreenFocusLost")
     homeScreen.observeFieldScoped("visible", "onHomeScreenVisibilityChange")
-    homeScreen.observeFieldScoped("contentSelected", "onContentSelected")
+    homeScreen.observeFieldScoped("tileSelected", "onContentSelected")
     homeScreen.observeFieldScoped("contentToPlay", "onContentToPlay")
     homeScreen.observeFieldScoped("transportVoiceResponse", "onTransportVoiceResponse")
     homeScreen.observeFieldScoped("loadCategoryForIds", "onLoadCategoryForIds")
@@ -140,8 +140,8 @@ End Function
 
 
 '//This is called when the homescreen has already loaded but the ad display content has expired and needs to be refreshed.
-Function onHomesceenAdDisplayBatchResponse(response)
-  tubiLog("HomeScreenHelpers.onHomesceenAdDisplayBatchResponse")
+Function onHomeScreenAdDisplayBatchResponse(response)
+  tubiLog("HomeScreenHelpers.onHomeScreenAdDisplayBatchResponse")
   screenId = m.constants.ui.screenIds.homeScreen
   if response <> invalid AND isNonEmptyString(response.screenId) = true
     screenId = response.screenId
@@ -372,12 +372,12 @@ Function fetchHomeScreen(homeScreen, useCache = false)
   if isKidsUIOn() = false AND isParentalControlsAdultLevel() = true
     if homeScreen.id = m.constants.ui.screenIds.homeScreen
       '//Call an ad endpoint to get ad content for the homescreen. The ad endpoint will return if any ads are active
-      aAdTypes = [m.constants.adTypes.adRowlistCarousel, m.constants.adTypes.adRowlistSpotlight, m.constants.adTypes.skinAd, m.constants.adTypes.thematicTakeover]
+      aAdTypes = [m.constants.adTypes.adRowlistCarousel, m.constants.adTypes.adRowlistSpotlight, m.constants.adTypes.skinAd, m.constants.adTypes.thematicTakeover, m.constants.adTypes.hubRowLockupAd, m.constants.adTypes.sponsoredLiveEventsHero]
     else
       '//For non-default homescreens, only request thematic takeover ads
       aAdTypes = [m.constants.adTypes.thematicTakeover]
     end if
-    createHomescreenAdRequest(screenId, onHomesceenAdDisplaySuccessResponse, aAdTypes, onHomesceenAdDisplayErrorResponse)
+    createHomeScreenAdRequest(screenId, onHomesceenAdDisplaySuccessResponse, aAdTypes, onHomesceenAdDisplayErrorResponse)
 
   else
     'If in kids mode, then user is not in experiment and we should indicate that the adContentFetchCompleted flag is true so that ads are not waited on when loading homescreen content
@@ -438,7 +438,7 @@ End Function
 ' @successCallback: function to call on success
 ' @aAdTypes: array of strings, the ad types to request; possible values are found under m.constants.adTypes.
 ' @errorCallback: function to call on error
-Function createHomescreenAdRequest(homescreenId, successCallback, aAdTypes = [], errorCallback = invalid) as Void
+Function createHomeScreenAdRequest(homescreenId, successCallback, aAdTypes = [], errorCallback = invalid) as Void
   if isNonEmptyArray(aAdTypes) = false
     '//If no ad types are specified, then there is no need to make the ad request
     return
@@ -456,7 +456,7 @@ Function createHomescreenAdRequest(homescreenId, successCallback, aAdTypes = [],
   if authInfo <> invalid AND authInfo.userId <> invalid
     userId = authInfo.userId.toStr()
   end if
-  adDisplayReqInfo = m.cmsApi.createAdHomescreenDisplayContainerReqInfo(aAdTypes, appMode, userId, isKidsUIOn())
+  adDisplayReqInfo = m.adsApi.createHomeScreenAdReqInfo(aAdTypes, appMode, userId, isKidsUIOn())
   m.makeRequest({
     url: adDisplayReqInfo.url
     requestType: m.constants.reqNames.getHomescreenAds
@@ -530,6 +530,7 @@ Function onHomesceenAdDisplaySuccessResponse(response)
     if response <> invalid AND response.data <> invalid
       aAdData = response.data
     end if
+
     if isNonEmptyArray(aAdData) = true AND isKidsUIOn() = false AND isParentalControlsAdultLevel() = true
       for each adResponse in aAdData
         '// Iterate through the ad responses and determine whether each ad should be displayed
@@ -543,7 +544,7 @@ Function onHomesceenAdDisplaySuccessResponse(response)
               ' This is needed because we refresh home screen behind the scenes during parent controls change.
               m.videoTileOverlayGroup.visible = false
             end if
-          else if adResponse.type = m.constants.ui.contentTypes.adRowlistCarousel OR adResponse.type = m.constants.ui.contentTypes.adRowlistSpotlight OR adResponse.type = m.constants.ui.contentTypes.thematicTakeover
+          else if adResponse.type = m.constants.ui.contentTypes.adRowlistCarousel OR adResponse.type = m.constants.ui.contentTypes.adRowlistSpotlight OR adResponse.type = m.constants.ui.contentTypes.thematicTakeover OR adResponse.type = m.constants.ui.contentTypes.hubRowLockupAd
             if adResponse.type = m.constants.ui.contentTypes.thematicTakeover
               '//Thematic Takeover ads are not controlled by the ads_hdc_all_holdback_v3 experiment YET.
               '//Work is being done to move them onto the same experiment as the other ad types, but in the meantime, we not gate them as being controlled by the experiment.
@@ -551,6 +552,8 @@ Function onHomesceenAdDisplaySuccessResponse(response)
             else if getStatsigExperimentResource("ads_homegrid_layer", "ads_hdc_all_holdback_v3", true).enabled = true
               aParsedResponseAfterExperimentCheck.push(adResponse)
             end if
+          else if adResponse.type = m.constants.ui.contentTypes.sponsoredLiveEventsHero
+            homeScreen.sponsoredLiveEventsHeroAdContent = adResponse
           end if
         end if
       end for
@@ -593,26 +596,63 @@ Function checkIfHomeScreenContentIsReady(homeScreen)
   bAdContentLoaded = (homeScreen.adContentFetchCompleted = true)
   bContentLoaded = (homeScreen.contentFetchCompleted = true)
   if bContentLoaded = true AND bAdContentLoaded = true
-
-    '// Only insert ad rows (carousel, spotlight) on the default homescreen
-    if bIsHomeScreen = true
-      adContent = homeScreen.adContent
-      homescreenContent = homeScreen.content
-
-      if adContent <> invalid then
-        ' Insert each node into homeScreen.content at rowPlacement index
-        ' Skip skinAd (handled separately) and thematicTakeover (applies to containers, not inserted as rows)
-        for each node in adContent
-          if node <> invalid AND node.type <> m.constants.ui.contentTypes.skinAd AND node.type <> m.constants.ui.contentTypes.thematicTakeover
-            homescreenContent.insertChild(node, node.rowPlacement)
-          end if
-        end for
-      end if
+    adContent = homeScreen.adContent
+    homescreenContent = homeScreen.content
+    '// Only insert ad rows (carousel, spotlight) on the default homescreen.
+    '// Non-default homescreens (Movie, TV, Español) only request thematicTakeover,
+    '// which is applied directly to containers and never inserted as a row.
+    if adContent <> invalid AND bIsHomeScreen = true
+      ' Insert each node into homeScreen.content at rowPlacement index.
+      ' Skip ad types that are applied directly to containers or managed via separate fields
+      ' rather than inserted as grid rows:
+      '   skinAd                  - applied as a separate RowList overlay
+      '   thematicTakeover        - applied directly to individual containers
+      '   hubRowLockupAd          - applied to hub row lockup tiles
+      '   sponsoredLiveEventsHero - managed via sponsoredLiveEventsHeroAdContent /
+      '                             applySponsoredLiveEventsHeroAdToLiveEventsContainer
+      for each node in adContent
+        if node <> invalid AND node.type <> m.constants.ui.contentTypes.skinAd AND node.type <> m.constants.ui.contentTypes.thematicTakeover AND node.type <> m.constants.ui.contentTypes.hubRowLockupAd AND node.type <> m.constants.ui.contentTypes.sponsoredLiveEventsHero
+          homescreenContent.insertChild(node, node.rowPlacement)
+        end if
+      end for
     end if
+
+    ' Apply Sponsored Live Events Hero ad brand logo to the LiveEventsContainer row (if present)
+    applySponsoredLiveEventsHeroAdToLiveEventsContainer(homeScreen)
 
     onHomeScreenContentUpdateComplete(sID)
   end if
 
+End Function
+
+
+' Applies the Sponsored Live Events Hero ad to the liveEventSpotlight container in homescreen content.
+' Sets the container's sponsor field (CategoryContentNode.sponsor) to the AdContentNode so that
+' LiveEventsContainer can observe it and display the brand logo.
+' AdContentNode.titleImageUrl carries the brand logo URL; imageImpTracking and adInfo carry pixel
+' tracking and ad metadata.
+' @param homeScreen: roSGNode, the HomeScreen component
+Function applySponsoredLiveEventsHeroAdToLiveEventsContainer(homeScreen) as Void
+  tubiLog("HomeScreenHelpers.applySponsoredLiveEventsHeroAdToLiveEventsContainer")
+
+  adContent = homeScreen.sponsoredLiveEventsHeroAdContent
+  if adContent = invalid OR isNonEmptyString(adContent.titleImageUrl) = false
+    return
+  end if
+
+  content = homeScreen.content
+  if content = invalid
+    return
+  end if
+
+  ' Find the first liveEventSpotlight container and set its sponsor field to the AdContentNode
+  for i = 0 to content.getChildCount() - 1
+    container = content.getChild(i)
+    if container <> invalid AND container.gridItemType = m.constants.ui.gridItemTypes.liveEventSpotlight
+      container.sponsor = adContent
+      exit for
+    end if
+  end for
 End Function
 
 
@@ -918,7 +958,18 @@ Function makeContainerRequest(category, columnFocused, homeScreen, successCallba
     if hasMoreContent = true AND columnFocused >= rightEdge AND category.state <> "containerPaginationRequestPending"
       isKidsMode = shouldKidsModeBeSentToServer()
       isSignedInUser = isLoggedInUser()
-      categoryReqInfo = m.cmsApi.createGetContainerContentsReqInfo(category, homeScreen, isKidsMode, isSignedInUser, m.uiMode, false)
+      appId = ""
+      if homeScreen.hasField("containerRefreshAppId")
+        appId = homeScreen.containerRefreshAppId
+      end if
+      categoryReqInfo = m.cmsApi.createGetContainerContentsReqInfo({
+        category: category
+        screen: homeScreen
+        bKidsMode: isKidsMode
+        isSignedInUser: isSignedInUser
+        uiMode: m.uiMode
+        appId: appId
+      })
       if categoryReqInfo <> invalid
         category.state = "containerPaginationRequestPending"
         m.makeRequest({
@@ -1127,13 +1178,23 @@ Function checkHomeScreenFocusRowToSendAdPixels(homeScreen)
   tubiLog("HomeScreenHelpers.checkHomeScreenFocusRowToSendAdPixels")
   if homeScreen <> invalid
     row = homeScreen.rowFocused
-    if row <> invalid AND row.imageImpTracking <> invalid
-      imageImpTracking = row.imageImpTracking
-      '//Once the pixel has been sent, then set the imageImpTracking to invalid so that it is not sent again
-      row.imageImpTracking = invalid
-      sendAdPixels(imageImpTracking)
-      '//Mark the ad as needing pixel refresh when it becomes not visible
-      markAdForPixelRefresh(row)
+    if row <> invalid
+      if row.gridItemType = m.constants.ui.gridItemTypes.liveEventSpotlight AND isNode(row.sponsor) = true AND row.sponsor.imageImpTracking <> invalid
+        ' Sponsored Live Events Hero: impression pixels live on row.sponsor (type: AdContentNode)
+        imageImpTracking = row.sponsor.imageImpTracking
+        '//Once the pixel has been sent, then set the imageImpTracking to invalid so that it is not sent again
+        row.sponsor.imageImpTracking = invalid
+        sendAdPixels(imageImpTracking)
+        '//Mark the ad as needing pixel refresh when it becomes not visible
+        markAdForPixelRefresh(row)
+      else if row.imageImpTracking <> invalid
+        imageImpTracking = row.imageImpTracking
+        '//Once the pixel has been sent, then set the imageImpTracking to invalid so that it is not sent again
+        row.imageImpTracking = invalid
+        sendAdPixels(imageImpTracking)
+        '//Mark the ad as needing pixel refresh when it becomes not visible
+        markAdForPixelRefresh(row)
+      end if
     end if
   end if
 End Function
@@ -1143,51 +1204,53 @@ End Function
 ' Stores ad info immediately when pixels are fired for later refresh request
 ' @param row: roSGNode, the ad row (CategoryContentNode) that had pixels fired
 ' @param screenId: string, the screen ID of the homescreen (for thematic takeover support on all homescreen types)
-Function markAdForPixelRefresh(row, screenId = "")
+Function markAdForPixelRefresh(row, screenId = "") as Void
   tubiLog("HomeScreenHelpers.markAdForPixelRefresh")
-  if row <> invalid
-    sContentType = row.type
+  if row = invalid then return
 
-    if sContentType = m.constants.ui.contentTypes.adRowlistCarousel OR sContentType = m.constants.ui.contentTypes.adRowlistSpotlight OR sContentType = m.constants.ui.contentTypes.skinAd
-      '//Initialize the tracking object if needed
-      if m.adsAwaitingPixelRefresh = invalid
-        m.adsAwaitingPixelRefresh = {
-          isProcessing: false,
-          ads: {}
-        }
-      end if
 
-      '//Store the ad info immediately when pixels are fired
-      sAdKey = row.type
-      ' Use ad-level id (row.adInfo.ad_id) when present.
-      if row.adInfo <> invalid AND row.adInfo.ad_id <> invalid AND row.adInfo.ad_id <> "" then
-        sOriginalAdId = row.adInfo.ad_id
+  if m.adsAwaitingPixelRefresh = invalid
+    m.adsAwaitingPixelRefresh = {
+      isProcessing: false,
+      ads: {}
+    }
+  end if
 
-        ' Non-thematic ads (carousel, spotlight, skin) only exist on default homeScreen
-        m.adsAwaitingPixelRefresh.ads[sAdKey] = {
-          originalAdId: sOriginalAdId
-          adType: row.type
-          screenId: m.constants.ui.screenIds.homeScreen
-        }
-      end if
-    else if row.sponsorImages <> invalid AND row.sponsorImages.thematicTakeoverId <> invalid
-      '//Initialize the tracking object if needed
-      if m.adsAwaitingPixelRefresh = invalid
-        m.adsAwaitingPixelRefresh = {
-          isProcessing: false,
-          ads: {}
-        }
-      end if
+  adKey = invalid
+  adType = invalid
+  originalAdId = invalid
+  containerId = invalid
 
-      ' For thematic takeover, we use the thematicTakeoverId as the key since multiple containers can have themes
-      sAdKey = m.constants.ui.contentTypes.thematicTakeover + "_" + row.id
-      m.adsAwaitingPixelRefresh.ads[sAdKey] = {
-        originalAdId: row.sponsorImages.thematicTakeoverId
-        adType: m.constants.ui.contentTypes.thematicTakeover
-        containerId: row.id
-        screenId: screenId
-      }
-    end if
+  if row.sponsorImages <> invalid AND row.sponsorImages.thematicTakeoverId <> invalid
+    adType = m.constants.ui.contentTypes.thematicTakeover
+    adKey = adType + "_" + row.id
+    originalAdId = row.sponsorImages.thematicTakeoverId
+    containerId = row.id
+  else if row.hubLockupAd <> invalid AND isNonEmptyString(row.hubLockupAd.adId)
+    adType = m.constants.ui.contentTypes.hubRowLockupAd
+    adKey = adType
+    originalAdId = row.hubLockupAd.adId
+    containerId = row.id
+  else if row.gridItemType = m.constants.ui.gridItemTypes.liveEventSpotlight AND row.sponsor <> invalid AND row.sponsor.adInfo <> invalid AND isNonEmptyString(row.sponsor.adInfo.ad_id)
+    ' Sponsored Live Events Hero: ad info is stored on the container's sponsor AdContentNode
+    adType = m.constants.ui.contentTypes.sponsoredLiveEventsHero
+    adKey = adType
+    originalAdId = row.sponsor.adInfo.ad_id
+    containerId = row.id
+  else if row.adInfo <> invalid AND isNonEmptyString(row.adInfo.ad_id)
+    adType = row.type
+    adKey = adType
+    originalAdId = row.adInfo.ad_id
+  end if
+
+  if adKey <> invalid
+    adEntry = {
+      originalAdId: originalAdId
+      adType: adType
+      screenId: screenId
+    }
+    if containerId <> invalid then adEntry.containerId = containerId
+    m.adsAwaitingPixelRefresh.ads[adKey] = adEntry
   end if
 End Function
 
@@ -1245,6 +1308,24 @@ Function onRefreshedAdImpressionPixelsSuccess(response) as Void
         continue for
       end if
 
+      ' Update hub lockup ad impression pixels only (graphics stay unchanged)
+      if sContentType = m.constants.ui.contentTypes.hubRowLockupAd
+        sAdKey = m.constants.ui.contentTypes.hubRowLockupAd
+        awaitingInfo = m.adsAwaitingPixelRefresh.ads[sAdKey]
+        m.adsAwaitingPixelRefresh.ads.delete(sAdKey)
+        if awaitingInfo <> invalid AND isNonEmptyString(adContent.adId) AND adContent.adId = awaitingInfo.originalAdId
+          targetHomeScreen = getFromScreenCache(sRequestedScreenId)
+          if targetHomeScreen <> invalid
+            targetHomeScreen.hubLockupAdUpdate = {
+              impTracking: adContent.imageImpTracking
+            }
+          end if
+        else if awaitingInfo <> invalid
+          markAdForRemoval(awaitingInfo.originalAdId, awaitingInfo.adType, awaitingInfo.containerId, awaitingInfo.screenId)
+        end if
+        continue for
+      end if
+
       '//Check if we have a pending pixel refresh request for this ad type
       awaitingInfo = m.adsAwaitingPixelRefresh.ads[sContentType]
       if awaitingInfo = invalid then continue for
@@ -1257,7 +1338,14 @@ Function onRefreshedAdImpressionPixelsSuccess(response) as Void
       if sResponseAdID = awaitingInfo.originalAdId
         '//Same ad ID - check if this ad row is currently focused
         homeScreen = getFromScreenCache(m.constants.ui.screenIds.homeScreen)
-        bIsAdRowFocused = (homeScreen <> invalid AND homeScreen.rowFocused <> invalid AND homeScreen.rowFocused.type = sContentType)
+        ' For most ad types, rowFocused IS the ad row and its .type matches sContentType.
+        ' For sponsoredLiveEventsHero, rowFocused is the liveEventSpotlight CategoryContentNode
+        ' whose .type is the container type, not the ad type — so check gridItemType instead.
+        if sContentType = m.constants.ui.contentTypes.sponsoredLiveEventsHero
+          bIsAdRowFocused = (homeScreen <> invalid AND homeScreen.rowFocused <> invalid AND homeScreen.rowFocused.gridItemType = m.constants.ui.gridItemTypes.liveEventSpotlight)
+        else
+          bIsAdRowFocused = (homeScreen <> invalid AND homeScreen.rowFocused <> invalid AND homeScreen.rowFocused.type = sContentType)
+        end if
 
         if bIsAdRowFocused = true
           '//Ad row is focused - skip pixel update, queue for next refresh cycle
@@ -1536,6 +1624,25 @@ Function removeMarkedAds(homeScreen) as Void
         removeThematicTakeoverFromContainer(homeScreen, adInfo.containerId)
         ' Need to repopulate to visually update the container without the theme
         shouldRepopulateContent = true
+      else if sAdType = m.constants.ui.contentTypes.hubRowLockupAd
+        '//Handle sponsored container removal - clear sponsorship but keep the container
+        homeScreen.hubLockupAdUpdate = invalid
+        m.sentSponsorPixels[adInfo.containerId] = invalid
+        shouldRepopulateContent = true
+      else if sAdType = m.constants.ui.contentTypes.sponsoredLiveEventsHero
+        ' Remove Sponsored Live Events Hero: clear the container's sponsor field so LiveEventsContainer
+        ' falls back to the normal network logo priority, but leave the row itself intact.
+        homeScreen.sponsoredLiveEventsHeroAdContent = invalid
+        content = homeScreen.content
+        if content <> invalid
+          for j = 0 to content.getChildCount() - 1
+            liveEventsContainer = content.getChild(j)
+            if liveEventsContainer <> invalid AND liveEventsContainer.gridItemType = m.constants.ui.gridItemTypes.liveEventSpotlight AND liveEventsContainer.sponsor <> invalid
+              liveEventsContainer.sponsor = invalid
+              exit for
+            end if
+          end for
+        end if
       else
         '//Handle carousel and spotlight ad removal
         content = homeScreen.content
@@ -1643,10 +1750,12 @@ Function requestPixelRefreshForAllPendingAds(homeScreen) as Void
     m.constants.adTypes.adRowlistCarousel,
     m.constants.adTypes.adRowlistSpotlight,
     m.constants.adTypes.skinAd,
-    m.constants.adTypes.thematicTakeover
+    m.constants.adTypes.thematicTakeover,
+    m.constants.adTypes.hubRowLockupAd,
+    m.constants.adTypes.sponsoredLiveEventsHero
   ]
 
-  createHomescreenAdRequest(homeScreen.id, onRefreshedAdImpressionPixelsSuccess, aAdTypesToRefresh, onRefreshedAdImpressionPixelsError)
+  createHomeScreenAdRequest(homeScreen.id, onRefreshedAdImpressionPixelsSuccess, aAdTypesToRefresh, onRefreshedAdImpressionPixelsError)
 End Function
 
 
@@ -1674,6 +1783,14 @@ Function manageHomeScreenSponsorPixels(rowFocused, screenId = "")
       if rowFocused.sponsorImages <> invalid AND rowFocused.sponsorImages.thematicTakeoverId <> invalid AND rowFocused.sponsorImages.thematicTakeoverId <> ""
         markAdForPixelRefresh(rowFocused, screenId)
       end if
+    end if
+
+    ' Fire sponsored_container impression pixels when row is focused
+    if rowFocused.hubLockupAd <> invalid AND m.sentSponsorPixels[containerId] <> true AND isNonEmptyArray(rowFocused.hubLockupAd.impTracking) = true
+      m.sentSponsorPixels[containerId] = true
+      sendAdPixels(rowFocused.hubLockupAd.impTracking)
+      rowFocused.hubLockupAd.impTracking = invalid
+      markAdForPixelRefresh(rowFocused, screenId)
     end if
   end if
 End Function
@@ -1757,17 +1874,14 @@ End Function
 ' @msg, roSGNode, the message containing the content item and the home screen node.
 Function onContentSelected(msg) as Void
   tubiLog("HomeScreenHelpers.onContentSelected")
-  screen = msg.getRoSGNode()
-  content = screen.contentFocused
+  homeScreen = msg.getRoSGNode()
+  content = homeScreen.contentSelected
 
   if content = invalid then return
 
   contentType = content.type
 
   if contentType <> m.constants.ui.contentTypes.adRowlistCarousel AND contentType <> m.constants.ui.contentTypes.adRowlistSpotlight
-    '//process the user content selection if the content selected is not a carousel or spotlight ad campaign type
-
-    homeScreen = msg.getRoSGNode()
     containerId = getCurrentFocusedContainerId(homeScreen, content)
     m.autoplayContext = containerId
     playbackSource = {
@@ -1778,8 +1892,6 @@ Function onContentSelected(msg) as Void
     processUserContentSelection(content, homeScreen, playbackSource)
 
     if contentType = m.constants.ui.contentTypes.skinAd AND (m.adsAwaitingPixelRefresh = invalid OR m.adsAwaitingPixelRefresh.ads[contentType] = invalid)
-      '// If the content selected is a skinAd, then check if there are any ad pixels to be sent. But only do so if we haven't already sent pixels for this ad: i.e. it's not in the adsAwaitingPixelRefresh list.
-      '// essentially this should be fired if the user selects the skinAd before the ad timer impression fires.
       checkHomeScreenFocusRowToSendAdPixels(homeScreen)
     end if
   end if
@@ -1978,9 +2090,14 @@ Function onLoadCategoryForIds(msg)
     if bNeedThematicTakeoverRefresh = true
       aAdTypes.push(m.constants.adTypes.thematicTakeover)
     end if
+
+    ' Add sponsoredLiveEventsHero type if an active sponsored hero ad is currently displayed
+    if homeScreen.sponsoredLiveEventsHeroAdContent <> invalid
+      aAdTypes.push(m.constants.adTypes.sponsoredLiveEventsHero)
+    end if
   end if
 
-  createHomescreenAdRequest(homeScreen.id, onHomesceenAdDisplayBatchResponse, aAdTypes)
+  createHomeScreenAdRequest(homeScreen.id, onHomeScreenAdDisplayBatchResponse, aAdTypes)
 
   isKidsMode = shouldKidsModeBeSentToServer()
   isSignedInUser = isLoggedInUser()
@@ -1991,7 +2108,12 @@ Function onLoadCategoryForIds(msg)
     contentMode = homeScreen.contentMode
   end if
 
-  batchRequests = m.cmsApi.createHomeScreenBatchReqInfoForContainers(categoryIDs, contentMode, isKidsMode, isSignedInUser)
+  batchRequests = m.cmsApi.createBatchReqInfoForContainers({
+    containerIds: categoryIDs
+    contentMode: contentMode
+    bKidsMode: isKidsMode
+    isSignedInUser: isSignedInUser
+  })
 
   if batchRequests <> invalid
     m.makeBatchRequest({
@@ -2174,8 +2296,8 @@ End Function
 
 
 Function onRowFocusedItemChange(msg) as Void
-  focusedItem = msg.getData()
   screen = msg.getRoSGNode()
+  focusedItem = screen.contentFocused
 
   if focusedItem = invalid
     return
@@ -2426,7 +2548,7 @@ Function appendPaginatedContainersToScreen(screen, response)
     ' Apply thematic takeover themes to new containers before appending
     ' This ensures lazy-loaded containers get themed styling from adContent
     adContent = screen.adContent
-    if isNonEmptyArray(adContent) = true
+    if isArray(adContent) = true
       for each item in items
         if item <> invalid
           for each adItem in adContent

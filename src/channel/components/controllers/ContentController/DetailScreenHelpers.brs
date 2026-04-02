@@ -118,7 +118,7 @@ Function showDetailScreen(content, sendTrackingOnResponse = true, successCb = in
     end if
 
     ' waiting to populate the details screen for series until after we fetch episode data
-    if m.deepLinkContent <> invalid OR content.type = m.constants.ui.contentTypes.series OR (content.type = m.constants.ui.contentTypes.video AND content.seriesId <> invalid AND content.seriesId <> "")
+    if m.deeplinkContent <> invalid OR content.type = m.constants.ui.contentTypes.series OR (content.type = m.constants.ui.contentTypes.video AND content.seriesId <> invalid AND content.seriesId <> "")
       detailScreen.isLoading = true
     else if successCb <> invalid
       detailScreen.isLoading = true
@@ -275,7 +275,7 @@ Function populateDetailScreen(detailScreen, content, shouldResetButtonIndex = fa
     detailScreen.selectedContentType = content.type
     hasVideoresources = content.hasVideoresources
     airDatetime = content.airDatetime
-    info = getAvailabilityTypeBadgeAndMatchTimeValues(airDatetime, hasVideoresources)
+    info = getAvailabilityTypeBadgeAndMatchTimeValues(airDatetime, hasVideoresources, content.isReplay = true)
     isComingSoon = isComingSoonContent(content)
     if isComingSoon = true
       info.availabilityType = m.constants.ui.contentTimings.upcoming
@@ -1313,6 +1313,8 @@ Function setIsHistory(detailScreen, isHistory)
     detailScreen.stringPlayButton = getTranslation("registration_signIn_to_play_button") + ";" + getTranslation("registration_signup_button_free")
   else if isHistory = true
     detailScreen.stringPlayButton = getTranslation("screenDetails_button_startOver")
+  else if detailScreen.content <> invalid AND detailScreen.content.isReplay = true
+    detailScreen.stringPlayButton = getTranslation("screenDetails_button_watch_replay")
   else
     detailScreen.stringPlayButton = getTranslation("screenDetails_button_play")
   end if
@@ -2111,7 +2113,7 @@ Function playHelper(screen)
     if isLoggedInUser() = false AND bMature = true
       '//if user is a guest and is trying to play content geared for only adults, then ask them to register
       dialogSubtype = "mature-play"
-      if m.deepLinkContent <> invalid
+      if m.deeplinkContent <> invalid
         '//this is a deeplink so, indicate that the warning originated from a deeplink
         dialogSubtype = "mature-play-deep"
       end if
@@ -2150,7 +2152,7 @@ Function processResume(episode)
   if isLoggedInUser() = false AND bMature = true
     '//if user is a guest and is trying to play content geared for only adults, then ask them to register dialogSubtype = "mature-play"
     dialogSubtype = "mature-resume"
-    if m.deepLinkContent <> invalid
+    if m.deeplinkContent <> invalid
       '//this is a deeplink so, indicate that the warning originated from a deeplink
       dialogSubtype = "mature-resume-deep"
     end if

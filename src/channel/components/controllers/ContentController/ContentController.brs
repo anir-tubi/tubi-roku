@@ -77,10 +77,16 @@ Function init()
   'playerStats is used in TestingAidPanel which shows/hides the player stats overlay in VideoplayerScreen
   m.global.addField("showPlayerStats", "boolean", false)
 
+  ' Stores listing schedule IDs per screen for bulk refresh: { screenId: { scheduleId: { rowIndex, columnIndex, contentId } } }
+  m.global.addField("pendingListingRefreshData", "assocarray", false)
+
   ' Holds true or false based on if app suspend is in progress
   m.isApplicationSuspendInProgress = false
 
   m.top.getScene().observeFieldScoped("focusedChild", "onSceneFocusedChildChanged")
+
+  ' Holds the screen stack group node
+  m.global.addField("screenStackGroup", "node", false)
 
   ' Holds the paginated content in queue to be appended to the screen.
   m.paginatedContentQueue = invalid
@@ -169,6 +175,7 @@ Function addControllerUi()
   statSigExperimentsInfo = getStatsigExperimentsInfoFromGlobal()
   experimentsInterface = StatsigExperimentsInterface(statSigExperimentsInfo)
   m.cmsApi = CmsApi(m.constants, apiUtilsLib, experiments, experimentsInterface)
+  m.adsApi = AdsApi(m.constants, apiUtilsLib)
   m.userDeviceApi = UserDeviceApi(m.constants, apiUtilsLib)
   m.tensorapi = TensorApi(m.constants, m.pub_serverPersistentData)
   m.rainmakerApi = RainmakerApi(m.constants)
@@ -470,6 +477,9 @@ Function addControllerUi()
   getUserInfo(onStartupAuthInfoReceived)
 
   getStatsigExperimentResource("", "roku_no_layer_experiment", true)
+
+  ' Holds the screen stack group node
+  m.global.screenStackGroup = m.top.findNode("screenStackGroup")
 End Function
 
 
@@ -1003,6 +1013,8 @@ Function handleStartUpArgs()
 
     if m.constants.settings.mode <> "production" AND startupArgs.lastExitOrTerminationReason = "EXIT_BRIGHTSCRIPT_CRASH" then
       RegDeleteSection("experimentOverrides")
+      RegDeleteSection("configurationOverrides")
+      RegDeleteSection(m.constants.registrySectionIDs.settingsOverride)
     end if
 
     if startupArgs.lastExitInfo <> invalid then
@@ -3875,12 +3887,14 @@ Function processUserContentSelection(content, screen, playbackSource = {}) as Vo
     else
       selectLinearContent(content)
     end if
+  else if contentType = m.constants.ui.appTypes.creator
+    showCollectionScreen(content.id)
+  else if contentType = m.constants.ui.appTypes.pivot OR contentType = m.constants.ui.appTypes.explore
+    showPivotDetailScreen(content)
   else if contentType = m.constants.ui.contentTypes.skinAd
     playAdContent(content)
   else if content.scheduleData <> invalid
     showLinearDetailScreen(content, playbackSource)
-  else if contentType = m.constants.ui.contentTypes.app
-    fetchAppContentTypeAndNavigate(content)
   else
     showDetailScreen(content, true, invalid, invalid, playbackSource)
   end if
@@ -3995,6 +4009,10 @@ Function processUserPlayAction(content, screen, playbackSource = {}) as Void
   else if contentType = m.constants.ui.contentTypes.historySignedOutUser
     '//if a signed out user selects the continue watching row, then navigate him/her to the sign in screen
     startSignIn(refreshScreenAndContentAfterSignIn)
+  else if contentType = m.constants.ui.appTypes.creator
+    showCollectionScreen(content.id)
+  else if contentType = m.constants.ui.appTypes.pivot OR contentType = m.constants.ui.appTypes.explore
+    showPivotDetailScreen(content)
   else if contentType = m.constants.ui.contentTypes.skinAd
     playAdContent(content)
   else if isNonEmptyString(content.actionId) = true
@@ -4007,12 +4025,10 @@ Function processUserPlayAction(content, screen, playbackSource = {}) as Void
         playerLinearChannel(content)
       end if
     end if
-  else if content.scheduleData <> invalid
-    showLinearDetailScreen(content, playbackSource)
+  else if content.scheduleData <> invalid OR content.isReplay = true
+    showLinearDetailScreen(content, playbackSource, false, skipDetailScreen)
   else if contentType = m.constants.ui.contentTypes.linear
     selectLinearContent(content)
-  else if contentType = m.constants.ui.contentTypes.app
-    return
   else
     showDetailScreen(content, false, skipDetailScreen, invalid, playbackSource)
   end if
@@ -4295,4 +4311,29 @@ Function onScreenPageLoadCompleteChange(msg) as Void
   end if
 
   showHideSpinner(false)
+End Function
+
+
+' Returns an AA for the event hub tile if the current time is within the event hub time window.
+' Reads the nested event.hub config from externalConfigInfo.
+' @returns AA suitable for node.update() or invalid if outside the time window or config is missing
+Function getEventHubTileAA()
+  eventConfig = getExternalConfigValueFromGlobal("event", invalid)
+  if eventConfig = invalid OR eventConfig.hub = invalid then return invalid
+
+  hub = eventConfig.hub
+  if isNowWithinTimePeriod(hub.start_time, hub.end_time) = false then return invalid
+
+  return {
+    subtype: "ContentNode"
+    id: hub.id
+    title: hub.title
+    description: hub.container_description
+    titleImageUri: hub.title_art
+    hdGridPosterUrl: hub.logo
+    gridItemType: m.constants.ui.gridItemTypes.eventHubTile
+    titleTypography: getTypographyConstants().ids.bodySmallStrong
+    type: m.constants.ui.appTypes.pivot
+    containerId: hub.container_id
+  }
 End Function
