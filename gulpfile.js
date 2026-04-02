@@ -1089,11 +1089,11 @@ function listTasks(done) {
 function validateBuildEnvironment(done) {
   // Adding check to make sure we have all required environment variables added.
   let requiredEnvVars = ['AWS_PROFILE', 'RCDN_GIT_DIRECTORY', 'ROKU_DEV_TARGET', 'DEV_PASSWORD', 'PKG_PASSWORD', 'INFRA_REPO_DIR'];
-  requiredEnvVars.forEach((envVar) => {
-    if (!process.env[envVar]) {
-      done(new NoStackError(`\x1b[31m Missing required environment variable: ${envVar} \x1b[0m`));
-    }
-  });
+  let missingEnvVars = requiredEnvVars.filter((envVar) => !process.env[envVar]);
+  if (missingEnvVars.length > 0) {
+    done(new NoStackError(`\x1b[31m Missing required environment variables: ${missingEnvVars.join(', ')} \x1b[0m`));
+    return;
+  }
 
   // Adding check to make sure we have a valid aws sso token.
   // If we do not have a valid token then we will get error as follows - "Error when retrieving token from sso: Token has expired and refresh failed."
