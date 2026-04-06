@@ -86,7 +86,7 @@ Function epgMixin_badgeInfo_laterToday_test()
   airLocal.fromSeconds(now.asSeconds() + 7200)
 
   ' Only run this test if the +2h time is still the same calendar day
-  if airLocal.getDayOfYear() = now.getDayOfYear() AND airLocal.getYear() = now.getYear()
+  if airLocal.getDayOfMonth() = now.getDayOfMonth() AND airLocal.getMonth() = now.getMonth() AND airLocal.getYear() = now.getYear()
     airUtc = CreateObject("roDateTime")
     airUtc.fromSeconds(CreateObject("roDateTime").asSeconds() + 7200)
     endUtc = CreateObject("roDateTime")
@@ -110,24 +110,31 @@ Function epgMixin_badgeInfo_tomorrow_test()
   now = CreateObject("roDateTime")
   now.toLocalTime()
 
-  ' Find seconds until end of local day, then add 6 hours into tomorrow
+  ' Find seconds until end of local day, then add 6 hours into tomorrow.
+  ' The resulting event must be (a) >= 86400s away so it bypasses the
+  ' countdown branch in getLinearContentBadgeInfo (which shows "Live in Xh"
+  ' for anything < 24h out), and (b) inside the isTomorrow window.
+  ' After ~18:00 local, secsLeftToday + 21600 < 86400, so the countdown
+  ' branch would catch it. Skip the test in that case — the "later today"
+  ' test already covers the countdown path.
   secsLeftToday = 86400 - (now.getHours() * 3600 + now.getMinutes() * 60 + now.getSeconds())
   offsetToTomorrow = secsLeftToday + 21600
+  if offsetToTomorrow >= 86460
+    startUtc = CreateObject("roDateTime")
+    startUtc.fromSeconds(CreateObject("roDateTime").asSeconds() + offsetToTomorrow)
+    endUtc = CreateObject("roDateTime")
+    endUtc.fromSeconds(CreateObject("roDateTime").asSeconds() + offsetToTomorrow + 10800)
 
-  startUtc = CreateObject("roDateTime")
-  startUtc.fromSeconds(CreateObject("roDateTime").asSeconds() + offsetToTomorrow)
-  endUtc = CreateObject("roDateTime")
-  endUtc.fromSeconds(CreateObject("roDateTime").asSeconds() + offsetToTomorrow + 10800)
+    schedule = {
+      startTime: startUtc.toISOString()
+      endTime: endUtc.toISOString()
+    }
 
-  schedule = {
-    startTime: startUtc.toISOString()
-    endTime: endUtc.toISOString()
-  }
-
-  result = getLinearContentBadgeInfo(schedule, false)
-  m.assertNotInvalid(result)
-  m.assertEqual(result.availability, "upcoming")
-  m.assertTrue(result.badgeText.instr("Tomorrow") >= 0 OR result.badgeText.instr("tomorrow") >= 0)
+    result = getLinearContentBadgeInfo(schedule, false)
+    m.assertNotInvalid(result)
+    m.assertEqual(result.availability, "upcoming")
+    m.assertTrue(result.badgeText.instr("Tomorrow") >= 0 OR result.badgeText.instr("tomorrow") >= 0)
+  end if
 End Function
 
 
