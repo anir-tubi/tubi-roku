@@ -45,7 +45,6 @@ Function init() as Void
   topRef.observeFieldScoped("isLoading", "onLoadingChange")
   topRef.observeFieldScoped("pivotId", "onPivotIdChange")
   topRef.observeFieldScoped("trackingPageInfo", "onTrackingPageInfoChange")
-  topRef.observeFieldScoped("containerAppendMoreTilesStatus", "onContainerAppendMoreTilesStatusChange")
   topRef.observeFieldScoped("refreshContent", "onContentRefreshNeeded")
   topRef.observeFieldScoped("focusedChild", "onPivotScreenFocusChange")
   topRef.enableContentRefresh = true
@@ -260,21 +259,6 @@ End Function
 Function onLoadingChange() as Void
   if m.top.isLoading = true
     m.rowList.content = invalid
-  end if
-End Function
-
-
-' Handles container append more tiles status changes
-' Manages focus position during tile appending to prevent focus reset issues
-' @param msg - Message containing the status ("start", "complete")
-Function onContainerAppendMoreTilesStatusChange(msg) as Void
-  status = msg.getData()
-
-  if status = "start" AND isNonEmptyArray(m.rowList.rowItemFocused) = true
-    m.resetListPositionOnAppend = [m.rowList.rowItemFocused[0], m.rowList.rowItemFocused[1]]
-  else if status = "complete" AND isNonEmptyArray(m.resetListPositionOnAppend) = true
-    m.rowList.jumpToRowItem = m.resetListPositionOnAppend
-    m.resetListPositionOnAppend = invalid
   end if
 End Function
 

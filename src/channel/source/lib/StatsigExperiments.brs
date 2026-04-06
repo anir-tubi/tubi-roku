@@ -187,6 +187,12 @@ Function StatsigExperimentsInterface(statsigExperimentsInfo) as Object
         default: { "enabled": false }
       }
 
+      ' MyStuff horizontal pagination experiment
+      ' When enabled, loads fewer items per container initially and lazy-loads more as user scrolls right
+      roku_mystuff_pagination_v1: {
+        default: { "enabled": false }
+      }
+
       ' Skip pre-roll ads for casting-initiated CTV sessions (Voyager or ECP deeplink from mobile).
       casting_playback_preroll_skip: {
         casting_playback_preroll_skip_v1: {

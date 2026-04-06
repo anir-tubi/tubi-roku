@@ -95,7 +95,14 @@ Function fetchMyStuffCategoryDetails()
 
   isSignedInUser = isLoggedInUser()
 
-  batchRequests = m.cmsApi.createMyStuffScreenBatchReqInfo(content, isKidsMode, isSignedInUser)
+  batchOptions = {}
+  if getStatsigExperimentResource("", "roku_mystuff_pagination_v1", false).enabled = true
+    batchOptions = {
+      params: { contents_limit: m.constants.performance.categoryGridList.initialBlockSize }
+    }
+  end if
+
+  batchRequests = m.cmsApi.createMyStuffScreenBatchReqInfo(content, isKidsMode, isSignedInUser, batchOptions)
   if batchRequests <> invalid
     m.makeBatchRequest({
       requests: batchRequests
@@ -124,6 +131,7 @@ Function onMyStuffBatchResponse(response)
       screen.contentUpdated = true
 
       getStatsigExperimentResource("", "roku_video_tiles_1_9_1", true)
+      getStatsigExperimentResource("", "roku_mystuff_pagination_v1", true)
     else
       modalInfo = {
         message: getTranslation("error_noContent_description")

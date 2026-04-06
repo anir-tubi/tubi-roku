@@ -58,6 +58,7 @@ Function initVideoTilesScreen(contentAreaNode, rowListNode, infoPanelNode = inva
   m.lastFocusRow = 0
   m.ignoreCurrColumnChange = false
   m.ignoreRowColumnChange = false
+  m.resetListPositionOnAppend = invalid
 
   ' Set up row list observers for video tiles
   rowListNode.observeFieldScoped("currFocusColumn", "onRowCurrFocusColumnChange")
@@ -77,6 +78,7 @@ Function initVideoTilesScreen(contentAreaNode, rowListNode, infoPanelNode = inva
   m.top.observeFieldScoped("rowCurrFocusColumn", "onRowCurrFocusColumnUpdate")
   m.top.observeFieldScoped("expiredContainerIds", "onExpiredContainerIds")
   m.top.observeFieldScoped("listingRefreshData", "onListingRefreshData")
+  m.top.observeFieldScoped("containerAppendMoreTilesStatus", "onContainerAppendMoreTilesStatusChange")
 
   ' Initialize rowListTranslation and field syncs immediately
   updateRowListTranslation(rowListNode.translation)
@@ -178,6 +180,23 @@ End Function
 ' @param msg - Message containing AA keyed by scheduleId with listing data from the EPG API
 Function onListingRefreshData(msg) as Void
   processListingRefreshData(msg.getData())
+End Function
+
+
+' Handles focus position during horizontal pagination tile appending
+' Saves the current focus position on "start" and restores it on "complete"
+' to prevent focus reset when children are appended to the RowList content
+' @param msg - Message containing the status ("start", "complete")
+Function onContainerAppendMoreTilesStatusChange(msg) as Void
+  status = msg.getData()
+  if m.rowListNode = invalid then return
+
+  if status = "start" AND isNonEmptyArray(m.rowListNode.rowItemFocused) = true
+    m.resetListPositionOnAppend = [m.rowListNode.currFocusRow, m.top.rowCurrFocusColumn]
+  else if status = "complete" AND isNonEmptyArray(m.resetListPositionOnAppend) = true
+    m.rowListNode.jumpToRowItem = m.resetListPositionOnAppend
+    m.resetListPositionOnAppend = invalid
+  end if
 End Function
 
 

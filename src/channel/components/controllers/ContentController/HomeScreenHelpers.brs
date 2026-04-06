@@ -950,6 +950,7 @@ Function makeContainerRequest(category, columnFocused, homeScreen, successCallba
 
   if isNode(category) = true AND category.paginationInfo <> invalid AND columnFocused >= firstBatchLimit
     cursor = category.paginationInfo.cursor
+    if isNumber(cursor) = false then cursor = 0
     hasMoreContent = category.paginationInfo.hasMoreContent
     rightEdge = cursor - 10
     if isInteger(category.totalDuplicates)

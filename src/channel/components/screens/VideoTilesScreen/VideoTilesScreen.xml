@@ -104,5 +104,9 @@
 
     <!-- Signal fired with IDs of expired containers needing refresh -->
     <field id="expiredContainerIds" type="array" alwaysNotify="true" />
+
+    <!-- Pagination: tracks when tiles are being appended to a container during horizontal lazy loading.
+         Possible values: "none", "start", "complete" -->
+    <field id="containerAppendMoreTilesStatus" type="string" value="none" />
   </interface>
 </component>

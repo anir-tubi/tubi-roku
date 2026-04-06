@@ -48,10 +48,6 @@
     <!-- Set to true when the user presses back button -->
     <field id="backButtonPressed" type="boolean" alwaysNotify="true" />
 
-    <!-- Signals that more tiles are being appended to a container during lazy loading -->
-    <!-- Possible values: "none", "start", "complete" -->
-    <field id="containerAppendMoreTilesStatus" type="string" value="none" />
-
     <!-- Sponsored hub ad content data (assets, trackers, adId) -->
     <field id="sponsoredHubAdContent" type="assocarray" />
   </interface>

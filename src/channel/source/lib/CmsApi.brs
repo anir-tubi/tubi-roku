@@ -822,7 +822,7 @@ End Function
 ' @isSignedInUser: boolean, value based on user loggedIn or not
 '
 ' returns batch requests
-Function cmsApi_createMyStuffScreenBatchReqInfo(content, bKidsMode = false, isSignedInUser = false)
+Function cmsApi_createMyStuffScreenBatchReqInfo(content, bKidsMode = false, isSignedInUser = false, passedOptions = {})
 
   reqName = m.constants.reqNames.getMyStuffContainers
 
@@ -840,6 +840,9 @@ Function cmsApi_createMyStuffScreenBatchReqInfo(content, bKidsMode = false, isSi
           options = {
             params: {}
           }
+          if passedOptions <> invalid AND passedOptions.params <> invalid
+            options.params.append(passedOptions.params)
+          end if
 
           '// Request both portrait and hero (landscape) image types.
           '//   For the landscape image, request the hero type instead of the regular landscape type, because

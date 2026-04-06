@@ -31,6 +31,20 @@ Function parseCategoryMyStuffContentSuccess(fullResponse, reqInfo)
     end if
 
     convertedMetadata = m.metadataTranslate.translateContainer(parsedResponse, fullJson, orientation, bFullData, contentMode, m.constants.ui.screenIds.myStuffScreen, isSignedInUser)
+
+    ' When pagination experiment is enabled, the initial request uses a small contents_limit (initialBlockSize).
+    ' translateContainer calculates hasMoreContent by comparing totalItems against lazyLoadItemsPerBatch,
+    ' which will always be false for the initial small batch. Override paginationInfo to match how
+    ' translateHomescreen handles it -- assume there is more content if items were returned.
+    initialBlockSize = m.constants.performance.categoryGridList.initialBlockSize
+    if reqInfo <> invalid AND reqInfo.options <> invalid AND reqInfo.options.params <> invalid AND reqInfo.options.params.contents_limit = initialBlockSize
+      if contents.count() >= initialBlockSize
+        convertedMetadata.paginationInfo = {
+          "cursor": initialBlockSize
+          "hasMoreContent": true
+        }
+      end if
+    end if
   else
     convertedMetadata = m.metadataTranslate.translateEmptyMyStuffContainer(parsedResponse)
   end if

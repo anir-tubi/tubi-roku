@@ -166,7 +166,12 @@ Function onRowCurrFocusColumnChange() as Void
   updateVideoTileOnFocusChange(rowFocused, columnFocused, screen)
 
   ' Trigger lazy loading for next batch of items
-  if isNumber(columnFocused) = true AND isNumber(rowFocused) = true AND screen.content <> invalid AND (screen.isSubType("HomeScreen") = true OR screen.isSubType("PivotDetailScreen") = true)
+  isEligibleScreen = screen.isSubType("HomeScreen") = true OR screen.isSubType("PivotDetailScreen") = true
+  if isEligibleScreen = false AND screen.isSubType("MyStuffScreen") = true
+    isEligibleScreen = getStatsigExperimentResource("", "roku_mystuff_pagination_v1", false).enabled = true
+  end if
+
+  if isNumber(columnFocused) = true AND isNumber(rowFocused) = true AND screen.content <> invalid AND isEligibleScreen
     category = screen.content.getChild(rowFocused)
     makeContainerRequest(category, columnFocused, screen, onVideoTilesListMoreItemsSuccess)
   end if
