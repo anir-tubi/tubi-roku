@@ -57,6 +57,13 @@ Function showVodDetailScreen(inputContent, playbackSource, successCb = invalid, 
         m.videoPreviewPlayer.isDetailScreen = true
         setPageInfoForVideoPreview(screen.trackingPageInfo)
       end if
+    else if m.lowVramPreviewVariant = "detail_screen_only" AND isVideoPreviewOn() = true AND content.videoPreviewUrl <> ""
+      startVideoPreview(content, screen.trackingPageInfo)
+      ' startVideoPreview resets isDetailScreen to false, so we must set it after
+      if m.videoPreviewPlayer <> invalid
+        m.videoPreviewPlayer.videoPlayerType = "BANNER"
+        m.videoPreviewPlayer.isDetailScreen = true
+      end if
     end if
 
     onVodDetailBackgroundUriListChange()

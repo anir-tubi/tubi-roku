@@ -278,6 +278,10 @@ Function startDebouncedVideoPreview() as Void
     return
   end if
 
+  if m.lowVramPreviewVariant = "detail_screen_only" OR m.lowVramPreviewVariant = "disabled"
+    return
+  end if
+
   if screen.listHasFocus = true
     handleListVideoPreview(screen)
   else

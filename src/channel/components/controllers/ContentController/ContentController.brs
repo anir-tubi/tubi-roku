@@ -236,6 +236,17 @@ Function addControllerUi()
   m.videoPreviewDebounce.duration = m.constants.player.videoPreviewDelayTimes.videoTiles
   m.videoPreviewDebounce.observeFieldScoped("fire", "startDebouncedVideoPreview")
 
+  m.lowVramPreviewVariant = "control"
+  if m.constants.deviceInfo.lowVram = true OR m.constants.deviceInfo.limitedUi = true
+    lowVramExp = getStatsigExperimentResource("", "roku_low_vram_video_preview_v1", true)
+    if lowVramExp <> invalid AND isNonEmptyString(lowVramExp.variant) = true
+      m.lowVramPreviewVariant = lowVramExp.variant
+    end if
+    if m.lowVramPreviewVariant = "debounce"
+      m.videoPreviewDebounce.duration = 2
+    end if
+  end if
+
   updateVideoTileSize()
 
   m.LinearPlayerGroup = m.top.findNode("LinearPlayerGroup")
@@ -2601,10 +2612,15 @@ Function resumeApp()
       ' without content which will be a blank screen. To avoid it, stop the counter and refresh the EPGScreen videoplay
       stopCountdownTimer()
       refreshEPGScreenVideoPlay(false, currentScreen)
-    else if currentScreen.id = m.constants.ui.screenIds.vodDetailScreen
+    else if currentScreen.id = m.constants.ui.screenIds.vodDetailScreen AND m.lowVramPreviewVariant <> "disabled"
       previewState = getVideoPreviewState()
       if previewState = "stopped" OR previewState = "paused"
         startVideoPreview(currentScreen.content, currentScreen.trackingPageInfo)
+        ' startVideoPreview resets isDetailScreen to false, so we must set it after
+        if m.lowVramPreviewVariant = "detail_screen_only" AND m.videoPreviewPlayer <> invalid
+          m.videoPreviewPlayer.videoPlayerType = "BANNER"
+          m.videoPreviewPlayer.isDetailScreen = true
+        end if
       end if
     end if
   end if

@@ -187,6 +187,12 @@ Function StatsigExperimentsInterface(statsigExperimentsInfo) as Object
         default: { "enabled": false }
       }
 
+      ' Low VRAM video preview experiment
+      ' Variants: "control" (default 1s debounce), "debounce" (2s debounce), "detail_screen_only" (preview only on detail screen), "disabled" (no preview)
+      roku_low_vram_video_preview_v1: {
+        default: { "variant": "control" }
+      }
+
       ' MyStuff horizontal pagination experiment
       ' When enabled, loads fewer items per container initially and lazy-loads more as user scrolls right
       roku_mystuff_pagination_v1: {

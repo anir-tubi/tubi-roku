@@ -70,12 +70,18 @@ Function showDetailScreen(content, sendTrackingOnResponse = true, successCb = in
       end if
       if previewState = "buffering" OR previewState = "playing"
         setPageInfoForVideoPreview(detailScreen.trackingPageInfo) ' this will help to trigger analytics
+      else if m.lowVramPreviewVariant = "detail_screen_only" AND content.videoPreviewUrl <> ""
+        startVideoPreview(content, detailScreen.trackingPageInfo)
+        ' startVideoPreview resets isDetailScreen to false, so we must set it after
+        if m.videoPreviewPlayer <> invalid
+          m.videoPreviewPlayer.videoPlayerType = "BANNER"
+          m.videoPreviewPlayer.isDetailScreen = true
+        end if
       else
         previewState = getVideoPreviewState()
         if previewState <> "stopped" AND previewState <> "finished" ' this means video not stopped/finished for previous content, so we need to stop it
           stopVideoPreview()
         end if
-
       end if
     end if
 
