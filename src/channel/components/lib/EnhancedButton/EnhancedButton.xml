@@ -21,7 +21,7 @@
     <field id="backgroundBlendColor" type="string" />
     <field id="padding" type="integer" value="48" />
     <field id="rowListHasFocus" type="boolean" />
-    <field id="dynamicIsPrimaryButton" type="boolean" alwaysNotify="true" />
+    <field id="showFocusedLabelBelow" type="boolean" value="false" />
 
     <!-- OUTPUTS -->
     <!-- Helps us with width calculation when we want to use with ArrayGrid -->

@@ -25,16 +25,6 @@ Function init()
   m.gradient = topRef.findNode("gradient")
   m.belowFoldGradient = topRef.findNode("belowFoldGradient")
   m.leftChevron = topRef.findNode("leftChevron")
-  ratingsOverlayResult = createRatingsOverlay()
-  m.ratingsOverlay = ratingsOverlayResult.overlay
-  m.ratingsOverlayButtonList = ratingsOverlayResult.buttonList
-  m.ratingsOverlayButtonList.observeFieldScoped("buttonSelected", "onRatingsOverlayButtonSelected")
-  m.top.appendChild(m.ratingsOverlay)
-
-  m.ratingsOverlayFocusTimer = CreateObject("roSGNode", "Timer")
-  m.ratingsOverlayFocusTimer.duration = 0.01
-  m.ratingsOverlayFocusTimer.repeat = false
-  m.ratingsOverlayFocusTimer.observeFieldScoped("fire", "onRatingsOverlayFocusTimer")
 
   m.aboveFoldGradientTranslation = [193, 360]
   m.contentContainer.translation = m.aboveFoldGradientTranslation
@@ -70,21 +60,41 @@ Function init()
   m.animationDuration = 0.4
 
   m.isComingSoon = false ' Initialize coming soon flag
+  m.isRatingsExpanded = false
+  m.ratingsButtonIndex = -1
 
-  experiment = getStatsigExperimentResource("", "roku_content_details_v5", false)
+  experiment = getStatsigExperimentResource("", "roku_content_details_v6", false)
   ' TODO: This experiment has left exit always enabled. Remove if left exit will be disabled or dynamic
   ' m.isLeftBackExitEnabled = experiment <> invalid AND experiment.enable_left_button_exit = true
   m.isLeftBackExitEnabled = true
   m.v3ExperimentEnabled = experiment <> invalid AND experiment.enabled = true
+  m.isAlwaysPrimaryButtons = experiment <> invalid AND experiment.enable_always_primary_buttons = true
+  m.isButtonTitleBelowOnFocus = experiment <> invalid AND experiment.is_expand_below = true
+  m.isEpisodeContainerBelowFold = experiment <> invalid AND experiment.is_episode_below = true
+  m.actionButtonList.showFocusedLabelBelow = m.isButtonTitleBelowOnFocus
+
+  m.focusedLabelBelow = CreateObject("roSGNode", "Label")
+  m.focusedLabelBelow.horizAlign = "center"
+  m.focusedLabelBelow.visible = false
+  setTypographyOfLabel(m.focusedLabelBelow, typographyConstants.ids.bodyMediumStrong)
+  m.top.appendChild(m.focusedLabelBelow)
+
+  m.focusedLabelBelowTimer = CreateObject("roSGNode", "Timer")
+  m.focusedLabelBelowTimer.duration = 0.1
+  m.focusedLabelBelowTimer.repeat = false
+  m.focusedLabelBelowTimer.observeFieldScoped("fire", "onFocusedLabelBelowTimer")
+  m.contentContainer.observeFieldScoped("translation", "onFocusedLabelBelowParentTranslationChange")
+  m.actionButtonList.observeFieldScoped("translation", "onFocusedLabelBelowParentTranslationChange")
 
   m.leftChevron.visible = m.isLeftBackExitEnabled
-  ' TODO: Temporary fix for section tabs spacing in roku_content_details_v5 experiment. Remove if sectionTabs will be visible
+  ' TODO: Temporary fix for section tabs spacing in roku_content_details_v6 experiment. Remove if sectionTabs will be visible
   if m.sectionTabs.visible = false
     m.sectionTabsSpacing = 0
   else
     m.sectionTabsSpacing = 63
   end if
-  m.contentContainer.itemSpacings = [60, m.sectionTabsSpacing, 24]
+
+  m.contentContainer.itemSpacings = [60, 0, m.sectionTabsSpacing, 24]
 
   if m.global <> invalid
     m.global.observeFieldScoped("theme", "onThemeChange")
@@ -105,6 +115,7 @@ Function onThemeChange(msg = invalid)
     m.contentTitleLabel.color = theme.primaryTextColor
     m.neutralColor2 = theme.neutralColor2
     m.neutralColor = theme.neutralColor
+    m.focusedLabelBelow.color = theme.focusedColor
   end if
 End Function
 
@@ -154,7 +165,7 @@ Function onFocusRelatedContent() as Void
 
   ymalIndex = getYmalTabIndex()
   m.sectionTabs.focusedIndex = ymalIndex
-  m.contentContainer.jumpToIndex = 3
+  m.contentContainer.jumpToIndex = m.additionalContentIndex
 End Function
 
 
@@ -234,9 +245,7 @@ End Function
 Function refreshButtonList()
   itemContent = m.top.content
   buttons = []
-  isRatingsOverlayFocused = m.ratingsOverlay.visible = true AND m.ratingsOverlayButtonList.isInFocusChain() = true
-  isButtonsListInFocusChain = m.actionButtonList.isInFocusChain() = true OR isRatingsOverlayFocused
-  hideRatingsOverlay()
+  isButtonsListInFocusChain = m.actionButtonList.isInFocusChain() = true
 
   if itemContent <> invalid
     contentId = itemContent.id
@@ -248,29 +257,56 @@ Function refreshButtonList()
       addPlayOrResumeButtons(buttons, itemContent, history)
       addSignInButton(buttons)
       addCreatorButton(buttons, itemContent)
-      addRemoveHistoryButton(buttons, history)
+    end if
 
-      if m.top.isInKidsMode = false
-        addRatingsButton(buttons, like)
-
-        if isNonEmptyString(itemContent.channelId)
-          addChannelButton(buttons, itemContent)
-        end if
-      end if
-      if itemContent.type = "series"
+    addTrailerButton(buttons, itemContent)
+    if m.isComingSoon = false
+      if itemContent.type = m.constants.ui.contentTypes.series AND m.isEpisodeContainerBelowFold <> true
         buttons.push({
           id: "episodes"
           title: getTranslation("screenDetails_button_episodes")
           iconUrl: "pkg:/images/icon-all-episodes.webp"
+          isPrimaryButton: true
           trackingContext: createButtonAnalytics("episodes")
         })
       end if
+
+      if m.isEpisodeContainerBelowFold = true
+        if itemContent.type = m.constants.ui.contentTypes.series
+          m.episodesContainer.visible = true
+          m.episodesContainer.isCreatorContent = (itemContent.creatorTensorApp <> invalid)
+          m.contentContainer.itemSpacings = [60, 36, 0, 24]
+        else
+          m.episodesContainer.visible = false
+          m.contentContainer.itemSpacings = [60, 0, 0, 24]
+        end if
+      end if
     end if
 
-    addTrailerButton(buttons, itemContent)
     addQueueButton(buttons, bookmark)
+
+    if m.isComingSoon = false
+      if m.top.isInKidsMode = false
+        if isNonEmptyString(itemContent.channelId)
+          addChannelButton(buttons, itemContent)
+        end if
+      end if
+      addRemoveHistoryButton(buttons, history)
+      if m.top.isInKidsMode = false
+        if m.isRatingsExpanded = true
+          addLikeDislikeButtons(buttons, like)
+        else
+          addRatingsButton(buttons, like)
+        end if
+      end if
+    end if
   end if
 
+  if m.isAlwaysPrimaryButtons = true
+    for each button in buttons
+      button.isPrimaryButton = true
+    end for
+  end if
   m.actionButtonList.buttons = buttons
   m.actionButtonList.visible = isNonEmptyArray(buttons)
 
@@ -279,118 +315,6 @@ Function refreshButtonList()
   end if
 End Function
 
-
-' Creates the ratings overlay containing a background poster and a vertical
-' EnhancedButtonList with dislike/like buttons. Floats above the button row.
-Function createRatingsOverlay() as Object
-  overlay = CreateObject("roSGNode", "Group")
-  overlay.id = "ratingsOverlay"
-  overlay.visible = false
-
-  background = CreateObject("roSGNode", "Poster")
-  background.uri = "pkg:/images/ratings-background-$$RES$$.9.png"
-  background.width = 260
-  background.height = 256
-  background.translation = [-14, -16]
-  overlay.appendChild(background)
-
-  buttonList = CreateObject("roSGNode", "EnhancedButtonList")
-  buttonList.id = "ratingsOverlayButtonList"
-  buttonList.layoutDirection = "vert"
-  buttonList.buttonSpacing = [12]
-  buttonList.buttons = [
-    {
-      id: "dislike"
-      title: getTranslation("screenDetails_button_dislike")
-      isPrimaryButton: true
-      iconUrl: "pkg:/images/icon-dislike.webp"
-      trackingContext: createButtonAnalytics("dislike")
-    }
-    {
-      id: "like"
-      title: getTranslation("screenDetails_button_like")
-      isPrimaryButton: true
-      padding: 66
-      iconUrl: "pkg:/images/icon-like.webp"
-      trackingContext: createButtonAnalytics("like")
-    }
-  ]
-  overlay.appendChild(buttonList)
-
-  return { overlay: overlay, buttonList: buttonList }
-End Function
-
-
-' Handles ratings overlay button selection (like or dislike)
-Function onRatingsOverlayButtonSelected(msg) as Void
-  buttonData = msg.getData()
-  if buttonData = invalid then return
-  setComponentInteractionEventForButton("CONFIRM", buttonData)
-  hideRatingsOverlay()
-  m.actionButtonList.setFocus(true)
-  m.top.ctaSelectedButtonId = buttonData.id
-End Function
-
-
-' Shows the ratings overlay (dislike/like) above the focused ratings button.
-' Uses fade with 0 duration as a deferred callback to set focus after the
-' actionButtonList finishes its internal focus handling.
-Function showRatingsOverlay() as Void
-  focusedButton = m.actionButtonList.buttonFocused
-  if focusedButton = invalid OR focusedButton.button = invalid then return
-
-  m.ratingsButtonNode = focusedButton.button
-  m.ratingsButtonNode.padding = 66
-  m.ratingsButtonNode.dynamicIsPrimaryButton = true
-  m.ratingsButtonNode.observeFieldScoped("translation", "onRatingsButtonTranslationChange")
-  m.contentContainer.observeFieldScoped("translation", "onRatingsButtonTranslationChange")
-  m.actionButtonList.observeFieldScoped("translation", "onRatingsButtonTranslationChange")
-  updateRatingsOverlayPosition()
-  m.ratingsOverlayButtonList.jumpToIndex = 1
-  m.ratingsOverlay.visible = true
-  m.ratingsOverlayFocusTimer.control = "start"
-End Function
-
-
-Function onRatingsOverlayFocusTimer() as Void
-  if m.ratingsOverlay.visible = true
-    m.ratingsOverlayButtonList.setFocus(true)
-  end if
-End Function
-
-
-Function onRatingsButtonTranslationChange(msg) as Void
-  if m.ratingsOverlay.visible = true
-    updateRatingsOverlayPosition()
-  end if
-End Function
-
-
-' Positions the ratings overlay relative to the ratings button in the action button list.
-' The overlay is placed so the like button aligns with the ratings button,
-' and the dislike button sits above it.
-Function updateRatingsOverlayPosition() as Void
-  if m.ratingsButtonNode = invalid then return
-  buttonRect = m.ratingsButtonNode.sceneBoundingRect()
-  m.ratingsOverlay.translation = [buttonRect.x, buttonRect.y - 117]
-End Function
-
-
-Function hideRatingsOverlay() as Void
-  m.ratingsOverlay.visible = false
-  if m.ratingsButtonNode <> invalid
-    m.ratingsButtonNode.padding = 33
-    m.ratingsButtonNode.dynamicIsPrimaryButton = false
-    m.ratingsButtonNode.unobserveFieldScoped("translation")
-    m.contentContainer.unobserveFieldScoped("translation")
-    m.actionButtonList.unobserveFieldScoped("translation")
-    m.ratingsButtonNode = invalid
-  end if
-End Function
-
-
-' Handles Dislike button selection
-' Hides the overlay and propagates the dislike action
 
 ' Handles user sign-in state changes
 ' Refreshes button list to show/hide sign-in dependent buttons
@@ -411,7 +335,7 @@ Function renderSectionTabs()
 
   if itemContent <> invalid
     ' Episodes tab - only show for series content
-    if itemContent.type = "series"
+    if itemContent.type = m.constants.ui.contentTypes.series
       episodesTab = {
         id: "episodes"
         title: getTranslation("button_episodes")
@@ -448,6 +372,7 @@ Function renderSectionTabs()
 
   playbackSource = m.top.playbackSource
   if isAA(playbackSource) AND playbackSource.srcForAds = "deeplink"
+    ' TODO: Now at index 3 because of episodelistcontainer, change if we move back to SectionTabs
     m.contentContainer.jumpToIndex = 2
     m.sectionTabs.jumpToIndex = getYmalTabIndex()
   end if
@@ -495,9 +420,9 @@ Function onSectionTabFocused(msg)
 
     ' Set spacing: episodes tab has different bottom spacing (0) vs other tabs (42)
     if tabId = "episodes"
-      m.contentContainer.itemSpacings = [60, m.sectionTabsSpacing, 0]
+      m.contentContainer.itemSpacings = [60, 0, m.sectionTabsSpacing, 0]
     else
-      m.contentContainer.itemSpacings = [60, m.sectionTabsSpacing, 42]
+      m.contentContainer.itemSpacings = [60, 0, m.sectionTabsSpacing, 42]
     end if
 
     m.top.selectedSection = tabId
@@ -508,13 +433,25 @@ End Function
 ' Handles action button selection events
 ' Sends component interaction tracking event and propagates button ID to parent
 ' @param msg - Message object containing selected button data
-Function onActionButtonSelected(msg)
+sub onActionButtonSelected(msg)
   buttonSelected = msg.getData()
   if buttonSelected <> invalid AND buttonSelected.id <> invalid
     ' Send CONFIRM component interaction event
     setComponentInteractionEventForButton("CONFIRM", buttonSelected)
 
     buttonId = buttonSelected.id
+
+    ' Intercept unrated ratings button selection to expand inline like/dislike
+    if m.isRatingsExpanded = false AND buttonId = "ratings"
+      expandRatingsButtons()
+      return
+    end if
+
+    ' Reset expanded state when user confirms a like/dislike selection
+    if m.isRatingsExpanded = true AND (buttonId = "like" OR buttonId = "dislike")
+      m.isRatingsExpanded = false
+    end if
+
     if buttonId = "ratingsLiked"
       buttonId = "like"
     else if buttonId = "ratingsDisliked"
@@ -522,7 +459,7 @@ Function onActionButtonSelected(msg)
     end if
     m.top.ctaSelectedButtonId = buttonId
   end if
-End Function
+end sub
 
 
 ' Handles content container focus index changes
@@ -531,8 +468,13 @@ End Function
 Function onContentContainerFocusIndexChange(msg)
   focusedIndex = msg.getData()
   if focusedIndex <> invalid
-    if focusedIndex <> 1 AND m.ratingsOverlay.visible = true
-      hideRatingsOverlay()
+    if focusedIndex <> 1 AND m.isRatingsExpanded = true
+      m.isRatingsExpanded = false
+      refreshButtonList()
+    end if
+    if focusedIndex <> 1
+      m.focusedLabelBelowTimer.control = "stop"
+      m.focusedLabelBelow.visible = false
     end if
     m.top.shouldPauseVideoPreview = focusedIndex > 1
     componentGainingFocus = m.contentContainer.componentGainingFocus
@@ -540,7 +482,7 @@ Function onContentContainerFocusIndexChange(msg)
 
     if componentGainingFocus <> invalid
       translationX = m.contentContainer.translation[0]
-      didUserNavigateToAdditionalContent = (componentGainingFocus.id = "sectionTabs" OR componentGainingFocus.id = "additionalContentContainer")
+      didUserNavigateToAdditionalContent = (componentGainingFocus.id = "sectionTabs" OR componentGainingFocus.id = "additionalContentContainer" OR (m.isEpisodeContainerBelowFold = true AND componentGainingFocus.id = "episodesContainer"))
       if didUserNavigateToAdditionalContent = true
         fade(m.contentTitle, "in", 0.3)
         fade(m.belowFoldGradient, "in", 0.3)
@@ -557,19 +499,36 @@ Function onContentContainerFocusIndexChange(msg)
 
       ' Check content validity before accessing type property
       content = m.top.content
-      m.episodesContainer.showSeasonSelector = (didUserNavigateToAdditionalContent = true AND content <> invalid AND content.type = m.constants.ui.contentTypes.series)
+      isSeriesContent = (content <> invalid AND content.type = m.constants.ui.contentTypes.series)
+      m.episodesContainer.showSeasonSelector = (didUserNavigateToAdditionalContent = true AND isSeriesContent)
+      if m.isEpisodeContainerBelowFold = true
+        m.episodesContainer.showHeader = (componentGainingFocus.id <> "episodesContainer")
+      end if
 
       ' Adjust UI layout based on focus position
+      isEpisodeContainerBelowFoldActive = (m.isEpisodeContainerBelowFold = true AND isSeriesContent = true)
+
       if focusedIndex = 1
         ' User is on action buttons - slide down to show buttons area
         slideTo(m.contentContainer, m.aboveFoldGradientTranslation, 0.3)
-        m.contentContainer.itemSpacings = [60, m.sectionTabsSpacing, 24]
+        if isEpisodeContainerBelowFoldActive = true
+          m.contentContainer.itemSpacings = [60, 36, 0, 24]
+        else
+          m.contentContainer.itemSpacings = [60, 0, m.sectionTabsSpacing, 24]
+        end if
         fade(m.actionButtonList, "in", 0.3)
         ' Use foreground-10 when action buttons are focused
         m.sectionTabs.buttonBackgroundBlendColor = m.neutralColor2
       else
         ' User is on content area - slide up to maximize content viewing area
-        slideTo(m.contentContainer, [translationX, -372], 0.3)
+        if isEpisodeContainerBelowFoldActive = true AND componentGainingFocus.id = "episodesContainer"
+          slideY = -315
+        else if isEpisodeContainerBelowFoldActive = true AND componentGainingFocus.id = "additionalContentContainer"
+          slideY = -500 - m.episodesContainer.boundingRect().height
+        else
+          slideY = -372
+        end if
+        slideTo(m.contentContainer, [translationX, slideY], 0.3)
         fade(m.actionButtonList, "out", 0.3)
         ' Use foreground-20 when section tabs are focused
         m.sectionTabs.buttonBackgroundBlendColor = m.neutralColor
@@ -582,7 +541,17 @@ Function onContentContainerFocusIndexChange(msg)
         bottomSpacing = 0 ' For episodes section
         if isEpisodesSection = false then bottomSpacing = 42 ' For other sections
 
-        m.contentContainer.itemSpacings = [60, m.sectionTabsSpacing, bottomSpacing]
+        if isEpisodeContainerBelowFoldActive = true
+          episodesTopSpacing = 36
+          if componentGainingFocus.id = "episodesContainer"
+            episodesTopSpacing = 0
+          else if componentGainingFocus.id = "additionalContentContainer"
+            bottomSpacing = bottomSpacing + 176
+          end if
+          m.contentContainer.itemSpacings = [60, episodesTopSpacing, 0, bottomSpacing]
+        else
+          m.contentContainer.itemSpacings = [60, 0, m.sectionTabsSpacing, bottomSpacing]
+        end if
       end if
     end if
   end if
@@ -597,12 +566,61 @@ Function onActionButtonFocused(msg) as Void
   if focusedButton <> invalid AND m.top.shouldPauseVideoPreview = true
     m.top.shouldPauseVideoPreview = false
   end if
-  if focusedButton <> invalid AND focusedButton.id = "like"
-    showRatingsOverlay()
+
+  ' Collapse expanded ratings when focus leaves the like/dislike buttons
+  if m.isRatingsExpanded = true AND focusedButton <> invalid
+    if focusedButton.id <> "like" AND focusedButton.id <> "dislike"
+      collapseRatingsButtons()
+      return ' New buttons trigger a fresh onActionButtonFocused with valid references
+    end if
   end if
-  if focusedButton <> invalid AND focusedButton.id <> "like" AND m.ratingsOverlay.visible = true
-    hideRatingsOverlay()
+
+  ' Show focused label below for non-primary buttons in variant 2
+  if m.isButtonTitleBelowOnFocus = true AND focusedButton <> invalid
+    setupFocusedLabelBelow(focusedButton.button)
   end if
+End Function
+
+
+' Sets up or tears down the focused label below a button
+' @param buttonNode - The button node to show the label for, or invalid to hide
+Function setupFocusedLabelBelow(buttonNode as Dynamic) as Void
+  m.focusedLabelBelowButton = invalid
+  m.focusedLabelBelow.visible = false
+  m.focusedLabelBelowTimer.control = "stop"
+
+  if buttonNode <> invalid AND buttonNode.itemContent <> invalid AND buttonNode.itemContent.isPrimaryButton <> true
+    m.focusedLabelBelowButton = buttonNode
+    m.focusedLabelBelow.text = buttonNode.itemContent.title
+    m.focusedLabelBelowTimer.control = "start"
+  end if
+End Function
+
+
+' Positions the focused label below the button after a short delay
+' Delay allows layout to settle before reading sceneBoundingRect
+Function onFocusedLabelBelowTimer() as Void
+  positionFocusedLabelBelow()
+  m.focusedLabelBelow.visible = true
+End Function
+
+
+' Repositions the focused label when a parent (contentContainer or actionButtonList) moves
+Function onFocusedLabelBelowParentTranslationChange() as Void
+  if m.focusedLabelBelow.visible = true
+    positionFocusedLabelBelow()
+  end if
+End Function
+
+
+' Centers the focused label below the currently tracked button
+Function positionFocusedLabelBelow() as Void
+  buttonNode = m.focusedLabelBelowButton
+  if buttonNode = invalid then return
+
+  buttonRect = buttonNode.sceneBoundingRect()
+  labelWidth = m.focusedLabelBelow.boundingRect().width
+  m.focusedLabelBelow.translation = [buttonRect.x + Int((buttonRect.width - labelWidth) / 2), buttonRect.y + buttonRect.height + 6]
 End Function
 
 
@@ -651,7 +669,7 @@ Function addPlayOrResumeButtons(buttons, content, history) as Void
     ' Start from beginning button
     buttons.push({
       id: "startFromBeginning"
-      title: getTranslation("screenDetails_button_startFromBeginning")
+      title: getTranslation("screenDetails_button_restart")
       iconUrl: "pkg:/images/icon-restart.webp"
       trackingContext: createButtonAnalytics("startFromBeginning")
     })
@@ -889,6 +907,7 @@ Function addLikeDislikeButtons(buttons, like) as Void
     id: "like"
     title: getTranslation(likeTranslationKey)
     iconUrl: likeIconUrl
+    isPrimaryButton: true
     trackingContext: createButtonAnalytics("like")
   })
 
@@ -904,6 +923,7 @@ Function addLikeDislikeButtons(buttons, like) as Void
     id: "dislike"
     title: getTranslation(dislikeTranslationKey)
     iconUrl: dislikeIconUrl
+    isPrimaryButton: true
     trackingContext: createButtonAnalytics("dislike")
   })
 End Function
@@ -928,21 +948,51 @@ Function addRatingsButton(buttons, like) as Void
       trackingContext: createButtonAnalytics("ratingsDisliked")
     })
   else
-    if m.v3ExperimentEnabled = true
-      buttons.push({
-        id: "like"
-        title: getTranslation("screenDetails_button_like")
-        iconUrl: "pkg:/images/icon-like.webp"
-        padding: 66
-        trackingContext: createButtonAnalytics("like")
-      })
-    else
-      buttons.push({
-        id: "ratings"
-        title: getTranslation("screenDetails_button_likeDislike")
-        iconUrl: "pkg:/images/icon-like.webp"
-        trackingContext: createButtonAnalytics("ratings")
-      })
+    buttons.push({
+      id: "ratings"
+      title: getTranslation("screenDetails_button_rate")
+      iconUrl: "pkg:/images/icon-like.webp"
+      trackingContext: createButtonAnalytics("ratings")
+    })
+  end if
+End Function
+
+
+' Expands the single ratings button into inline like and dislike buttons
+Function expandRatingsButtons() as Void
+  m.ratingsButtonIndex = m.actionButtonList.focusedIndex
+  m.isRatingsExpanded = true
+  refreshButtonList()
+  m.actionButtonList.focusedIndex = m.ratingsButtonIndex
+  m.actionButtonList.setFocus(true)
+
+  ' Dim non-ratings buttons
+  for i = 0 to m.actionButtonList.getChildCount() - 1
+    child = m.actionButtonList.getChild(i)
+    if child <> invalid AND child.id <> "like" AND child.id <> "dislike"
+      child.opacity = 0.2
+    end if
+  end for
+End Function
+
+
+' Collapses expanded like/dislike buttons back to a single ratings button
+' Focuses the button before the ratings position
+Function collapseRatingsButtons() as Void
+  if m.isRatingsExpanded = false then return
+  targetIndex = m.ratingsButtonIndex - 1
+  if targetIndex < 0 then targetIndex = 0
+  m.isRatingsExpanded = false
+  m.actionButtonList.focusedIndex = targetIndex
+  refreshButtonList()
+
+  ' onButtonsChange runs synchronously, so new buttons exist now.
+  ' Focus was lost during removeAllChildren — explicitly re-focus and set up label.
+  child = m.actionButtonList.getChild(targetIndex)
+  if child <> invalid
+    child.setFocus(true)
+    if m.isButtonTitleBelowOnFocus = true
+      setupFocusedLabelBelow(child)
     end if
   end if
 End Function
@@ -1016,27 +1066,10 @@ End Function
 ' @return Boolean - True if event was handled, false otherwise
 Function onKeyEvent(key as String, press as Boolean) as Boolean
   if press = true
-    ' Handle navigation when ratings overlay is active
-    if m.ratingsOverlay.visible = true
-      if key = "left"
-        hideRatingsOverlay()
-        targetIndex = m.actionButtonList.focusedIndex - 1
-        if targetIndex >= 0
-          m.actionButtonList.jumpToIndex = targetIndex
-        end if
-        m.actionButtonList.setFocus(true)
-        return true
-      else if key = "right"
-        hideRatingsOverlay()
-        targetIndex = m.actionButtonList.focusedIndex + 1
-        if targetIndex < m.actionButtonList.getChildCount()
-          m.actionButtonList.jumpToIndex = targetIndex
-        end if
-        m.actionButtonList.setFocus(true)
-        return true
-      else if key = "down"
-        hideRatingsOverlay()
-        m.contentContainer.jumpToIndex = 3
+    ' Handle left key when ratings are expanded and like button is at the leftmost position
+    if m.isRatingsExpanded = true AND key = "left" AND m.contentContainer.focusedIndex = 1
+      if m.actionButtonList.focusedIndex = m.ratingsButtonIndex
+        collapseRatingsButtons()
         return true
       end if
     end if

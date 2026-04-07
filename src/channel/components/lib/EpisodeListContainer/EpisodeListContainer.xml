@@ -13,7 +13,9 @@
     <field id="seasonList" type="assocarray" />
     <field id="defaultSelectedSeason" type="integer" value="-1" />
     <field id="showSeasonSelector" type="boolean" value="false" alwaysNotify="true" />
+    <field id="showHeader" type="boolean" value="true" alwaysNotify="true" />
     <field id="seriesId" type="string" />
+    <field id="isCreatorContent" type="boolean" value="false" />
 
     <!-- OUTPUTS -->
     <field id="focusedSeason" type="integer" />
@@ -24,6 +26,10 @@
   </interface>
 
   <children>
+    <Label
+      id="header"
+      height="56"
+      vertAlign="center" />
     <RowList
       id="seasonButtonsList"
       itemComponentName="SeasonButton"

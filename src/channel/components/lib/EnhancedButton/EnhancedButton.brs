@@ -8,7 +8,6 @@ Function init() as Void
   topRef.observeFieldScoped("hideFocusFootprint", "onHideFocusFootprintChange")
   topRef.observeFieldScoped("backgroundUri", "onBackgroundUriChange")
   topRef.observeFieldScoped("backgroundBlendColor", "onBackgroundBlendColorChange")
-  topRef.observeFieldScoped("dynamicIsPrimaryButton", "onDynamicIsPrimaryButtonChange")
 
   ' Cache all node references
   m.icon = topRef.findNode("icon")
@@ -169,11 +168,12 @@ Function updateButtonState(itemHasFocus as Boolean) as Void
   item = m.top.itemContent
   if item = invalid then return
 
-  if m.dynamicIsPrimaryButtonSet = true
-    renderButton(item, m.top.dynamicIsPrimaryButton, itemHasFocus)
-  else if (item.isPrimaryButton <> true OR item.displayOnlyIconTileWhenNotFocused = true)
-    ' Treat as primary button if focused OR if already marked as primary
-    isPrimaryButton = (itemHasFocus OR (item.isPrimaryButton = true))
+  if (item.isPrimaryButton <> true OR item.displayOnlyIconTileWhenNotFocused = true)
+    if m.top.showFocusedLabelBelow = true
+      isPrimaryButton = (item.isPrimaryButton = true)
+    else
+      isPrimaryButton = (itemHasFocus OR (item.isPrimaryButton = true))
+    end if
     renderButton(item, isPrimaryButton, itemHasFocus)
   end if
   updateUIBasedOnFocus(itemHasFocus)
@@ -326,6 +326,7 @@ Function renderButton(item as Object, isPrimaryButton as Dynamic, itemHasFocus a
       end if
     end if
   else
+    m.buttonBackground.opacity = 0
     m.label.text = ""
     m.labelFocused.text = ""
     m.top.calculatedTextWidth = 52
@@ -341,15 +342,6 @@ Function renderButton(item as Object, isPrimaryButton as Dynamic, itemHasFocus a
     iconPadding = Int((105 - iconWidth) / 2)
     m.elementsGroup.translation = [iconPadding, m.top.height / 2]
   end if
-End Function
-
-
-' Handles dynamicIsPrimaryButton field changes
-' Re-renders the button with the new primary button state
-Function onDynamicIsPrimaryButtonChange(msg as Object) as Void
-  if m.top.itemContent = invalid then return
-  m.dynamicIsPrimaryButtonSet = true
-  renderButton(m.top.itemContent, msg.getData(), m.top.hasFocus())
 End Function
 
 

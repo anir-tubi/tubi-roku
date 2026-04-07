@@ -85,7 +85,7 @@
     <Group
       id="contentGroup">
       <FocusControlLayoutGroup
-        itemSpacings="[60, 63, 24]"
+        itemSpacings="[60, 0, 63, 24]"
         horizAlignment="custom"
         id="contentContainer">
 
@@ -99,6 +99,10 @@
           id="actionButtonList"
           layoutDirection="horiz"
           buttonSpacing="[15]" />
+
+        <EpisodeListContainer
+          visible="false"
+          id="episodesContainer" />
 
         <EnhancedButtonList
           id="sectionTabs"
@@ -120,16 +124,13 @@
           <VideoDetailsPanel
             visible="false"
             id="videoDetailsPanel" />
-          <EpisodeListContainer
-            visible="false"
-            id="episodesContainer" />
         </FocusControlGroup>
       </FocusControlLayoutGroup>
     </Group>
     <Group
       id="contentTitle"
       opacity="0"
-      translation="[225, 72]">
+      translation="[200, 72]">
       <Rectangle
         id="transparentSpacer"
         width="1"

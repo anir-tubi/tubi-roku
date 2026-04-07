@@ -74,6 +74,7 @@ Function onButtonsChange(msg as Object) as Void
     m.top.appendChildren(buttonList)
     ' Cache reference to button nodes for later use
     m.buttons = buttonList
+
   else
     m.buttons = []
   end if
@@ -96,6 +97,7 @@ Function createButton(buttonData as Object) as Object
     button.backgroundBlendColor = m.top.buttonBackgroundBlendColor
   end if
   button.padding = m.top.padding
+  button.showFocusedLabelBelow = m.top.showFocusedLabelBelow
 
   if buttonData.height <> invalid
     button.height = buttonData.height

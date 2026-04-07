@@ -1269,6 +1269,10 @@ Function getTranslation_en_US()
       "description": "Label of button to allow users to display the list of episodes/seasons of the current video title. Should be title case.",
       "message": "All Episodes"
     },
+    "screenDetails_button_episodes_container": {
+      "description": "Label of button to allow users to display the list of episodes/seasons of the current video title. Should be title case.",
+      "message": "Episodes and More"
+    },
     "screenDetails_relatedTitles": {
       "description": "Label of button to allow users to view other video titles related to the current video title",
       "message": "You Might Also Like"
@@ -1288,6 +1292,10 @@ Function getTranslation_en_US()
     "screenDetails_button_startFromBeginning": {
       "description": "Label of button to start playing from the beginning",
       "message": "Start From Beginning"
+    },
+    "screenDetails_button_restart": {
+      "description": "Label of button to restart playing from the beginning",
+      "message": "Restart"
     },
     "screenDetails_button_like_instructions": {
       "description": "text to be place AFTER the text that indicates that the user 'liked' or 'disliked' the current video title. This appears once the button gains focus",
@@ -1324,6 +1332,10 @@ Function getTranslation_en_US()
     "screenDetails_button_likeDislike": {
       "description": "Label of unfocused button to allow users to like or dislike the current video title",
       "message": "Like or Dislike"
+    },
+    "screenDetails_button_rate": {
+      "description": "Label of button to rate the current video title",
+      "message": "Rate"
     },
     "screenDetails_button_sign_in_to_set_reminder": {
       "description": "Label of button to allow users to set the reminder to the current video title when the user is not signed in.",

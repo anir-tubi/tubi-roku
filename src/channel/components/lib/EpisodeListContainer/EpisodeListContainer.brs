@@ -6,11 +6,19 @@ Function init()
   m.typographyConstants = getTypographyConstants()
   m.constants = getConstantsFromGlobal()
   m.tracking = TubiTrackingInfo(m.constants)
+  m.header = topRef.findNode("header")
   m.seasonButtonsList = topRef.findNode("seasonButtonsList")
   m.episodeGrid = topRef.findNode("episodeGrid")
+
+  m.header.text = getTranslation("button_episodes")
+  setTypographyOfLabel(m.header, m.typographyConstants.ids.subheaderMedium)
+  m.seasonButtonsList.translation = [0, 56]
+
   m.episodeGrid.itemSize = m.constants.ui.imageSizes.largeLandscape
-  size = m.constants.ui.episodeGrid.itemSize
-  m.episodeGrid.itemClippingRect = [0, 0, 1920, size[1]]
+  ' size = m.constants.ui.episodeGrid.itemSize
+  ' m.episodeGrid.itemClippingRect = [0, 0, 1920, size[1]]
+  m.episodeGrid.itemClippingRect = [0, 0, 1920, 520]
+
 
   if m.global <> invalid
     m.global.observeFieldScoped("theme", "onThemeChange")
@@ -22,10 +30,28 @@ Function init()
   m.seasonButtonsList.observeFieldScoped("rowItemFocused", "onSeasonButtonFocusedChange")
   m.episodeGrid.observeFieldScoped("itemSelected", "onEpisodeSelectedChange")
   m.episodeGrid.observeFieldScoped("itemFocused", "onEpisodeFocusedChange")
+  topRef.observeFieldScoped("isCreatorContent", "onIsCreatorContentChange")
   topRef.observeFieldScoped("showSeasonSelector", "onShowSeasonSelectorChange")
+  topRef.observeFieldScoped("showHeader", "onShowHeaderChange")
 
   ' Local copy of episodes by season. re-using in case user switches back and forth between seasons.
   m.episodesBySeason = {}
+
+  ' Default to episodeGrid (index 2) instead of the first focusable child (seasonButtonsList).
+  ' Use focusedIndex rather than jumpToIndex to avoid stealing focus during init.
+  m.top.focusedIndex = 2
+End Function
+
+
+' Updates header title based on whether content is creator content
+' Creator content shows "Episodes and More", regular content shows "Episodes"
+Function onIsCreatorContentChange(msg)
+  isCreator = msg.getData()
+  if isCreator = true
+    m.header.text = getTranslation("screenDetails_button_episodes_container")
+  else
+    m.header.text = getTranslation("button_episodes")
+  end if
 End Function
 
 
@@ -35,10 +61,35 @@ End Function
 Function onShowSeasonSelectorChange(msg)
   showSeasonSelector = msg.getData()
   m.seasonButtonsList.visible = showSeasonSelector
-  if showSeasonSelector = true
-    m.episodeGrid.translation = [0, 111]
+  updateEpisodeGridTranslation(showSeasonSelector)
+End Function
+
+
+' Handles header visibility changes
+' When hidden, moves season buttons to [0,0] so their bounds subsume the header's bounds
+' @param msg - Message containing boolean for header visibility
+Function onShowHeaderChange(msg)
+  showHeader = msg.getData()
+  m.header.visible = showHeader
+  if showHeader = true
+    m.seasonButtonsList.translation = [0, 56]
   else
-    m.episodeGrid.translation = [0, -3]
+    m.seasonButtonsList.translation = [0, 0]
+  end if
+  updateEpisodeGridTranslation(m.seasonButtonsList.visible)
+End Function
+
+
+' Updates the episode grid translation based on header and season selector visibility
+' @param showSeasonSelector - Boolean, whether the season selector is visible
+Function updateEpisodeGridTranslation(showSeasonSelector as Boolean) as Void
+  headerOffset = 0
+  if m.header.visible = true then headerOffset = 56
+
+  if showSeasonSelector = true
+    m.episodeGrid.translation = [0, headerOffset + 141]
+  else
+    m.episodeGrid.translation = [0, headerOffset - 3]
   end if
 End Function
 
@@ -54,6 +105,7 @@ Function onThemeChange(msg = invalid)
 
   if theme <> invalid
     m.theme = theme
+    m.header.color = theme.primaryTextColor
     m.episodeGrid.focusBitmapBlendColor = theme.focusedColor
   end if
 End Function
