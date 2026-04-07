@@ -94,7 +94,12 @@ Function init()
     m.sectionTabsSpacing = 63
   end if
 
-  m.contentContainer.itemSpacings = [60, 0, m.sectionTabsSpacing, 24]
+  if m.isEpisodeContainerBelowFold = true
+    m.contentContainer.itemSpacings = [60, 0, m.sectionTabsSpacing, 24]
+  else
+    m.contentContainer.removeChild(m.episodesContainer)
+    m.contentContainer.itemSpacings = [60, m.sectionTabsSpacing, 80]
+  end if
 
   if m.global <> invalid
     m.global.observeFieldScoped("theme", "onThemeChange")
@@ -513,8 +518,10 @@ Function onContentContainerFocusIndexChange(msg)
         slideTo(m.contentContainer, m.aboveFoldGradientTranslation, 0.3)
         if isEpisodeContainerBelowFoldActive = true
           m.contentContainer.itemSpacings = [60, 36, 0, 24]
-        else
+        else if m.isEpisodeContainerBelowFold = true
           m.contentContainer.itemSpacings = [60, 0, m.sectionTabsSpacing, 24]
+        else
+          m.contentContainer.itemSpacings = [60, m.sectionTabsSpacing, 80]
         end if
         fade(m.actionButtonList, "in", 0.3)
         ' Use foreground-10 when action buttons are focused
@@ -549,8 +556,13 @@ Function onContentContainerFocusIndexChange(msg)
             bottomSpacing = bottomSpacing + 176
           end if
           m.contentContainer.itemSpacings = [60, episodesTopSpacing, 0, bottomSpacing]
-        else
+        else if m.isEpisodeContainerBelowFold = true
           m.contentContainer.itemSpacings = [60, 0, m.sectionTabsSpacing, bottomSpacing]
+        else
+          if componentGainingFocus.id = "additionalContentContainer"
+            bottomSpacing = bottomSpacing + 50
+          end if
+          m.contentContainer.itemSpacings = [60, m.sectionTabsSpacing, bottomSpacing]
         end if
       end if
     end if
