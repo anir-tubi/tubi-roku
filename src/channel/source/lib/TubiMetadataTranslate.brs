@@ -55,6 +55,7 @@ Function TubiMetadataTranslate(constants, experiments = invalid, soTStaticConfig
     buildUICustomizationTile: tubiMetadataTranslate_buildUICustomizationTile
     processSotStaticConfig: tubiMetadataTranslate_processSotStaticConfig
     isVideoTileEnabledScreen: tubiMetadataTranslate_isVideoTileEnabledScreen
+    isRemoveContainerJsonEnabled: tubiMetadataTranslate_isRemoveContainerJsonEnabled
   }
 End Function
 
@@ -1206,7 +1207,7 @@ Function tubiMetadataTranslate_translateHomescreen(contentToTranslate, contentMo
         ' then ensure row is empty except for 1 item that will entice users to sign in
         categoryAA = m.buildContinueWatchingSignedOutUserCategoryAA(container, isKidsMode, contentMode, screenId, uiMode)
       else
-        shouldInsertChannelTile = not m.isVideoTileEnabledScreen(screenId, uiMode)
+        shouldInsertChannelTile = not m.isVideoTileEnabledScreen(screenId)
 
         bFullData = false
         if screenId = m.constants.ui.screenIds.collectionScreen then
@@ -1537,7 +1538,9 @@ Function tubiMetadataTranslate_buildCategoryAA(container, contents, contentsJson
   end if
 
   categoryParent.children = categoryChildrenInfo.children
-  categoryParent.json = categoryChildrenInfo.contentsJson
+  if not (m.isVideoTileEnabledScreen(screenId) AND m.isRemoveContainerJsonEnabled())
+    categoryParent.json = categoryChildrenInfo.contentsJson
+  end if
   categoryParent.gridItemType = gridItemType
   categoryParent.childrenContentIDs = categoryChildrenInfo.childrenContentIDs
   categoryParent.totalDuplicates = categoryChildrenInfo.totalDuplicates
@@ -1765,7 +1768,7 @@ Function tubiMetadataTranslate_buildCategoryChildrenInfo(container, contents, co
           end if
 
 
-          isUserInVideoTilesExp = m.isVideoTileEnabledScreen(requestContext.screenId, uiMode)
+          isUserInVideoTilesExp = m.isVideoTileEnabledScreen(requestContext.screenId)
 
           rottenTomatoScore = 0
           if isAA(fullChild.content_tags) = true AND isNonEmptyArray(fullChild.content_tags.rotten_tomatoes_certified_fresh) = true
@@ -1830,9 +1833,7 @@ Function tubiMetadataTranslate_buildCategoryChildrenInfo(container, contents, co
               rating: rating
               titleImageUrl: titleImage
               thumbnailUri: thumbnailUri
-              seasons: seasons
               type: sContentType
-              userStarRating: rottenTomatoScore
               featuredLandscape: featuredLandscape
               sotPosterLabels: sotPosterLabels
               sotInfo: sotInfo
@@ -1841,6 +1842,14 @@ Function tubiMetadataTranslate_buildCategoryChildrenInfo(container, contents, co
               availabilityEnds: fullChild.availability_ends
               parentId: container.id
             }
+
+            if sContentType = m.contentTypes.series
+              childAA.seasons = seasons
+            end if
+
+            if parentGridItemType = m.constants.ui.gridItemTypes.certifiedFresh
+              childAA.userStarRating = rottenTomatoScore
+            end if
 
             if parentGridItemType = m.constants.ui.gridItemTypes.episodeItem OR parentGridItemType = m.constants.ui.gridItemTypes.episodeItemLatestEpisodes OR parentGridItemType = m.constants.ui.gridItemTypes.landscapeSeries OR parentGridItemType = m.constants.ui.gridItemTypes.landscapeSeriesMultiple
               childAA.landscape = m.getThumbnailImage(fullChild, parentGridItemType)
@@ -1852,6 +1861,19 @@ Function tubiMetadataTranslate_buildCategoryChildrenInfo(container, contents, co
 
             if isNonEmptyString(fullChild.series_title)
               childAA.seriesTitle = fullChild.series_title
+            end if
+
+            if isNonEmptyArray(fullChild.video_previews) = true AND isAA(fullChild.video_previews[0])
+              childAA.videoPreviewUrl = fullChild.video_previews[0].url
+              childAA.previewId = fullChild.video_previews[0].uuid
+            else if isNonEmptyString(fullChild.video_preview_url)
+              childAA.videoPreviewUrl = fullChild.video_preview_url
+              childAA.previewId = ""
+            end if
+
+            backgrounds = m.getBackgroundImages(fullChild)
+            if isNonEmptyArray(backgrounds) = true
+              childAA.backgrounds = [backgrounds[0]]
             end if
           else
 
@@ -2108,7 +2130,7 @@ End Function
 Function tubiMetadataTranslate_buildContinueWatchingSignedOutUserCategoryAA(container, bKidsMode = false, contentMode = "", screenId = "", uiMode = "standard")
   updateMetadata = {}
   if container <> invalid
-    useVideoTilesFormat = m.isVideoTileEnabledScreen(screenId, uiMode)
+    useVideoTilesFormat = m.isVideoTileEnabledScreen(screenId)
 
     updateMetadata = {
       id: container.id
@@ -2169,13 +2191,7 @@ End Function
 Function tubiMetadataTranslate_buildEmptyMyStuffCategoryAA(container)
   updateMetadata = {}
   if container <> invalid
-    ' Check if user is in video tiles experiment
-    ' MyStuff screen is always eligible (in videoTilesEligibleScreenIds) and always in standard mode
-    useVideoTilesFormat = false
-    if m.statSigExperiments <> invalid
-      experiment = m.statSigExperiments.getExperimentResource("", "roku_video_tiles_1_9_1")
-      useVideoTilesFormat = (experiment.enabled = true)
-    end if
+    useVideoTilesFormat = true
 
     updateMetadata = {
       id: container.id
@@ -2257,7 +2273,7 @@ Function tubiMetadataTranslate_getGridItemType(container, orientation, constants
   gridItemTypes = constants.ui.gridItemTypes
   gridItemType = gridItemTypes.portrait
 
-  isUserInVideoTilesExperiment = m.isVideoTileEnabledScreen(screenId, uiMode)
+  isUserInVideoTilesExperiment = m.isVideoTileEnabledScreen(screenId)
 
   if isAA(container.ui_customization) = true AND container.ui_customization.type = "live_event_spotlight"
     gridItemType = gridItemTypes.liveEventSpotlight
@@ -3540,25 +3556,25 @@ Function tubiMetadataTranslate_buildUICustomizationTile(uiCustomization, contain
 End Function
 
 
-Function tubiMetadataTranslate_isVideoTileEnabledScreen(screenId = "", uiMode = "standard") as Boolean
+Function tubiMetadataTranslate_isVideoTileEnabledScreen(screenId = "") as Boolean
   if isNonEmptyString(screenId) = false
     return false
   end if
 
-  ' Always enable video tiles on homeScreen in standard mode (not kids mode)
-  if screenId = m.constants.ui.screenIds.homeScreen AND uiMode = "standard"
-    return true
-  end if
+  return m.constants.ui.videoTilesEligibleScreenIds.doesExist(screenId)
+End Function
 
-  if screenId = m.constants.ui.screenIds.pivotDetailScreen
-    return true
-  end if
 
+' Checks if the roku_remove_container_json_v1 experiment is enabled
+' When enabled, video tiles eligible screens use full TubiContentNode children
+' instead of abbreviated ContentNode + category.json for lazy resolution
+Function tubiMetadataTranslate_isRemoveContainerJsonEnabled() as Boolean
   if m.statSigExperiments <> invalid
-    experiment = m.statSigExperiments.getExperimentResource("", "roku_video_tiles_1_9_1")
-    return experiment <> invalid AND isAA(experiment.enabled_screens) = true AND experiment.enabled_screens.doesExist(screenId)
+    experiment = m.statSigExperiments.getExperimentResource("", "roku_remove_container_json_v1")
+    if experiment <> invalid AND experiment.enabled = true
+      return true
+    end if
   end if
-
   return false
 End Function
 

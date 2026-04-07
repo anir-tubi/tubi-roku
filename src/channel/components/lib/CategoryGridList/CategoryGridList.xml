@@ -167,8 +167,8 @@
 
     <field id="focusedPosition" type="array" />
 
-    <!-- in the case that focus is not being set on the RowList, inform that content is loaded
-          and infoPanel should be updated. Typically happens on kids mode toggle.
+    <!-- in the case that focus is not being set on the RowList, inform that content is loaded.
+          Typically happens on kids mode toggle.
      -->
     <field id="reloadedItemToBeFocused" type="node" />
 
@@ -194,7 +194,6 @@
     <field id="listHasFocus" type="boolean" value="false" />
     <field id="currentFocusedItemBoundingRect" type="assocArray" value="{}" />
     <field id="inTransitCurrentFocusedItemBoundingRect" type="assocArray" value="{}" />
-    <field id="hideInfoPanel" type="boolean" alwaysNotify="true" />
 
     <field id="rowIndexBoost" type="integer" value="0" />
     <field id="rowListTranslation" alias="RowList.translation" alwaysNotify="true" />

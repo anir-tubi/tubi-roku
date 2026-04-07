@@ -568,6 +568,9 @@ Function getTubiContentNodeFromRowItem(rowItemIndex, metadataTranslate = invalid
   if isNonResolvableGridItem = true then return content
 
   if content <> invalid AND isNonEmptyString(content.id) AND metadataTranslate <> invalid
+    if metadataTranslate.isRemoveContainerJsonEnabled()
+      return content
+    end if
     category = m.top.content.getChild(rowItemIndex[0])
     if category <> invalid
       contentId = content.id

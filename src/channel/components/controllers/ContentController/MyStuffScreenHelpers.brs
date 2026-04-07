@@ -130,7 +130,6 @@ Function onMyStuffBatchResponse(response)
       screen.content = response
       screen.contentUpdated = true
 
-      getStatsigExperimentResource("", "roku_video_tiles_1_9_1", true)
       getStatsigExperimentResource("", "roku_mystuff_pagination_v1", true)
     else
       modalInfo = {

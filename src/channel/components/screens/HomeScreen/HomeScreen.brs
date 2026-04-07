@@ -21,8 +21,6 @@ Function init()
   m.ContentArea = topRef.findNode("ContentArea")
   m.ContentArea.maskUri = m.maskUri
   m.adContentGroup = topRef.findNode("adContentGroup")
-  m.InfoPanel = topRef.findNode("InfoPanel")
-  m.InfoPanelParent = topRef.findNode("InfoPanelParent")
   m.backButtonHint = topRef.findNode("backButtonHint")
   m.pivotContentArea = topRef.findNode("pivotContentArea")
   m.sideNavOffset = 338
@@ -41,7 +39,6 @@ Function init()
   topRef.observeFieldScoped("isLoading", "onLoadingChange")
   topRef.observeFieldScoped("resetContentAreaValues", "onResetContentAreaValues")
   topRef.observeFieldScoped("id", "onIDChange")
-  topRef.observeFieldScoped("fullscreenCountdown", "onFullscreenCountdown")
   topRef.observeFieldScoped("transportVoiceRequest", "onTransportVoiceRequest")
   topRef.observeFieldScoped("personalizationId", "onPersonalizationIdChanged")
   topRef.observeFieldScoped("contentUpdated", "onContentUpdated")
@@ -73,7 +70,6 @@ Function init()
   m.CategoryGridList.observeFieldScoped("gridContentIsReady", "onGridContentIsReadyChange")
   m.CategoryGridList.observeFieldScoped("listHasFocus", "onListHasFocusChange")
   m.CategoryGridList.observeFieldScoped("rowFocusedItem", "onRowFocusedItemChange")
-  m.CategoryGridList.observeFieldScoped("hideInfoPanel", "onHideInfoPanelChange")
   m.CategoryGridList.observeFieldScoped("rowListTranslation", "updateRowListTranslation")
   m.CategoryGridList.observeFieldScoped("listCurrFocusRow", "onListCurrFocusRowChange")
   m.ContentAreaParent.observeFieldScoped("translation", "updateRowListTranslation")
@@ -281,7 +277,6 @@ Function onContentUpdated()
     '//the presence or absence of a 1st-Row will dictate the starting point of the peek row mask
     if m.top.kidsMode = false AND (m.top.skinAdContent <> invalid AND m.top.skinAdContent.getChildCount() > 0) AND (m.top.lastFocusedList = "skinAdRow" OR m.top.lastFocusedList = "")
       moveContentAreaMask(-1)
-      fadeOutInfoPanel()
     else
       moveContentAreaMask(0)
     end if
@@ -568,8 +563,6 @@ Function onLoadingChange()
     m.adFocusTimer.control = "stop"
     m.top.contentFocused = invalid
     m.top.contentReady = false
-    emptyContentNode = CreateObject("roSGNode", "TubiContentNode")
-    populateInfoPanel(m.constants.ui.infoPanelModes.item, emptyContentNode) 'empties the info panel
     m.CategoryGridList.content = invalid ' should be all categories with initial amounts of content in them
     m.CategoryGridList.skinAdContent = invalid
     deleteAdDisplayCarouselComponent()
@@ -966,13 +959,8 @@ Function contractContentAreaToOriginal(rowPercent)
       nDiffContentAreaTranslation_y = m.currentContentAreaTranslation[1] - m.ContentAreaParent.translation[1]
 
       m.ContentAreaParent.translation = [m.currentContentAreaTranslation[0], m.ContentAreaParent.translation[1] + nDiffContentAreaTranslation_y * rowPercent]
-      if m.InfoPanel.opacity < 1 AND m.InfoPanel.opacity < rowPercent
-        m.InfoPanel.opacity = rowPercent
-      end if
     else
-      '//once the rowPercent has reached a certain percent, then immediately set everything back to original numbers to ensure it happens
       m.ContentAreaParent.translation = m.currentContentAreaTranslation
-      m.InfoPanel.opacity = 1
     end if
 
   end if
@@ -980,44 +968,13 @@ End Function
 
 
 ' Expands content area for sponsorship row display
-' Adjusts row list position and info panel opacity
 ' @param rowPercent - Percentage of sponsorship row focus progress (0-1)
 Function expandContentAreaForSponsorship(rowPercent)
   m.ContentAreaParent.translation = [m.ContentAreaParent.translation[0], m.currentContentAreaTranslation[1] - (m.sponsorSlideAmt * rowPercent)]
-
-  if m.InfoPanel.opacity < 0
-    '//gradually display the info panel as the sponsorship row comes into view
-    if rowPercent < 0.95
-      m.InfoPanel.opacity = rowPercent
-    else
-      m.InfoPanel.opacity = 1
-    end if
-  end if
-End Function
-
-
-' Expands content area for containers without info panel
-' Hides info panel and brings content to top of screen
-' @param rowPercent - Percentage of container focus progress (0-1)
-Function expandContentAreaForContainersWithoutInfoPanel(rowPercent)
-  nDiffHeight = m.originalContentAreaTranslation[1] - 102 '//bring this to the top of the screen
-  if m.currentContentAreaTranslation[1] = m.videoTilesListTranslation[1]
-    nDiffHeight = m.currentContentAreaTranslation[1] + 302 '//bring this to the top of the screen if the home redesign is enabled
-  end if
-  m.ContentAreaParent.translation = [m.ContentAreaParent.translation[0], m.currentContentAreaTranslation[1] - (nDiffHeight * rowPercent)]
-
-  '//gradually hide the info panel as the adRowlistSpotlight comes into view
-  stopAnimation(m.infoPanelFade)
-  if rowPercent < 0.95
-    m.InfoPanelParent.opacity = 1 - rowPercent
-  else
-    m.InfoPanelParent.opacity = 0
-  end if
 End Function
 
 
 ' Expands content area for ad display carousel
-' Hides info panel and brings content to top of screen
 ' @param rowPercent - Percentage of carousel focus progress (0-1)
 Function expandContentAreaForAdDisplayCarousel(rowPercent)
   nDiffHeight = m.originalContentAreaTranslation[1] - 102 '//bring this to the top of the screen
@@ -1025,45 +982,10 @@ Function expandContentAreaForAdDisplayCarousel(rowPercent)
     nDiffHeight = m.currentContentAreaTranslation[1] + 302 '//bring this to the top of the screen if the home redesign is enabled
   end if
   m.ContentAreaParent.translation = [m.ContentAreaParent.translation[0], m.currentContentAreaTranslation[1] - (nDiffHeight * rowPercent)]
-  '//gradually hide the info panel as the adRowlistCarousel comes into view
-  stopAnimation(m.infoPanelFade)
-  if rowPercent < 0.95
-    m.InfoPanelParent.opacity = 1 - rowPercent
-  else
-    m.InfoPanelParent.opacity = 0
-  end if
-End Function
-
-
-' Populates info panel based on focused content type
-' @param focusedContent - Content node to display in info panel
-Function populateInfoPanelByContent(focusedContent)
-  if focusedContent <> invalid
-    sType = focusedContent.type
-
-    if focusedContent.scheduleData <> invalid
-      populateInfoPanel(m.constants.ui.infoPanelModes.item, focusedContent)
-    else if sType = m.constants.ui.contentTypes.linear
-      populateInfoPanel(m.constants.ui.infoPanelModes.linearProgramHomescreen, focusedContent)
-    else if sType = m.constants.ui.contentTypes.historySignedOutUser
-      populateInfoPanel(m.constants.ui.infoPanelModes.continueWatching, focusedContent)
-    else if sType = m.constants.ui.contentTypes.sportsEvent
-      populateInfoPanel(m.constants.ui.infoPanelModes.sportsEvent, focusedContent)
-    else
-      populateInfoPanel(m.constants.ui.infoPanelModes.item, focusedContent)
-    end if
-  end if
-
-  ' If focus is on an empty category, leave the background as is.  This helps avoid
-  ' background jank and keeps CPU usage down while categories are being fetched.
-  if focusedContent <> invalid
-    m.top.backgroundUriList = determineBackgroundImage(focusedContent)
-  end if
 End Function
 
 
 ' Handles list focus state changes
-' Fades out info panel and updates content area state
 ' @param _msg - Message containing new focus state
 Function onListHasFocusChange(_msg)
   setContentAreaState()
@@ -1106,11 +1028,6 @@ Function onRowFocusedItemChange(msg) as Void
     m.top.backgroundUriList = determineBackgroundImage(focusedContent)
   else if focusedContent.type = m.constants.ui.contentTypes.adRowlistCarousel
     displayAdDisplayCarousel()
-  else
-    if gridItemType <> m.constants.ui.gridItemTypes.videoTile AND m.top.enableVideoTiles <> true
-      populateInfoPanelByContent(focusedContent)
-      fadeInContentArea()
-    end if
   end if
 
   fireNavigateWithinPageEvent()
@@ -1311,7 +1228,7 @@ End Function
 
 
 ' Handles item to be focused change when content loads without gaining focus
-' Updates info panel and background for reloaded content
+' Updates background for reloaded content
 Function onItemToBeFocusedChange()
   tubiLog("HomeScreen.onItemToBeFocusedChange")
   if m.top.contentReady = false
@@ -1319,79 +1236,12 @@ Function onItemToBeFocusedChange()
   end if
 
   reloadedItemToBeFocused = m.CategoryGridList.reloadedItemToBeFocused
-  'We are updating the infopanel for updated focused content, but not updating the contentFocused.
-  'Here we are updating the contentFocused, so it will play correct video preview when the content is updated.
   m.top.contentFocused = reloadedItemToBeFocused
   m.top.contentFocusedUpdated = true
 
-  if reloadedItemToBeFocused <> invalid AND reloadedItemToBeFocused.gridItemType <> m.constants.ui.gridItemTypes.skinAd AND reloadedItemToBeFocused.gridItemType <> m.constants.ui.gridItemTypes.adRowlistSpotlight
-    ' Covers use cases where info panel was hidden but due to home screen container changes purple carpet is removed and info panel was reset.
-    fadeInContentArea()
-    populateInfoPanelByContent(reloadedItemToBeFocused)
-  else
-    ' Making sure the background is also updated
+  if reloadedItemToBeFocused <> invalid
     m.top.backgroundUriList = determineBackgroundImage(reloadedItemToBeFocused)
   end if
-End Function
-
-
-' Populates info panel with content based on mode
-' @param mode - Info panel mode (item, linearProgramHomescreen, continueWatching, sportsEvent)
-' @param contentNode - Content node to display
-Function populateInfoPanel(mode, contentNode)
-
-  if contentNode <> invalid
-    sType = contentNode.type
-    if sType <> m.constants.ui.contentTypes.adRowlistCarousel AND sType <> m.constants.ui.contentTypes.adRowlistSpotlight
-      ' The below is to ensure that there is slight delay in showing the info panel so that there is no overlap with any row that is gaining focus.
-      if m.InfoPanel.visible = false
-        slideFadeGeneral(m.InfoPanelParent, [0, 0], "in", 0.2)
-      end if
-
-      if mode = m.constants.ui.infoPanelModes.item
-        if contentNode.scheduleData <> invalid
-          populateInfoPanelForLiveEvent(contentNode, m.InfoPanel)
-        else
-          populateInfoPanelWithHomescreenStyleItemMode(contentNode, m.InfoPanel, true)
-        end if
-      else if mode = m.constants.ui.infoPanelModes.linearProgramHomescreen
-        populateInfoPanelWithLinearProgramHomescreenMode(contentNode, m.InfoPanel) 'V4 api
-      else if mode = m.constants.ui.infoPanelModes.continueWatching
-        m.InfoPanel.mode = mode
-        m.InfoPanel.title = contentNode.title
-        m.InfoPanel.description = contentNode.description
-
-        ' Always set needsLogin = false for linear content in infoPanel, regular content follows normal logic
-        if contentNode.type = m.constants.ui.contentTypes.linear
-          m.InfoPanel.needsLogin = false
-        else if contentNode.needsLogin = true AND m.top.signedIn <> true
-          m.InfoPanel.loginReason = contentNode.loginReason 'set login reason before needsLogin
-          m.InfoPanel.needsLogin = true
-        else
-          m.InfoPanel.needsLogin = false
-        end if
-
-        m.InfoPanel.reminderIsSet = false
-
-      else if mode = m.constants.ui.infoPanelModes.sportsEvent
-        populateInfoPanelWithHomescreenStyleSportsMode(contentNode, m.InfoPanel)
-      end if
-
-      m.InfoPanel.calculateHeight = true
-    else
-      m.infoPanelFade = slideFadeGeneral(m.InfoPanelParent, [0, -50], "out", 0.2)
-    end if
-
-  else
-    m.infoPanelFade = slideFadeGeneral(m.InfoPanelParent, [0, -50], "out", 0.2)
-    setContentAreaState()
-  end if
-End Function
-
-
-' Handles fullscreen countdown changes
-Function onFullscreenCountdown()
-  m.InfoPanel.fullscreenCountdown = m.top.fullscreenCountdown
 End Function
 
 
@@ -1415,22 +1265,18 @@ Function onAdFocusTimer()
 End Function
 
 
-' Sets focus on category grid and manages carousel/info panel visibility
+' Sets focus on category grid and manages carousel visibility
 Function setFocusOnCategoryGrid()
   tubiLog("Homescreen.setFocusOnCategoryGrid" + m.top.id)
   focusedContent = m.CategoryGridList.rowFocusedItem
   shouldPlaceFocusOnCategoryGridList = true
   if focusedContent <> invalid AND (focusedContent.gridItemType = m.constants.ui.gridItemTypes.skinAd OR focusedContent.gridItemType = m.constants.ui.gridItemTypes.adRowlistSpotlight OR focusedContent.gridItemType = m.constants.ui.gridItemTypes.adRowlistCarousel)
-    fadeOutInfoPanel()
-
     if focusedContent.gridItemType = m.constants.ui.gridItemTypes.adRowlistCarousel AND isAdDisplayCarouselAvailable() = true
       shouldPlaceFocusOnCategoryGridList = false
       displayAdDisplayCarousel()
     else
       m.top.backgroundUriList = determineBackgroundImage(focusedContent)
     end if
-  else
-    fadeInContentArea()
   end if
 
   if shouldPlaceFocusOnCategoryGridList = true
@@ -1478,27 +1324,6 @@ Function onCarouselFadeOutComplete()
     '//because onCarouselFadeOutComplete is sometimes called on a delay, we need to check if the component is still out of focus before resetting the mask
     m.ContentArea.maskUri = m.maskUri
   end if
-End Function
-
-
-' Fades in content area and info panel
-Function fadeInContentArea()
-  stopAnimation(m.gridFade)
-  if m.CategoryGridList.opacity < 1
-    m.gridFade = fade(m.CategoryGridList, "in", .4, 0.0, 1)
-  end if
-
-  stopAnimation(m.infoPanelFade)
-  if m.InfoPanelParent.opacity < 1
-    m.infoPanelFade = slideFadeGeneral(m.InfoPanelParent, [0, 0], "in", 0.2)
-  end if
-End Function
-
-
-' Fades out info panel
-Function fadeOutInfoPanel()
-  stopAnimation(m.infoPanelFade)
-  m.infoPanelFade = fade(m.InfoPanelParent, "out", .4)
 End Function
 
 
@@ -1702,19 +1527,6 @@ Function onGridContentIsReadyChange(msg)
   if msg.getData() = true AND m.top.contentReady = false
     m.top.contentReady = true
     setContentAreaState()
-  end if
-End Function
-
-
-' Handles hide info panel changes
-' Fades info panel in or out based on visibility state
-' @param msg - Message containing visibility state
-Function onHideInfoPanelChange(msg)
-  visible = msg.getData()
-  if visible = true
-    m.infoPanelFade = slideFadeGeneral(m.InfoPanelParent, [0, 0], "in", 0.2, 1)
-  else
-    m.infoPanelFade = slideFadeGeneral(m.InfoPanelParent, [0, -50], "out", 0.2)
   end if
 End Function
 

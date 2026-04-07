@@ -701,13 +701,6 @@ Function respondToHomeScreenSuccessResponse(screenID, rawResponse)
       sanitizeHomeScreenResponseAndReturnLiveEventsContainer(rawResponse)
       refreshLiveEventsContainerWithEpgListingInfo(rawResponse)
 
-      ' Log experiment exposure for all eligible screens where experiment controls behavior
-      ' Exclude homeScreen in standard mode (always enabled, not experiment-controlled)
-      ' This ensures both treatment and control groups are logged for accurate A/B testing
-      if isNode(rawResponse) = true AND rawResponse.getChildCount() > 0 AND (screenID <> m.constants.ui.screenIds.homeScreen OR isKidsUIOn() = true)
-        getStatsigExperimentResource("", "roku_video_tiles_1_9_1", true)
-      end if
-
       if enableVideoTiles
         if isNode(rawResponse) = true AND rawResponse.getChildCount() > 0
           ' Only show the video tile overlay group if the screen is eligible for video tiles and skin ads are not available.
@@ -1025,32 +1018,35 @@ Function appendContentToCategory(response, contentNode)
   category = m.NodeHelpers.getChildById(contentNode, response.id)
   items = response.getChildren(-1, 0)
   if isNonEmptyArray(items) = true AND category <> invalid
-    fullJson = ParseJson(category.json)
-    newJson = ParseJson(response.json)
-    if fullJson <> invalid AND newJson <> invalid
-      childUICustomization = {}
-      if isAA(category.child_ui_customization) = true
-        childUICustomization = category.child_ui_customization
-        if isAA(response.child_ui_customization) = true
-          childUICustomization.append(response.child_ui_customization)
-        end if
+    if isNonEmptyString(category.json) AND isNonEmptyString(response.json)
+      fullJson = ParseJson(category.json)
+      newJson = ParseJson(response.json)
+      if fullJson <> invalid AND newJson <> invalid
+        fullJson.append(newJson)
+        category.json = FormatJson(fullJson)
       end if
+    end if
 
-      fullJson.append(newJson)
-      screen = getCurrentScreen()
-      screen.containerAppendMoreTilesStatus = "start"
-
-      category.paginationInfo = response.paginationInfo
-      category.child_ui_customization = childUICustomization
-      category.childrenContentIDs = response.childrenContentIDs
-      category.totalDuplicates = response.totalDuplicates
-      category.json = FormatJson(fullJson)
-      category.state = response.state
-      category.appendChildren(items)
-      screen.containerAppendMoreTilesStatus = "complete"
-      if m.videoPreviewDebounce.control = "stop"
-        m.videoPreviewDebounce.control = "start"
+    childUICustomization = {}
+    if isAA(category.child_ui_customization) = true
+      childUICustomization = category.child_ui_customization
+      if isAA(response.child_ui_customization) = true
+        childUICustomization.append(response.child_ui_customization)
       end if
+    end if
+
+    screen = getCurrentScreen()
+    screen.containerAppendMoreTilesStatus = "start"
+
+    category.paginationInfo = response.paginationInfo
+    category.child_ui_customization = childUICustomization
+    category.childrenContentIDs = response.childrenContentIDs
+    category.totalDuplicates = response.totalDuplicates
+    category.state = response.state
+    category.appendChildren(items)
+    screen.containerAppendMoreTilesStatus = "complete"
+    if m.videoPreviewDebounce.control = "stop"
+      m.videoPreviewDebounce.control = "start"
     end if
   end if
 End Function

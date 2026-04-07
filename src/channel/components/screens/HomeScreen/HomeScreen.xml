@@ -6,7 +6,6 @@
   <script type="text/brightscript" uri="../../lib/AnimationMixin.brs" />
   <script type="text/brightscript" uri="../../lib/UserMixin.brs" />
   <script type="text/brightscript" uri="../../lib/ContentMixin.brs" />
-  <script type="text/brightscript" uri="../../lib/InfoPanelMixin.brs" />
   <script type="text/brightscript" uri="../../lib/EPGMixin.brs" />
   <script type="text/brightscript" uri="../../../source/lib/TubiMetadataTranslate.brs" />
   <script type="text/brightscript" uri="../../../source/lib/ApiUtils.brs" />
@@ -315,16 +314,6 @@
           itemSize="[1920, 60]"
           id="pivotList" />
       </MaskGroup>
-      <Group
-        id="InfoPanelParent">
-        <InfoPanel
-          id="InfoPanel"
-          maxHeight="387"
-          width="960"
-          translation="[0,102]"
-          maxTitleLines="2" />
-      </Group>
-
       <Group
         id="ContentAreaParent">
         <MaskGroup

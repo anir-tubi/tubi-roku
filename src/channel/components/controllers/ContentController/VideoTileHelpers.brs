@@ -621,22 +621,10 @@ End Function
 ' Determines if video tiles should be enabled for the current screen
 ' @return Boolean - true if video tiles should be enabled, false otherwise
 Function isVideoTileEnabledScreen(screenId = "" as String) as Boolean
-  ' If no screenId provided, get from current screen
   if screenId = ""
     currentScreen = getCurrentScreen()
     if currentScreen = invalid then return false
     screenId = currentScreen.id
-  end if
-
-  isInKidsMode = isKidsUIOn()
-
-  ' Always enable video tiles on homeScreen in standard mode (not kids mode)
-  if screenId = m.constants.ui.screenIds.homeScreen AND isInKidsMode = false
-    return true
-  end if
-
-  if screenId = m.constants.ui.screenIds.pivotDetailScreen
-    return true
   end if
 
   return m.constants.ui.videoTilesEligibleScreenIds.doesExist(screenId)

@@ -213,20 +213,12 @@ Function addControllerUi()
   m.autoStartPreviewToPlaybackTimer.opacity = 0.0
   m.contentGroup.appendChild(m.autoStartPreviewToPlaybackTimer)
 
-  ' Video tiles experiment related node.
-  ' Holds the poster for the video tile that is in transit.That is in case of user scrolling down next container poster vs previous container poster when scrolling up.
+  ' Video tiles overlay nodes
   m.inTransitInlineVideoMetadataOverlay = m.top.findNode("inTransitInlineVideoMetadataOverlay")
   m.videoTileOverlayGroup = m.top.findNode("videoTileOverlayGroup")
-  experiment = getStatsigExperimentResource("", "roku_video_tiles_1_9_1", false)
   videoTilesListTranslation = m.constants.ui.videoTilesListTranslation
-  ' Using clipping rect to ensure that when scrolling up the video tile gets clipped along with the rest of the row list tiles
   m.videoTileOverlayGroup.clippingRect = [videoTilesListTranslation[0], videoTilesListTranslation[1], 1920, 1080]
   m.videoTileOverlayGroup.translation = [videoTilesListTranslation[0], -6]
-
-  ' Not ideal but this is simpler and being it is for experiment purpose and we will remove using this approach to override constants when experiment is removed.
-  if experiment <> invalid AND isAA(experiment.enabled_screens) = true
-    m.constants.ui.videoTilesEligibleScreenIds = experiment.enabled_screens
-  end if
 
   m.queuedVideoTilePreview = false
 
@@ -488,6 +480,7 @@ Function addControllerUi()
   getUserInfo(onStartupAuthInfoReceived)
 
   getStatsigExperimentResource("", "roku_no_layer_experiment", true)
+  getStatsigExperimentResource("", "roku_remove_container_json_v1", true)
 
   ' Holds the screen stack group node
   m.global.screenStackGroup = m.top.findNode("screenStackGroup")

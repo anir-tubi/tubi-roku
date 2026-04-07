@@ -102,14 +102,6 @@ Function StatsigExperimentsInterface(statsigExperimentsInfo) as Object
         }
       }
 
-      ' Video tiles experiment: Controls which screens show video previews in tiles
-      ' enabled_screens: AA mapping screen IDs to boolean (true = enabled for that screen)
-      ' Possible screen ID values: movieScreen, tvScreen, espanolScreen, myStuffScreen
-      ' Note: homeScreen is always enabled in standard mode (not controlled by experiment)
-      roku_video_tiles_1_9_1: {
-        default: { enabled_screens: {} }
-      }
-
       reusable_video_node: {
         reusable_video_node_v1: {
           default: { enabled: false }
@@ -198,6 +190,13 @@ Function StatsigExperimentsInterface(statsigExperimentsInfo) as Object
         casting_playback_preroll_skip_v1: {
           default: { "enabled": false }
         }
+      }
+
+      ' Remove container-level JSON blob experiment
+      ' When enabled, video tiles eligible screens use full TubiContentNode children
+      ' instead of abbreviated ContentNode + category.json for lazy resolution
+      roku_remove_container_json_v1: {
+        default: { "enabled": false }
       }
     }
     statsigExperimentsInfo: statsigExperimentsInfo

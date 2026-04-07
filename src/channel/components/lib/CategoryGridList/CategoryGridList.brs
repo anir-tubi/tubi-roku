@@ -480,13 +480,11 @@ Function setRowHeights()
         m.rowList.focusXOffset = [m.expandedTileFocusXOffset, 0]
       end if
       m.rowList.rowItemFocused = [0, 0]
-      if m.top.enableVideoTiles = true
-        m.top.lastFocusedList = "rowList"
-      end if
+      m.top.lastFocusedList = "rowList"
     end if
   end if
 
-  m.rowList.drawFocusFeedback = (m.top.enableVideoTiles = false)
+  m.rowList.drawFocusFeedback = false
 End Function
 
 
@@ -497,6 +495,10 @@ End Function
 Function resolveAbbreviatedContent(content, rowItemIndex)
   itemContent = m.nodeHelpers.getNodeFromPosition(content, rowItemIndex)
   if itemContent = invalid then return invalid
+
+  if m.metadataTranslate.isRemoveContainerJsonEnabled()
+    return itemContent
+  end if
 
   contentType = itemContent.type
   gridItemType = itemContent.gridItemType
@@ -1160,7 +1162,6 @@ Function translateListAndSetFocus()
   ' on the same row. The second call would have oldRow == row (same id), making
   ' isRowAdContainerContainer = false.
   m.rowList.setFocus(true)
-  m.top.hideInfoPanel = false
 End Function
 
 
