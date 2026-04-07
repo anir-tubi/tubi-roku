@@ -869,7 +869,7 @@ function extractPrIdFromCommitInfo(commitInfo) {
 }
 
 
-async function addMissingImagesToRemoteLibrary(done) {
+async function addMissingImagesToRemoteLibrary(done, autoCommitAndPush = false) {
   execShellCommand(done, 'git fetch --tags', 'Failed to fetch tags');
 
   // First we need to find our last submission release
@@ -939,8 +939,8 @@ async function addMissingImagesToRemoteLibrary(done) {
     log(`The following images were found that are not included in ${newImagesSinceFilePath} already:\n${formattedNewImageContents}`);
 
     let addToFile = true;
-    if (process.env.CI) {
-      log('CI detected — auto-adding missing images');
+    if (process.env.CI || autoCommitAndPush) {
+      log('Auto-adding missing images (non-interactive mode)');
     } else {
       const response = await prompts({
         type: 'confirm',
@@ -952,6 +952,23 @@ async function addMissingImagesToRemoteLibrary(done) {
     if (addToFile) {
       newImagesSinceFileContents += '\n' + formattedNewImageContents;
       fs.writeFileSync(newImagesSinceFilePath, newImagesSinceFileContents);
+
+      if (autoCommitAndPush) {
+        const currentBranch = getCurrentBranch(done);
+        const commands = [
+          { cmd: `git add ${newImagesSinceFilePath}`, err: `Failed to stage ${newImagesSinceFilePath}` },
+          { cmd: `git commit -m "chore: add missing images to remote library"`, err: 'Failed to commit missing images' },
+          { cmd: `git push origin ${currentBranch}`, err: `Failed to push missing images to origin/${currentBranch}` }
+        ];
+        for (const { cmd, err } of commands) {
+          log(`Performing: ${cmd}`);
+          const result = shell.exec(cmd);
+          if (result.code !== 0) {
+            done(new NoStackError(result.stderr || err));
+            return;
+          }
+        }
+      }
     }
   } else {
     log(`No images were found that are not already included in ${newImagesSinceFilePath}`);
@@ -959,6 +976,10 @@ async function addMissingImagesToRemoteLibrary(done) {
   done();
 }
 
+
+async function addMissingImagesAndPush(done) {
+  return addMissingImagesToRemoteLibrary(done, true);
+}
 
 
 // increase the build/patch numbers in config/build.yml
@@ -1581,6 +1602,7 @@ module.exports = {
   findCommitsNotOnProductionBranch,
   findCommitsNotOnCurrentBranch,
   addMissingImagesToRemoteLibrary,
+  addMissingImagesAndPush,
   pushBranch,
   buildReleaseNotes,
   buildQaChanges,

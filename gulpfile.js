@@ -32,7 +32,7 @@ const { replaceTypographyConstants, updateTypographyJSON } = require('./js/typog
 const { NoStackError } = require('./js/utilities');
 
 // Importing functions with Git functionality
-const { makeReleasePrs, pushTag, createGithubRelease, findCommitsNotOnProductionBranch, addMissingImagesToRemoteLibrary, findCommitsNotOnCurrentBranch, pushBranch, buildReleaseNotes, buildQaChanges, buildQaBranch, bumpBuild, bumpBuildTen, bumpRevision, tagBuild, createCdnPullRequestForOneTrustSDK, createCdnPullRequestForFoxVideoPlayer, getCurrentBranch, isBranchTrackingPresent, createTranslationsPullRequestIfChanges, cherryPickTranslationsToQaBranch } = require('./js/git');
+const { makeReleasePrs, pushTag, createGithubRelease, findCommitsNotOnProductionBranch, addMissingImagesToRemoteLibrary, addMissingImagesAndPush, findCommitsNotOnCurrentBranch, pushBranch, buildReleaseNotes, buildQaChanges, buildQaBranch, bumpBuild, bumpBuildTen, bumpRevision, tagBuild, createCdnPullRequestForOneTrustSDK, createCdnPullRequestForFoxVideoPlayer, getCurrentBranch, isBranchTrackingPresent, createTranslationsPullRequestIfChanges, cherryPickTranslationsToQaBranch } = require('./js/git');
 
 // importing functions related to client error config
 const { updateLocalClientErrorConfigFile, verifyLocalClientErrorConfigIsCurrent } = require('./js/local-client-error-config');
@@ -1111,10 +1111,17 @@ function validateBuildEnvironment(done) {
 
   if (behindCount > 0) {
     done(new NoStackError(`\x1b[31m ${currentBranch} is behind ${releaseBranch}. Possible reasons hot fix. Please merge changes from ${releaseBranch} to ${currentBranch}. \x1b[0m`));
+    return;
   }
 
   if (!isBranchTrackingPresent(done, currentBranch)) {
-    done(new NoStackError(`\x1b[31m ${currentBranch} does not have a remote tracking branch. \x1b[0m`));
+    log(`\x1b[33m ${currentBranch} does not have a remote tracking branch. Pushing and setting up tracking automatically... \x1b[0m`);
+    const pushResult = shell.exec(`git push -u origin ${currentBranch}`, { silent: true });
+    if (pushResult.code !== 0) {
+      done(new NoStackError(`\x1b[31m Failed to push ${currentBranch} to origin: ${pushResult.stderr} \x1b[0m`));
+      return;
+    }
+    log(`\x1b[32m Remote tracking branch set up for ${currentBranch}. \x1b[0m`);
   }
 
   const buildTag = getBuildTag('revision');
@@ -1143,7 +1150,7 @@ exports.bumpQa = exports.bumpQA; //Create bumpQA command alias
 exports.install = series(exports.build, conditionalPackage, sideLoad);
 exports.test = series(setTest, clean, preprocessTests, buildInstalled, sideLoad);
 exports.buildQaBranch = buildQaBranch;
-exports.stage = series(validateBuildEnvironment, verifyLocalClientErrorConfigIsCurrent, uploadLatestTranslationsAndCreateTicketForMissingTranslations, setStaging, bumpRevision, exports.build, packageAll, pushStaging, pushBranch);
+exports.stage = series(validateBuildEnvironment, verifyLocalClientErrorConfigIsCurrent, uploadLatestTranslationsAndCreateTicketForMissingTranslations, setStaging, bumpRevision, addMissingImagesAndPush, exports.build, packageAll, pushStaging, pushBranch);
 exports.releaseOnGithub = series(tagBuild, pushTag, createGithubRelease);
 exports.release = series(validateBuildEnvironment, confirmRelease, verifyLocalClientErrorConfigIsCurrent, setProduction, bumpBuild, exports.build, packageAll, makeReleasePrs, exports.releaseOnGithub);
 exports.compareProd = findCommitsNotOnProductionBranch;

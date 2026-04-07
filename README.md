@@ -441,10 +441,9 @@ __NOTE__ The compareProd command will list commits in order from oldest to newes
 
 Ensure the cherry pick commit names include the name of PR number. This usually is done automatically but be aware that we need to have the PR numbers to make it easier later on so we know which PRs have been pushed and which ones have not.
 
-5\. Run the command `gulp addMissingImages` to update the `new_images_since/new_images_since_x_y` file with any new or updated images.
+5\. Deploy to staging
 
-
-6\. Deploy to staging
+> **Note:** `gulp addMissingImages` is no longer a separate manual step — it runs automatically as part of `gulp stage`.
 
 - Before deploying to staging, ensure you have the AWS CLI tool installed. If you have not done that yet, then do that now, [https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-install.html](https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-install.html)
 
@@ -455,10 +454,10 @@ Ensure the cherry pick commit names include the name of PR number. This usually 
 
   Note: This will also push the current qa branch to github.
 
-7\. Check with your fellow Roku developers to see if there are any experiments from this build that should be added to Popper Staging. If there are, then [deploy the experiments to popper staging.](#deploying-an-experiment-on-popper-staging)
+6\. Check with your fellow Roku developers to see if there are any experiments from this build that should be added to Popper Staging. If there are, then [deploy the experiments to popper staging.](#deploying-an-experiment-on-popper-staging)
 
 
-8\. Create a JIRA ticket with any changes that have been made and give the ticket to the QA team for manual testing.
+7\. Create a JIRA ticket with any changes that have been made and give the ticket to the QA team for manual testing.
   - Go to [JIRA](https://tubitv.atlassian.net/)
   - Create a QA ticket.
   - Run the command `gulp buildQaChanges`, which will build most of the copy for this ticket and place it in your clipboard
@@ -466,13 +465,13 @@ Ensure the cherry pick commit names include the name of PR number. This usually 
   - Make sure that no work is missing in the list and that the included info looks correct
   - Provide QA with a link to the ticket within the roku_qa slack channel
 
-9\. Any bugs found by QA should be fixed, committed to master, and then cherry picked into this QA build. Use the following command to update the staging channel with the latest version of the QA branch.
+8\. Any bugs found by QA should be fixed, committed to master, and then cherry picked into this QA build. Use the following command to update the staging channel with the latest version of the QA branch.
 
   `$ gulp stage`
 
   Note: The revision number will only display as part of the version number under the About Settings Screen when the mode is set to "qa".
 
-10\. After QA Sign Off, run `$ gulp release`. This will:
+9\. After QA Sign Off, run `$ gulp release`. This will:
 
   - increment the version number once more (the QA build should not be the same version number as the production build)
   - install a new build using the "production" config, to create the .pkgs needed to update the production build.
@@ -494,15 +493,15 @@ Ensure the cherry pick commit names include the name of PR number. This usually 
 
   __Note:__ As an edge case, if you need to manually perform the release steps for the new build, follow the [Manual Remote Release Steps](https://github.com/adRise/tubi-roku/docs/manual_release.md#remote-release)
 
-11\. Inform the team that the PRs are ready for review (you can paste the urls that were added to the clipboard when the last step completed, into the [`#roku-prs`](https://fox.enterprise.slack.com/archives/C099JR27AUU) slack channel. The PR URLs can also be found on the tubi-roku and rcdn repos respectively), and wait for approval.
+10\. Inform the team that the PRs are ready for review (you can paste the urls that were added to the clipboard when the last step completed, into the [`#roku-prs`](https://fox.enterprise.slack.com/archives/C099JR27AUU) slack channel. The PR URLs can also be found on the tubi-roku and rcdn repos respectively), and wait for approval.
 
-12\. Merge the new PR in the rcdn repo. Also merge the release_x_y_z PR into the x_y_branch branch in project_total_recall. Once merged, delete both of these branches.
+11\. Merge the new PR in the rcdn repo. Also merge the release_x_y_z PR into the x_y_branch branch in project_total_recall. Once merged, delete both of these branches.
 
-13\. Check if you need to run multifactor authentication for AWS. Typically this means running `$ valet`. You ran this in a previous step, but some time may has passed and you may have to run it again. Refer to the [valet repo](https://github.com/adRise/valet#installation) on how to install the valet command.
+12\. Check if you need to run multifactor authentication for AWS. Typically this means running `$ valet`. You ran this in a previous step, but some time may has passed and you may have to run it again. Refer to the [valet repo](https://github.com/adRise/valet#installation) on how to install the valet command.
 
 - __DO NOT PROCEED TO THE FOLLOWING INFRA SCRIPT STEP UNTIL THIS PR AND THE PREVIOUS PRs ARE APPROVED__
 
-14\. Use an infra script to move the updates from the CDN repo to the actual CDN servers.
+13\. Use an infra script to move the updates from the CDN repo to the actual CDN servers.
 
 - Ensure you have the latest files. Update your local version of the [adrise_infrastructure repo](https://github.com/adRise/adrise_infrastructure)
 - You may find during this step, that you may not have the correct version of python. If that is the case, then you will need to update your version on python based on your system requirements. If you are on Mac, you may simply have to run the following command within your adrise_infrastructure repo:
@@ -525,7 +524,7 @@ Ensure the cherry pick commit names include the name of PR number. This usually 
 
   Note: The URLs will require you to replace a part of the URL with version strings. For instance: "{{versionMinorUnderscored}}" = "3_2", "{{versionUnderscored}}" = "3_2_34_0".
 
-15\. Verify the release
+14\. Verify the release
 
 - Run a smoke test on production checking at minimum:
     - The production channel loads
@@ -534,7 +533,7 @@ Ensure the cherry pick commit names include the name of PR number. This usually 
 - Monitor various metrics for signs of any issues:
   - [Ad impressions per second](https://app.datadoghq.com/dashboard/ckr-vrw-xh4/ad-server-business-metrics?from_ts=1563412592034&to_ts=1564017392034&live=true&tile_size=m&fullscreen_widget=80673160&fullscreen_section=overview)
 
-16\. Create a release on Github (only if you did not create a release in the CLI as part of step 9). As part of the release script, a tag was automatically created and pushed to Github.
+15\. Create a release on Github (only if you did not create a release in the CLI as part of step 9). As part of the release script, a tag was automatically created and pushed to Github.
 
 - From the following link, find the tag that was just pushed to Github, and click on the link for that tag.
   - [github.com/adRise/tubi-roku/tags](https://github.com/adRise/tubi-roku/tags)
@@ -549,7 +548,7 @@ Ensure the cherry pick commit names include the name of PR number. This usually 
 
 - Select "Publish Release"
 
-17\. Currently, if starter component/remote component fails to load, app fallsback on to the submitted version of the app.  But if submitted version of the app coantians any critical issues or the legal issues or API-deprecated /discontinued related issues then we might not want to fallback on submitted version of the app.
+16\. Currently, if starter component/remote component fails to load, app fallsback on to the submitted version of the app.  But if submitted version of the app coantians any critical issues or the legal issues or API-deprecated /discontinued related issues then we might not want to fallback on submitted version of the app.
 
 - Please check the release notes to determine if any of the released items are critical fixes or the legal updates/fixes or API-deprecated /discontinued related updates to the submitted version of the app.  If you find any such items because of which we do not want the users to fallback on submitted version of the app then we need to add the submitted-app-version-number to `external config->fallback_blocked_versions[]`. (eg: "fallback_blocked_versions": ["2.21.0", "2.24.0"])
 
