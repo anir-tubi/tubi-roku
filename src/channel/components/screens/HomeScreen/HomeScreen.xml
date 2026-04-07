@@ -245,7 +245,7 @@
     <!-- Communicates to parent what was the last focused list was. -->
     <field id="lastFocusedList" alias="CategoryGridList.lastFocusedList" />
 
-    <!-- Resets focus from PivotList to CategoryGridList (roku_pivots_v1_2 experiment - remove if experiment is not positive) -->
+    <!-- Resets focus from PivotList to CategoryGridList (roku_pivots_v_1_3 experiment - remove if experiment is not positive) -->
     <field id="focusCategoryGridList" type="boolean" alwaysNotify="true" />
 
     <field id="rowListTranslation" type="array" alwaysNotify="true" />

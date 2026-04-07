@@ -22,7 +22,7 @@ import {
 
 /**
  * Pivots Analytics Test Suite
- * Tests analytics events for roku_pivots_v1_2 experiment
+ * Tests analytics events for roku_pivots_v_1_3 experiment
  *
  * Based on: [TV] Homegrid Pivots Exp 1.1 Analytics Event Instrumentation
  * Doc: js/automated-tests/docs/[TV] Pivots Analytics Event Instrumentation.md
@@ -67,7 +67,7 @@ async function startApplicationWithPivotExperiment(args: any = {}) {
   return await testUtils.startApplicationAtPage('home' as any, {
     ...args,
     experimentOverrides: {
-      roku_pivots_v1_2: {
+      roku_pivots_v_1_3: {
         default: { "enabled": true, "treatment_group": "hard-coded", "background_enabled": false, "remove_pivots": [] }
       }
     }

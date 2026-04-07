@@ -2356,7 +2356,7 @@ Function onCustomSuspend(msg)
     ' Handles the case where user navigated deeper (e.g. to a details screen) from the pivot
     pivotScreen = getScreenFromStackById(m.constants.ui.screenIds.pivotDetailScreen)
     if pivotScreen <> invalid
-      pivotExperiment = getStatsigExperimentResource("", "roku_pivots_v1_2", false)
+      pivotExperiment = getStatsigExperimentResource("", "roku_pivots_v_1_3", false)
       if pivotExperiment <> invalid AND pivotExperiment.background_enabled = false
         currentScreen = getCurrentScreen()
         while currentScreen <> invalid AND currentScreen.id <> m.constants.ui.screenIds.homeScreen
@@ -2502,7 +2502,7 @@ Function onCustomResume(msg)
 
     ' Reset focus from pivot list to CategoryGridList when background_enabled is false
     if currentScreen <> invalid AND currentScreen.id = m.constants.ui.screenIds.homeScreen AND currentScreen.lastFocusedList = "pivotList"
-      pivotExperiment = getStatsigExperimentResource("", "roku_pivots_v1_2", false)
+      pivotExperiment = getStatsigExperimentResource("", "roku_pivots_v_1_3", false)
       if pivotExperiment <> invalid AND pivotExperiment.background_enabled = false
         currentScreen.focusCategoryGridList = true
       end if

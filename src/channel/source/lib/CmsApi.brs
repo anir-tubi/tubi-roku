@@ -1131,7 +1131,7 @@ End Function
 
 
 ' Creates request info for fetching all pivots
-' Includes feature_flags[treatment_group] from roku_pivots_v1_2 experiment
+' Includes feature_flags[treatment_group] from roku_pivots_v_1_3 experiment
 ' @return Object containing url and options for the pivots API request
 Function cmsApi_createGetAllPivotsReqInfo()
   options = m.getCommonOptions(true)
@@ -1143,9 +1143,9 @@ Function cmsApi_createGetAllPivotsReqInfo()
     "video_resources": m.constants.player.drmOrderWithHlsWidevine
   })
 
-  ' Add treatment_group from roku_pivots_v1_2 experiment
+  ' Add treatment_group from roku_pivots_v_1_3 experiment
   if m.statSigExperiments <> invalid
-    experimentResource = m.statSigExperiments.getExperimentResource("", "roku_pivots_v1_2")
+    experimentResource = m.statSigExperiments.getExperimentResource("", "roku_pivots_v_1_3")
     if experimentResource <> invalid AND isNonEmptyString(experimentResource.treatment_group)
       params["feature_flags[treatment_group]"] = experimentResource.treatment_group
     end if

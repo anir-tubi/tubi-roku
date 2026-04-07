@@ -10,7 +10,7 @@ describe("Pivots Row Position and Sticky Behavior", function () {
     return await testUtils.startApplicationAtPage('home' as any, {
       ...args,
       experimentOverrides: {
-        roku_pivots_v1_2: {
+        roku_pivots_v_1_3: {
           default: { "enabled": true, "treatment_group": "hard-coded", "background_enabled": false, "remove_pivots": [] }
         }
       }
@@ -2512,7 +2512,7 @@ describe("Pivots Row Position and Sticky Behavior", function () {
       contentID: "342067",
     }, {
       experimentOverrides: {
-        roku_pivots_v1_2: {
+        roku_pivots_v_1_3: {
           default: { "enabled": true, "treatment_group": "hard-coded", "background_enabled": false, "remove_pivots": [] }
         }
       }
