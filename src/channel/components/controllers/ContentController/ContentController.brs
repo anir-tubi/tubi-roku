@@ -4201,24 +4201,15 @@ Function performProfileMigration()
 
     profileCount = getUserProfileCount(profiles)
 
-    if getStatsigExperimentResource("roku_multi_account", "roku_multi_account_v1", false).variant <> "none" AND isSignedUser = true
-
-      if authInfo.expireTime <> invalid AND profileCount = 0
-        ' get the user info from settings api and patch with what we have already stored in the registry
-        'use v2 parental rating from settings api since we are anyway going to migrate.
-        requestInfo = m.userDeviceApi.createUserSettingsGeneralTaskReqInfo(onStartMigrateDefaultUserToNewProfileSuccess, setNotMigratedDefaultState, true)
-        m.makeRequest(requestInfo)
-      else
-        setNotMigratedDefaultState()
-      end if
+    if profileCount = 0 AND isSignedUser = true AND authInfo.expireTime <> invalid
+      ' get the user info from settings api and patch with what we have already stored in the registry
+      'use v2 parental rating from settings api since we are anyway going to migrate.
+      requestInfo = m.userDeviceApi.createUserSettingsGeneralTaskReqInfo(onStartMigrateDefaultUserToNewProfileSuccess, setNotMigratedDefaultState, true)
+      m.makeRequest(requestInfo)
     else
       setNotMigratedDefaultState()
     end if
 
-    'send exposure event
-    if isSignedUser = true OR profileCount > 0
-      getStatsigExperimentResource("roku_multi_account", "roku_multi_account_v1", true)
-    end if
   end if
 End Function
 

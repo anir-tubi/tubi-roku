@@ -108,12 +108,6 @@ Function StatsigExperimentsInterface(statsigExperimentsInfo) as Object
         }
       }
 
-      roku_multi_account: {
-        roku_multi_account_v1: {
-          default: { "variant": "none" } ' "none", "adult_with_kids"
-        }
-      }
-
       roku_linear_epg_categories: {
         roku_linear_epg_categories_v1: {
           default: { "variant": "none" } ' "none", "categories", "categories_with_favorites"

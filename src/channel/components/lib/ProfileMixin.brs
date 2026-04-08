@@ -2,12 +2,6 @@
 'this function should be used in content controller context
 
 Function isUserInMultiAccount()
-  if m.Auth = invalid
-    m.Auth = TubiAuth(m.constants)
-  end if
-
-  profiles = m.Auth.getAllProfilesAuthInfo()
-
   if m.enableMultipleAccounts = invalid
     m.enableMultipleAccounts = getExternalConfigValueFromGlobal("enable_multiple_accounts", false)
   end if
@@ -17,18 +11,12 @@ Function isUserInMultiAccount()
     return false
   end if
 
-  profileCount = getUserProfileCount(profiles)
+  profileCount = getUserProfileCount()
 
-  isTreamentEnabled = (getStatsigExperimentResource("roku_multi_account", "roku_multi_account_v1", false).variant <> "none")
-
-  if isTreamentEnabled = true AND profileCount > 0 AND UCase(m.constants.deviceInfo.countryCode) = "US"
-    return true
-  end if
-
-
+  ' US users are in multi account feature by default.
   ' if user has already created a profile then we always show give them MAKA feature.
   ' one use case is if user in US registers multiple accounts and then travel to MX.
-  if profileCount > 1
+  if (profileCount > 0 AND UCase(m.constants.deviceInfo.countryCode) = "US") OR (profileCount > 1)
     return true
   end if
 
