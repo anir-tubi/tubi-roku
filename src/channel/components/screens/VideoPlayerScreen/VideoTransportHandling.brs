@@ -279,6 +279,11 @@ Function updatePlayerPosition(amt = 0)
     m.playerPosition = videoPosition
   end if
 
+  ' this is a hack to fix the player position being negative may be mal value retured by video node!
+  if m.playerPosition < 0
+    m.playerPosition = 0
+  end if
+
   ' update transport details only when it is shown
   if m.HUD.opacity > 0 OR amt <> 0
     updateTransport()
