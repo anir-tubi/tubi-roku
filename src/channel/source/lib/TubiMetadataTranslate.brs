@@ -31,6 +31,7 @@ Function TubiMetadataTranslate(constants, experiments = invalid, soTStaticConfig
 
     dedupeBackgrounds: tubiMetadataTranslate_dedupeBackgrounds
     setTotalCount: tubiMetadataTranslate_setTotalCount
+    setSponsorshipInfo: tubiMetadataTranslate_setSponsorshipInfo ' TODO(REMOVE-OLD-THEMATIC)
     getContentsJson: tubiMetadataTranslate_getContentsJson
     buildCategoryAA: tubiMetadataTranslate_buildCategoryAA
     buildCategoryAAWithInsert: tubiMetadataTranslate_buildCategoryAAWithInsert
@@ -1662,6 +1663,11 @@ Function tubiMetadataTranslate_buildCategoryParentInfo(container, sOrientation =
       updateMetadata.gridItemType = m.getGridItemType(container, sOrientation, m.constants, "", contentMode)
     end if
 
+    ' TODO(REMOVE-OLD-THEMATIC): Remove this block.
+    if m.constants.featureFlags.useHomescreenApiThematicTakeover = true
+      updateMetadata = m.setSponsorshipInfo(updateMetadata, container.sponsorship)
+    end if
+
     if container.thumbnail <> invalid
       updateMetadata.thumbnail = container.thumbnail
     end if
@@ -2246,6 +2252,34 @@ Function tubiMetadataTranslate_buildEmptyMyStuffCategoryAA(container)
   end if
 
   return updateMetadata
+End Function
+
+
+' TODO(REMOVE-OLD-THEMATIC): Remove this entire function and its hook registration above.
+' add sponsorship info, if it exists, to the metadata
+' @metadata: object, The metadata associative array or CategoryContentNode that needs to add the sponsorship info
+' @sponsorshipInfo: assocArray, The associative array that contains the raw data of the sponsor info
+Function tubiMetadataTranslate_setSponsorshipInfo(metadata, sponsorshipInfo)
+  if metadata <> invalid AND sponsorshipInfo <> invalid AND sponsorshipInfo.spon_exp <> invalid AND sponsorshipInfo.image_urls <> invalid then
+    images = sponsorshipInfo.image_urls
+    ' The info AA later becomes of type "TubiSponsorImagesNode" when the update() function is called on the parent contentNode
+    info = {}
+    info.subtype = "TubiSponsorImagesNode" '//when the update() function is called, subtype will ensure this AA is typed to the TubiSponsorImagesNode type
+    info.brandLogo = images.brand_logo
+    info.brandGraphic = images.brand_graphic
+    ' The homescreen API returns pixels as an AA keyed by screen type; extract the homescreen array
+    ' to match the array format expected by manageHomeScreenSponsorPixels
+    if isAA(sponsorshipInfo.pixels) = true
+      info.pixels = sponsorshipInfo.pixels["homescreen"]
+    else
+      info.pixels = sponsorshipInfo.pixels
+    end if
+
+    metadata.sponsorImages = info
+    metadata.sponsorExp = sponsorshipInfo.spon_exp
+  end if
+
+  return metadata
 End Function
 
 

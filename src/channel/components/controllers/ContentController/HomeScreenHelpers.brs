@@ -372,12 +372,24 @@ Function fetchHomeScreen(homeScreen, useCache = false)
   if isKidsUIOn() = false AND isParentalControlsAdultLevel() = true
     if homeScreen.id = m.constants.ui.screenIds.homeScreen
       '//Call an ad endpoint to get ad content for the homescreen. The ad endpoint will return if any ads are active
-      aAdTypes = [m.constants.adTypes.adRowlistCarousel, m.constants.adTypes.adRowlistSpotlight, m.constants.adTypes.skinAd, m.constants.adTypes.thematicTakeover, m.constants.adTypes.hubRowLockupAd, m.constants.adTypes.sponsoredLiveEventsHero]
+      ' TODO(REMOVE-OLD-THEMATIC): Remove this if/else and keep only the else branch (restoring thematicTakeover to aAdTypes).
+      if m.constants.featureFlags.useHomescreenApiThematicTakeover = true
+        ' Old approach: thematic takeover comes from the homescreen API (container.sponsorship), not the ad endpoint
+        aAdTypes = [m.constants.adTypes.adRowlistCarousel, m.constants.adTypes.adRowlistSpotlight, m.constants.adTypes.skinAd, m.constants.adTypes.hubRowLockupAd, m.constants.adTypes.sponsoredLiveEventsHero]
+      else
+        aAdTypes = [m.constants.adTypes.adRowlistCarousel, m.constants.adTypes.adRowlistSpotlight, m.constants.adTypes.skinAd, m.constants.adTypes.thematicTakeover, m.constants.adTypes.hubRowLockupAd, m.constants.adTypes.sponsoredLiveEventsHero]
+      end if
+      createHomeScreenAdRequest(screenId, onHomesceenAdDisplaySuccessResponse, aAdTypes, onHomesceenAdDisplayErrorResponse)
+      ' TODO(REMOVE-OLD-THEMATIC): Remove this else-if branch entirely.
+    else if m.constants.featureFlags.useHomescreenApiThematicTakeover = true
+      ' Old approach: non-default homescreens get sponsorship from API; no ad endpoint request needed
+      homeScreen.adContent = []
+      homeScreen.adContentFetchCompleted = true
     else
       '//For non-default homescreens, only request thematic takeover ads
       aAdTypes = [m.constants.adTypes.thematicTakeover]
+      createHomeScreenAdRequest(screenId, onHomesceenAdDisplaySuccessResponse, aAdTypes, onHomesceenAdDisplayErrorResponse)
     end if
-    createHomeScreenAdRequest(screenId, onHomesceenAdDisplaySuccessResponse, aAdTypes, onHomesceenAdDisplayErrorResponse)
 
   else
     'If in kids mode, then user is not in experiment and we should indicate that the adContentFetchCompleted flag is true so that ads are not waited on when loading homescreen content
@@ -1773,12 +1785,17 @@ Function manageHomeScreenSponsorPixels(rowFocused, screenId = "")
     '//Only send sponsor pixels once per page load
     if m.sentSponsorPixels[containerId] <> true AND isNonEmptyArray(sponsorPixels) = true
       m.sentSponsorPixels[containerId] = true '//set to true when the sponsor image has been seen at least once per page load. This AA will be reset when the homescreen is no longer visible
-      rowFocused.sponsorImages.pixels = invalid
+      ' TODO(REMOVE-OLD-THEMATIC): Remove this guard and keep only the inner line (rowFocused.sponsorImages.pixels = invalid).
+      if m.constants.featureFlags.useHomescreenApiThematicTakeover = false
+        rowFocused.sponsorImages.pixels = invalid
+      end if
       sendAdPixels(sponsorPixels)
 
-      ' If this is a thematic takeover container, mark for pixel refresh
-      if rowFocused.sponsorImages <> invalid AND rowFocused.sponsorImages.thematicTakeoverId <> invalid AND rowFocused.sponsorImages.thematicTakeoverId <> ""
-        markAdForPixelRefresh(rowFocused, screenId)
+      ' TODO(REMOVE-OLD-THEMATIC): Remove this guard and keep only the inner if block.
+      if m.constants.featureFlags.useHomescreenApiThematicTakeover = false
+        if rowFocused.sponsorImages <> invalid AND rowFocused.sponsorImages.thematicTakeoverId <> invalid AND rowFocused.sponsorImages.thematicTakeoverId <> ""
+          markAdForPixelRefresh(rowFocused, screenId)
+        end if
       end if
     end if
 

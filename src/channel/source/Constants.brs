@@ -2199,6 +2199,12 @@ Function getConstants()
   constants.serverPersistentRegistryKeys.email = "email"
   constants.serverPersistentRegistryKeys.parentalRating = "parental_rating_v2" ' we are blindly using V2 here because we are using registry only for treatment of MA
 
+  ' TODO(REMOVE-OLD-THEMATIC): Remove this entire featureFlags block.
+  ' When true: sponsorship info is sourced from container.sponsorship in the homescreen API response (old way).
+  ' When false: sponsorship info is sourced from the separate ad endpoint via ThematicTakeoverMixin (new way).
+  constants.featureFlags = {}
+  constants.featureFlags.useHomescreenApiThematicTakeover = true
+
   return constants
 End Function
 
