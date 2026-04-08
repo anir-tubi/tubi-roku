@@ -48,7 +48,7 @@ describe('Autoplay Series', function () {
 
     await ecp.sendKeypress(ecp.Key.Back);
     const { node } = await odc.getFocusedNode();
-    expect(node.id).to.equal('videoPlayerScreen');
+    expect(node.id).to.equal('ProgressBar');
   });
 
   //Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/148693
@@ -135,7 +135,7 @@ describe('Autoplay Series', function () {
 
     await ecp.sendKeypress(ecp.Key.Back);
     const { node } = await odc.getFocusedNode();
-    expect(node.id).to.equal('videoPlayerScreen');
+    expect(node.id).to.equal('ProgressBar');
 
     await testUtils.waitForCurrentScreenToEqual('detailScreen');
   });

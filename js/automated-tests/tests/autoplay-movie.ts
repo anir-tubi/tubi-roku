@@ -57,7 +57,7 @@ describe('Autoplay Movies', function () {
 
     await ecp.sendKeypress(ecp.Key.Back);
     const { node } = await odc.getFocusedNode();
-    expect(node.id).to.equal('videoPlayerScreen');
+    expect(node.id).to.equal('ProgressBar');
   });
 
   // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/70395
@@ -135,7 +135,7 @@ describe('Autoplay Movies', function () {
 
     await ecp.sendKeypress(ecp.Key.Back);
     const { node } = await odc.getFocusedNode();
-    expect(node.id).to.equal('videoPlayerScreen');
+    expect(node.id).to.equal('ProgressBar');
 
     // Testing to make sure it is auto plays to the next title.
     const gridContents = await testUtils.getAllGridItemsContent(
@@ -199,7 +199,7 @@ describe('Autoplay Movies', function () {
 
     await ecp.sendKeypress(ecp.Key.Back);
     const { node } = await odc.getFocusedNode();
-    expect(node.id).to.equal('videoPlayerScreen');
+    expect(node.id).to.equal('ProgressBar');
 
     await testUtils.waitForCurrentScreenToEqual('detailScreen');
   });
