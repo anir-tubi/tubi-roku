@@ -567,8 +567,7 @@ End Function
 ' @sAutoCompleteSessionID: string, If this is a search requesting stemming from an autocomplete suggestion, then
 '       send the personalization_id that was sent back from the autocomplete request
 ' @includeLinear: boolean, should linear content be included in the search results
-' @includeApps: boolean, should creator apps be included in the search results
-Function cmsApi_createSearchReqInfo(searchText, bKidsMode = false, sAutoCompleteSessionID = invalid, includeLinear = true, includeApps = false)
+Function cmsApi_createSearchReqInfo(searchText, bKidsMode = false, sAutoCompleteSessionID = invalid, includeLinear = true)
   url = m.constants.urls.search
   options = m.getCommonOptions()
   options.params["search"] = searchText
@@ -597,10 +596,8 @@ Function cmsApi_createSearchReqInfo(searchText, bKidsMode = false, sAutoComplete
   ' Server frameworks parse feature_flags[include_coming_soon]=true as { feature_flags: { include_coming_soon: "true" } }.
   options.params["feature_flags[include_coming_soon]"] = "true"
 
-  if includeApps = true
-    options.params["include_apps"] = true
-    options.params = m.setAppImageParams(options.params)
-  end if
+  options.params["include_apps"] = true
+  options.params = m.setAppImageParams(options.params)
 
   return {
     url: url

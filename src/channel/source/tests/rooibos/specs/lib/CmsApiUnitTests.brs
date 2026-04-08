@@ -813,6 +813,9 @@ Function cmsApi_createSearchReqInfo_test()
     "search"
     "is_kids_mode"
     "images[poster_tb]"
+    "include_apps"
+    "app_images[background_tb]"
+    "app_images[logo]"
   ]
 
   searchUrl = m.cmsApi.constants.urls.search
@@ -839,6 +842,9 @@ Function cmsApi_createSearchReqInfo_test()
   m.assertEqual(searchInfo.options.params["search"], searchOptions.params["search"])
   m.assertEqual(searchInfo.options.params["is_kids_mode"], searchOptions.params["is_kids_mode"])
   m.assertEqual(searchInfo.options.params["images[poster_tb]"], searchOptions.params["images[poster_tb]"])
+  m.assertEqual(searchInfo.options.params["include_apps"], true)
+  m.assertEqual(searchInfo.options.params["app_images[background_tb]"], m.getExpectedAppImageParam("background"))
+  m.assertEqual(searchInfo.options.params["app_images[logo]"], m.getExpectedAppImageParam("logo"))
 
   ' with kids mode
   searchOptions.params["is_kids_mode"] = true
@@ -853,40 +859,9 @@ Function cmsApi_createSearchReqInfo_test()
   m.assertEqual(searchInfo.options.params["search"], searchOptions.params["search"])
   m.assertEqual(searchInfo.options.params["is_kids_mode"], searchOptions.params["is_kids_mode"])
   m.assertEqual(searchInfo.options.params["images[poster_tb]"], searchOptions.params["images[poster_tb]"])
-
-  ' with includeApps - uses searchV3 url and adds app image params
-  appsParams = [
-    "platform"
-    "device_id"
-    "search"
-    "is_kids_mode"
-    "images[poster_tb]"
-    "include_apps"
-    "app_images[background_tb]"
-    "app_images[logo]"
-  ]
-
-  searchInfo = m.cmsApi.createSearchReqInfo("search_text", false, invalid, true, true)
-
-  m.assertEqual(searchInfo.count(), 2)
-  m.assertAAHasKeys(searchInfo, infoKeys)
-  m.assertEqual(searchInfo.url, searchUrl)
-  m.assertAAHasKeys(searchInfo.options.params, appsParams)
-  m.assertEqual(searchInfo.options.params["platform"], m.cmsApi.constants.platform)
-  m.assertEqual(searchInfo.options.params["device_id"], m.cmsApi.constants.deviceInfo.deviceId)
-  m.assertEqual(searchInfo.options.params["search"], "search_text")
-  m.assertEqual(searchInfo.options.params["is_kids_mode"], false)
   m.assertEqual(searchInfo.options.params["include_apps"], true)
   m.assertEqual(searchInfo.options.params["app_images[background_tb]"], m.getExpectedAppImageParam("background"))
   m.assertEqual(searchInfo.options.params["app_images[logo]"], m.getExpectedAppImageParam("logo"))
-
-  ' without includeApps - does not use searchV3 url and has no app image params
-  searchInfo = m.cmsApi.createSearchReqInfo("search_text", false)
-
-  m.assertEqual(searchInfo.url, searchUrl)
-  m.assertInvalid(searchInfo.options.params["include_apps"])
-  m.assertInvalid(searchInfo.options.params["app_images[background_tb]"])
-  m.assertInvalid(searchInfo.options.params["app_images[logo]"])
 End Function
 
 

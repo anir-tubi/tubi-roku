@@ -49,6 +49,7 @@ Function parseSearchAPISuccess(fullResponse, reqInfo)
     isSignedInUser = reqInfo.isSignedInUser
   end if
 
+  filterCreatorAppsFromRawResponse(parsedResponse)
   convertedMetadata = m.metadataTranslate.translateSearchResults(parsedResponse, isSignedInUser)
 
   parsedData = CreateObject("roSGNode", "SearchContentNode")
@@ -82,4 +83,27 @@ Function parseAutocompleteAPISuccess(fullResponse, reqInfo)
     suggestions: aSuggestions
   }
   return convertedMetadata
+End Function
+
+
+' Removes CREATOR app entries from the raw search API response before translation.
+' Other app types (PIVOT, EXPLORE) are always kept.
+' @param parsedResponse - raw AA from the V3 search API JSON
+Function filterCreatorAppsFromRawResponse(parsedResponse) as Void
+  apps = parsedResponse.apps
+  if isNonEmptyAA(apps) <> true
+    return
+  end if
+
+  if m.statSigExperiments <> invalid AND m.statSigExperiments.getExperimentResource("roku_search_creator_tile", "roku_search_creator_tile_v1").enabled = true
+    return
+  end if
+
+  for each appId in apps.keys()
+    app = apps[appId]
+    if isAA(app) = true AND isNonEmptyString(app.type) = true AND LCase(app.type) = m.constants.ui.appTypes.creator
+      apps.delete(appId)
+      exit for
+    end if
+  end for
 End Function
