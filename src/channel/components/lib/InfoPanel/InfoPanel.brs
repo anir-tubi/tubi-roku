@@ -210,8 +210,10 @@ Function onThemeChange(msg = invalid)
     m.Description.color = theme.primaryTextColor
     m.Director.color = theme.primaryTextColor
     m.Starring.color = theme.primaryTextColor
-    m.uhdAvailableBadge.backgroundColor = theme.defaultDarkTransparentAccent20
-    m.uhdAvailableBadge.textColor = theme.highlightedTextColor
+    m.uhdAvailableBadge.backgroundColor = theme.shadeColor
+    m.uhdAvailableBadge.backgroundUri = "pkg:/images/rounded-background-$$RES$$.9.png"
+    m.uhdAvailableBadge.borderUri = ""
+    m.uhdAvailableBadge.textColor = theme.primaryTextColor
     m.Line1Bold.color = theme.secondaryTextColor
   end if
 End Function
@@ -1619,9 +1621,10 @@ Function formatBadge(text, badgeComponent, iconUri = "")
       badgeComponent.badgeTextFont = m.typographyConstants.ids.bodySmall
       badgeComponent.text = text
     else
-      ' TODAY, TOMORROW, <<Date>> badge
-      badgeComponent.backgroundColor = theme.primaryTextColor
-      badgeComponent.textColor = theme.backgroundColor
+      badgeComponent.backgroundColor = theme.shadeColor
+      badgeComponent.backgroundUri = "pkg:/images/rounded-background-$$RES$$.9.png"
+      badgeComponent.borderUri = ""
+      badgeComponent.textColor = theme.primaryTextColor
       badgeComponent.text = uText
     end if
   end if

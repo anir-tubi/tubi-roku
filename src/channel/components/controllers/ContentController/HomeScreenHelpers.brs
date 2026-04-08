@@ -343,6 +343,10 @@ Function fetchHomeScreen(homeScreen, useCache = false)
   if UCase(m.constants.deviceInfo.countryCode) = "US"
     isPivotExperimentEnabled = getStatsigExperimentResource("", "roku_pivots_v_1_3", true).enabled = true
   end if
+  ' TODO: Remove mock server override once roku_pivots_v_1_3 experiment is graduated
+  if m.constants.settings.mockServerEnabled = true
+    isPivotExperimentEnabled = true
+  end if
   homeScreen.showPivots = (isPivotExperimentEnabled AND screenId = m.constants.ui.screenIds.homeScreen AND isKidsUIOn() = false AND isParentalControlsTeensLevel() = false)
 
   '//reset contentFetchCompleted flags

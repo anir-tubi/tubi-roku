@@ -309,7 +309,7 @@ End Function
 Function prependEventHubTileToSearchResults(response) as Void
   if response.results = invalid then return
 
-  eventHubTileAA = getEventHubTileAA()
+  eventHubTileAA = getEventHubTileAA("trending_search_entry")
   if eventHubTileAA = invalid then return
 
   eventHubTileAA.titleTypography = getTypographyConstants().ids.bodyExtraSmallStrong

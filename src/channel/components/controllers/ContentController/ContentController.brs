@@ -3904,6 +3904,8 @@ Function processUserContentSelection(content, screen, playbackSource = {}) as Vo
     playAdContent(content)
   else if content.scheduleData <> invalid
     showLinearDetailScreen(content, playbackSource)
+  else if contentType = m.constants.ui.contentTypes.video AND isNonEmptyString(content.seriesId) = true
+    showDetailScreen(content, false, skipDetailScreen, invalid, playbackSource)
   else
     showDetailScreen(content, true, invalid, invalid, playbackSource)
   end if
@@ -4323,15 +4325,25 @@ Function onScreenPageLoadCompleteChange(msg) as Void
 End Function
 
 
-' Returns an AA for the event hub tile if the current time is within the event hub time window.
-' Reads the nested event.hub config from externalConfigInfo.
+' Returns an AA for the event hub tile if the current time is within the entry point's time window.
+' @param entryType - Optional entry point key (e.g. "category_entry", "trending_search_entry").
+'                    Uses the nested start_time/end_time from hub[entryType] if present,
+'                    otherwise falls back to hub.start_time/hub.end_time (deeplink default).
 ' @returns AA suitable for node.update() or invalid if outside the time window or config is missing
-Function getEventHubTileAA()
+Function getEventHubTileAA(entryType = invalid)
   eventConfig = getExternalConfigValueFromGlobal("event", invalid)
   if eventConfig = invalid OR eventConfig.hub = invalid then return invalid
 
   hub = eventConfig.hub
-  if isNowWithinTimePeriod(hub.start_time, hub.end_time) = false then return invalid
+
+  startTime = hub.start_time
+  endTime = hub.end_time
+  if isNonEmptyString(entryType) = true AND isAA(hub[entryType]) = true
+    if isNonEmptyString(hub[entryType].start_time) then startTime = hub[entryType].start_time
+    if isNonEmptyString(hub[entryType].end_time) then endTime = hub[entryType].end_time
+  end if
+
+  if isNowWithinTimePeriod(startTime, endTime) = false then return invalid
 
   return {
     subtype: "ContentNode"

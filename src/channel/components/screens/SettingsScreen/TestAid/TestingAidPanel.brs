@@ -192,7 +192,7 @@ Function createTestAidList(listId as String, selectionCallback as String, numRow
     itemSize: "[450,72]"
     itemSpacing: "[0,8]"
     itemComponentName: "CheckButton"
-    vertFocusAnimationStyle: "floatingFocus"
+    vertFocusAnimationStyle: "fixedFocus"
     translation: translation
   }, true)
   list.focusBitmapBlendColor = m.focusedColor
@@ -205,7 +205,7 @@ End Function
 Function showMockServerProfileList(show = false)
   if show = true
     if m.mockServerProfileList = invalid
-      m.mockServerProfileList = createTestAidList("mockServerProfileList", "onMockServerProfileSelected", 7, "[350,185]")
+      m.mockServerProfileList = createTestAidList("mockServerProfileList", "onMockServerProfileSelected", 6, "[350,185]")
 
       registrySection = CreateObject("roRegistrySection", m.constants.registrySectionIDs.settingsOverride)
       currentPhase = registrySection.read("mockServerProfile")
@@ -217,7 +217,10 @@ Function showMockServerProfileList(show = false)
           { id: "30days", title: "Solar Bear - 30 Days", checked: (currentPhase = "30days") }
           { id: "5days", title: "Solar Bear - 5 Days", checked: (currentPhase = "5days") }
           { id: "2days", title: "Solar Bear - 2 Days", checked: (currentPhase = "2days") }
+          { id: "today", title: "Solar Bear - Live (Today)", checked: (currentPhase = "today") }
           { id: "live", title: "Solar Bear - Live (2 min)", checked: (currentPhase = "live") }
+          { id: "livenow", title: "Solar Bear - Live (Now)", checked: (currentPhase = "livenow") }
+          { id: "postgame", title: "Solar Bear - Post Game", checked: (currentPhase = "postgame") }
           { id: "replay", title: "Solar Bear - Replay", checked: (currentPhase = "replay") }
         ]
       }, true)

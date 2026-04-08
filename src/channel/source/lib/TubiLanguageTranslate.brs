@@ -2419,9 +2419,9 @@ Function getTranslation_en_US()
       "description": "Sign in to watch live button label.",
       "message": "Sign in to Watch"
     },
-    "live_in_date": {
-      "description": "date label used in air date countdown timer",
-      "message": "LIVE IN {timeString}"
+    "live_time": {
+      "description": "badge text for live event happening later today with start time",
+      "message": "Live {time}"
     },
     "starts_date": {
       "description": "date label used in air date countdown timer",
@@ -4898,10 +4898,6 @@ Function getTranslation_es_MX()
       "description": "Sign in to watch live button label.",
       "message": "Inicia sesión para ver"
     },
-    "live_in_date": {
-      "description": "date label used in air date countdown timer",
-      "message": "EN VIVO EN {timeString}"
-    },
     "starts_date": {
       "description": "date label used in air date countdown timer",
       "message": "COMIENZA {date}"
@@ -7357,10 +7353,6 @@ Function getTranslation_fr_CA()
     "sign_in_watch": {
       "description": "Sign in to watch live button label.",
       "message": "Se connecter pour voir"
-    },
-    "live_in_date": {
-      "description": "date label used in air date countdown timer",
-      "message": "EN DIRECT DANS {timeString}"
     },
     "starts_date": {
       "description": "date label used in air date countdown timer",

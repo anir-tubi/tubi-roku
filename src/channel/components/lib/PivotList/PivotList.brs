@@ -143,7 +143,14 @@ Function createHubPivotNode() as Dynamic
     return invalid
   end if
 
-  if isNowWithinTimePeriod(hub.start_time, hub.end_time) = false
+  startTime = hub.start_time
+  endTime = hub.end_time
+  if isAA(hub.pivot_entry) = true
+    if isNonEmptyString(hub.pivot_entry.start_time) then startTime = hub.pivot_entry.start_time
+    if isNonEmptyString(hub.pivot_entry.end_time) then endTime = hub.pivot_entry.end_time
+  end if
+
+  if isNowWithinTimePeriod(startTime, endTime) = false
     return invalid
   end if
 

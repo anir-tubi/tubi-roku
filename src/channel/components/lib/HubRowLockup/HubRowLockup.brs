@@ -114,12 +114,9 @@ Function onFocusChange(msg = invalid) as Void
   focusPercent = m.top.focusPercent
   if focusPercent <> 0 AND focusPercent <> 1 then return
 
-  itemHasFocus = (focusPercent = 1)
-  rowHasFocus = m.top.rowHasFocus
+  itemHasFocus = (focusPercent = 1 AND m.top.rowHasFocus = true)
 
   m.exploreButton.itemHasFocus = itemHasFocus
-  m.exploreButton.visible = (itemHasFocus = true OR rowHasFocus = false)
-
 End Function
 
 

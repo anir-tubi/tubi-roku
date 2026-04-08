@@ -1331,6 +1331,8 @@ End Function
 ' Resets category grid state, fires analytics, and sets focus on pivot list
 ' @param key - The key that triggered the focus change ("up" or "back")
 Function focusPivotList(key as String) as Void
+  m.pivotList.visible = true
+
   if m.top.lastFocusedList = "rowList"
     m.CategoryGridList.resetCategoryGridState = true
   end if
@@ -1411,7 +1413,7 @@ Function onKeyEvent(key, press) as Boolean
       ' navigating to the side nav
       m.top.stopLinearVideoPlayer = true
 
-      if m.pivotList.content <> invalid AND m.pivotList.content.getChildCount() > 0 AND m.pivotList.isInFocusChain() = false AND key = "back"
+      if m.pivotList.content <> invalid AND m.pivotList.content.getChildCount() > 0 AND m.pivotList.isInFocusChain() = false AND key = "back" AND m.pivotList.visible = true
         focusPivotList("back")
         return true
       end if

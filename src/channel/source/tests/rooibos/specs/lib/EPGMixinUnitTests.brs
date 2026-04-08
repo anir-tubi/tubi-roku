@@ -76,7 +76,7 @@ Function epgMixin_badgeInfo_live_test()
 End Function
 
 
-'@Test returns upcoming with time string for event later today
+'@Test returns upcoming with formatted time for event later today (e.g. "Live 3 PM")
 Function epgMixin_badgeInfo_laterToday_test()
   now = CreateObject("roDateTime")
   now.toLocalTime()
@@ -100,7 +100,9 @@ Function epgMixin_badgeInfo_laterToday_test()
     result = getLinearContentBadgeInfo(schedule, false)
     m.assertNotInvalid(result)
     m.assertEqual(result.availability, "upcoming")
-    m.assertNotEmpty(result.badgeText)
+    m.assertTrue(result.badgeText.instr("Live") >= 0)
+    ' Should contain AM or PM time indicator, not a countdown like "in 2h"
+    m.assertTrue(result.badgeText.instr("AM") >= 0 OR result.badgeText.instr("PM") >= 0)
   end if
 End Function
 
@@ -110,35 +112,29 @@ Function epgMixin_badgeInfo_tomorrow_test()
   now = CreateObject("roDateTime")
   now.toLocalTime()
 
-  ' Find seconds until end of local day, then add 6 hours into tomorrow.
-  ' The resulting event must be (a) >= 86400s away so it bypasses the
-  ' countdown branch in getLinearContentBadgeInfo (which shows "Live in Xh"
-  ' for anything < 24h out), and (b) inside the isTomorrow window.
-  ' After ~18:00 local, secsLeftToday + 21600 < 86400, so the countdown
-  ' branch would catch it. Skip the test in that case — the "later today"
-  ' test already covers the countdown path.
+  ' Place the event 6 hours into tomorrow (local time).
+  ' The new badge logic uses isTomorrow() directly, so this works at any time of day.
   secsLeftToday = 86400 - (now.getHours() * 3600 + now.getMinutes() * 60 + now.getSeconds())
   offsetToTomorrow = secsLeftToday + 21600
-  if offsetToTomorrow >= 86460
-    startUtc = CreateObject("roDateTime")
-    startUtc.fromSeconds(CreateObject("roDateTime").asSeconds() + offsetToTomorrow)
-    endUtc = CreateObject("roDateTime")
-    endUtc.fromSeconds(CreateObject("roDateTime").asSeconds() + offsetToTomorrow + 10800)
 
-    schedule = {
-      startTime: startUtc.toISOString()
-      endTime: endUtc.toISOString()
-    }
+  startUtc = CreateObject("roDateTime")
+  startUtc.fromSeconds(CreateObject("roDateTime").asSeconds() + offsetToTomorrow)
+  endUtc = CreateObject("roDateTime")
+  endUtc.fromSeconds(CreateObject("roDateTime").asSeconds() + offsetToTomorrow + 10800)
 
-    result = getLinearContentBadgeInfo(schedule, false)
-    m.assertNotInvalid(result)
-    m.assertEqual(result.availability, "upcoming")
-    m.assertTrue(result.badgeText.instr("Tomorrow") >= 0 OR result.badgeText.instr("tomorrow") >= 0)
-  end if
+  schedule = {
+    startTime: startUtc.toISOString()
+    endTime: endUtc.toISOString()
+  }
+
+  result = getLinearContentBadgeInfo(schedule, false)
+  m.assertNotInvalid(result)
+  m.assertEqual(result.availability, "upcoming")
+  m.assertTrue(result.badgeText.instr("Tomorrow") >= 0 OR result.badgeText.instr("tomorrow") >= 0)
 End Function
 
 
-'@Test returns upcoming badge for event 5 days away
+'@Test returns upcoming badge with date for event 5 days away (e.g. "Live Jun 12")
 Function epgMixin_badgeInfo_futureDays_test()
   now = CreateObject("roDateTime")
   startUtc = CreateObject("roDateTime")
@@ -154,7 +150,9 @@ Function epgMixin_badgeInfo_futureDays_test()
   result = getLinearContentBadgeInfo(schedule, false)
   m.assertNotInvalid(result)
   m.assertEqual(result.availability, "upcoming")
-  m.assertNotEmpty(result.badgeText)
+  m.assertTrue(result.badgeText.instr("Live") >= 0)
+  ' Should NOT contain AM/PM (that's for same-day), should be a date like "Live Jun 12"
+  m.assertFalse(result.badgeText.instr("AM") >= 0 OR result.badgeText.instr("PM") >= 0)
 End Function
 
 

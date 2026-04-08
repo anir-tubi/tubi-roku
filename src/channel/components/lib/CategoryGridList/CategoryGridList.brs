@@ -1255,6 +1255,15 @@ Function onRequestRowHeightReset(msg) as Void
 
   ' Check if row is a video tile enabled container
   if isVideoTileEnabledContainer(category.gridItemType) = true
+    ' Skip reset if the focused item is a non-video-tile item (e.g. hub lockup)
+    ' since no expansion occurs for those items
+    columnIndex = category.focusIndex
+    if columnIndex = invalid OR columnIndex < 0 then columnIndex = 0
+    focusedItem = m.nodeHelpers.getNodeFromPosition(m.top.content, [rowIndex, columnIndex])
+    if focusedItem <> invalid AND arrayIncludes(m.constants.ui.nonVideoTileGridItemTypes, focusedItem.gridItemType) = true
+      return
+    end if
+
     resetHeight = m.featuredRowPoster[1] + 76
     updateRowHeight(rowIndex, resetHeight)
     m.resetRowHeights = true

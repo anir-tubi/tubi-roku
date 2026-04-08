@@ -71,30 +71,24 @@ Function getLinearContentBadgeInfo(schedule, isReplay = false)
     else if airDatetime.asSeconds() <= currentDatetime.asSeconds() AND hasEventEnded = false
       return { availability: "live" }
     else if hasEventEnded = false
-      secondsUntilAirTime = airDatetime.asSeconds() - currentDatetime.asSeconds()
-      if secondsUntilAirTime < (24 * 60 * 60)
-        remainingHours = Int(secondsUntilAirTime / 3600)
-        remainingMinutes = Int(secondsUntilAirTime / 60)
-
-        if secondsUntilAirTime < 60
-          remainingMinutes = 1
-        end if
-
-        if remainingMinutes < 60
-          timeString = getTranslation("m_duration", { "minutes": remainingMinutes.toStr() })
-        else
-          timeString = getTranslation("h_duration", { "hours": remainingHours.toStr() })
-        end if
-
-        badgeText = getTranslation("live_in_date", { "timeString": timeString })
-        return {
-          availability: "upcoming",
-          badgeText: badgeText
-        }
-      else if isTomorrow(schedule.startTime)
+      if isTomorrow(schedule.startTime)
         return {
           availability: "upcoming",
           badgeText: getTranslation("liveTomorrow")
+        }
+      else if isToday(schedule.startTime)
+        localAir = CreateObject("roDateTime")
+        localAir.FromISO8601String(schedule.startTime)
+        localAir.toLocalTime()
+        minuteValue = localAir.getMinutes()
+        if minuteValue = 0
+          formattedTime = UCase(localizedTimeString(localAir, "h a"))
+        else
+          formattedTime = UCase(localizedTimeString(localAir, "h:mm a"))
+        end if
+        return {
+          availability: "upcoming",
+          badgeText: getTranslation("live_time", { "time": formattedTime })
         }
       else
         airDatetime.toLocalTime()

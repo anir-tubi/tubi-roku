@@ -214,6 +214,9 @@ Function setAppImages(adContent = invalid) as Void
     m.backgroundPoster.unobserveFieldScoped("loadStatus")
     m.backgroundPoster.observeFieldScoped("loadStatus", "onBackgroundPosterLoaded")
     m.backgroundPoster.uri = backgroundUrl
+    if m.backgroundPoster.loadStatus = "ready"
+      showBackgroundPoster()
+    end if
   end if
 
   if adContent <> invalid AND isNonEmptyString(adContent.brandGraphicUrl)
@@ -226,9 +229,14 @@ End Function
 ' Fades in the background poster once the image has finished loading
 Function onBackgroundPosterLoaded(msg) as Void
   if msg.getData() = "ready"
-    m.backgroundPoster.visible = true
-    fade(m.backgroundPoster, "in", 0.3)
+    showBackgroundPoster()
   end if
+End Function
+
+
+Function showBackgroundPoster() as Void
+  m.backgroundPoster.visible = true
+  fade(m.backgroundPoster, "in", 0.3)
 End Function
 
 

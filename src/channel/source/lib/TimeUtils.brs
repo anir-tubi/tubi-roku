@@ -368,10 +368,10 @@ Function localizedTimeString(dateTime, format = "h:mm a")
       inputDateMins = "0" + inputDateMins
     end if
 
-    meridiem = "am"
+    meridiem = "AM"
 
     if inputDateHours > 11
-      meridiem = "pm"
+      meridiem = "PM"
     end if
 
     inputDate12Hours = inputDateHours mod 12

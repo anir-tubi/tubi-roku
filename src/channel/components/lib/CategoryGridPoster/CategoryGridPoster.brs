@@ -4,7 +4,6 @@ Function init()
   m.InnerLayout = m.top.findNode("InnerLayout")
   m.TimeRemaining = m.top.findNode("TimeRemaining")
 
-  m.badgeGroup = m.top.findNode("badgeGroup")
   m.resumeProgressBar = m.top.findNode("ResumeProgressBar")
   m.DurationBar = m.top.findNode("DurationBar")
   m.top.observeField("itemContent", "onContentChange")
@@ -25,12 +24,6 @@ Function init()
     epg: "epg"
     live: "live"
     sportsEvent: "sports_event"
-  }
-
-  '//recreate the contentTimings from constants so as not to access m.global.constants for every item on the home screen as they are created
-  m.contentTimings = {
-    replay: "replay"
-    upcoming: "upcoming"
   }
 
   '//recreate the gridItemTypes (itemIDs) from constants so as not to access m.global.constants for every item on the home screen as they are created
@@ -121,21 +114,12 @@ Function onContentChange(msg)
   ' settings poster visibility true to avoid image caching issue. if it is not set to true, seeing some blank posters
   m.poster.visible = true
 
-  removeBadges()
   removeShowALlLabel()
 
   sPosterURL = ""
   if itemContent <> invalid then
 
     sPosterURL = itemContent.hdgridposterurl
-    hasVideoresources = itemContent.hasVideoresources
-    airDatetime = itemContent.airDatetime
-
-    info = getAvailabilityTypeBadgeAndMatchTimeValues(airDatetime, hasVideoresources)
-    badgeText = info.badgeText
-    if isNonEmptyString(badgeText) = true
-      setReplayOrUpcomingBadge(badgeText)
-    end if
 
     if itemContent.needsLogin = true
       setLockIcon()
@@ -166,18 +150,12 @@ Function onContentChange(msg)
         end if
         drawHistoryProgressBar()
       else if itemContent.type = m.contentTypes.linear
-        if (categoryContent.gridItemType = m.gridItemTypes.landscape OR categoryContent.gridItemType = m.gridItemTypes.landscapeNoTitle) 'linear content on landscape row
+        if (categoryContent.gridItemType = m.gridItemTypes.landscape OR categoryContent.gridItemType = m.gridItemTypes.landscapeNoTitle)
           currentProgram = getCurrentLiveProgram(itemContent)
 
           if currentProgram <> invalid AND isNonEmptyString(currentProgram.hdgridposterurl) = true
             sPosterURL = currentProgram.hdgridposterurl
           end if
-
-          setLiveBadge()
-        else if itemContent.gridItemType = "" OR categoryContent.gridItemType <> m.gridItemTypes.linear
-          'itemContent.gridItemType is not an empty string on the home screen,
-          'and we want this to set Live logo and text just on the search screen.
-          setLiveBadge()
         end if
       end if
     end if
@@ -261,45 +239,6 @@ Function setInnerGradient()
     gradientPoster.uri = "pkg:/images/categoryGridPosterInnerGradient.webp"
     gradientPoster.id = "gradientPoster"
   end if
-End Function
-
-
-Function setLiveBadge()
-  tubiLog("CategoryGridPoster.setLiveBadge")
-  badge = m.badgeGroup.createChild("Badge")
-  theme = getThemeFromGlobal()
-  badge.translation = [12, 12]
-  if theme <> invalid
-    badge.backgroundColor = theme.focused2Color
-    badge.textColor = theme.primaryTextColor
-  end if
-  badge.iconUri = "pkg:/images/live-icon.webp"
-  badge.text = UCase(getTranslation("screenSearch_liveText"))
-End Function
-
-
-Function removeBadges()
-  tubiLog("CategoryGridPoster.removeBadges")
-  childCount = m.badgeGroup.getChildCount()
-  m.badgeGroup.removeChildrenIndex(childCount, 0)
-End Function
-
-
-Function setReplayOrUpcomingBadge(badgeText)
-  tubiLog("CategoryGridPoster.setReplayOrUpcomingBadge")
-  theme = getThemeFromGlobal()
-  badge = m.badgeGroup.createChild("Badge")
-  badge.translation = [12, 12]
-  if theme <> invalid
-    if badgeText = m.contentTimings.replay
-      badge.backgroundColor = theme.backgroundColorLight
-      badge.textColor = theme.neutralColor2
-    else
-      badge.backgroundColor = theme.neutralColor
-      badge.textColor = theme.primaryText
-    end if
-  end if
-  badge.text = UCase(badgeText)
 End Function
 
 

@@ -1165,6 +1165,141 @@ exports.validateBuildEnvironment = validateBuildEnvironment;
 exports.verifyLocalClientErrorConfigIsCurrent = verifyLocalClientErrorConfigIsCurrent;
 
 
+function requireAwsProfile() {
+  const profile = process.env.AWS_PROFILE;
+  if (!profile) {
+    throw new NoStackError('AWS_PROFILE environment variable is not set. Run "valet aws" first.');
+  }
+  return profile;
+}
+
+function getGitInfo() {
+  const exec = (cmd) => shell.exec(cmd, { silent: true }).stdout.trim();
+  return {
+    branch: exec('git rev-parse --abbrev-ref HEAD'),
+    commitSha: exec('git rev-parse HEAD'),
+    author: exec('git config user.name') || 'unknown'
+  };
+}
+
+function awsExec(cmd, done) {
+  const result = shell.exec(cmd, { silent: true });
+  if (result.code !== 0) {
+    done(new NoStackError(result.stderr));
+    return false;
+  }
+  return true;
+}
+
+function runManifestCommand(envOverrides, done) {
+  const env = { ...process.env, S3_BUCKET: S3_ROKU_MULTI_CDN_STAGING_CORE, ...envOverrides };
+  const result = shell.exec('node .github/scripts/manageBranchManifest.js', { env, silent: true });
+  if (result.code !== 0) {
+    done(new NoStackError(`Manifest update failed: ${result.stderr}`));
+    return false;
+  }
+  return true;
+}
+
+function invalidateComponentLibCache(awsProfile) {
+  shell.exec(
+    `aws cloudfront create-invalidation --distribution-id ${stagingCdnDistributionID} --paths "/appFiles/components/branches/*" --profile ${awsProfile}`,
+    { silent: true }
+  );
+}
+
+async function deployComponentLib(done) {
+  const CDN_BASE_URL = 'https://mrcdn-staging.tubitv.com';
+  let awsProfile;
+  try { awsProfile = requireAwsProfile(); } catch (e) { done(e); return; }
+
+  const response = await prompts({
+    type: 'text',
+    name: 'displayName',
+    message: 'Enter a display name for this component library build:',
+    validate: val => val.trim() ? true : 'Display name cannot be empty'
+  });
+  if (!response.displayName) { done(new NoStackError('Deploy cancelled.')); return; }
+
+  const displayName = response.displayName.trim();
+  const git = getGitInfo();
+  const prArg = passedArgs.find(a => a.startsWith('--pr='));
+  const libId = prArg ? prArg.split('=')[1] : Math.floor(1000 + Math.random() * 9000);
+  const libProvided = `TubiRemoteLib-${libId}`;
+
+  process.env.REMOTE_COMPONENT_LIB_PROVIDED = libProvided;
+  options.config = 'staging';
+
+  log(`Deploying component library: "${displayName}" (${git.branch})`);
+
+  log('Adding missing images to remote library...');
+  await new Promise((resolve, reject) => {
+    addMissingImagesToRemoteLibrary((err) => err ? reject(err) : resolve());
+  });
+
+  await new Promise((resolve, reject) => {
+    series(buildRemote, packageRemote)((err) => err ? reject(err) : resolve());
+  });
+
+  const pkgFile = `build/tubi_remote_components_${getBuildTag('revision')}.pkg`;
+  if (!fs.existsSync(pkgFile)) { done(new NoStackError(`Package not found: ${pkgFile}`)); return; }
+
+  const s3Path = `appFiles/components/branches/${libId}`;
+  if (!awsExec(`aws s3 cp "${pkgFile}" "s3://${S3_ROKU_MULTI_CDN_STAGING_CORE}/${s3Path}/tubi_remote_components.pkg" --profile ${awsProfile}`, done)) return;
+
+  const pkgUrl = `${CDN_BASE_URL}/${s3Path}/tubi_remote_components.pkg`;
+  if (!runManifestCommand({
+    COMMAND: 'upsert',
+    PR_NUMBER: String(libId),
+    DISPLAY_NAME: displayName,
+    BRANCH: git.branch,
+    COMMIT_SHA: git.commitSha,
+    AUTHOR: git.author,
+    PKG_URL: pkgUrl,
+    LIB_PROVIDED: libProvided
+  }, done)) return;
+
+  invalidateComponentLibCache(awsProfile);
+
+  log(`\x1b[32mDeployed!\x1b[0m ${pkgUrl} (${libProvided})`);
+  done();
+}
+
+exports.deployComponentLib = series(setStaging, deployComponentLib);
+
+
+async function cleanComponentLib(done) {
+  let awsProfile;
+  try { awsProfile = requireAwsProfile(); } catch (e) { done(e); return; }
+
+  const response = await prompts({
+    type: 'text',
+    name: 'id',
+    message: 'Enter the lib ID to remove (or "all" to clear all):',
+    validate: val => val.trim() ? true : 'ID cannot be empty'
+  });
+  if (!response.id) { done(new NoStackError('Clean cancelled.')); return; }
+
+  const id = response.id.trim();
+
+  if (id === 'all') {
+    if (!awsExec(
+      `echo "[]" | aws s3 cp - "s3://${S3_ROKU_MULTI_CDN_STAGING_CORE}/appFiles/components/branches/manifest.json" --content-type "application/json" --profile ${awsProfile}`,
+      done
+    )) return;
+    log('Manifest cleared.');
+  } else {
+    if (!runManifestCommand({ COMMAND: 'remove', PR_NUMBER: id }, done)) return;
+    log(`Removed entry: ${id}`);
+  }
+
+  invalidateComponentLibCache(awsProfile);
+  done();
+}
+
+exports.cleanComponentLib = cleanComponentLib;
+
+
 // Automated test related
 // Because automated-tests has to call ts-node/register it takes over 300ms to load so we only want to load when necessary. We are adding wrappers for these functions here
 let _automatedTests;

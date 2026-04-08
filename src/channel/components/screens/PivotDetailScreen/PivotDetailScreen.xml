@@ -57,6 +57,8 @@
       id="backgroundPoster"
       width="1920"
       height="1080"
+      loadWidth="1920"
+      loadHeight="1080"
       visible="false"
       loadDisplayMode="scaleToFill" />
 
@@ -68,7 +70,7 @@
         layoutDirection="horiz"
         vertAlignment="center"
         itemSpacings="[16]"
-        translation="[0, 48]"
+        translation="[0, 85]"
         visible="false">
         <Poster
           id="pivotLogo"

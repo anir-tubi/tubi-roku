@@ -578,7 +578,7 @@ End Function
 ' so users can browse into it like any other category.
 ' @param categoriesList - ContentNode containing the list of category nodes
 Function prependEventHubCategoryToList(categoriesList) as Void
-  eventHubTileAA = getEventHubTileAA()
+  eventHubTileAA = getEventHubTileAA("category_entry")
   if eventHubTileAA = invalid then return
 
   if categoriesList.getChildCount() > 0
@@ -602,9 +602,14 @@ End Function
 ' @param categoryContent - ContentNode containing the category's content tiles
 ' @param focusedItem - The currently focused category list item
 Function prependEventHubTileToCategoryContent(categoryContent, focusedItem) as Void
-  eventHubTileAA = getEventHubTileAA()
+  eventHubTileAA = getEventHubTileAA("category_entry")
   if eventHubTileAA = invalid then return
   if focusedItem.id <> eventHubTileAA.containerId then return
+
+  if categoryContent.getChildCount() > 0
+    firstChild = categoryContent.getChild(0)
+    if firstChild <> invalid AND firstChild.id = eventHubTileAA.id then return
+  end if
 
   eventHubTileNode = CreateObject("roSGNode", "ContentNode")
   eventHubTileNode.update(eventHubTileAA, true)
