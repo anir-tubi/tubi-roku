@@ -2191,6 +2191,7 @@ End Function
 Function onRowCurrFocusRowChange(msg)
   screen = msg.getRoSGNode()
   currFocusRow = msg.getData()
+  m.videoPreviewDebounce.control = "stop"
   fade(m.autoStartPreviewToPlaybackTimer, "out", 0.1)
   ' It will only start the timer for the first time.
   m.performanceMetricsTracker.startMetricTiming("vertical_scroll_performance")

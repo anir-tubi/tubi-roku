@@ -240,7 +240,8 @@ Function pauseVideoPreviewAndShowPoster() as Void
 
     m.inlinePreviewPlayerFadeAnimation = fade(m.videoPreviewPlayer, "out", 0.3)
 
-    if getVideoPreviewState() = "playing"
+    playerState = getVideoPreviewState()
+    if playerState = "playing" OR playerState = "buffering"
       pauseVideoPreview()
     end if
   end if
