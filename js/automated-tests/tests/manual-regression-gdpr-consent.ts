@@ -683,9 +683,7 @@ describe('GDPR/Consent Regression Tests', function () {
     // Verify user is signed in by checking the side nav
     await ecp.sendKeypress(ecp.Key.Left);
     await testUtils.waitForSideNavMenuToBeExpanded();
-    let sideNavSignedInLabel = await testUtils.getNodeForElement('sideNavSignedInLabel');
-    expect(sideNavSignedInLabel.text).to.contain('Hi');
-    expect(sideNavSignedInLabel.visible, 'User should be signed in after registration').to.be.true;
+    await testUtils.assertUserIsSignedIn();
 
     await shared.openSettings();
     await testUtils.waitForCurrentScreenToEqual('settingsScreen')

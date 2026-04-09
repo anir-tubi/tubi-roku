@@ -65,8 +65,7 @@ describe('Daily Sign In/Sign Out Automation', function () {
     // Open side nav to check signed in status
     await ecp.sendKeypress(ecp.Key.Left);
     await testUtils.waitForElementToShowOnScreen('sideNavSignedInLabel', 'Side nav signed in label not found', 15000);
-    const sideNavSignedInLabel = await testUtils.getNodeForElement('sideNavSignedInLabel');
-    expect(sideNavSignedInLabel.text).to.contain('Hi');
+    await testUtils.assertUserIsSignedIn();
 
 
     // Step 4: Sign out
@@ -93,16 +92,13 @@ describe('Daily Sign In/Sign Out Automation', function () {
     // Step 5: Verify sign out was successful
     await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for home screen after sign out', 20000);
 
-    // Verify user is signed out (sideNavSignedInLabel should not contain 'Hi')
+    // Verify user is signed out (label should not contain any known signed-in user name)
     await testUtils.retryWithTimeOut(async () => {
       const sideNavSignedInLabel = await testUtils.getNodeForElement('sideNavSignedInLabel');
-      // If element exists but doesn't contain 'Hi', user is signed out
       if (sideNavSignedInLabel !== undefined && sideNavSignedInLabel.text !== undefined) {
-        if (!sideNavSignedInLabel.text.includes('Hi')) {
-          expect(sideNavSignedInLabel.text).to.not.contain('Hi');
-        }
+        expect(sideNavSignedInLabel.text).to.not.contain('Automation');
+        expect(sideNavSignedInLabel.text).to.not.contain('build_roku_');
       } else {
-        // Element might not exist when signed out, which is also valid
         console.log('User successfully signed out');
       }
     }, 10000);
@@ -120,7 +116,7 @@ describe('Daily Sign In/Sign Out Automation', function () {
     // Step 3: Sign out if already signed in (cleanup from previous test)
     await ecp.sendKeypress(ecp.Key.Left);
     const sideNavSignedInLabel = await testUtils.getNodeForElement('sideNavSignedInLabel');
-    if (sideNavSignedInLabel !== undefined && sideNavSignedInLabel.text !== undefined && sideNavSignedInLabel.text.includes('Hi')) {
+    if (sideNavSignedInLabel !== undefined && sideNavSignedInLabel.text !== undefined && (sideNavSignedInLabel.text.includes('Automation') || sideNavSignedInLabel.text.includes('build_roku_'))) {
       console.log('User is already signed in, signing out first...');
       await shared.openSettings();
       await testUtils.waitForElementToFullyShowOnScreen('settingsScreen', 'Settings screen not found', 15000);
@@ -173,8 +169,7 @@ describe('Daily Sign In/Sign Out Automation', function () {
     // Step 11: Verify user is signed in
     await ecp.sendKeypress(ecp.Key.Left);
     await testUtils.waitForElementToShowOnScreen('sideNavSignedInLabel', 'Side nav signed in label not found', 15000);
-    const sideNavSignedInLabelAfterSignIn = await testUtils.getNodeForElement('sideNavSignedInLabel');
-    expect(sideNavSignedInLabelAfterSignIn.text).to.contain('Hi');
+    await testUtils.assertUserIsSignedIn();
 
     console.log('Sign in completed successfully. User is now signed in.');
   });

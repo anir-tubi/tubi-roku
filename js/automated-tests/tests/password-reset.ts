@@ -158,8 +158,7 @@ describe('Sign In: On-Device Password Reset', function () {
     // Verify user back to home screen and signed in
     await testUtils.waitForCurrentScreenToEqual('homeScreen');
     await ecp.sendKeypress(ecp.Key.Left);
-    const sideNavSignedInLabel = await testUtils.getNodeForElement('sideNavSignedInLabel');
-    expect(sideNavSignedInLabel.text).to.contain('Hi');
+    await testUtils.assertUserIsSignedIn();
   });
 
   // Test Rail link: https://tubi.testrail.io/index.php?/cases/view/476635

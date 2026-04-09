@@ -16,8 +16,7 @@ describe('Application Launch', function () {
   // https://tubi.testrail.io/index.php?/cases/view/535807
   it('C535807 User Signed in - Homescreen Display @registered_user,@smoke,@application_launch @application_launch', async () => {
     await testUtils.retryWithTimeOut(async () => {
-      const sideNavSignedInLabel = await testUtils.getNodeForElement('sideNavSignedInLabel');
-      expect(sideNavSignedInLabel.text).to.contain('Hi');
+      await testUtils.assertUserIsSignedIn();
     });
   });
 

@@ -912,8 +912,9 @@ class TestHelpers {
     // Wait for settings menu to have focus before navigating
     await testUtils.waitForElementToHaveFocus('settingsMenu', 'Timed out waiting for settings menu to have focus', 10000);
     await testUtils.waitForGridContentToLoad('settingsMenu');
-    await utils.sleep(100);
-    await ecp.sendKeypress(ecp.Key.Down);
+    await testUtils.waitForElementToShowOnScreen('settingsAccountPanel', 'Timed out waiting for settings account panel', 10000);
+    const autoplayIndex = await testUtils.findRowIndexWithTitle('settingsMenu', 'Autoplay Controls');
+    await ecp.sendKeypress(ecp.Key.Down, { count: autoplayIndex, wait: 200 });
     try {
       await testUtils.waitForElementToShowOnScreen('autoplayPreviewMenu', 'Timed out waiting for autoplay preview menu to show', 10000);
     } catch (_) {

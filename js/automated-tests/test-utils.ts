@@ -1670,6 +1670,16 @@ class TestUtils {
 
     return result as T;
   }
+
+  /**
+   * Asserts that the user is signed in by checking the side nav label.
+   * Accepts users created via API (first_name: 'Automation') or via UI registration (email-based name starting with 'build_roku_').
+   */
+  public async assertUserIsSignedIn() {
+    const sideNavSignedInLabel = await this.getNodeForElement('sideNavSignedInLabel');
+    const text = sideNavSignedInLabel.text || '';
+    expect(text.includes('Automation') || text.includes('build_roku_'), `Expected signed-in label to contain 'Automation' or 'build_roku_', but got: '${text}'`).to.be.true;
+  }
 }
 
 

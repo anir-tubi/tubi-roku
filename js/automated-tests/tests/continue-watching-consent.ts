@@ -52,8 +52,7 @@ describe('Continue Watching Consent During Registration', function () {
         // Verify user back to home screen and signed in
         await testUtils.waitForCurrentScreenToEqual('homeScreen');
         await ecp.sendKeypress(ecp.Key.Left);
-        const sideNavSignedInLabel = await testUtils.getNodeForElement('sideNavSignedInLabel');
-        expect(sideNavSignedInLabel.text).to.contain('Hi');
+        await testUtils.assertUserIsSignedIn();
 
         // Navigate to Settings > Privacy Center
         await goToPrivacyCenter();
@@ -82,8 +81,7 @@ describe('Continue Watching Consent During Registration', function () {
         // Verify user back to home screen and signed in
         await testUtils.waitForCurrentScreenToEqual('homeScreen');
         await ecp.sendKeypress(ecp.Key.Left);
-        const sideNavSignedInLabel = await testUtils.getNodeForElement('sideNavSignedInLabel');
-        expect(sideNavSignedInLabel.text).to.contain('Hi');
+        await testUtils.assertUserIsSignedIn();
 
         // Navigate to Settings > Privacy Center
         await goToPrivacyCenter();
@@ -110,8 +108,7 @@ describe('Continue Watching Consent During Registration', function () {
         // Verify user back to home screen and signed in
         await testUtils.waitForCurrentScreenToEqual('homeScreen');
         await ecp.sendKeypress(ecp.Key.Left);
-        const sideNavSignedInLabel = await testUtils.getNodeForElement('sideNavSignedInLabel');
-        expect(sideNavSignedInLabel.text).to.contain('Hi');
+        await testUtils.assertUserIsSignedIn();
 
         await goToPrivacyCenter();
 
@@ -154,8 +151,7 @@ describe('Continue Watching Consent During Registration', function () {
         // Verify user back to home screen and signed in
         await testUtils.waitForCurrentScreenToEqual('homeScreen');
         await ecp.sendKeypress(ecp.Key.Left);
-        const sideNavSignedInLabel = await testUtils.getNodeForElement('sideNavSignedInLabel');
-        expect(sideNavSignedInLabel.text).to.contain('Hi');
+        await testUtils.assertUserIsSignedIn();
     });
 });
 

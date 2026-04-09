@@ -2282,6 +2282,12 @@ const elements = typeCheckElements({
       '#ContentController.#uiGroup.#ContentGroup.#screenStackGroup.#ScreenStack.#settingsScreen.#PageGroup.#PanelSet.2.#SettingsMenuGroup.#SettingsMenu',
   },
 
+  /** Settings account panel (right-side detail panel) */
+  settingsAccountPanel: {
+    keyPath:
+      '#ContentController.#uiGroup.#ContentGroup.#screenStackGroup.#ScreenStack.#settingsScreen.#PageGroup.#PanelSet.3',
+  },
+
   /** Settings menu item */
   settingsMenuItem: {
     keyPath:
