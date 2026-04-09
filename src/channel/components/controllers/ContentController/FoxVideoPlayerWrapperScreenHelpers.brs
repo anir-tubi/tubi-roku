@@ -582,7 +582,25 @@ Function getFoxVideoPlayerConfig()
 End Function
 
 
-Function onFoxVideoPlayerExitStreamChange()
+Function onFoxVideoPlayerExitStreamChange(msg)
+  exitStreamEventData = ""
+  exitStreamValue = msg.getData()
+  if exitStreamValue <> invalid then
+    exitStreamEventData = FormatJSON(exitStreamValue)
+  end if
+
+  tubiId = ""
+  if m.foxPlayerCurrentListing <> invalid then
+    tubiId = m.foxPlayerCurrentListing.tubi_id
+  end if
+
+  payload = {
+    "tubi_id": tubiId
+    "event_data": exitStreamEventData
+    "timestamp": createObject("roDateTime").toISOString()
+  }
+  logInfo(FormatJSON(payload), "videoInfo", "foxLiveExitStream", 0.001)
+
   m.foxPlayerEndSlateCloseDelayTimer = createObject("roSGNode", "Timer")
   m.foxPlayerEndSlateCloseDelayTimer.observeField("fire", "onFoxPlayerEndSlateCloseDelayTimerFired")
   ' We want to delay foxPlayerEndSlateCloseDelay seconds before we close the player

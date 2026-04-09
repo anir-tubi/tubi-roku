@@ -1,0 +1,12 @@
+name: fox-live-exit-stream-logging
+jira: TPLAYER-2723
+createdAt: 2026-03-23T23:31:01.879856Z
+worktree:
+  branch: fox-live-exit-stream-logging-TPLAYER-2723
+  baseBranch: master
+workflow: simple
+variables:
+  featureName: fox-live-exit-stream-logging
+  branchName: fox-live-exit-stream-logging-TPLAYER-2723
+  coAuthorEmail: pshetty@tubi.tv
+  coAuthorName: Prajwal Shetty

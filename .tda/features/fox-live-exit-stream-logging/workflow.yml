@@ -1,0 +1,56 @@
+name: simple
+description: Streamlined workflow using simple all-in-one worker and PR submission
+stages:
+- name: jira
+  description: Load JIRA ticket details into intent
+  worker: jira
+  approvalRequired: false
+  maxRetries: 1
+  inputs:
+  - config.yml
+  - specs/intent.md
+  outputs:
+  - specs/intent.md
+- name: intent-polish
+  description: Analyze codebase, ask clarifying questions, refine intent
+  worker: intent-polish
+  approvalRequired: true
+  maxRetries: 1
+  inputs:
+  - specs/intent.md
+  outputs:
+  - specs/intent.md
+  - docs/intent-questions.yml
+- name: build
+  description: Complete end-to-end implementation
+  worker: simple
+  approvalRequired: false
+  maxRetries: 3
+  inputs:
+  - specs/intent.md
+  outputs: []
+- name: pr
+  description: Create pull request
+  worker: pr
+  approvalRequired: false
+  maxRetries: 2
+  inputs:
+  - specs/intent.md
+  outputs: []
+- name: jira-finish
+  description: Add PR link to JIRA ticket
+  worker: jira-finish
+  approvalRequired: false
+  maxRetries: 1
+  inputs:
+  - config.yml
+  - status.yml
+  outputs: []
+- name: pr-fix
+  description: Fix pull request code review comments
+  worker: pr-fix
+  approvalRequired: false
+  maxRetries: 1
+  inputs: []
+  outputs:
+  - specs/pr-fix-plan.md

@@ -1,0 +1,121 @@
+status: completed
+currentStageIndex: 5
+stages:
+- name: jira
+  status: completed
+  retryCount: 0
+  durationMs: 21019
+  numTurns: 7
+  totalCostUsd: 0.026923549999999997
+  startedAt: 2026-03-23T23:32:26.040844Z
+  endedAt: 2026-03-23T23:32:51.641090Z
+  error: null
+  attemptMetrics:
+  - attemptNumber: 1
+    turns: 7
+    costUsd: 0.026923549999999997
+    durationMs: 21019
+    startedAt: 2026-03-23T23:32:26.040844Z
+    endedAt: 2026-03-23T23:32:51.641090Z
+  sessionId: f47309b7-9c9a-493d-9093-4d0c2d5dd2ec
+- name: intent-polish
+  status: completed
+  retryCount: 0
+  durationMs: 160265
+  numTurns: 17
+  totalCostUsd: 0.65540455
+  startedAt: 2026-03-24T02:35:09.082496Z
+  endedAt: 2026-03-24T02:37:52.464109Z
+  error: null
+  attemptMetrics:
+  - attemptNumber: 1
+    turns: 17
+    costUsd: 1.1093887
+    durationMs: 1508200
+    startedAt: 2026-03-23T23:32:51.642216Z
+    endedAt: 2026-03-23T23:58:01.828945Z
+  - attemptNumber: 1
+    turns: 17
+    costUsd: 0.65540455
+    durationMs: 160265
+    startedAt: 2026-03-24T02:35:09.082496Z
+    endedAt: 2026-03-24T02:37:52.464103Z
+  sessionId: 23da97cc-511c-4911-a450-14f2278889eb
+- name: build
+  status: completed
+  retryCount: 0
+  durationMs: 106102
+  numTurns: 17
+  totalCostUsd: 0.39103124999999994
+  startedAt: 2026-03-24T02:54:25.315787Z
+  endedAt: 2026-03-24T02:56:13.979266Z
+  error: null
+  attemptMetrics:
+  - attemptNumber: 1
+    turns: 17
+    costUsd: 0.39103124999999994
+    durationMs: 106102
+    startedAt: 2026-03-24T02:54:25.315787Z
+    endedAt: 2026-03-24T02:56:13.979265Z
+  sessionId: ad6d48c4-f645-4c58-8161-254b130c0273
+- name: pr
+  status: completed
+  retryCount: 0
+  durationMs: 181140
+  numTurns: 29
+  totalCostUsd: 0.4010149500000001
+  startedAt: 2026-03-24T02:56:14.551833Z
+  endedAt: 2026-03-24T02:59:18.320208Z
+  error: null
+  attemptMetrics:
+  - attemptNumber: 1
+    turns: 29
+    costUsd: 0.4010149500000001
+    durationMs: 181140
+    startedAt: 2026-03-24T02:56:14.551833Z
+    endedAt: 2026-03-24T02:59:18.320206Z
+  sessionId: 6e83a1f0-4c5f-4cc7-aec7-35e7d1104c27
+- name: jira-finish
+  status: completed
+  retryCount: 0
+  durationMs: 20720
+  numTurns: 9
+  totalCostUsd: 0.03759695
+  startedAt: 2026-03-24T02:59:18.324336Z
+  endedAt: 2026-03-24T02:59:41.477226Z
+  error: null
+  attemptMetrics:
+  - attemptNumber: 1
+    turns: 9
+    costUsd: 0.03759695
+    durationMs: 20720
+    startedAt: 2026-03-24T02:59:18.324336Z
+    endedAt: 2026-03-24T02:59:41.477225Z
+  sessionId: 6cf58243-2a5b-47de-9d5a-b390f010f771
+- name: pr-fix
+  status: completed
+  retryCount: 0
+  durationMs: 266115
+  numTurns: 36
+  totalCostUsd: 1.0212642499999998
+  startedAt: 2026-03-24T03:10:47.469256Z
+  endedAt: 2026-03-24T03:15:16.398391Z
+  error: null
+  attemptMetrics:
+  - attemptNumber: 1
+    turns: 36
+    costUsd: 1.0212642499999998
+    durationMs: 266115
+    startedAt: 2026-03-24T03:10:47.469256Z
+    endedAt: 2026-03-24T03:15:16.398391Z
+  sessionId: 2f3ef845-a564-4cc9-927e-52b16b5a1287
+metrics:
+  totalDurationMs: 755361
+  totalCostUsd: 2.5332355
+  totalTurns: 115
+pr:
+  number: 5941
+  url: https://github.com/adRise/tubi-roku/pull/5941
+  state: open
+  hasNewComments: false
+  hasConflicts: false

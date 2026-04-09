@@ -1,0 +1,42 @@
+version: 1
+generated_at: "2026-03-23T12:00:00Z"
+status: complete
+summary: "Intent has been refined with sufficient detail for design generation. All clarifying questions resolved: using tubi_id for content identification, no live-playback guard needed, minimal payload. Corrected logging API from trackingLoggingTask pattern to direct logInfo() call, and fixed addLog reference to tubiLog()."
+
+questions: []
+
+context:
+  related_files:
+    - path: "src/channel/components/controllers/ContentController/FoxVideoPlayerWrapperScreenHelpers.brs"
+      description: "Contains onFoxVideoPlayerExitStreamChange() handler at line 585 - the single file to modify. Also has onLiveAssetInfoChange() which populates m.foxPlayerCurrentListing with tubi_id."
+      relevance: high
+    - path: "src/channel/source/lib/Log.brs"
+      description: "Logging framework with logInfo(message, serverTypeName, subtype, samplePercent) function. Handles sampling via tubiLog_isSampled() using Rnd(0) comparison."
+      relevance: high
+    - path: "src/channel/components/controllers/ContentController/VideoHelpers.brs"
+      description: "Contains example videoInfo logging patterns (e.g., video-title-undefined subtype at line 271) to follow as reference."
+      relevance: medium
+    - path: "src/channel/components/screens/FoxVideoPlayerWrapperScreen/FoxVideoPlayerWrapperScreen.brs"
+      description: "Fox player wrapper screen component. Contains buildPlayerInfo() with live playback flags. Confirms Fox player is live-only."
+      relevance: medium
+    - path: "src/channel/components/tasks/TrackingLoggingTask/TrackingLoggingTask.brs"
+      description: "Task that processes log messages. Used internally by logInfo() in SceneGraph context — no direct interaction needed."
+      relevance: low
+
+  detected_patterns:
+    - "logInfo(FormatJSON(payload), 'videoInfo', 'subtype-name', samplePercent) for analytics logging"
+    - "tubiLog(message) for on-device console debug logging"
+    - "Sampling via samplePercent float param (0.001 = 0.1%)"
+    - "Fox player events observed via foxRpfInstance.playerEvent field observers"
+    - "m.foxPlayerCurrentListing populated from onLiveAssetInfoChange() with tubi_id field"
+
+  tech_stack:
+    - "BrightScript / SceneGraph (Roku)"
+    - "Fox RPF (Roku Player Framework) runtime component library"
+    - "Tubi analytics pipeline (client_logs via analyticsV3 endpoint)"
+    - "Rooibos test framework"
+
+  suggestions:
+    - "Use logInfo() directly rather than m.trackingLoggingTask.logMsg — logInfo handles the SceneGraph routing internally via tubiLog_helper"
+    - "Handle case where m.foxPlayerCurrentListing may be invalid (e.g., exitStream fires before onLiveAssetInfoChange completes)"
+    - "FormatJSON the exitStream event data to safely stringify any nested objects in the payload"

@@ -1,0 +1,11 @@
+- input: |-
+    Q1: Which content_id to include in the log payload?
+    - Tubi video ID (listing.tubi_id)
+
+    Q2: Should a live-playback guard be added?
+    - No guard needed - Fox player is live-only
+
+    Q3: Should the log also include the foxPlayerEndSlateCloseDelay value?
+    - No, keep payload minimal
+  status: open
+  timestamp: 2026-03-24T02:35:09.049143Z
