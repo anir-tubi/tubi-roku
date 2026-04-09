@@ -1,0 +1,36 @@
+---
+description: Run bsfmt formatter on .brs files after editing them
+globs: **/*.brs
+alwaysApply: false
+---
+
+# Run bsfmt After Editing BrightScript Files
+
+After making any edits to a `.brs` file, run the formatter:
+
+```
+npx bsfmt <path/to/file.brs>
+```
+
+This is **mandatory** — the CI "Check formatting consistency" step will fail if skipped.
+
+## Key rules enforced by bsfmt.json
+
+- `Function` / `End Function` (Title case) — not `function` / `end function`
+- `AND` / `OR` (uppercase) — not `and` / `or`
+- All other keywords lowercase (`if`, `then`, `end if`, `for`, `return`, etc.)
+- 2-space indentation (spaces, not tabs)
+- Comments use `'` single-quote style
+- No trailing whitespace
+- Spaces inside non-empty `{}` braces
+- Multi-line objects/arrays are formatted consistently
+
+## Example
+
+After editing `HomeScreenHelpers.brs`:
+
+```
+npx bsfmt src/channel/components/controllers/ContentController/HomeScreenHelpers.brs
+```
+
+If editing multiple files, run bsfmt on each one individually.
