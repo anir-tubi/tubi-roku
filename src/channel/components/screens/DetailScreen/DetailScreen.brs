@@ -465,6 +465,8 @@ Function onContentChange(msg) as Void
     addRemoveMenuItem(false, menuIndex)
     menuIndex = m.NodeHelpers.getChildIndexById(m.Menu.content, m.ResumeMenuItem.id)
     addRemoveMenuItem(false, menuIndex)
+    menuIndex = m.NodeHelpers.getChildIndexById(m.Menu.content, m.EpisodesMenuItem.id)
+    addRemoveMenuItem(false, menuIndex)
 
     '//Display the coming soon badge on the info panel
     m.Info.availabilityStarts = m.top.content.availabilityStarts

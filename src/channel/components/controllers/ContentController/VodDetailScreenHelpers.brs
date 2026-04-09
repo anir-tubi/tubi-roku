@@ -484,6 +484,16 @@ Function onGetSeasonListSuccess(seasonData)
           screen.seasonList = seasonData
           getSeriesEpisodes(seriesId, seasonNum, 1, pageSizeInSeason)
         end if
+      else
+        ' episodes_by_season was present but empty (seasons AA is blank), so
+        ' resolveSeasonNum() returned invalid — this is the coming soon series path.
+        ' Fall back to singleContent (/api/v2/content) to get the full series node,
+        ' including availabilityStarts, which is not present on the homescreen stub.
+        if screen.content <> invalid
+          getSingleContentFromServer(screen.content, onGetSeasonListFallbackSuccess, onGetSeasonListFallbackError)
+        else
+          showHideSpinner(false)
+        end if
       end if
     end if
   end if
@@ -1496,7 +1506,7 @@ Function onGetSeasonListFallbackSuccess(content)
     if screen <> invalid AND screen.content <> invalid
       content.sotInfo = screen.content.sotInfo
       applyVodDetailContentSotSignalsPerDetailScreenExperiment(content)
-      screen.content.update(content, true)
+      screen.content = content
 
       seasonData = buildSeasonListFromContent(content)
       if seasonData <> invalid
