@@ -106,6 +106,11 @@ Function showVodDetailScreen(inputContent, playbackSource, successCb = invalid, 
         getSingleContentFromServer(content, onGetVodContentSuccess, onGetVodContentError)
       else
         onGetVodContentSuccess(content)
+        ' YMAL API does not return channel data. Fetch channelId async and refresh button list only.
+        if isAA(playbackSource) = true AND playbackSource.srcForAds = m.constants.player.playbackOrigin.ymal
+          getSingleContentFromServer(content, onGetVodContentChannelInfoSuccess, sub(_error)
+          end sub)
+        end if
       end if
     end if
     if screen.wasContentFetchCompleted = false
@@ -193,6 +198,23 @@ Function onGetVodContentSuccess(content)
     showHideSpinner(false)
 
     executeVodDetailSuccessCallback(content, screen.playbackSource, screen.episodes)
+  end if
+End Function
+
+
+' Lightweight callback for async channel info fetch from YMAL navigation.
+' Copies only channel fields onto existing screen content and refreshes the button list.
+Function onGetVodContentChannelInfoSuccess(content)
+  tubiLog("VodDetailScreenHelpers.onGetVodContentChannelInfoSuccess")
+  screen = getDetailScreenFromStackWithId(m.constants.ui.screenIds.vodDetailScreen, content.id)
+  if screen <> invalid AND screen.content <> invalid AND isNonEmptyString(content.channelId)
+    screen.content.update({
+      channelId: content.channelId
+      channelName: content.channelName
+      channelLogoShort: content.channelLogoShort
+      inlineLogoUri: content.inlineLogoUri
+    }, true)
+    screen.shouldRefreshButtonList = true
   end if
 End Function
 

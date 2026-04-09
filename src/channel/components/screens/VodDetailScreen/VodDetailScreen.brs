@@ -261,11 +261,6 @@ Function refreshButtonList()
     if m.isComingSoon = false
       addPlayOrResumeButtons(buttons, itemContent, history)
       addSignInButton(buttons)
-      addCreatorButton(buttons, itemContent)
-    end if
-
-    addTrailerButton(buttons, itemContent)
-    if m.isComingSoon = false
       if itemContent.type = m.constants.ui.contentTypes.series AND m.isEpisodeContainerBelowFold <> true
         buttons.push({
           id: "episodes"
@@ -275,7 +270,6 @@ Function refreshButtonList()
           trackingContext: createButtonAnalytics("episodes")
         })
       end if
-
       if m.isEpisodeContainerBelowFold = true
         if itemContent.type = m.constants.ui.contentTypes.series
           m.episodesContainer.visible = true
@@ -287,6 +281,10 @@ Function refreshButtonList()
         end if
       end if
     end if
+
+    addTrailerButton(buttons, itemContent)
+    addCreatorButton(buttons, itemContent)
+
 
     addQueueButton(buttons, bookmark)
 
@@ -683,6 +681,7 @@ Function addPlayOrResumeButtons(buttons, content, history) as Void
       id: "startFromBeginning"
       title: getTranslation("screenDetails_button_restart")
       iconUrl: "pkg:/images/icon-restart.webp"
+      isPrimaryButton: true
       trackingContext: createButtonAnalytics("startFromBeginning")
     })
   else
