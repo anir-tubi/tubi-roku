@@ -170,7 +170,7 @@ ${testDetails.testSteps.split('\n').map((line, idx) => `   * ${idx + 1}. ${line.
   // test code here
 });
 
-OUTPUT: TypeScript code only. Start with 'import'. No explanations/markdown.
+OUTPUT: TypeScript code only. Start with 'import'. No explanations/markdown/html/css.
 </guidelines>`;
 }
 

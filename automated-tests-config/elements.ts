@@ -147,6 +147,18 @@ const elements = typeCheckElements({
       '#ContentController.#uiGroup.#ContentGroup.#screenStackGroup.#ScreenStack.#pivotDetailScreen.#screenContentGroup.#pivotTitleLabel',
   },
 
+  /** Collection Screen (Creator Page) shown when clicking a creator tile */
+  collectionScreen: {
+    keyPath:
+      '#ContentController.#uiGroup.#ContentGroup.#screenStackGroup.#ScreenStack.#collectionScreen',
+  },
+
+  /** Creator name label in the info panel on the Collection Screen */
+  collectionScreenCreatorName: {
+    keyPath:
+      '#ContentController.#uiGroup.#ContentGroup.#screenStackGroup.#ScreenStack.#collectionScreen.#creatorInfoPanel.#nameLabel',
+  },
+
   /** Skin ad row component in CategoryGridList */
 
   skinAdContainer: {
@@ -2867,6 +2879,30 @@ const elements = typeCheckElements({
   searchResultsGridPoster: {
     keyPath:
       '#ContentController.#uiGroup.#ContentGroup.#screenStackGroup.#ScreenStack.#searchScreen.#PageGroup.#ResultArea.#gridContainer.#resultsContainer.#ResultGrid.0.#poster',
+  },
+
+  /** Logo Poster inside the focused AppItem grid tile (first search result) */
+  searchResultGridAppItemLogo: {
+    keyPath:
+      '#ContentController.#uiGroup.#ContentGroup.#screenStackGroup.#ScreenStack.#searchScreen.#PageGroup.#rightSide.#ResultArea.#gridContainer.#resultsContainer.#ResultGrid.0.#logo',
+  },
+
+  /** Title label inside the focused AppItem grid tile (first search result) */
+  searchResultGridAppItemTitle: {
+    keyPath:
+      '#ContentController.#uiGroup.#ContentGroup.#screenStackGroup.#ScreenStack.#searchScreen.#PageGroup.#rightSide.#ResultArea.#gridContainer.#resultsContainer.#ResultGrid.0.#title',
+  },
+
+  /** TitleLogo Poster in the SearchScreen InfoPanel (displayed left of creator name) */
+  searchScreenInfoPanelTitleLogo: {
+    keyPath:
+      '#ContentController.#uiGroup.#ContentGroup.#screenStackGroup.#ScreenStack.#searchScreen.#SearchScreenInfoPanel.#infoPanelGroup.#Offset.#TitleGroup.#TitleLogo',
+  },
+
+  /** Title label in the SearchScreen InfoPanel TitleGroup */
+  searchScreenInfoPanelTitle: {
+    keyPath:
+      '#ContentController.#uiGroup.#ContentGroup.#screenStackGroup.#ScreenStack.#searchScreen.#SearchScreenInfoPanel.#infoPanelGroup.#Offset.#TitleGroup.#Title',
   },
 
   /* Welcome registration modal */

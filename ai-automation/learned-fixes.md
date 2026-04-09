@@ -36,7 +36,46 @@ AFTER:
 
 ## Recorded Fixes
 
-_Fixes will be added here as test failures are resolved._
+### Fix #1: Creator Search Test Requires Experiment Override
+**Date:** 2026-03-25
+**Test File:** `js/automated-tests/tests/creatorverse.ts`
+**Error Type:** Visibility
+
+**Error Message:**
+```
+Error: Search results grid does not contain expected Creator Page tile
+```
+
+**Root Cause:**
+1. The `roku_search_creator_tile_v1` experiment defaults to `enabled: false`, so creator tiles never appear in results without an explicit override.
+
+**Solution Applied:**
+1. Added `experimentOverrides` to `startApplicationAtPage` to enable `roku_search_creator_tile_v1`.
+
+**Code Changes:**
+BEFORE:
+```typescript
+await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: true });
+```
+
+AFTER:
+```typescript
+await testUtils.startApplicationAtPage('home', {
+  shouldCreateNewUser: true,
+  experimentOverrides: {
+    roku_search_creator_tile: {
+      roku_search_creator_tile_v1: {
+        default: { "enabled": true }
+      }
+    }
+  }
+});
+```
+
+**Pattern Matched:** New pattern
+**Lessons Learned:**
+- Search tests that depend on feature-flagged content MUST include the corresponding `experimentOverrides` in `startApplicationAtPage`.
+- Experiment name for creator tiles in search: `roku_search_creator_tile` / `roku_search_creator_tile_v1` with `{ "enabled": true }`.
 
 ---
 

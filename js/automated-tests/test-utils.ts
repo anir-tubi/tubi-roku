@@ -73,7 +73,8 @@ enum ScreenIds {
   'managePreferencesScreen' = 'managePreferencesScreen',
   'signUpAgeVerificationScreen' = 'signUpAgeVerificationScreen',
   'rokuContinueWatchingConsentScreen' = 'rokuContinueWatchingConsentScreen',
-  'pivotDetailScreen' = 'pivotDetailScreen'
+  'pivotDetailScreen' = 'pivotDetailScreen',
+  'collectionScreen' = 'collectionScreen'
 }
 
 
