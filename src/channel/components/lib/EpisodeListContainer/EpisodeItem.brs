@@ -16,7 +16,7 @@ Function init() as Void
 
   setTypographyOfLabel(m.episodeTitle, m.typographyConstants.ids.subheaderSmall, { lineSpacing: 2 })
   setTypographyOfLabel(m.description, m.typographyConstants.ids.bodyMedium, { lineSpacing: 2 })
-  setTypographyOfLabel(m.duration, m.typographyConstants.ids.bodyMedium)
+  setTypographyOfLabel(m.duration, m.typographyConstants.ids.bodySmall)
   setTypographyOfLabel(m.ratingLabel, m.typographyConstants.ids.bodyExtraSmallStrong)
 
   if m.global <> invalid
