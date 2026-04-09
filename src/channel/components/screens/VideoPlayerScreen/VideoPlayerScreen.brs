@@ -968,11 +968,13 @@ Function playContent()
         ' Start pre-roll fetch
         m.top.adControl = "preroll"
       else
+        updatePlayerLogLib(m.playerLogLib, "setFirstFrameForContentStart")
         m.Video.control = "play"
         setInitialCCAndAudioTracks()
       end if
 
     else
+      updatePlayerLogLib(m.playerLogLib, "setFirstFrameForContentStart")
       m.Video.control = "play"
       setInitialCCAndAudioTracks()
     end if
