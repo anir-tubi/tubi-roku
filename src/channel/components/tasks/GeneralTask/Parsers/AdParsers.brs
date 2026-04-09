@@ -122,14 +122,14 @@ Function parseSponsoredHubAdsSuccess(fullResponse, _reqInfo) as Object
     trackers: adUnit.trackers
   }
 
-  if assets.small_logo_lockup <> invalid AND isNonEmptyString(assets.small_logo_lockup.url)
-    result.smallLogoLockupUrl = assets.small_logo_lockup.url
+  if assets.small_logo_lockup_tv <> invalid AND isNonEmptyString(assets.small_logo_lockup_tv.url)
+    result.smallLogoLockupUrl = assets.small_logo_lockup_tv.url
   end if
-  if assets.brand_background <> invalid AND isNonEmptyString(assets.brand_background.url)
-    result.brandBackgroundUrl = assets.brand_background.url
+  if assets.brand_background_tv <> invalid AND isNonEmptyString(assets.brand_background_tv.url)
+    result.brandBackgroundUrl = assets.brand_background_tv.url
   end if
-  if assets.brand_graphic <> invalid AND isNonEmptyString(assets.brand_graphic.url)
-    result.brandGraphicUrl = assets.brand_graphic.url
+  if assets.brand_graphic_tv <> invalid AND isNonEmptyString(assets.brand_graphic_tv.url)
+    result.brandGraphicUrl = assets.brand_graphic_tv.url
   end if
 
   return result
@@ -160,12 +160,12 @@ Function parseSponsoredContainerAd(adUnits) as Object
     validDuration: adUnit.valid_duration
   }
 
-  if assets.hero_logo <> invalid AND isNonEmptyString(assets.hero_logo.url)
-    containerResult.heroLogoUrl = assets.hero_logo.url
+  if assets.hero_logo_tv <> invalid AND isNonEmptyString(assets.hero_logo_tv.url)
+    containerResult.heroLogoUrl = assets.hero_logo_tv.url
   end if
 
-  if assets.brand_background <> invalid AND isNonEmptyString(assets.brand_background.url)
-    containerResult.brandBackgroundUrl = assets.brand_background.url
+  if assets.brand_background_tv <> invalid AND isNonEmptyString(assets.brand_background_tv.url)
+    containerResult.brandBackgroundUrl = assets.brand_background_tv.url
   end if
 
   return containerResult
@@ -646,7 +646,7 @@ Function processSponsoredLiveEventsHeroAdContent(adUnits) as Object
   end if
 
   assets = adUnit.ad.assets
-  if assets = invalid OR assets.brand_logo = invalid OR isNonEmptyString(assets.brand_logo.url) = false
+  if assets = invalid OR assets.brand_logo_tv = invalid OR isNonEmptyString(assets.brand_logo_tv.url) = false
     return invalid
   end if
 
@@ -665,7 +665,7 @@ Function processSponsoredLiveEventsHeroAdContent(adUnits) as Object
   adNode.id = adId
   adNode.type = m.constants.ui.contentTypes.sponsoredLiveEventsHero
   ' titleImageUrl is repurposed here to carry the brand logo overlay URL
-  adNode.titleImageUrl = assets.brand_logo.url
+  adNode.titleImageUrl = assets.brand_logo_tv.url
   adNode.imageImpTracking = aImageTracking
   adNode.validUntil = iValidUntil
   adNode.adInfo = {

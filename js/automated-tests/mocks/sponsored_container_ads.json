@@ -10,10 +10,10 @@
         },
         "ad": {
           "assets": {
-            "hero_logo": {
+            "hero_logo_tv": {
               "url": "https://dq22kh8qxu6kh.cloudfront.net/cc64be02-3f41-4ad3-b05d-df83cdbe63d1/sponsored_container/hero_logo_tv.png"
             },
-            "brand_background": {
+            "brand_background_tv": {
               "url": "https://dq22kh8qxu6kh.cloudfront.net/cc64be02-3f41-4ad3-b05d-df83cdbe63d1/sponsored_hub/brand_background_tv.jpg"
             }
           },
