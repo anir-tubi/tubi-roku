@@ -226,6 +226,12 @@ Function registerParsingCallbacks()
     parseError: parseHomeScreenAdsError
   }
 
+  ' video player scrubber showcase ads
+  m.requestTypes[m.constants.reqNames.getVideoPlayerScrubberShowcase] = {
+    parseSuccess: parseVideoPlayerScrubberShowcaseSuccess
+    parseError: parseVideoPlayerScrubberShowcaseError
+  }
+
   ' sponsored hub ads
   m.requestTypes[m.constants.reqNames.getSponsoredHubAds] = {
     parseSuccess: parseSponsoredHubAdsSuccess

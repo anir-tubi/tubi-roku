@@ -17,11 +17,13 @@ Function AdsApi(constants, apiUtilsLib)
       sponsoredHero: "sponsored_hero"
       thematicTakeover: "thematic_takeover_row"
       hubRowLockupAd: "sponsored_container"
+      brandedScrubber: "branded_scrubber"
     }
 
     ' public
     createHomeScreenAdReqInfo: adsApi_createHomeScreenAdReqInfo
     createSponsoredHubAdReqInfo: adsApi_createSponsoredHubAdReqInfo
+    createVideoPlayerScrubberShowcaseReqInfo: cmsApi_createVideoPlayerScrubberShowcaseReqInfo
 
     ' private
     getAdRequestHeaders: adsApi_getAdRequestHeaders
@@ -199,6 +201,8 @@ Function adsApi_generateAdUnitFromAdType(sAdType, aaAdUnits)
     aaAdUnits.sponsored_container = adsApi_adUnit([m.renderingCodes.hubRowLockupAd])
   else if sAdType = adTypes.sponsoredLiveEventsHero
     aaAdUnits.sponsored_hero = adsApi_adUnit([m.renderingCodes.sponsoredHero])
+  else if sAdType = adTypes.brandedScrubber
+    aaAdUnits.branded_scrubber = adsApi_adUnit([m.renderingCodes.brandedScrubber])
   end if
 
   return aaAdUnits
@@ -213,4 +217,44 @@ Function adsApi_adUnit(renderingCodes as Object) as Object
       rendering_codes: renderingCodes
     }
   }
+End Function
+
+
+' Request body for video player scrubber showcase ads (branded_scrubber).
+' @contentId: string or integer, current playback content id
+' @appMode: string, the app mode for which the ad request is being made
+' @userId: string, the user id for which the ad request is being made.
+' @bKidsMode: boolean Are we in kids mode?
+Function cmsApi_createVideoPlayerScrubberShowcaseReqInfo(contentId, appMode = "DEFAULT_MODE", userId = "", bKidsMode = false) as Object
+  contentIdStr = ""
+  if contentId <> invalid
+    if isString(contentId) = true
+      contentIdStr = contentId
+    else
+      contentIdStr = contentId.toStr()
+    end if
+  end if
+
+  ifaValue = ""
+  if bKidsMode = false
+    ifaValue = m.constants.deviceInfo.deviceAdId
+  end if
+
+  adUnits = {}
+  adUnits = m.generateAdUnitFromAdType(m.constants.adTypes.brandedScrubber, adUnits)
+
+  body = {
+    viewer: {
+      viewer_id: userId
+    }
+    content_id: contentIdStr
+    app: m.getAdAppInfo(ifaValue)
+    device: m.getAdDeviceInfo()
+    custom_kvps: {
+      app_mode: appMode
+    }
+    ad_units: adUnits
+  }
+
+  return m.buildAdReqInfo(body)
 End Function

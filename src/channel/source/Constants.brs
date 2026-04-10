@@ -295,6 +295,7 @@ Function getConstants()
   constants.reqNames.getMiniHomescreen = "getMiniHomescreen"
   constants.reqNames.getCategoriesListScreen = "getCategoriesListScreen"
   constants.reqNames.getHomescreenAds = "getHomescreenAds"
+  constants.reqNames.getVideoPlayerScrubberShowcase = "getVideoPlayerScrubberShowcase"
   constants.reqNames.getSponsoredHubAds = "getSponsoredHubAds"
   constants.reqNames.getCategoryDetailsScreen = "getCategoryDetailsScreen"
   constants.reqNames.getSearchDefault = "getSearchDefault"
@@ -890,6 +891,7 @@ Function getConstants()
   constants.adTypes.sponsoredLiveEventsHero = "sponsoredLiveEventsHero"
   constants.adTypes.thematicTakeover = "thematicTakeover"
   constants.adTypes.hubRowLockupAd = "hubRowLockupAd"
+  constants.adTypes.brandedScrubber = "brandedScrubber"
 
   'common http request headers
   constants.headers = {}

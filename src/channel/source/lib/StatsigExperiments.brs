@@ -167,6 +167,12 @@ Function StatsigExperimentsInterface(statsigExperimentsInfo) as Object
         default: { "enabled": false }
       }
 
+      roku_branded_scrubber: {
+        roku_branded_scrubber_v1: {
+          default: { "enabled": false }
+        }
+      }
+
       ' Low VRAM video preview experiment
       ' Variants: "control" (default 1s debounce), "debounce" (2s debounce), "detail_screen_only" (preview only on detail screen), "disabled" (no preview)
       roku_low_vram_video_preview_v1: {

@@ -278,6 +278,14 @@
     get the pauseAd overlay info.-->
     <field id="getPauseAd" type="boolean" alwaysNotify="true" />
 
+    <!-- Pulses true when main content begins playing to fetch scrubber showcase (ContentController observes). -->
+    <field id="requestVideoPlayerScrubberShowcase" type="boolean" alwaysNotify="true" />
+
+    <!-- Parsed scrubber showcase response from GeneralTask (contentId + data). -->
+    <field id="videoPlayerScrubberShowcaseResponse" type="assocarray" alwaysNotify="true" />
+    <!-- Fires scrubber showcase impression pixels via ContentController.sendAdPixels; set as { urls: [...] }. -->
+    <field id="sendScrubberShowcaseAdPixels" type="assocarray" alwaysNotify="true" />
+
     <!-- pixelUrl to fire during pause ad -->
     <field id="sendPauseAdPixel" type="string" alwaysNotify="true" />
 
@@ -582,6 +590,7 @@
         id="Thumbnail"
         width="342"
         height="192"
+        visible="false"
         spriteDirection="horiz" />
 
     </Group>  <!-- HUD -->

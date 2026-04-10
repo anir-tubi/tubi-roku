@@ -241,3 +241,62 @@ Function parseMiniHomeScreenContentSuccess(fullResponse, reqInfo)
 
   return convertedMetadata
 End Function
+
+
+' Parses scrubber showcase ad response for the video player (branded_scrubber on video_player_scrubber).
+' @param fullResponse: assocArray, as returned for successful HTTP responses with parsed JSON in .data
+' @param reqInfo: assocArray, request info including contentId
+' @returns: assocArray with data: { adId, brandedScrubberUri, scrubberShowcaseImpPixelUrls } or data: invalid
+Function parseVideoPlayerScrubberShowcaseSuccess(fullResponse, reqInfo) as Object
+  tubiLog("VideoScreenParsers.parseVideoPlayerScrubberShowcaseSuccess")
+
+  scrubberPayload = invalid
+  parsedResponse = invalid
+  if fullResponse <> invalid AND isAA(fullResponse) = true
+    parsedResponse = fullResponse.data
+  end if
+
+  if parsedResponse = invalid OR isAA(parsedResponse) = false
+    return scrubberPayload
+  end if
+
+  ads = parsedResponse.ads
+  if ads = invalid OR isAA(ads) = false OR isAA(ads.ad_units) = false
+    return scrubberPayload
+  end if
+
+  adUnit = ads.ad_units.branded_scrubber
+  if adUnit = invalid OR adUnit.rendering_code <> "branded_scrubber" OR isValidAssetAdUnit(adUnit) = false
+    return scrubberPayload
+  end if
+
+  brandedScrubberUri = ""
+  assets = adUnit.ad.assets
+  if assets <> invalid AND isAA(assets) = true
+    bsAsset = assets.branded_scrubber
+    if bsAsset <> invalid AND isAA(bsAsset) = true AND bsAsset.url <> invalid
+      brandedScrubberUri = bsAsset.url
+    end if
+  end if
+
+  impPixelUrls = invalid
+  if adUnit.trackers <> invalid AND isAA(adUnit.trackers) = true AND isNonEmptyArray(adUnit.trackers.imp) = true
+    impPixelUrls = adUnit.trackers.imp
+  end if
+
+  if isNonEmptyString(brandedScrubberUri) = true AND isNonEmptyArray(impPixelUrls) = true
+    scrubberPayload = {
+      adId: getAdID(adUnit.ad.id)
+      brandedScrubberUri: brandedScrubberUri
+      scrubberShowcaseImpPixelUrls: impPixelUrls
+    }
+  end if
+
+  return scrubberPayload
+End Function
+
+
+Function parseVideoPlayerScrubberShowcaseError(fullResponse, reqInfo)
+  tubiLog("VideoScreenParsers.parseVideoPlayerScrubberShowcaseError")
+  return invalid
+End Function

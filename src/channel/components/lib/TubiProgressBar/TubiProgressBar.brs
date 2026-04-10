@@ -3,6 +3,7 @@ Function init()
   m.background.observeField("bitmapWidth", "drawProgressBar")
   m.foreground = m.top.findNode("ProgressBarForeground")
   m.pointer = m.top.findNode("pointer")
+  m.pointer.observeFieldScoped("loadStatus", "onPointerLoadStatusChange")
 
   theme = getThemeFromGlobal()
   if theme <> invalid
@@ -18,6 +19,14 @@ Function init()
   m.top.observeField("focusColor", "drawProgressBar")
   m.top.observeField("unfocusColor", "drawProgressBar")
   m.top.observeField("isInFocusChain", "onIsInFocusChainChange")
+  m.top.observeField("brandedScrubberUri", "drawProgressBar")
+  m.top.observeField("pointerHeight", "drawProgressBar")
+
+  m.pointerDefaultSize = m.top.pointerHeight
+  if m.pointerDefaultSize < 1
+    m.pointerDefaultSize = 32
+  end if
+
   drawProgressBar()
 End Function
 
@@ -84,8 +93,32 @@ Function drawProgressBar()
     m.foreground.blendColor = m.top.focusColor
 
     if m.top.highlightPointer = true
-      m.pointer.translation = [foregroundWidth - 15, -5]
       m.pointer.visible = true
+
+      if isNonEmptyString(m.top.brandedScrubberUri) = true
+        m.pointer.uri = m.top.brandedScrubberUri
+        pointerW = 50
+        pointerH = 50
+      else
+        m.pointer.uri = "pkg:/images/transport/sgplayer/icon-pointer.webp"
+        pointerW = m.pointerDefaultSize
+        pointerH = m.pointerDefaultSize
+      end if
+
+      m.pointer.width = pointerW
+      m.pointer.height = pointerH
+
+      barHeight = m.top.height
+      if barHeight < 1
+        barHeight = 16
+      end if
+
+      pointerX = foregroundWidth - (pointerW / 2)
+      pointerY = (barHeight - pointerH) / 2
+      if isNonEmptyString(m.top.brandedScrubberUri) = false
+        pointerY = pointerY + 3
+      end if
+      m.pointer.translation = [pointerX, pointerY]
     else
       m.pointer.visible = false
     end if
@@ -93,6 +126,33 @@ Function drawProgressBar()
     m.foreground.blendColor = m.top.unfocusColor
     m.pointer.visible = false
   end if
+
+End Function
+
+
+' Updates brandedScrubberImageReady from pointer loadStatus when a branded URI is in use.
+Function onPointerLoadStatusChange(msg) as Void
+  updateBrandedScrubberImageReady()
+End Function
+
+
+' Sets brandedScrubberImageReady when the showcase image URI loaded successfully (ready + non-zero bitmap).
+Function updateBrandedScrubberImageReady() as Void
+
+  if m.pointer.loadStatus = "failed"
+    m.pointer.uri = "pkg:/images/transport/sgplayer/icon-pointer.webp"
+    m.top.brandedScrubberImageReady = false
+  else if m.pointer.loadStatus = "ready"
+    if m.pointer.bitmapWidth > 0 AND m.pointer.bitmapHeight > 0
+      m.top.brandedScrubberImageReady = true
+    else
+      m.pointer.uri = "pkg:/images/transport/sgplayer/icon-pointer.webp"
+      m.top.brandedScrubberImageReady = false
+    end if
+  else
+    m.top.brandedScrubberImageReady = false
+  end if
+
 End Function
 
 

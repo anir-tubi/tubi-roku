@@ -113,7 +113,9 @@ Function setupVideoPlayer(content, playbackSource = { "srcForAnalytic": "unknown
     videoPlayer.observeFieldScoped("visible", "onVideoPlayerVisibleChange")
     videoPlayer.observeFieldScoped("transportVoiceResponse", "onTransportVoiceResponse")
     videoPlayer.observeFieldScoped("getPauseAd", "onGetPauseAd")
+    videoPlayer.observeFieldScoped("requestVideoPlayerScrubberShowcase", "onRequestVideoPlayerScrubberShowcase")
     videoPlayer.observeFieldScoped("sendPauseAdPixel", "onSendPauseAdPixel")
+    videoPlayer.observeFieldScoped("sendScrubberShowcaseAdPixels", "onSendScrubberShowcaseAdPixels")
     videoPlayer.observeFieldScoped("subtitleTrackSettings", "onSubtitleTrackSettingsChange")
     videoPlayer.observeFieldScoped("audioTrackSettings", "onAudioTrackSettingsChange")
     videoPlayer.observeFieldScoped("relatedContentToPlay", "onPlayerRelatedContentToPlay")
@@ -696,6 +698,62 @@ Function onVideoPlayerState(msg)
     end if
 
     trackVideoPlayerStoppingState(state)
+  end if
+End Function
+
+
+Function onRequestVideoPlayerScrubberShowcase(msg) as Void
+  videoPlayer = msg.getRoSGNode()
+  if videoPlayer = invalid
+    return
+  end if
+
+  content = videoPlayer.content
+  if content = invalid OR content.id = invalid
+    return
+  end if
+
+  appMode = videoPlayer.appMode
+  if appMode = invalid OR appMode = ""
+    appMode = "DEFAULT_MODE"
+  end if
+
+  authInfo = m.tubiAuthUpdate.getAuthInfo()
+  userId = ""
+  if authInfo <> invalid AND authInfo.userId <> invalid
+    userId = authInfo.userId.toStr()
+  end if
+
+  scrubberReqInfo = m.adsApi.createVideoPlayerScrubberShowcaseReqInfo(content.id, appMode, userId, isKidsUIOn())
+
+  if scrubberReqInfo <> invalid
+    m.makeRequest({
+      url: scrubberReqInfo.url
+      requestType: m.constants.reqNames.getVideoPlayerScrubberShowcase
+      options: scrubberReqInfo.options
+      successCallback: onVideoPlayerScrubberShowcaseResponse
+      errorCallback: onVideoPlayerScrubberShowcaseError
+      silenceCallbackWarnings: true
+      responseType: "assocarray"
+      timeoutInMilliSec: scrubberReqInfo.timeoutInMilliSec
+      analyticsScreenId: m.constants.ui.screenIds.videoPlayerScreen
+    })
+  end if
+End Function
+
+
+Function onVideoPlayerScrubberShowcaseResponse(response)
+  videoPlayerScreen = getFromScreenCache(m.constants.ui.screenIds.videoPlayerScreen)
+  if videoPlayerScreen <> invalid AND response <> invalid
+    videoPlayerScreen.videoPlayerScrubberShowcaseResponse = response
+  end if
+End Function
+
+
+Function onVideoPlayerScrubberShowcaseError(err)
+  videoPlayerScreen = getFromScreenCache(m.constants.ui.screenIds.videoPlayerScreen)
+  if videoPlayerScreen <> invalid
+    videoPlayerScreen.videoPlayerScrubberShowcaseResponse = invalid
   end if
 End Function
 
@@ -1547,6 +1605,19 @@ End Function
 Function onSendPauseAdPixel(msg)
   pixelUrl = msg.getData()
   sendPauseAdPixel(pixelUrl)
+End Function
+
+
+' Fires video player scrubber showcase impression pixels (trackers.imp).
+Function onSendScrubberShowcaseAdPixels(msg)
+  payload = msg.getData()
+  urls = invalid
+  if isAA(payload) = true AND payload.urls <> invalid
+    urls = payload.urls
+  end if
+  if isNonEmptyArray(urls) = true
+    sendAdPixels(urls)
+  end if
 End Function
 
 

@@ -153,6 +153,7 @@ Function init()
   m.top.observeFieldScoped("adBufferingObject", "onAdBufferingObject")
   m.top.observeFieldScoped("filledAdData", "onHandleFilledAdData")
   m.top.observeFieldScoped("showYMALInFullScreen", "onShowYMALInFullScreen")
+  m.top.observeFieldScoped("videoPlayerScrubberShowcaseResponse", "onVideoPlayerScrubberShowcaseResponse")
 
   'isPauseAdReqInProgress is the state of pauseAd requests in flight.
   'If pause ad request is in flight, we do not send another pause ad request
@@ -420,6 +421,8 @@ Function init()
     m.LoadingProgressBar.scaledUI = isScaledUI
   end if
 
+  m.ProgressBar.observeFieldScoped("brandedScrubberImageReady", "onBrandedScrubberImageReadyChange")
+
   ' m.didAdvanceDrm holds current state regarding if playback failed, and the player is going to try the
   ' the next video stream available
   m.didAdvanceDrm = false
@@ -580,6 +583,8 @@ Function initExperiments()
   ' BWW Landscape experiment
   m.isBWWLandscapeEnabled = getStatsigExperimentResource("roku_player_improvement", "roku_bww_landscape_v2", false).enabled
 
+  ' Branded Scrubber experiment
+  m.isBrandedScrubberEnabled = getStatsigExperimentResource("roku_branded_scrubber", "roku_branded_scrubber_v1", false).enabled
 End Function
 
 
@@ -843,6 +848,11 @@ Function autoHideSkipCuepointsButton()
     if shouldShowSubtitleOverlay = true
       showSubtitleSelectionOverlay()
       m.hasShownSubtitleOverlayForCurrentPlayback = true
+    else
+      if m.isBrandedScrubberEnabled = true AND m.top.videoPlayerScrubberShowcaseResponse <> invalid
+        showTransport()
+        showBrowseWhileWatching()
+      end if
     end if
   else
     ' HUD is visible - defer showing subtitle overlay until HUD closes
@@ -1112,14 +1122,16 @@ Function onControlChange()
   updatePlayerLogLib(m.playerLogLib, "setVideoControl", control)
 
   if control = "play"
-    if m.top.content <> invalid
+    content = m.top.content
+    if content <> invalid
       playerLoadTime = m.top.loadTime
       updatePlayerLogLib(m.playerLogLib, "setPlayerInitialization", playerLoadTime)
-      prepareToStartVideo(m.top.content)
+      prepareToStartVideo(content)
       updatePlayerLogLib(m.playerLogLib, "setPlayerSetupEndTime")
       updatePlayerLogLib(m.playerLogLib, "setLastStartStep", "START_LOAD")
       updatePlayerLogLib(m.playerLogLib, "setPlayerStage", "READY")
       updatePlayerLogLib(m.playerLogLib, "setPlaybackSource", m.top.playbackSource)
+      requestScrubberShowcase(content.id)
       playContent()
     end if
 
@@ -1224,6 +1236,15 @@ Function onFallbackTimerFired()
 End Function
 
 
+' Fetches scrubber showcase from the play path before playContent(), and again after imp pixels fire (see fireScrubberShowcaseImpPixels).
+Function requestScrubberShowcase(contentId) as Void
+  if isNonEmptyString(contentId) = true
+    logDebug("VideoPlayer.requestScrubberShowcase for contentId: " + contentId)
+    m.top.requestVideoPlayerScrubberShowcase = true
+  end if
+End Function
+
+
 'Occurs when m.Video.state changes (not when m.top.state changes)
 Function onVideoStateChange(msg)
   logDebug("VideoPlayer.onVideoStateChange " + msg.GetData())
@@ -1238,6 +1259,14 @@ Function onVideoStateChange(msg)
     end if
     m.shouldFireStartVideoEvent = false
     fireStartVideoOrTrailerEvent()
+
+    if state = "playing"
+      if m.isBrandedScrubberEnabled = true AND m.top.videoPlayerScrubberShowcaseResponse <> invalid AND contentHasSkipCuepoints() = false
+        showTransport()
+        showBrowseWhileWatching()
+      end if
+    end if
+
   end if
 
   if state = "buffering"
@@ -2307,6 +2336,9 @@ Function resetVideoPlayerState(content = invalid)
     m.top.adPosition = content.nowPos
     updateVideoPlayerState(content)
   end if
+
+  resetBrandedScrubberShowcaseState()
+  m.top.videoPlayerScrubberShowcaseResponse = invalid
 
   m.isPauseAdReqInProgress = false
   m.isPixelFiredForCurrentPauseAd = true
@@ -3705,4 +3737,37 @@ Function onSubtitleSelectionOverlayPlayPressed(msg)
     showTransport()
     pauseVideo(true, true)
   end if
+End Function
+
+
+' Applies scrubber showcase assets when image URI is valid; imp pixels only after the pointer image loads successfully.
+Function onVideoPlayerScrubberShowcaseResponse(msg) as Void
+  response = msg.getData()
+  resetBrandedScrubberShowcaseState()
+
+  if response <> invalid
+    if m.isBrandedScrubberEnabled = true
+      m.ProgressBar.brandedScrubberUri = response.brandedScrubberUri
+    end if
+    fireScrubberShowcaseExposure()
+  end if
+
+End Function
+
+
+Function onBrandedScrubberImageReadyChange(msg) as Void
+  m.brandedScrubberImageReady = msg.getData()
+
+  if m.brandedScrubberImageReady = true AND m.isBrandedScrubberEnabled = true AND m.top.videoPlayerScrubberShowcaseResponse <> invalid AND m.scrubberShowcaseImpPixelFired = false AND m.HUD.opacity > 0 AND m.focusedNode.isSameNode(m.progressBar) = true
+    fireScrubberShowcaseImpPixels()
+  end if
+
+End Function
+
+
+Function resetBrandedScrubberShowcaseState()
+  m.ProgressBar.brandedScrubberUri = ""
+  m.scrubberShowcaseImpPixelFired = false
+  m.top.sendScrubberShowcaseAdPixels = invalid
+  m.brandedScrubberImageReady = false
 End Function

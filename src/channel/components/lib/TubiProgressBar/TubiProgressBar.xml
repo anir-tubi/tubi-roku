@@ -11,6 +11,8 @@
 <component name="TubiProgressBar" extends="Group">
   <script type="text/brightscript" uri="TubiProgressBar.brs" />
   <script type="text/brightscript" uri="pkg:/components/lib/GlobalMixin.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/StringUtils.brs" />
+  <script type="text/brightscript" uri="pkg:/source/3rdparty/rta/typeUtils.brs" />
 
   <interface>
     <!-- INPUT -->
@@ -27,6 +29,12 @@
 
     <!-- enable this field to show black scrubber on progress bar -->
     <field id="highlightPointer" type="boolean" />
+
+    <!-- Optional branded scrubber image URL (VOD scrubber showcase); shown on the pointer when focused. -->
+    <field id="brandedScrubberUri" type="string" />
+
+    <!-- True when brandedScrubberUri is set and the pointer Poster finished loading successfully. -->
+    <field id="brandedScrubberImageReady" type="boolean" value="false" alwaysNotify="true" />
 
     <field id="scaledUI" type="boolean" value="false" />
 
@@ -61,5 +69,6 @@
       height="32"
       uri="pkg:/images/transport/sgplayer/icon-pointer.webp"
       visible="false" />
+
   </children>
 </component>

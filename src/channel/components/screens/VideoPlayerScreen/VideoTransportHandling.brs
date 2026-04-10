@@ -1060,6 +1060,11 @@ Function onSkipCuepointsButtonSelected()
   end if
 
   clearSkipCuepointsButtonAndTimer()
+
+  if m.HUD.opacity = 0.0 AND m.top.videoPlayerScrubberShowcaseResponse <> invalid
+    showTransport()
+    showBrowseWhileWatching()
+  end if
 End Function
 
 
@@ -1487,8 +1492,27 @@ Function showTransport()
     end if
   end if
 
+  if m.brandedScrubberImageReady = true AND m.isBrandedScrubberEnabled = true AND m.scrubberShowcaseImpPixelFired = false AND m.top.videoPlayerScrubberShowcaseResponse <> invalid
+    fireScrubberShowcaseImpPixels()
+  end if
+
   animateTransport("in")
   updatePlayerLogLib(m.playerLogLib, "setDidUserSeeBwwPeek", true)
+End Function
+
+
+' Sends scrubber showcase impression pixels when the progress bar has focus and the branded scrubber image has loaded.
+Function fireScrubberShowcaseImpPixels() as Void
+  if m.top.videoPlayerScrubberShowcaseResponse <> invalid
+    m.top.sendScrubberShowcaseAdPixels = { urls: m.top.videoPlayerScrubberShowcaseResponse.scrubberShowcaseImpPixelUrls }
+    m.scrubberShowcaseImpPixelFired = true
+  end if
+End Function
+
+
+Function fireScrubberShowcaseExposure()
+  ' Fire roku_branded_scrubber_v1 experiment exposure (control + variant when showcase payload is present)
+  getStatsigExperimentResource("roku_branded_scrubber", "roku_branded_scrubber_v1")
 End Function
 
 
