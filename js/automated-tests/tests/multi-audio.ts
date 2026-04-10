@@ -21,8 +21,8 @@ describe('Multiple Audio', function () {
 
   // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/403413
   it('C403413 - Video Player - New Audio / subtitle menu selection @multiple_audio, @smoke', async () => {
-    await testUtils.startApplicationWithDeeplink({mediaType: 'episode', contentID: '526358', shouldCreateNewUser: true });
-    
+    await testUtils.startApplicationWithDeeplink({ mediaType: 'movie', contentID: '661023', shouldCreateNewUser: true });
+
 
     // Verify that video is playing
     await testUtils.waitForPlayerStateToEqual('videoPlayerScreen', 'playing');
@@ -35,7 +35,7 @@ describe('Multiple Audio', function () {
 
     // Navigate right to open Options
     await ecp.sendKeypress(ecp.Key.Up);
-    await ecp.sendKeypress(ecp.Key.Right, { count: 2 });
+    await ecp.sendKeypress(ecp.Key.Right);
     await ecp.sendKeypress(ecp.Key.Ok);
 
     // Validate options

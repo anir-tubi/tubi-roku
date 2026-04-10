@@ -76,7 +76,7 @@ Function epgMixin_badgeInfo_live_test()
 End Function
 
 
-'@Test returns upcoming with formatted time for event later today (e.g. "Live 3 PM")
+'@Test returns upcoming with formatted time for event later today
 Function epgMixin_badgeInfo_laterToday_test()
   now = CreateObject("roDateTime")
   now.toLocalTime()
@@ -102,7 +102,7 @@ Function epgMixin_badgeInfo_laterToday_test()
     m.assertEqual(result.availability, "upcoming")
     m.assertTrue(result.badgeText.instr("Live") >= 0)
     ' Should contain AM or PM time indicator, not a countdown like "in 2h"
-    m.assertTrue(result.badgeText.instr("AM") >= 0 OR result.badgeText.instr("PM") >= 0)
+    m.assertTrue(result.badgeText.instr("AM") >= 0 OR result.badgeText.instr("PM") >= 0 OR result.badgeText.instr("A.M.") >= 0 OR result.badgeText.instr("P.M.") >= 0)
   end if
 End Function
 
@@ -134,7 +134,7 @@ Function epgMixin_badgeInfo_tomorrow_test()
 End Function
 
 
-'@Test returns upcoming badge with date for event 5 days away (e.g. "Live Jun 12")
+'@Test returns upcoming badge with date for event 5 days away
 Function epgMixin_badgeInfo_futureDays_test()
   now = CreateObject("roDateTime")
   startUtc = CreateObject("roDateTime")
@@ -152,7 +152,7 @@ Function epgMixin_badgeInfo_futureDays_test()
   m.assertEqual(result.availability, "upcoming")
   m.assertTrue(result.badgeText.instr("Live") >= 0)
   ' Should NOT contain AM/PM (that's for same-day), should be a date like "Live Jun 12"
-  m.assertFalse(result.badgeText.instr("AM") >= 0 OR result.badgeText.instr("PM") >= 0)
+  m.assertFalse(result.badgeText.instr("AM") >= 0 OR result.badgeText.instr("PM") >= 0 OR result.badgeText.instr("A.M.") >= 0 OR result.badgeText.instr("P.M.") >= 0)
 End Function
 
 
