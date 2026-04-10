@@ -1,0 +1,44 @@
+name: Send Release Metric to Datadog
+
+on:
+  pull_request:
+    types: [closed]
+    branches:
+      - '*_branch'
+
+jobs:
+  send-metric:
+    if: >
+      github.event.pull_request.merged == true &&
+      startsWith(github.event.pull_request.head.ref, 'release_')
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - name: Send release metric
+        env:
+          DD_API_KEY: ${{ secrets.DD_API_KEY }}
+        run: |
+          curl -s --fail-with-body -X POST "https://api.datadoghq.com/api/v2/series" \
+            -H "Accept: application/json" \
+            -H "Content-Type: application/json" \
+            -H "DD-API-KEY: ${DD_API_KEY}" \
+            -d @- <<EOF
+          {
+            "series": [
+              {
+                "metric": "client.release.success",
+                "type": 1,
+                "points": [
+                  {
+                    "timestamp": $(date +%s),
+                    "value": 1
+                  }
+                ],
+                "tags": [
+                  "platform:roku",
+                  "env:production"
+                ]
+              }
+            ]
+          }
+          EOF
