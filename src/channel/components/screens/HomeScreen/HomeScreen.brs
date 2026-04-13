@@ -784,7 +784,9 @@ Function updateHubContainerGradient() as Void
     if m.rowListNode <> invalid AND nextRowIndex >= 0
       peekBoundingRect = m.rowListNode.sceneSubBoundingRect("item" + nextRowIndex.toStr() + "_0")
       if peekBoundingRect <> invalid
-        m.containerBackgroundPoster.translation = [0, peekBoundingRect.y - 48]
+        peekTranslation = [0, peekBoundingRect.y - 48]
+        m.containerBackgroundPoster.translation = peekTranslation
+        m.hubPeekGradient.translation = peekTranslation
         fade(m.containerBackgroundPoster, "in", 0.3)
       end if
     end if
@@ -1914,9 +1916,9 @@ End Function
 Function onScreenStackTranslationChange(msg) as Void
   translation = msg.getData()
   if translation = invalid then return
-
+  peekGradientTranslation = m.hubPeekGradient.translation
   m.hubFocusGradient.translation = [-translation[0], 0]
-  m.hubPeekGradient.translation = [-translation[0], 0]
+  m.hubPeekGradient.translation = [-translation[0], peekGradientTranslation[1]]
   containerTranslation = m.containerBackgroundPoster.translation
   m.containerBackgroundPoster.translation = [-translation[0], containerTranslation[1]]
 End Function

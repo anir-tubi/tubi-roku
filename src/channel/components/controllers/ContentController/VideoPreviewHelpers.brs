@@ -362,6 +362,7 @@ Function updatePreviewPlayerToFullScreen()
   m.videoPreviewPlayer.clippingRect = [0, 0, 1920, 1080]
   m.videoPreviewPlayer.videoPlayerType = "BANNER"
   resizeToLocation(m.videoPreviewPlayer, 1919, 1079, [0, 0], 0)
+  m.videoPreviewPlayer.opacity = 1
 End Function
 
 
@@ -599,7 +600,7 @@ End Function
 
 
 Function renderAutoStartPlaybackFromPreviewCounter(contentFocused, diff) as Void
-  if contentFocused = invalid OR arrayIncludes([m.constants.ui.contentTypes.adRowlistSpotlight, m.constants.ui.contentTypes.adRowlistCarousel], contentFocused.type) = true OR isVideoTileEnabledContainer(contentFocused.gridItemType) = false
+  if contentFocused = invalid OR isVideoTileEnabledContainer(contentFocused.gridItemType) = false OR contentFocused.playerType = m.constants.ui.playerTypes.fox
     fade(m.autoStartPreviewToPlaybackTimer, "out", 0.1)
     return
   end if

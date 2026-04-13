@@ -29,6 +29,7 @@
     <field id="itemHasFocus" type="boolean" value="false" />
     <field id="rowHasFocus" type="boolean" value="false" />
     <field id="rowListHasFocus" type="boolean" value="false" />
+    <field id="focusPercent" type="float" value="0" />
     <field id="trackingPageInfo" type="assocarray" />
 
     <!-- OUTPUT -->
@@ -62,11 +63,11 @@
           vertAlignment="center"
           itemSpacings="[12]">
           <AvailabilityBadge
-            height="36"
+            height="39"
             id="availabilityBadge" />
           <Badge
             visible="false"
-            height="36"
+            height="39"
             id="uhdAvailableBadge" />
           <Label
             id="genres"

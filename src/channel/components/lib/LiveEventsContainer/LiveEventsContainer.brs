@@ -32,9 +32,8 @@ Function init() as Void
   topRef.observeFieldScoped("focusedChild", "onComponentFocusChange")
   topRef.observeFieldScoped("signedIn", "onSignedInChange")
   topRef.observeFieldScoped("didUserSetReminderForEventContent", "onDidSetReminderForEventContentChange")
-  topRef.observeFieldScoped("itemHasFocus", "onItemHasFocusChange")
   topRef.observeFieldScoped("rowHasFocus", "onItemHasFocusChange")
-  topRef.observeFieldScoped("rowListHasFocus", "onItemHasFocusChange")
+  topRef.observeFieldScoped("focusPercent", "onItemHasFocusChange")
   m.titleImage.observeFieldScoped("loadStatus", "adjustMetadataSectionTranslation")
   m.networkLogo.observeFieldScoped("loadStatus", "adjustMetadataSectionTranslation")
 
@@ -95,12 +94,19 @@ Function onComponentFocusChange() as Void
 End Function
 
 
-' Propagates combined focus state to the currently focused CTA button
-Function onItemHasFocusChange() as Void
-  itemHasFocus = m.top.itemHasFocus AND m.top.rowHasFocus = true AND m.top.rowListHasFocus = true
+' Same focus rule as HubRowLockup: ignore mid-scroll focusPercent; CTA itemHasFocus only when
+' focusPercent = 1 and the row has focus.
+Function onItemHasFocusChange(_msg = invalid) as Void
+  focusPercent = m.top.focusPercent
+  if focusPercent <> 0 AND focusPercent <> 1
+    return
+  end if
+
+  ctaFocused = (focusPercent = 1 AND m.top.rowHasFocus = true)
+
   ctaButton = getFocusedButton()
   if ctaButton <> invalid
-    ctaButton.itemHasFocus = itemHasFocus
+    ctaButton.itemHasFocus = ctaFocused
   end if
 End Function
 
@@ -350,10 +356,9 @@ Function onDidSetReminderForEventContentChange(_msg) as Void
 End Function
 
 
-' Periodic refresh triggered by the timer to update buttons and badge state
+' Periodic refresh triggered by the timer to update buttons (AvailabilityBadge refreshes itself)
 Function onUiRefreshTimerFired(_msg) as Void
   refreshButtonList()
-  updateAvailabilityBadge()
 End Function
 
 
