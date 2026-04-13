@@ -483,7 +483,18 @@ class TestUtils {
 
   public async restartApplication(args: Parameters<typeof ecp.sendLaunchChannel>[0] = undefined) {
     await this.exitApplication();
-    await ecp.sendLaunchChannel(args);
+    try {
+      await ecp.sendLaunchChannel(args);
+    } catch (initialError) {
+      console.warn(`⚠ sendLaunchChannel failed: ${initialError.message}. Waiting 3s and retrying...`);
+      await new Promise(resolve => setTimeout(resolve, 3000));
+      try {
+        await ecp.sendLaunchChannel(args);
+        console.log(`✓ sendLaunchChannel retry succeeded`);
+      } catch (_) {
+        throw initialError;
+      }
+    }
   }
 
 

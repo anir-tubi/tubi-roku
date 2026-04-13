@@ -12,10 +12,12 @@ const { device, utils } = require('roku-test-automation');
 const fs = require('fs');
 const log = require('fancy-log');
 const path = require('path');
+const needle = require('needle');
 
 const { execShellCommand, spawnShellCommand } = require('./utilities');
 
 const { testUtils, auth, ContentTypes, ContentRatings } = require('./automated-tests/test-utils');
+const { CIRCUIT_BREAKER_DIR } = require('./automated-tests/circuit-breaker-constants');
 
 const jsonReportOutputPath = `${testUtils.testsOutputFolder}/report.json`;
 
@@ -254,6 +256,70 @@ function runAutomatedAnalyticsTests(done) {
 }
 
 
+/**
+ * Probes each Roku device via ECP to verify reachability before starting tests.
+ * Mutates config in place, removing unreachable devices. Rewrites rta-config.json
+ * so Mocha workers only target devices that are actually online.
+ * @param {Object} config - The RTA config object from rta-config.json
+ */
+async function validateDevices(config) {
+  const devices = config.RokuDevice.devices;
+  log(`Pre-flight health check: probing ${devices.length} device(s)...`);
+
+  const healthChecks = devices.map(async (deviceConfig) => {
+    const host = deviceConfig.host;
+    const url = `http://${host}:8060/query/device-info`;
+    try {
+      const response = await needle('get', url, null, { open_timeout: 10000, response_timeout: 10000, read_timeout: 10000 });
+      if (response.statusCode === 200) {
+        log(`  ✓ Device ${host} is reachable`);
+        return { device: deviceConfig, healthy: true };
+      }
+      log(`  ✗ Device ${host} responded with status ${response.statusCode}`);
+      return { device: deviceConfig, healthy: false };
+    } catch (err) {
+      log(`  ✗ Device ${host} is unreachable: ${err.message}`);
+      return { device: deviceConfig, healthy: false };
+    }
+  });
+
+  const results = await Promise.all(healthChecks);
+  const healthyDevices = results.filter(r => r.healthy).map(r => r.device);
+  const unhealthyCount = devices.length - healthyDevices.length;
+
+  if (healthyDevices.length === 0) {
+    throw new Error('Pre-flight health check failed: no Roku devices are reachable. Aborting test run.');
+  }
+
+  if (unhealthyCount > 0) {
+    log(`⚠ Pre-flight health check: removed ${unhealthyCount} unhealthy device(s). Continuing with ${healthyDevices.length} device(s).`);
+    config.RokuDevice.devices = healthyDevices;
+    // rta-config.json is resolved relative to the project root, matching getConfigFromConfigFile()
+    fs.writeFileSync('./rta-config.json', JSON.stringify(config, null, 4));
+  } else {
+    log(`Pre-flight health check: all ${devices.length} device(s) are healthy.`);
+  }
+}
+
+
+/**
+ * Removes circuit breaker temp files from previous runs so workers start with a clean slate.
+ */
+function cleanCircuitBreakerFiles() {
+  try {
+    if (fs.existsSync(CIRCUIT_BREAKER_DIR)) {
+      const files = fs.readdirSync(CIRCUIT_BREAKER_DIR);
+      for (const file of files) {
+        fs.unlinkSync(path.join(CIRCUIT_BREAKER_DIR, file));
+      }
+      log('Cleared circuit breaker state from previous run.');
+    }
+  } catch (err) {
+    log(`Warning: could not clear circuit breaker files: ${err.message}`);
+  }
+}
+
+
 async function runAutomatedTests(done, branch = '', tags = [], testsPath = 'js/automated-tests/tests/**/*.ts', shouldUseExistingBranch = false) {
   // Load env file to allow overrides while developing tests
   const envPath = '.vscode/.env';
@@ -312,6 +378,10 @@ async function runAutomatedTests(done, branch = '', tags = [], testsPath = 'js/a
   });
 
   const config = utils.getConfigFromConfigFile();
+
+  // Validate that devices are reachable before starting tests
+  await validateDevices(config);
+
   // Enable parallel testing if multiple devices are included and we haven't disabled running in parallel
   if (config.RokuDevice.devices.length > 1 && process.env.DISABLE_MOCHA_PARALLEL !== 'true') {
     mochaOptions.push(`--parallel --jobs ${config.RokuDevice.devices.length}`);
@@ -331,6 +401,9 @@ async function runAutomatedTests(done, branch = '', tags = [], testsPath = 'js/a
       '**/*'
     ]
   });
+
+  // Clear circuit breaker state from any previous run
+  cleanCircuitBreakerFiles();
 
   const code = await spawnShellCommand(done, `npx mocha ${mochaOptions.join(' ')} "${testsPath}"`, true);
   await appendDataToJsonReport(branch);
