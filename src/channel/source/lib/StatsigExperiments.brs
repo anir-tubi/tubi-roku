@@ -198,6 +198,10 @@ Function StatsigExperimentsInterface(statsigExperimentsInfo) as Object
       roku_remove_container_json_v1: {
         default: { "enabled": false }
       }
+
+      roku_unblock_homescreen_fail_v1: {
+        default: { "enabled": false }
+      }
     }
     statsigExperimentsInfo: statsigExperimentsInfo
     getExperimentResource: statsigExperiments_getExperimentResource

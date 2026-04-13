@@ -828,7 +828,12 @@ Function handleHomeScreenErrorResponse(screenID, response)
         trackingTask: m.trackingLoggingTask
       }
 
-      fnCancelFunction = retryCategoryList
+      if getStatsigExperimentResource("", "roku_unblock_homescreen_fail_v1", true).enabled = true then
+        fnCancelFunction = invalid
+      else
+        fnCancelFunction = retryCategoryList
+      end if
+
       cancelParams = screenID
       if screenID <> m.constants.ui.screenIds.homeScreen
         '//it might be true there is no where to go to if the content of the main homescreen fails to load, but

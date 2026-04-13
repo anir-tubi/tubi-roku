@@ -1,3 +1,4 @@
+<!-- TODO should remove this and can probably move BaseGeneralTask into ControllerGeneralTask -->
 <component name="StarterGeneralTask" extends="BaseGeneralTask">
     <script type="text/brightscript" uri="StarterGeneralTask.brs" />
     <script type="text/brightscript" uri="Parsers/UncategorizedParsers.brs" />
