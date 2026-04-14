@@ -565,7 +565,7 @@ Function createSignOutProfilePanel(existingPanel = invalid)
       sInitial = signInInfo.name.left(1)
     end if
     sParentalRating = signInInfo.parentalRating
-    if signInInfo.linkedAccounts <> invalid
+    if signInInfo.linkedAccounts <> invalid AND isUserInMultiAccount() = true
       panel.linkedAccounts = signInInfo.linkedAccounts
       panel.linkedAccountsLabel = getTranslation("screenSettings_linked_accounts_label")
       panel.linkedAccountsDescription = getTranslation("screenSettings_linked_accounts_description")

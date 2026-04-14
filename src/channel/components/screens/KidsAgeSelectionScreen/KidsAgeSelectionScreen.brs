@@ -62,7 +62,6 @@ Function setupAgeSelectionList()
     title: ageRatingTitle
     SecondaryTitle: "1-3"
     HDposterUrl: "pkg:/images/kids-age-1.png"
-    ShortDescriptionLine1: "TV-Y"
   })
   ageSelectionListContent.appendChild(contentY)
 
@@ -71,7 +70,6 @@ Function setupAgeSelectionList()
     title: ageRatingTitle
     SecondaryTitle: "4-6"
     HDposterUrl: "pkg:/images/kids-age-2.png"
-    ShortDescriptionLine1: "TV-Y | TV-G | G"
   })
   ageSelectionListContent.appendChild(contentG)
 
@@ -80,7 +78,6 @@ Function setupAgeSelectionList()
     title: ageRatingTitle
     SecondaryTitle: "7-9"
     HDposterUrl: "pkg:/images/kids-age-3.png"
-    ShortDescriptionLine1: "TV-Y | TV-G | G | TV-Y7 | TV-Y7-FV"
   })
   ageSelectionListContent.appendChild(contentPG)
 
@@ -90,7 +87,6 @@ Function setupAgeSelectionList()
     SecondaryTitle: "10-12"
     Description: includedUpToTitle
     HDposterUrl: "pkg:/images/kids-age-4.png"
-    ShortDescriptionLine1: "TV-PG | PG"
   })
   ageSelectionListContent.appendChild(contentPG13)
 

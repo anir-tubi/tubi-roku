@@ -71,37 +71,35 @@ Function onItemContentChange()
     end if
 
     m.kidsModePoster.uri = itemContent.HDposterUrl
-    if itemContent.shortDescriptionLine1 <> invalid AND itemContent.shortDescriptionLine1 <> ""
-      badges = itemContent.shortDescriptionLine1.split(" | ")
 
-      if itemContent.secondaryTitle = "1-3"
-        m.ratingsBadge1.text = badges[0]
-        m.ratingsBadge2.visible = false
-        m.ratingsBadge3.visible = false
-        m.ratingsBadge4.visible = false
-        m.ratingsBadge5.visible = false
-      else if itemContent.secondaryTitle = "4-6"
-        m.ratingsBadge1.text = badges[0]
-        m.ratingsBadge2.text = badges[1]
-        m.ratingsBadge3.text = badges[2]
-        m.ratingsBadge4.visible = false
-        m.ratingsBadge5.visible = false
-      else if itemContent.secondaryTitle = "7-9"
-        m.ratingsBadge1.text = badges[0]
-        m.ratingsBadge2.text = badges[1]
-        m.ratingsBadge3.text = badges[2]
-        m.ratingsBadge4.text = badges[3]
-        m.ratingsBadge5.text = badges[4]
-      else if itemContent.secondaryTitle = "10-12"
-        m.AgeSelectionListItemGroup.itemSpacings = [4, 36, 36, 36]
+    if itemContent.secondaryTitle = "1-3"
+      m.ratingsBadge1.text = "TV-Y"
+      m.ratingsBadge2.visible = false
+      m.ratingsBadge3.visible = false
+      m.ratingsBadge4.visible = false
+      m.ratingsBadge5.visible = false
+    else if itemContent.secondaryTitle = "4-6"
+      m.ratingsBadge1.text = "TV-Y"
+      m.ratingsBadge2.text = "TV-G"
+      m.ratingsBadge3.text = "G"
+      m.ratingsBadge4.visible = false
+      m.ratingsBadge5.visible = false
+    else if itemContent.secondaryTitle = "7-9"
+      m.ratingsBadge1.text = "TV-Y"
+      m.ratingsBadge2.text = "TV-G"
+      m.ratingsBadge3.text = "G"
+      m.ratingsBadge4.text = "TV-Y7"
+      m.ratingsBadge5.text = "TV-Y7-FV"
+    else if itemContent.secondaryTitle = "10-12"
+      m.AgeSelectionListItemGroup.itemSpacings = [4, 36, 36, 36]
 
-        m.ratingsBadgeGroup1.removeChild(m.ratingsBadge1)
-        m.ratingsBadge2.text = badges[0]
-        m.ratingsBadge3.text = badges[1]
-        m.ratingsBadge4.visible = false
-        m.ratingsBadge5.visible = false
+      m.ratingsBadgeGroup1.removeChild(m.ratingsBadge1)
+      m.ratingsBadge2.text = "TV-PG"
+      m.ratingsBadge3.text = "PG"
+      m.ratingsBadge4.visible = false
+      m.ratingsBadge5.visible = false
 
-      end if
     end if
   end if
+
 End Function
