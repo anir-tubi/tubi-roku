@@ -636,7 +636,7 @@
   },
   "screenSettings_parentalControls_instructions": {
     "description": "Description of the parental controls screen",
-    "message": "Please select the appropriate viewing age for Tubi TV. Your selection will determine which movie and show ratings you can view in the app. If this selection is changed, you will be required to enter your account password."
+    "message": "Set content rating limits for your account to keep viewing safe and age-appropriate. If this selection is changed, you will be required to register or sign into Tubi."
   },
   "screenSettings_parentalControls_kids_instructions": {
     "description": "Description of the parental controls screen",
@@ -744,27 +744,27 @@
   },
   "screenSettings_error_parentalChanges_description_multi_account_group0": {
     "description": "Success message when content settings has changed to group 0 (Little Kids) in multi-account mode",
-    "message": "You will be directed to Tubi Kids.\n\n Content Settings changed to:\n Age Rating 4-6 (TV-G, G)."
+    "message": "You will be directed to Tubi Kids.\n\n Content Settings changed to:\n Age Rating 4-6 (TV-Y, TV-G, G)."
   },
-  "screenSettings_error_parentalChanges_description_multi_account_group1": {
+  "screenSettings_error_parentalChanges_description_multi_account_group5": {
     "description": "Success message when content settings has changed to group 1 (Older Kids) in multi-account mode",
-    "message": "You will be directed to Tubi Kids.\n\n Content Settings changed to:\n Age Rating 10-12 (TV-PG, PG)."
+    "message": "You will be directed to Tubi Kids.\n\n Content Settings changed to:\n Age Rating 10-12 (Up to TV-PG / PG)."
   },
   "screenSettings_error_parentalChanges_description_multi_account_group2": {
     "description": "Success message when content settings has changed to group 2 (Teens) in multi-account mode",
-    "message": "Content Settings changed to: Teen (TV-14, PG-13)."
+    "message": "Content Settings changed to: Age Rating 13–17 (Up to TV-14 / PG-13)."
   },
   "screenSettings_error_parentalChanges_description_multi_account_group3": {
     "description": "Success message when content settings has changed to group 3 (Adults) in multi-account mode",
-    "message": "Content Settings changed to: Adult (TV-MA, R, NC-17)."
+    "message": "Content Settings changed to: Age Rating 18+ (Up to TV-MA / R / NC-17)."
   },
   "screenSettings_error_parentalChanges_description_multi_account_group4": {
     "description": "Success message when content settings has changed to group 4 (Age Rating 1-3) in multi-account mode - user directed to Tubi Kids",
     "message": "You will be directed to Tubi Kids.\n\n Content Settings changed to:\n Age Rating 1-3 (TV-Y)."
   },
-  "screenSettings_error_parentalChanges_description_multi_account_group5": {
+  "screenSettings_error_parentalChanges_description_multi_account_group1": {
     "description": "Success message when content settings has changed to group 5 (Age Rating 7-9) in multi-account mode - user directed to Tubi Kids",
-    "message": "You will be directed to Tubi Kids.\n\n Content Settings changed to:\n Age Rating 7-9 (TV-Y7, TV-Y7-FV)."
+    "message": "You will be directed to Tubi Kids.\n\n Content Settings changed to:\n Age Rating 7-9 (TV-Y, TV-Y7, TV-Y7-FV, TV-G, G)."
   },
   "screenSettings_error_signInParental_description": {
     "description": "Description of message to let users know that they must be signed in to adjust the parental controls.",
@@ -2254,7 +2254,7 @@
   },
   "kidsAgeSelection_sub_header": {
     "description": "Subheading of the sign up kids age selection screen",
-    "message": "Learn more about ratings at tubi.tv/LINK"
+    "message": "Learn more about ratings at {url}"
   },
   "kidsAgeSelection_top_header": {
     "description": "Top header of the sign up kids age selection screen",
@@ -2266,7 +2266,7 @@
   },
   "kidsAgeSelection_includedUpToLabel": {
     "description": "Included up to label of the kids age selection screen",
-    "message": "Included Up To"
+    "message": "Includes content up to"
   },
   "ParentalControlPinPad_header": {
     "description": "Header of the parental control pin pad screen",
@@ -2310,11 +2310,11 @@
   },
   "screenSettings_contentSetting_TEEN": {
     "description": "Content setting label for teen",
-    "message": "Teen (Ages 13-17)"
+    "message": "Age Rating 13-17"
   },
   "screenSettings_contentSetting_ADULT": {
     "description": "Content setting label for adult",
-    "message": "Adult(Ages 18+)"
+    "message": "Age Rating 18+"
   },
   "screenSettings_contentSetting_YOUNGEST_CHILD": {
     "description": "Content setting label for youngest child",
@@ -2583,5 +2583,13 @@
   "explore": {
     "description": "Button text for exploring a hub or collection",
     "message": "Explore"
+  },
+  "content_settings_up_to": {
+    "description": "Label for the up to content setting",
+    "message": "Up to {ratings}"
+  },
+  "content_settings_learn_more": {
+    "description": "Label for the learn more link",
+    "message": "Learn more at {url}"
   }
 }

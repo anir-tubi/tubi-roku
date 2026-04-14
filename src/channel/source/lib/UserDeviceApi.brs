@@ -394,22 +394,17 @@ End Function
 
 '@parentalRating: integer, selected parentalRating from the settings screen
 'password: string, user entered password
-Function userDeviceApi_updateParentalRatingReqInfo(parentalRating, password, useV2ParentalRating = false)
+Function userDeviceApi_updateParentalRatingReqInfo(parentalRating, password)
 
   url = m.constants.urls.account.parentalRating
   options = {}
   headers = m.getCommonOptions().headers
-  if useV2ParentalRating = true
-    body = {
-      parental_rating_v2: parentalRating,
-      password: password
-    }
-  else
-    body = {
-      parental_rating: parentalRating,
-      password: password
-    }
-  end if
+
+  body = {
+    parental_rating_v2: parentalRating,
+    password: password
+  }
+
 
   options["method"] = m.constants.reqTypes.put
   options["body"] = FormatJson(body)

@@ -39,11 +39,9 @@ Function parseGetUserSettingsSuccess(fullResponse, reqInfo)
   if parsed.has_password <> invalid then
     result["hasPassword"] = parsed.has_password
   end if
-  'keep the parental_rating for older clients
-  if reqInfo.isUserInMultiAccount = true AND parsed.parental_rating_v2 <> invalid
+
+  if parsed.parental_rating_v2 <> invalid
     parentalRating = parsed.parental_rating_v2
-  else
-    parentalRating = parsed.parental_rating
   end if
 
   if parentalRating <> invalid then

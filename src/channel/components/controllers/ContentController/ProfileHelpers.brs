@@ -403,7 +403,7 @@ End Function
 
 Function verifyKidsAtSignup(signInInfo)
 
-  if signInInfo <> invalid AND isNumber(signInInfo.parental_rating) AND (isNonEmptyString(signInInfo.name) = true OR isNonEmptyString(signInInfo.firstName) = true)
+  if signInInfo <> invalid AND isNumber(signInInfo.parental_rating_v2) AND (isNonEmptyString(signInInfo.name) = true OR isNonEmptyString(signInInfo.firstName) = true)
     options = {}
 
     name = signInInfo.firstName
@@ -416,7 +416,7 @@ Function verifyKidsAtSignup(signInInfo)
       platform: m.constants.platform
       device_id: m.constants.deviceInfo.deviceId
       name: name
-      parental_rating_v2: signInInfo.parental_rating
+      parental_rating_v2: signInInfo.parental_rating_v2
     }
     if signInInfo.pinSubmitted <> invalid
       options.body["pin"] = signInInfo.pinSubmitted

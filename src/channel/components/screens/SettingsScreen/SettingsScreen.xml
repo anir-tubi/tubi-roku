@@ -50,7 +50,6 @@
     in teens parental controls.  -->
     <field id="isAllowedToManageConsent" type="boolean" value="false" />
 
-    <field id="isUserInMultiAccount" type="boolean" value="false" alwaysNotify="true" />
     <!-- Holds the Statsig experiments data fetched from API  -->
     <field id="statsigExperiments" type="assocarray" alwaysNotify="true" />
 

@@ -5,7 +5,7 @@ Function init()
   m.topHeader = m.top.findNode("TopPageHeader")
   m.pageHeader.text = getTranslation("kidsAgeSelection_header")
   m.topHeader.text = getTranslation("kidsAgeSelection_top_header")
-  m.subHeader.text = getTranslation("kidsAgeSelection_sub_header")
+  m.subHeader.text = getTranslation("kidsAgeSelection_sub_header", { url: "https://tubitv.com/help-center/App-Features-and-Settings/articles/42331260335643" })
   m.ageSelectionList = m.top.findNode("AgeSelectionList")
   m.ageSelectionList.observeFieldScoped("itemSelected", "onAgeSelectionListItemSelected")
   m.top.observeFieldScoped("focusedChild", "onComponentFocusChanged")
@@ -61,7 +61,6 @@ Function setupAgeSelectionList()
   contentY.update({
     title: ageRatingTitle
     SecondaryTitle: "1-3"
-    Description: includedUpToTitle
     HDposterUrl: "pkg:/images/kids-age-1.png"
     ShortDescriptionLine1: "TV-Y"
   })
@@ -71,10 +70,8 @@ Function setupAgeSelectionList()
   contentG.update({
     title: ageRatingTitle
     SecondaryTitle: "4-6"
-    Description: includedUpToTitle
     HDposterUrl: "pkg:/images/kids-age-2.png"
-    ShortDescriptionLine1: "TV-G"
-    ShortDescriptionLine2: "G"
+    ShortDescriptionLine1: "TV-Y | TV-G | G"
   })
   ageSelectionListContent.appendChild(contentG)
 
@@ -82,10 +79,8 @@ Function setupAgeSelectionList()
   contentPG.update({
     title: ageRatingTitle
     SecondaryTitle: "7-9"
-    Description: includedUpToTitle
     HDposterUrl: "pkg:/images/kids-age-3.png"
-    ShortDescriptionLine1: "TV-Y7"
-    ShortDescriptionLine2: "TV-Y7-FV"
+    ShortDescriptionLine1: "TV-Y | TV-G | G | TV-Y7 | TV-Y7-FV"
   })
   ageSelectionListContent.appendChild(contentPG)
 
@@ -95,8 +90,7 @@ Function setupAgeSelectionList()
     SecondaryTitle: "10-12"
     Description: includedUpToTitle
     HDposterUrl: "pkg:/images/kids-age-4.png"
-    ShortDescriptionLine1: "TV-PG"
-    ShortDescriptionLine2: "PG"
+    ShortDescriptionLine1: "TV-PG | PG"
   })
   ageSelectionListContent.appendChild(contentPG13)
 
@@ -130,7 +124,7 @@ Function onAgeSelectionListItemSelected(msg)
   end if
 
   if signInInfo <> invalid
-    signInInfo["parental_rating"] = pcRatingNumeric
+    signInInfo["parental_rating_v2"] = pcRatingNumeric 'changing to v2 just for clarity
     m.top.signInInfo = signInInfo
   end if
   m.top.ageSelected = true

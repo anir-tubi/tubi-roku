@@ -24,8 +24,6 @@
     <!-- Allowed values are those in constants.ui.modes -->
     <field id="uiMode" type="string" />
 
-    <field id="isUserInMultiAccount" type="boolean" value="false" alwaysNotify="true" />
-
     <!-- OUTPUTS -->
     <field id="content" alias="SettingsMenu.content" />
     <field id="itemSelected" alias="SettingsMenu.itemSelected" />

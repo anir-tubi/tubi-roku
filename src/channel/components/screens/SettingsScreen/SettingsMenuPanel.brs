@@ -16,8 +16,6 @@ Function init()
   m.top.observeFieldScoped("signInInfo", "onSignInInfoChange")
   m.top.observeFieldScoped("uiMode", "onUiModeChange")
 
-  m.isUserInMultiAccount = isUserInMultiAccount()
-
   setSettingsSidePanelMenuItems()
 
   resetSettingsMenuVerticalPosition()
@@ -50,36 +48,25 @@ Function setSettingsSidePanelMenuItems()
   index = 1
   availablePanelItems = {}
 
-  if m.isUserInMultiAccount = true
-    availablePanelItems.append({
-      "signInOut": {
-        subType: "DetailMenuItemContentNode"
-        id: "SignInOutButton"
-        title: getTranslation("menu_signIn")
-        iconUrl: "pkg:/images/icon-account.webp"
-        displayOrder: index
-    } })
-    index = index + 1
+  availablePanelItems.append({
+    "signInOut": {
+      subType: "DetailMenuItemContentNode"
+      id: "SignInOutButton"
+      title: getTranslation("menu_signIn")
+      iconUrl: "pkg:/images/icon-account.webp"
+      displayOrder: index
+  } })
+  index = index + 1
 
-    availablePanelItems.append({
-      "parentalControls": {
-        subType: "DetailMenuItemContentNode"
-        id: "ParentalControlsButton"
-        title: getTranslation("screenSettings_menu_contentSettings")
-        iconUrl: "pkg:/images/icon-parental.webp"
-        displayOrder: index
-    } })
+  availablePanelItems.append({
+    "parentalControls": {
+      subType: "DetailMenuItemContentNode"
+      id: "ParentalControlsButton"
+      title: getTranslation("screenSettings_menu_contentSettings")
+      iconUrl: "pkg:/images/icon-parental.webp"
+      displayOrder: index
+  } })
 
-  else
-    availablePanelItems.append({
-      "parentalControls": {
-        subType: "DetailMenuItemContentNode"
-        id: "ParentalControlsButton"
-        title: getTranslation("screenSettings_menu_parentalControls")
-        iconUrl: "pkg:/images/icon-parental.webp"
-        displayOrder: index
-    } })
-  end if
 
   index = index + 1
 
@@ -113,17 +100,6 @@ Function setSettingsSidePanelMenuItems()
       displayOrder: index
   } })
 
-  if m.isUserInMultiAccount = false
-    index = index + 1
-    availablePanelItems.append({
-      "signInOut": {
-        subType: "DetailMenuItemContentNode"
-        id: "SignInOutButton"
-        title: getTranslation("menu_signIn")
-        iconUrl: "pkg:/images/icon-account.webp"
-        displayOrder: index
-    } })
-  end if
 
   index = index + 1
   availablePanelItems.append({
@@ -175,16 +151,8 @@ End Function
 
 
 Function onSignInInfoChange()
-  sText = getTranslation("menu_signIn")
-  if m.isUserInMultiAccount = true
-    sText = getTranslation("screenSettings_menu_Account")
-  else
-    signInInfo = m.top.signInInfo
-    if signInInfo <> invalid AND signInInfo.signedIn = true
-      sText = getTranslation("screenSettings_menu_signOut")
-    end if
-  end if
 
+  sText = getTranslation("screenSettings_menu_Account")
 
   signInButton = m.nodeHelpers.getChildById(m.settingsMenuContent, "SignInOutButton")
   if signInButton <> invalid

@@ -903,7 +903,7 @@ Function getTranslation_en_US()
     },
     "screenSettings_parentalControls_instructions": {
       "description": "Description of the parental controls screen",
-      "message": "Please select the appropriate viewing age for Tubi TV. Your selection will determine which movie and show ratings you can view in the app. If this selection is changed, you will be required to enter your account password."
+      "message": "Set content rating limits for your account to keep viewing safe and age-appropriate. If this selection is changed, you will be required to register or sign into Tubi."
     },
     "screenSettings_parentalControls_kids_instructions": {
       "description": "Description of the parental controls screen",
@@ -1011,27 +1011,27 @@ Function getTranslation_en_US()
     },
     "screenSettings_error_parentalChanges_description_multi_account_group0": {
       "description": "Success message when content settings has changed to group 0 (Little Kids) in multi-account mode",
-      "message": "You will be directed to Tubi Kids.\n\n Content Settings changed to:\n Age Rating 4-6 (TV-G, G)."
+      "message": "You will be directed to Tubi Kids.\n\n Content Settings changed to:\n Age Rating 4-6 (TV-Y, TV-G, G)."
     },
-    "screenSettings_error_parentalChanges_description_multi_account_group1": {
+    "screenSettings_error_parentalChanges_description_multi_account_group5": {
       "description": "Success message when content settings has changed to group 1 (Older Kids) in multi-account mode",
-      "message": "You will be directed to Tubi Kids.\n\n Content Settings changed to:\n Age Rating 10-12 (TV-PG, PG)."
+      "message": "You will be directed to Tubi Kids.\n\n Content Settings changed to:\n Age Rating 10-12 (Up to TV-PG / PG)."
     },
     "screenSettings_error_parentalChanges_description_multi_account_group2": {
       "description": "Success message when content settings has changed to group 2 (Teens) in multi-account mode",
-      "message": "Content Settings changed to: Teen (TV-14, PG-13)."
+      "message": "Content Settings changed to: Age Rating 13–17 (Up to TV-14 / PG-13)."
     },
     "screenSettings_error_parentalChanges_description_multi_account_group3": {
       "description": "Success message when content settings has changed to group 3 (Adults) in multi-account mode",
-      "message": "Content Settings changed to: Adult (TV-MA, R, NC-17)."
+      "message": "Content Settings changed to: Age Rating 18+ (Up to TV-MA / R / NC-17)."
     },
     "screenSettings_error_parentalChanges_description_multi_account_group4": {
       "description": "Success message when content settings has changed to group 4 (Age Rating 1-3) in multi-account mode - user directed to Tubi Kids",
       "message": "You will be directed to Tubi Kids.\n\n Content Settings changed to:\n Age Rating 1-3 (TV-Y)."
     },
-    "screenSettings_error_parentalChanges_description_multi_account_group5": {
+    "screenSettings_error_parentalChanges_description_multi_account_group1": {
       "description": "Success message when content settings has changed to group 5 (Age Rating 7-9) in multi-account mode - user directed to Tubi Kids",
-      "message": "You will be directed to Tubi Kids.\n\n Content Settings changed to:\n Age Rating 7-9 (TV-Y7, TV-Y7-FV)."
+      "message": "You will be directed to Tubi Kids.\n\n Content Settings changed to:\n Age Rating 7-9 (TV-Y, TV-Y7, TV-Y7-FV, TV-G, G)."
     },
     "screenSettings_error_signInParental_description": {
       "description": "Description of message to let users know that they must be signed in to adjust the parental controls.",
@@ -2443,18 +2443,6 @@ Function getTranslation_en_US()
       "description": "Button label when the content is unavailable",
       "message": "Content Unavailable"
     },
-    "reminder_set_toast_header": {
-      "description": "Toast message header that is displayed when we set a reminder for a content",
-      "message": "New Reminder Added"
-    },
-    "reminder_set_toast_subheader": {
-      "description": "Toast message sub header that is displayed when we set a reminder for a content",
-      "message": "We'll notify you as soon as this becomes available to watch."
-    },
-    "reminder_set_button_label": {
-      "description": "Label of the button to remove a reminder for a content",
-      "message": "Reminder Set"
-    },
     "profile_selector_screen_title": {
       "description": "Title of the profile selector screen",
       "message": "Who's watching?"
@@ -2533,7 +2521,7 @@ Function getTranslation_en_US()
     },
     "kidsAgeSelection_sub_header": {
       "description": "Subheading of the sign up kids age selection screen",
-      "message": "Learn more about ratings at tubi.tv/LINK"
+      "message": "Learn more about ratings at {url}"
     },
     "kidsAgeSelection_top_header": {
       "description": "Top header of the sign up kids age selection screen",
@@ -2545,7 +2533,7 @@ Function getTranslation_en_US()
     },
     "kidsAgeSelection_includedUpToLabel": {
       "description": "Included up to label of the kids age selection screen",
-      "message": "Included Up To"
+      "message": "Includes content up to"
     },
     "ParentalControlPinPad_header": {
       "description": "Header of the parental control pin pad screen",
@@ -2589,11 +2577,11 @@ Function getTranslation_en_US()
     },
     "screenSettings_contentSetting_TEEN": {
       "description": "Content setting label for teen",
-      "message": "Teen (Ages 13-17)"
+      "message": "Age Rating 13-17"
     },
     "screenSettings_contentSetting_ADULT": {
       "description": "Content setting label for adult",
-      "message": "Adult(Ages 18+)"
+      "message": "Age Rating 18+"
     },
     "screenSettings_contentSetting_YOUNGEST_CHILD": {
       "description": "Content setting label for youngest child",
@@ -2602,6 +2590,42 @@ Function getTranslation_en_US()
     "screenSettings_contentSetting_OLDEST_CHILD": {
       "description": "Content setting label for oldest child",
       "message": "Age Rating 10-12"
+    },
+    "kidsAccountSetup_pageHeading": {
+      "description": "Page heading for Tubi Kids Account Setup screen",
+      "message": "Tubi Kids Account Setup"
+    },
+    "kidsAccountSetup_subHeading": {
+      "description": "Subheading for Tubi Kids Account Setup screen",
+      "message": "Enter your kid's info below to personalize and set up their Tubi Kids account."
+    },
+    "kidsAccountSetup_startWatchingButton": {
+      "description": "Start Watching button text on Kids Account Setup screen",
+      "message": "Start Watching"
+    },
+    "kidsAccountSetup_adultAccountLabel": {
+      "description": "Label for adult account field on Kids Account Setup screen",
+      "message": "Adult Account"
+    },
+    "kidsAccountSetup_adultAccountDescription": {
+      "description": "Description text for adult account field",
+      "message": "This account will manage the Tubi Kids account."
+    },
+    "kidsAccountSetup_kidFirstNameLabel": {
+      "description": "Label for kid's first name field",
+      "message": "Kid's First Name"
+    },
+    "kidsAccountSetup_contentSettingLabel": {
+      "description": "Label for content setting field",
+      "message": "Content Setting"
+    },
+    "kidsAccountSetup_pinDescription": {
+      "description": "Description text for PIN field",
+      "message": "You must enter this PIN to exit Tubi Kids accounts."
+    },
+    "kidsAccountSetup_termsText": {
+      "description": "Terms text for Kids Account Setup screen",
+      "message": "By clicking the Start Watching button below, you agree to {url1} and {url2}"
     },
     "screenSettings_contentSettings_instructions": {
       "description": "Instructions text for content settings panel",
@@ -2659,6 +2683,18 @@ Function getTranslation_en_US()
       "description": "A header for the message that let's the user know they've been signed in with the given email",
       "message": "Welcome, {name}!"
     },
+    "reminder_set_toast_header": {
+      "description": "Toast message header that is displayed when we set a reminder for a content",
+      "message": "New Reminder Added"
+    },
+    "reminder_set_toast_subheader": {
+      "description": "Toast message sub header that is displayed when we set a reminder for a content",
+      "message": "We'll notify you as soon as this becomes available to watch."
+    },
+    "reminder_set_button_label": {
+      "description": "Label of the button to remove a reminder for a content",
+      "message": "Reminder Set"
+    },
     "ParentalControlPinInputScreen_skip_button_label": {
       "description": "Label of the skip button in the parental control pin input screen",
       "message": "Turn Off PIN"
@@ -2699,43 +2735,6 @@ Function getTranslation_en_US()
       "description": "Error message shown when the profile name contains invalid characters",
       "message": "This name contains invalid characters."
     },
-    "kidsAccountSetup_pageHeading": {
-      "description": "Page heading for Tubi Kids Account Setup screen",
-      "message": "Tubi Kids Account Setup"
-    },
-    "kidsAccountSetup_termsText": {
-      "description": "Terms text for Kids Account Setup screen",
-      "message": "By clicking the Start Watching button below, you agree to {url1} and {url2}"
-    },
-    "kidsAccountSetup_subHeading": {
-      "description": "Subheading for Tubi Kids Account Setup screen",
-      "message": "Enter your kid's info below to personalize and set up their Tubi Kids account."
-    },
-    "kidsAccountSetup_startWatchingButton": {
-      "description": "Start Watching button text on Kids Account Setup screen",
-      "message": "Start Watching"
-    },
-    "kidsAccountSetup_adultAccountLabel": {
-      "description": "Label for adult account field on Kids Account Setup screen",
-      "message": "Adult Account"
-    },
-    "kidsAccountSetup_adultAccountDescription": {
-      "description": "Description text for adult account field",
-      "message": "This account will manage the Tubi Kids account."
-    },
-    "kidsAccountSetup_kidFirstNameLabel": {
-      "description": "Label for kid's first name field",
-      "message": "Kid's First Name"
-    },
-    "kidsAccountSetup_contentSettingLabel": {
-      "description": "Label for content setting field",
-      "message": "Content Setting"
-    },
-    "kidsAccountSetup_pinDescription": {
-      "description": "Description text for PIN field",
-      "message": "You must enter this PIN to exit Tubi Kids accounts."
-    },
-
     "screenDetails_button_resume": {
       "description": "Label of button to allow users to resume the current video title",
       "message": "Resume"
@@ -2851,6 +2850,14 @@ Function getTranslation_en_US()
     "explore": {
       "description": "Button text for exploring a hub or collection",
       "message": "Explore"
+    },
+    "content_settings_up_to": {
+      "description": "Label for the up to content setting",
+      "message": "Up to {ratings}"
+    },
+    "content_settings_learn_more": {
+      "description": "Label for the learn more link",
+      "message": "Learn more at {url}"
     }
   }
 End Function
@@ -3468,10 +3475,6 @@ Function getTranslation_es_MX()
       "message": "Adultos",
       "note": "This translation is used as screenSettings_parentalControls_group_Adults, please double check that it is not needed before deleting"
     },
-    "screenSettings_parentalControls_instructions": {
-      "description": "Description of the parental controls screen",
-      "message": "Elige la edad de visualización adecuada para Tubi. Tu selección determinará qué clasificaciones de películas y programas puedes ver en la aplicación. Si se modifica esta selección, pediremos que ingreses la contraseña de tu cuenta."
-    },
     "screenSettings_parentalControls_kids_instructions": {
       "description": "Description of the parental controls screen",
       "message": "Por restricciones de contenido, vuelve a la cuenta de adulto para actualizar tu configuración."
@@ -3580,7 +3583,7 @@ Function getTranslation_es_MX()
       "description": "Success message when content settings has changed to group 0 (Little Kids) in multi-account mode",
       "message": "Serás dirigido a Tubi Kids.\n\n La configuración cambió a:\n Clasificación 4-6 (TV-G, G)."
     },
-    "screenSettings_error_parentalChanges_description_multi_account_group1": {
+    "screenSettings_error_parentalChanges_description_multi_account_group5": {
       "description": "Success message when content settings has changed to group 1 (Older Kids) in multi-account mode",
       "message": "Serás dirigido a Tubi Kids.\n\n La configuración cambió a:\n Clasificación 10-12 (TV-PG, PG)."
     },
@@ -3596,7 +3599,7 @@ Function getTranslation_es_MX()
       "description": "Success message when content settings has changed to group 4 (Age Rating 1-3) in multi-account mode - user directed to Tubi Kids",
       "message": "Serás dirigido a Tubi Kids.\n\n La configuración cambió a:\n Clasificación 1-3 (TV-Y)."
     },
-    "screenSettings_error_parentalChanges_description_multi_account_group5": {
+    "screenSettings_error_parentalChanges_description_multi_account_group1": {
       "description": "Success message when content settings has changed to group 5 (Age Rating 7-9) in multi-account mode - user directed to Tubi Kids",
       "message": "Serás dirigido a Tubi Kids.\n\n La configuración cambió a:\n Clasificación 7-9 (TV-Y7, TV-Y7-FV)."
     },
@@ -4982,10 +4985,6 @@ Function getTranslation_es_MX()
       "description": "Heading of the sign up kids age selection screen",
       "message": "Elige una configuración de contenido"
     },
-    "kidsAgeSelection_sub_header": {
-      "description": "Subheading of the sign up kids age selection screen",
-      "message": "Obtén más información sobre clasificaciones en tubi.tv/LINK"
-    },
     "kidsAgeSelection_top_header": {
       "description": "Top header of the sign up kids age selection screen",
       "message": "Configuración de cuenta Tubi Kids"
@@ -4993,10 +4992,6 @@ Function getTranslation_es_MX()
     "kidsAgeSelection_ageRatingLabel": {
       "description": "Age rating label of the kids age selection screen",
       "message": "Clasificación de edad"
-    },
-    "kidsAgeSelection_includedUpToLabel": {
-      "description": "Included up to label of the kids age selection screen",
-      "message": "Incluye hasta"
     },
     "ParentalControlPinPad_header": {
       "description": "Header of the parental control pin pad screen",
@@ -5089,10 +5084,6 @@ Function getTranslation_es_MX()
     "kidsAccountSetup_termsText": {
       "description": "Terms text for Kids Account Setup screen",
       "message": "Al hacer clic en Empezar a ver, aceptas {url1} y {url2}"
-    },
-    "screenSettings_contentSettings_instructions": {
-      "description": "Instructions text for content settings panel",
-      "message": "Establece límites de clasificación para ti y tus hijos y gestiona tu PIN para una visualización segura."
     },
     "screenSettings_contentSettings_create_pinLabel": {
       "description": "Label for the create pin button",
@@ -5924,10 +5915,6 @@ Function getTranslation_fr_CA()
       "message": "Adultes",
       "note": "This translation is used as screenSettings_parentalControls_group_Adults, please double check that it is not needed before deleting"
     },
-    "screenSettings_parentalControls_instructions": {
-      "description": "Description of the parental controls screen",
-      "message": "Veuillez sélectionner l'âge approprié pour regarder Tubi TV. Votre sélection déterminera les classifications de films et d'émissions que vous pourrez consulter dans l'application. Si vous modifiez cette sélection, vous devrez entrer le mot de passe de votre compte."
-    },
     "screenSettings_parentalControls_kids_instructions": {
       "description": "Description of the parental controls screen",
       "message": "En raison des restrictions, retournez au compte adulte pour modifier vos paramètres de contenu."
@@ -6036,7 +6023,7 @@ Function getTranslation_fr_CA()
       "description": "Success message when content settings has changed to group 0 (Little Kids) in multi-account mode",
       "message": "Vous serez dirigé vers Tubi Kids.\n\n Les paramètres ont été changés à :\n Cote d’âge 4-6 (TV-G, G)."
     },
-    "screenSettings_error_parentalChanges_description_multi_account_group1": {
+    "screenSettings_error_parentalChanges_description_multi_account_group5": {
       "description": "Success message when content settings has changed to group 1 (Older Kids) in multi-account mode",
       "message": "Vous serez dirigé vers Tubi Kids.\n\n Les paramètres ont été changés à :\n Cote d’âge 10-12 (TV-PG, PG)."
     },
@@ -6052,7 +6039,7 @@ Function getTranslation_fr_CA()
       "description": "Success message when content settings has changed to group 4 (Age Rating 1-3) in multi-account mode - user directed to Tubi Kids",
       "message": "Vous serez dirigé vers Tubi Kids.\n\n Les paramètres ont été changés à :\n Cote d’âge 1-3 (TV-Y)."
     },
-    "screenSettings_error_parentalChanges_description_multi_account_group5": {
+    "screenSettings_error_parentalChanges_description_multi_account_group1": {
       "description": "Success message when content settings has changed to group 5 (Age Rating 7-9) in multi-account mode - user directed to Tubi Kids",
       "message": "Vous serez dirigé vers Tubi Kids.\n\n Les paramètres ont été changés à :\n Cote d’âge 7-9 (TV-Y7, TV-Y7-FV)."
     },
@@ -7438,10 +7425,6 @@ Function getTranslation_fr_CA()
       "description": "Heading of the sign up kids age selection screen",
       "message": "Choisissez un paramètre de contenu"
     },
-    "kidsAgeSelection_sub_header": {
-      "description": "Subheading of the sign up kids age selection screen",
-      "message": "En savoir plus sur les classifications à tubi.tv/LINK"
-    },
     "kidsAgeSelection_top_header": {
       "description": "Top header of the sign up kids age selection screen",
       "message": "Configuration du compte Tubi Kids"
@@ -7449,10 +7432,6 @@ Function getTranslation_fr_CA()
     "kidsAgeSelection_ageRatingLabel": {
       "description": "Age rating label of the kids age selection screen",
       "message": "Cote d’âge"
-    },
-    "kidsAgeSelection_includedUpToLabel": {
-      "description": "Included up to label of the kids age selection screen",
-      "message": "Inclus jusqu’à"
     },
     "ParentalControlPinPad_header": {
       "description": "Header of the parental control pin pad screen",
@@ -7545,10 +7524,6 @@ Function getTranslation_fr_CA()
     "kidsAccountSetup_termsText": {
       "description": "Terms text for Kids Account Setup screen",
       "message": "En cliquant sur Commencer à regarder, vous acceptez {url1} et {url2}"
-    },
-    "screenSettings_contentSettings_instructions": {
-      "description": "Instructions text for content settings panel",
-      "message": "Définissez des limites de classification pour vous et vos enfants et gérez votre NIP pour un visionnement sécuritaire."
     },
     "screenSettings_contentSettings_create_pinLabel": {
       "description": "Label for the create pin button",
@@ -7783,10 +7758,6 @@ Function getTranslation_en_GB()
     "screenSettings_about_description": {
       "description": "The description on the about screen",
       "message": "Tubi is the leading free, premium, video streaming app. We have a large and diverse library of content with many thousands of titles and 3x fewer adverts than other TV services."
-    },
-    "screenSettings_parentalControls_instructions": {
-      "description": "Description of the parental controls screen",
-      "message": "Please select the appropriate viewing age for Tubi TV. Your selection will determine which film and show ratings you can view in the app. If this selection is changed, you will be required to enter your account password."
     },
     "screenSettings_autoplayTimer_instructions_guest_users": {
       "description": "Description of the autoplay timer user choice screen for guest users",

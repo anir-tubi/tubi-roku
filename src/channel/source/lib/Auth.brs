@@ -903,7 +903,7 @@ Function tubiAuth_formatAuthInfoFromServer(serverAuthInfo)
   if serverAuthInfo.tubi_id <> invalid then authInfo.tubiId = serverAuthInfo.tubi_id.toStr()
   if serverAuthInfo.email <> invalid then authInfo.email = serverAuthInfo.email
   if serverAuthInfo.parent_tubi_id <> invalid then authInfo.parentId = serverAuthInfo.parent_tubi_id.toStr()
-  if serverAuthInfo.parental_rating <> invalid then authInfo.parentalRating = serverAuthInfo.parental_rating.toStr()
+  if serverAuthInfo.parental_rating_v2 <> invalid then authInfo.parentalRating = serverAuthInfo.parental_rating_v2.toStr()
   if serverAuthInfo.pwexpts <> invalid then authInfo.pwExpTs = serverAuthInfo.pwexpts.toStr()
 
   authInfo.firstName = ""

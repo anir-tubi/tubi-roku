@@ -10,15 +10,18 @@ Function init()
   m.instructions = m.top.findNode("Instructions")
   m.contentGroup = m.top.findNode("ContentGroup")
   m.accountsList = m.top.findNode("AccountsList")
+  m.MoreInfoLink = m.top.findNode("MoreInfoLink")
   m.constants = getConstantsFromGlobal()
 
   ' Set title and instructions
   m.Title.text = getTranslation("screenSettings_menu_contentSettings")
   m.Instructions.text = getTranslation("screenSettings_contentSettings_instructions")
+  m.MoreInfoLink.text = getTranslation("content_settings_learn_more", { url: "https://tubitv.com/help-center/App-Features-and-Settings/articles/42341556123163" })
 
   typographyConstants = getTypographyConstants()
   setTypographyOfLabel(m.Title, typographyConstants.ids.headerSmall)
   setTypographyOfLabel(m.Instructions, typographyConstants.ids.bodyMedium)
+  setTypographyOfLabel(m.MoreInfoLink, typographyConstants.ids.bodyMedium)
 
   theme = getThemeFromGlobal()
   if theme <> invalid
@@ -26,6 +29,7 @@ Function init()
     m.Instructions.color = theme.primaryTextColor
     m.accountsList.focusBitmapBlendColor = theme.focusedColor
     m.accountsList.focusFootprintBlendColor = theme.neutralColor
+    m.MoreInfoLink.color = theme.neutralColor
   end if
 
   ' Setup MarkupGrid observers

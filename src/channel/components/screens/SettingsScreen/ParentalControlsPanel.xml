@@ -21,7 +21,6 @@
     <field id="selectItem" type="integer" alwaysNotify="true" />
     <field id="offset" alias="Offset.translation" />
     <field id="isLoading" type="boolean" />
-    <field id="isUserInMultiAccount" type="boolean" value="false" alwaysNotify="true" />
     <field id="hideDescription" type="boolean" value="false" />
     <field id="showPCForKids" type="boolean" value="false" />
 
@@ -43,7 +42,7 @@
       <LayoutGroup
         id="ContentGroup"
         layoutDirection="vert"
-        itemSpacings="[25]">
+        itemSpacings="[25,12,25]">
         <Label
           id="Title"
           height="73"
@@ -61,25 +60,22 @@
             role="font" />
         </Label>
 
+        <Label
+          id="MoreInfoLink"
+          width="1002"
+          wrap="true"
+          vertAlign="bottom">
+          <Font
+            role="font" />
+        </Label>
+
         <MarkupList
           id="ParentalControlsMenu"
           numRows="12"
           itemSize="[560,80]"
           itemSpacing="[0,8]"
-          itemComponentName="CheckButton"
+          itemComponentName="ContentSettingCheckButton"
           vertFocusAnimationStyle="floatingFocus">
-          <ContentNode
-            id="SettingsMenuContent"
-            role="content">
-            <CheckButtonContentNode
-              id="LittleKids" />
-            <CheckButtonContentNode
-              id="OlderKids" />
-            <CheckButtonContentNode
-              id="Teens" />
-            <CheckButtonContentNode
-              id="Adults" />
-          </ContentNode>
         </MarkupList>
         <LayoutGroup
           id="PinLayout"

@@ -17,15 +17,15 @@
       uri="pkg:/images/poster-mask.png"
       translation="[0,0]"
       width="356"
-      height="576" />
+      height="584" />
 
     <LayoutGroup
       id="AgeSelectionListItemGroup"
       layoutDirection="vert"
-      itemSpacings="[4,36,36, 16]"
+      itemSpacings="[4,36,28, 16]"
       horizAlignment="center"
-      vertAlignment="center"
-      translation="[178,288]">
+      vertAlignment="top"
+      translation="[178,3]">
       <Label
         id="AgeRatingLabel"
         horizAlign="center"
@@ -45,25 +45,62 @@
         width="225"
         height="210" />
 
-      <Label
-        id="IncludedUpToLabel"
-        horizAlign="center"
-        width="356">
-        <Font
-          role="font" />
-      </Label>
       <LayoutGroup
-        id="RatingsBadgeGroup"
-        layoutDirection="horiz"
+        id="IncludedUpToLabelGroup"
+        layoutDirection="vert"
+        horizAlignment="center"
+        vertAlignment="center"
+        itemSpacings="[3]">
+        <Label
+          id="IncludedUpToLabel"
+          horizAlign="center"
+          width="356">
+          <Font
+            role="font" />
+        </Label>
+      </LayoutGroup>
+
+      <LayoutGroup
+        id="RatingsBadgeGroupParent"
+        layoutDirection="vert"
         horizAlignment="center"
         vertAlignment="center"
         itemSpacings="[12]">
-        <Badge
-          id="RatingsBadge1" />
-        <Badge
-          id="RatingsBadge2" />
-      </LayoutGroup>
+        <LayoutGroup
+          id="RatingsBadgeGroup1"
+          layoutDirection="horiz"
+          horizAlignment="center"
+          vertAlignment="center"
+          itemSpacings="[12]">
+          <Badge
+            id="RatingsBadge1" />
+        </LayoutGroup>
 
+        <LayoutGroup
+          id="RatingsBadgeGroup2"
+          layoutDirection="horiz"
+          horizAlignment="center"
+          vertAlignment="center"
+          itemSpacings="[12]">
+          <Badge
+            id="RatingsBadge2" />
+          <Badge
+            id="RatingsBadge3" />
+        </LayoutGroup>
+
+        <LayoutGroup
+          id="RatingsBadgeGroup3"
+          layoutDirection="horiz"
+          horizAlignment="center"
+          vertAlignment="center"
+          itemSpacings="[12]">
+          <Badge
+            id="RatingsBadge4" />
+          <Badge
+            id="RatingsBadge5" />
+        </LayoutGroup>
+
+      </LayoutGroup>
     </LayoutGroup>
   </children>
 </component>

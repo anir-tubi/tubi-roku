@@ -1873,12 +1873,12 @@ Function getConstants()
   constants.serverValues.parentalControls = ["YOUNGER_CHILD", "OLDER_CHILD", "TEEN", "ADULT", "YOUNGEST_CHILD", "OLDEST_CHILD"]
 
   constants.ui.ratings = {}
-  constants.ui.ratings[constants.serverValues.parentalControls[0]] = ["TV-G", "G"] '//Group 0, Little Kids
-  constants.ui.ratings[constants.serverValues.parentalControls[1]] = ["TV-PG", "PG"] '//Group 1, Big Kids
-  constants.ui.ratings[constants.serverValues.parentalControls[2]] = ["TV-14", "PG-13"] '//Group 2, Teens
-  constants.ui.ratings[constants.serverValues.parentalControls[3]] = ["TV-MA", "R", "NC-17"] '//Group 3, Adults
+  constants.ui.ratings[constants.serverValues.parentalControls[0]] = ["TV-Y / TV-G / G"] '//Group 0, Little Kids
+  constants.ui.ratings[constants.serverValues.parentalControls[1]] = ["TV-Y / TV-G / G / TV-Y7 / TV-Y7-FV"] '//Group 5, oldest Kids
+  constants.ui.ratings[constants.serverValues.parentalControls[2]] = ["TV-14 / PG-13"] '//Group 2, Teens
+  constants.ui.ratings[constants.serverValues.parentalControls[3]] = ["TV-MA / R / NC-17"] '//Group 3, Adults
   constants.ui.ratings[constants.serverValues.parentalControls[4]] = ["TV-Y"] '//Group 4, youngest Kids
-  constants.ui.ratings[constants.serverValues.parentalControls[5]] = ["TV-Y7", "TV-Y7-FV"] '//Group 5, oldest Kids
+  constants.ui.ratings[constants.serverValues.parentalControls[5]] = ["TV-PG / PG"] '//Group 1, Big Kids
 
   constants.urls.realtime.distributionMapping = {
     "viewTime": true,

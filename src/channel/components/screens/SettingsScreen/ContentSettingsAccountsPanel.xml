@@ -28,7 +28,7 @@
       <LayoutGroup
         id="ContentGroup"
         layoutDirection="vert"
-        itemSpacings="[45]">
+        itemSpacings="[45,12,45]">
         <Label
           id="Title"
           height="73"
@@ -39,6 +39,14 @@
 
         <Label
           id="Instructions"
+          width="650"
+          wrap="true"
+          vertAlign="bottom">
+          <Font
+            role="font" />
+        </Label>
+        <Label
+          id="MoreInfoLink"
           width="650"
           wrap="true"
           vertAlign="bottom">

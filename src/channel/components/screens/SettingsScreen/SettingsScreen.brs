@@ -12,8 +12,6 @@ Function init()
   m.Title = m.top.findNode("Title")
   m.Title.text = getTranslation("menu_settings")
 
-  m.isUserInMultiAccount = isUserInMultiAccount()
-
   ' Create the menu
   m.SettingsMenuPanel = createSettingsMenuPanel()
   m.SettingsMenuPanel.observeField("createNextPanelIndex", "onCreateNextPanelIndex")
@@ -184,11 +182,7 @@ Function createNextPanel(buttonContent)
       nextPanel = createLegalPanel(buttonContent.title, m.constants.urls.yourPrivacyChoicesUrl)
     else if buttonContent.id = "SignInOutButton"
       if isLoggedInUser() = true
-        if m.isUserInMultiAccount = true
-          nextPanel = createSignOutProfilePanel()
-        else
-          nextPanel = createSignOutPanel()
-        end if
+        nextPanel = createSignOutProfilePanel()
       else
         nextPanel = createSignInPanel()
       end if
@@ -229,7 +223,7 @@ Function createParentalControlsPanel(existingPanel = invalid)
   else
     pcPanel = existingPanel
   end if
-  pcPanel.isUserInMultiAccount = m.top.isUserInMultiAccount
+
   pcPanel.width = m.rightPanelWidth
   pcPanel.focusable = true
   pcPanel.hasNextPanel = false
@@ -237,14 +231,14 @@ Function createParentalControlsPanel(existingPanel = invalid)
   pcPanel.selectButtonMovesPanelForward = false
   pcPanel.offset = m.rightPanelOffset
 
-  if m.top.isUserInMultiAccount = true
-    if isKidsProfileSignInInfo() = true
-      pcPanel.showPCForKids = true
-      pcPanel.focusable = false
-    else
-      pcPanel.showPCForKids = false
-    end if
+
+  if isKidsProfileSignInInfo() = true
+    pcPanel.showPCForKids = true
+    pcPanel.focusable = false
+  else
+    pcPanel.showPCForKids = false
   end if
+
 
   if isSignedIn() = true
     pcPanel.isLoading = true
@@ -415,7 +409,6 @@ Function createSettingsMenuPanel()
   settingsMenuPanel.selectButtonMovesPanelForward = true
   settingsMenuPanel.signInInfo = m.top.signInInfo
   settingsMenuPanel.uiMode = m.top.uiMode
-  settingsMenuPanel.isUserInMultiAccount = m.isUserInMultiAccount
   return settingsMenuPanel
 End Function
 
@@ -720,15 +713,7 @@ End Function
 
 Function onMenuItemSelected()
   buttonContent = m.SettingsMenuPanel.content.getChild(m.SettingsMenuPanel.itemSelected)
-  if buttonContent.id = "SignInOutButton"
-    if m.top.isUserInMultiAccount = false
-      if isSignedIn() = true
-        m.top.signOutSelected = true
-      else
-        m.top.signInSelected = true
-      end if
-    end if
-  else if buttonContent.id = "ExitButton"
+  if buttonContent.id = "ExitButton"
     m.top.showExitModal = true
 
     ' TODO: This is a temporary event and a more thorough approach to analytics on the Settings page will be implemented in the near future.
@@ -872,13 +857,12 @@ End Function
 
 
 ' Check if we should show the ContentSettingsAccountsPanel
-' Returns true if user is in multi-account mode and has kids accounts
+' Returns true if user has has kids accounts
 Function shouldShowContentSettingsAccountsPanel()
-  if m.top.isUserInMultiAccount = true
-    signInInfo = m.top.signInInfo
-    if signInInfo <> invalid AND signInInfo.linkedAccounts <> invalid AND signInInfo.linkedAccounts.count() > 0
-      return true
-    end if
+
+  signInInfo = m.top.signInInfo
+  if signInInfo <> invalid AND signInInfo.linkedAccounts <> invalid AND signInInfo.linkedAccounts.count() > 0
+    return true
   end if
   return false
 End Function

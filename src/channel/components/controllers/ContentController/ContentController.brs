@@ -3139,6 +3139,10 @@ Function onGetUserInfoSuccess(userInfo)
     if userInfo.email <> invalid
       Auth.setAuthInfo("email", userInfo.email)
     end if
+
+    if userInfo.parentalRating <> invalid
+      Auth.setAuthInfo("parentalRating", userInfo.parentalRating)
+    end if
   end if
 
 

@@ -5,7 +5,6 @@ Function showSettingsScreen(sFocusID = "", screenLevel = 0)
   m.settingsScreen = CreateObject("roSGNode", "SettingsScreen")
   m.settingsScreen.id = m.constants.ui.screenIds.settingsScreen
   m.settingsScreen.uiMode = m.uiMode
-  m.settingsScreen.isUserInMultiAccount = isUserInMultiAccount()
   ' Passing in the saved isVideoPreviewOn.
   m.settingsScreen.isVideoPreviewOn = m.pub_serverPersistentData.isVideoPreviewOn
   m.settingsScreen.isAutoPlayTimerOn = isAutoPlayTimerOn()
@@ -138,45 +137,32 @@ End Function
 Function onSettingsSignOutSelected()
   tubiLog("SettingsScreenHelpers.onSettingsSignOutSelected")
 
-  if isUserInMultiAccount() = false
-    pageInfo = m.Tracking.getAnalyticsPage("account_page", { account_page_type: "PARENTAL" })
 
-    dialogEvent = {
-      type: "dialog"
-      values: {
-        dialog_type: "INFORMATION" 'DialogType enum - TODO use a "SIGN_OUT" type when it becomes available in protos
-        pageOneof: pageInfo 'settings_page doesn't exist in protos
-        dialog_action: "SHOW"
-        dialog_sub_type: "sign-out-settings"
-      }
-    }
-    showSignOutModal(dialogEvent, m.trackingLoggingTask, onSignOutModalSelected)
-  else
-    pageInfo = m.Tracking.getAnalyticsPage("account_page", { account_page_type: "ACCOUNT" })
+  pageInfo = m.Tracking.getAnalyticsPage("account_page", { account_page_type: "ACCOUNT" })
 
-    dialogEvent = {
-      type: "dialog"
-      values: {
-        dialog_type: "SIGN_OUT" 'DialogType enum - TODO use a "SIGN_OUT" type when it becomes available in protos
-        pageOneof: pageInfo 'settings_page doesn't exist in protos
-        dialog_action: "SHOW"
-        dialog_sub_type: "sign-out"
-      }
+  dialogEvent = {
+    type: "dialog"
+    values: {
+      dialog_type: "SIGN_OUT" 'DialogType enum - TODO use a "SIGN_OUT" type when it becomes available in protos
+      pageOneof: pageInfo 'settings_page doesn't exist in protos
+      dialog_action: "SHOW"
+      dialog_sub_type: "sign-out"
     }
-    showSignOutProfileWithKidsModal(dialogEvent, m.trackingLoggingTask, onSignOutProfileSelected)
-    'Send ComponentInteractionEvent
-    button_component = {
-      button_type: "TEXT"
-      button_value: "SIGN_OUT"
-    }
-    componentInteractionInfo = {
-      pageOneof: pageInfo
-      componentOneof: m.Tracking.getAnalyticsComponent("button_component", button_component)
-      user_interaction: "CONFIRM"
-    }
+  }
+  showSignOutProfileWithKidsModal(dialogEvent, m.trackingLoggingTask, onSignOutProfileSelected)
+  'Send ComponentInteractionEvent
+  button_component = {
+    button_type: "TEXT"
+    button_value: "SIGN_OUT"
+  }
+  componentInteractionInfo = {
+    pageOneof: pageInfo
+    componentOneof: m.Tracking.getAnalyticsComponent("button_component", button_component)
+    user_interaction: "CONFIRM"
+  }
 
-    sendcomponentInteractionInfo(componentInteractionInfo)
-  end if
+  sendcomponentInteractionInfo(componentInteractionInfo)
+
 End Function
 
 
@@ -357,7 +343,7 @@ Function onPinCreateOrEditForKidsAccount(msg)
     authInfo = currentAuthInfo
   end if
 
-  if isLoggedInUser(authInfo) = true AND isUserInMultiAccount() = true
+  if isLoggedInUser(authInfo) = true
     sTubiId = authInfo.tubiId
     signInInfo = m.pcPinInputScreen.signInInfo
     if signInInfo <> invalid AND signInInfo.pinSubmitted <> invalid AND signInInfo.password <> invalid
@@ -399,18 +385,13 @@ Function onParentalSettingSelected()
     currentRating = m.pub_serverPersistentData.parentalRating
     isChangePCRating = true
 
-    if isUserInMultiAccount() = true
-
-      if isNonEmptyString(m.settingsScreen.pcChangeRequestId) = true AND m.settingsScreen.signInInfo.linkedAccounts <> invalid
-        kid = m.settingsScreen.signInInfo.linkedAccounts[m.settingsScreen.pcChangeRequestId]
-        if kid <> invalid
-          currentRating = kid.parentalRating
-        end if
+    if isNonEmptyString(m.settingsScreen.pcChangeRequestId) = true AND m.settingsScreen.signInInfo.linkedAccounts <> invalid
+      kid = m.settingsScreen.signInInfo.linkedAccounts[m.settingsScreen.pcChangeRequestId]
+      if kid <> invalid
+        currentRating = kid.parentalRating
       end if
-      isChangePCRating = (getPCV2Mapping(parentalSetting) <> getPCV2Mapping(currentRating))
-    else
-      isChangePCRating = (currentRating <> parentalSetting)
     end if
+    isChangePCRating = (getPCV2Mapping(parentalSetting) <> getPCV2Mapping(currentRating))
 
     authInfo = m.tubiAuthUpdate.getAuthInfo()
     if isLoggedInUser(authInfo) = true AND isChangePCRating = true then
@@ -455,15 +436,14 @@ Function onParentalSettingSelected()
           tubiLog("SettingsScreenHelpers.onParentalSettingSelected(), use saved password")
           '//if there is a saved password, was it submitted within the last 5 minutes (300 seconds), if so, then use that password
           onPasswordConfirm()
-        else if isUserInMultiAccount() = true
-          if getPCV2Mapping(parentalSetting) < getPCV2Mapping(currentRating)
-            onPasswordConfirm()
-          else
-            showConfirmPasswordScreen()
-          end if
+        else if getPCV2Mapping(parentalSetting) < getPCV2Mapping(currentRating)
+          onPasswordConfirm()
+
         else
           showConfirmPasswordScreen()
         end if
+
+
       end if
     end if
   else
@@ -510,32 +490,29 @@ Function onPasswordConfirm(msg = invalid)
 
   authInfo = m.tubiAuthUpdate.getAuthInfo()
   if isLoggedInUser(authInfo) = true
-    useV2ParentalRating = false
+
     isUpdateForKidsAccount = false
     sName = ""
     sTubiId = ""
 
-    if isUserInMultiAccount() = true
-      useV2ParentalRating = true
+    pcChangeRequestId = m.settingsScreen.pcChangeRequestId
+    if pcChangeRequestId <> invalid
+      signInInfo = m.settingsScreen.signInInfo
+      if signInInfo <> invalid AND signInInfo.linkedAccounts <> invalid
+        linkedAccounts = signInInfo.linkedAccounts
 
-      pcChangeRequestId = m.settingsScreen.pcChangeRequestId
-      if pcChangeRequestId <> invalid
-        signInInfo = m.settingsScreen.signInInfo
-        if signInInfo <> invalid AND signInInfo.linkedAccounts <> invalid
-          linkedAccounts = signInInfo.linkedAccounts
-
-          for each item in linkedAccounts
-            account = linkedAccounts[item]
-            if item = pcChangeRequestId
-              sName = account.name
-              sTubiId = item
-              isUpdateForKidsAccount = true
-              exit for
-            end if
-          end for
-        end if
+        for each item in linkedAccounts
+          account = linkedAccounts[item]
+          if item = pcChangeRequestId
+            sName = account.name
+            sTubiId = item
+            isUpdateForKidsAccount = true
+            exit for
+          end if
+        end for
       end if
     end if
+
 
     if isUpdateForKidsAccount = true
       patchSettingsInfo = m.userDeviceApi.updateParentalRatingReqInfoForKidsAccount(m.settingsScreen.parentalSettingSelected, sPassword, sName, sTubiId)
@@ -552,7 +529,7 @@ Function onPasswordConfirm(msg = invalid)
       })
 
     else
-      parentalRatingReq = m.userDeviceApi.updateParentalRatingReqInfo(m.settingsScreen.parentalSettingSelected, sPassword, useV2ParentalRating)
+      parentalRatingReq = m.userDeviceApi.updateParentalRatingReqInfo(m.settingsScreen.parentalSettingSelected, sPassword)
       m.makeRequest({
         url: parentalRatingReq.url
         requestType: m.constants.reqNames.updateParentalRating
@@ -643,33 +620,20 @@ Function refreshUIAfterParentalControlsChange()
   parentalSetting = m.settingsScreen.parentalSettingSelected
   sMessageID = ""
   message = ""
-  if isUserInMultiAccount() = true
-    if type(parentalSetting) = "roInt"
-      sMessageID = "screenSettings_error_parentalChanges_description_multi_account_group" + parentalSetting.toStr()
-    end if
-
-    if sMessageID = ""
-      sMessageID = "screenSettings_error_parentalChanges_description_multi_account_default"
-    end if
-
-    title = getTranslation("screenSettings_error_parentalChanges_multi_account")
-  else
-    if type(parentalSetting) = "roInt"
-      sMessageID = "screenSettings_error_parentalChanges_description_group" + parentalSetting.toStr()
-    end if
-    if sMessageID = ""
-      sMessageID = "screenSettings_error_parentalChanges_description_default"
-    end if
-
-    title = getTranslation("screenSettings_error_parentalChanges")
+  if type(parentalSetting) = "roInt"
+    sMessageID = "screenSettings_error_parentalChanges_description_multi_account_group" + parentalSetting.toStr()
   end if
+
+  if sMessageID = ""
+    sMessageID = "screenSettings_error_parentalChanges_description_multi_account_default"
+  end if
+
+  title = getTranslation("screenSettings_error_parentalChanges_multi_account")
 
   message = getTranslation(sMessageID)
   showSimpleInstantResumableModal(title, message, [], dialogEvent, m.trackingLoggingTask)
 
-  if isUserInMultiAccount() = true
-    m.settingsScreen.removeKidsSignOutBtn = (isKidsUIOn() = true)
-  end if
+  m.settingsScreen.removeKidsSignOutBtn = (isKidsUIOn() = true)
 
 End Function
 
@@ -763,13 +727,10 @@ Function refreshAuthTokenAfterPCChangeForKidsAccount(response)
 End Function
 
 
-
-
-
-
 Function refreshAuthTokenAfterParentalControlsChange(response)
   if response <> invalid
-    saveLocalServerPersistentData([{ parentalRating: m.settingsScreen.parentalSettingSelected }])
+    parentalRating = m.settingsScreen.parentalSettingSelected
+    saveLocalServerPersistentData([{ parentalRating: parentalRating }])
     if isConfirmPasswordScreen() = true
       m.passwordCache = {
         password: response.requestInput.password
@@ -778,6 +739,9 @@ Function refreshAuthTokenAfterParentalControlsChange(response)
     else
       showHideSpinner(true)
     end if
+
+    'also update the local authInfo for consitency with the server persistent data
+    m.tubiAuthUpdate.setAuthInfo("parentalRating", parentalRating.toStr())
     m.tubiAuthUpdate.initOrUpdateAuthInfo(refreshUIAfterParentalControlsChange, true)
 
   end if
@@ -956,6 +920,7 @@ End Function
 
 
 Function onFetchUserSettingsChanged()
+
   isMultiAccount = isUserInMultiAccount()
   getUserSettingsRequest = m.userDeviceApi.createUserSettingsGeneralTaskReqInfo(onSettingsScreenGetUserSettingsSuccess, onSettingsScreenGetUserSettingsError, isMultiAccount)
   getUserSettingsRequest.analyticsScreenId = m.constants.ui.screenIds.settingsScreen
