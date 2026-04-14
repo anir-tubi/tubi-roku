@@ -78,6 +78,15 @@ Function init()
   m.epgBanner.observeFieldScoped("focusedChild", "onEpgBannerFocusChange")
   m.activeBannerData = invalid
 
+  epgShiftExperiment = getStatsigExperimentResource("roku_epg_shift", "roku_epg_shift_v1", false)
+  if epgShiftExperiment <> invalid AND epgShiftExperiment.enabled = true
+    m.epgTimeGrid.epgShiftLayoutEnabled = true
+    m.infoPanel.translation = [0, 80]
+    m.epgBanner.translation = [549, 372]
+    m.containerMarkupGrid.translation = [0, 456]
+    m.epgTimeGrid.translation = [6, 366]
+  end if
+
   'ChannelRefreshTimer
   m.channelRefreshTimer = m.top.findNode("channelRefreshTimer")
   'If channelRefreshTimer needs to be different than categoryContentRefreshTimeout then we need to add a constant

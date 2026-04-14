@@ -58,6 +58,8 @@ Function showEPGScreen(constants, screenID = "")
     showHideSpinner(false)
   end if
 
+  getStatsigExperimentResource("roku_epg_shift", "roku_epg_shift_v1", true)
+
   pushScreen(epgScreen, true, shouldSendPageLoadEvent)
 
 End Function

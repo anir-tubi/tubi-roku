@@ -43,6 +43,8 @@
                         false : 1 and half  = rows visible with fixedFocus-->
     <field id="EPGFullMode" type="boolean" value="true" />
 
+    <field id="epgShiftLayoutEnabled" type="boolean" value="false" />
+
     <field id="jumpToRowItem" alias="ProgramGrid.jumpToRowItem" />
 
     <field id="isChannelGridFocused" type="boolean" value="false" />

@@ -153,6 +153,12 @@ Function StatsigExperimentsInterface(statsigExperimentsInfo) as Object
         }
       }
 
+      roku_epg_shift: {
+        roku_epg_shift_v1: {
+          default: { "enabled": false }
+        }
+      }
+
       roku_search_creator_tile: {
         roku_search_creator_tile_v1: {
           default: { "enabled": false }

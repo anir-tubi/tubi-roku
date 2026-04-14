@@ -15,6 +15,7 @@ Function init()
   m.top.observeFieldScoped("jumpToLinearChannelID", "onJumpToLinearChannelID")
 
   m.top.observeFieldScoped("EPGFullMode", "onDisplayModeChange")
+  m.top.observeFieldScoped("epgShiftLayoutEnabled", "onDisplayModeChange")
   m.programGrid.observeFieldScoped("rowItemSelected", "onProgramGridContentSelected")
   m.programGrid.observeFieldScoped("rowItemFocused", "onProgramGridContentFocused")
   m.programGrid.observeFieldScoped("rowScrollFocused", "onProgramGridRowFocused")
@@ -311,8 +312,12 @@ End Function
 Function onDisplayModeChange()
   if m.top.EPGFullMode = true
     m.headerText.visible = true
-    m.channelsGrid.numRows = 4
-    m.programGrid.ProgramGrid = 4
+    fullModeRowCount = 4
+    if m.top.epgShiftLayoutEnabled = true
+      fullModeRowCount = 5
+    end if
+    m.channelsGrid.numRows = fullModeRowCount
+    m.programGrid.numRows = fullModeRowCount
   else
     m.headerText.visible = false
     m.channelsGrid.numRows = 3
