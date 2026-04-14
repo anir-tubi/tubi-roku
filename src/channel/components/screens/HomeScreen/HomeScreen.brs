@@ -797,7 +797,7 @@ Function updateHubContainerGradient() as Void
       end if
     end if
   else
-    m.containerBackgroundPoster.opacity = 0.0
+    fade(m.containerBackgroundPoster, "out", 0)
   end if
 End Function
 

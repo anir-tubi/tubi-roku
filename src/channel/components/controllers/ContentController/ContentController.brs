@@ -4326,6 +4326,8 @@ End Function
 '                    otherwise falls back to hub.start_time/hub.end_time (deeplink default).
 ' @returns AA suitable for node.update() or invalid if outside the time window or config is missing
 Function getEventHubTileAA(entryType = invalid)
+  if isKidsUIOn() = true then return invalid
+
   eventConfig = getExternalConfigValueFromGlobal("event", invalid)
   if eventConfig = invalid OR eventConfig.hub = invalid then return invalid
 

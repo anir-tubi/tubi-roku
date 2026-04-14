@@ -478,6 +478,7 @@ Function onContentChange(msg) as Void
   if content.isReplay = true
     m.Menu.numRows = 4
     m.Menu.translation = [m.Menu.translation[0], 553]
+    m.top.stringPlayButton = getTranslation("screenDetails_button_watch_replay")
   end if
 
   add = false
