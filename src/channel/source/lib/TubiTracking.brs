@@ -1516,6 +1516,7 @@ Function tubiTracking_getDetailScreenMenuPageMap(constants)
     if detailScreenMenuItemIds.setReminderMenuItem <> invalid then map[detailScreenMenuItemIds.setReminderMenuItem] = "SET_REMINDER"
     if detailScreenMenuItemIds.removeReminderMenuItem <> invalid then map[detailScreenMenuItemIds.removeReminderMenuItem] = "REMOVE_REMINDER"
     if detailScreenMenuItemIds.channelMenuItem <> invalid then map[detailScreenMenuItemIds.channelMenuItem] = "GO_TO_NETWORK"
+    if detailScreenMenuItemIds.creatorMenuItem <> invalid then map[detailScreenMenuItemIds.creatorMenuItem] = "COLLECTION"
   end if
   return map
 End Function

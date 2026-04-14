@@ -145,7 +145,7 @@ Function setDetailStrings()
   m.PlayMenuItem.title = getTranslation("screenDetails_button_play")
   m.PlayMenuItem.analyticsButtonValue = m.Tracking.detailScreenMenuItemMap[m.PlayMenuItem.id]
 
-  ' TODO need to set analytics value for creator button
+  m.CreatorMenuItem.analyticsButtonValue = m.Tracking.detailScreenMenuItemMap[m.CreatorMenuItem.id]
 
   m.LikeMenuItem.title = getTranslation("screenDetails_button_like")
   m.LikeMenuItem.analyticsButtonValue = m.Tracking.detailScreenMenuItemMap[m.LikeMenuItem.id]
@@ -814,8 +814,7 @@ Function onMenuItemFocused()
   }
 
   ' If oldFocusedMenuAnalyticsSection exists and is not the same as the focusedMenuItem,
-  ' then the user is focusing from another menu item.
-  if m.oldFocusedMenuAnalyticsSection <> invalid AND m.oldFocusedMenuAnalyticsSection.middle_nav_section <> focusedMenuAnalyticsSection
+  if m.oldFocusedMenuAnalyticsSection <> invalid AND isNonEmptyString(focusedMenuAnalyticsSection) AND m.oldFocusedMenuAnalyticsSection.middle_nav_section <> focusedMenuAnalyticsSection
     row = m.Menu.itemFocused + 1
     col = 1
 
@@ -917,22 +916,22 @@ Function onSecondaryMenuItemFocused()
     middle_nav_section: focusedSecondaryMenuAnalyticsSection
   }
 
-  ' If oldFocusedSecondaryMenuAnalyticsSection exists and is not the same as the focusedMenuItem,
-  ' then the user is focusing from another menu item.
-  if m.oldFocusedSecondaryMenuAnalyticsSection <> invalid AND m.oldFocusedSecondaryMenuAnalyticsSection.middle_nav_section <> focusedSecondaryMenuAnalyticsSection
+  if m.oldFocusedSecondaryMenuAnalyticsSection <> invalid AND isNonEmptyString(focusedSecondaryMenuAnalyticsSection) AND m.oldFocusedSecondaryMenuAnalyticsSection.middle_nav_section <> focusedSecondaryMenuAnalyticsSection
     row = m.SecondaryMenu.itemFocused + 1
     col = 1
 
     pageInfo = m.top.trackingPageInfo
-    m.top.navigateWithinPageInfo = {
-      pageOneof: m.Tracking.getAnalyticsPage(pageInfo.pageType, pageInfo.pageValues)
-      componentOneof: m.Tracking.getAnalyticsComponent("middle_nav_component", m.oldFocusedSecondaryMenuAnalyticsSection)
-      dest_componentOneof: m.Tracking.getAnalyticsDestinationComponent("dest_middle_nav_component", newFocusedSecondaryMenuAnalyticsSection)
-      means_of_navigation: "SCROLL" 'MeansOfNavigation enum
+    if pageInfo <> invalid then
+      m.top.navigateWithinPageInfo = {
+        pageOneof: m.Tracking.getAnalyticsPage(pageInfo.pageType, pageInfo.pageValues)
+        componentOneof: m.Tracking.getAnalyticsComponent("middle_nav_component", m.oldFocusedSecondaryMenuAnalyticsSection)
+        dest_componentOneof: m.Tracking.getAnalyticsDestinationComponent("dest_middle_nav_component", newFocusedSecondaryMenuAnalyticsSection)
+        means_of_navigation: "SCROLL" 'MeansOfNavigation enum
 
-      vertical_location: row '//The row location of the menu item
-      horizontal_location: col '//The column location of the menu item
-    }
+        vertical_location: row '//The row location of the menu item
+        horizontal_location: col '//The column location of the menu item
+      }
+    end if
   end if
 
   m.oldFocusedSecondaryMenuAnalyticsSection = newFocusedSecondaryMenuAnalyticsSection
