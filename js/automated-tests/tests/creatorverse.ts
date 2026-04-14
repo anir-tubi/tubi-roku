@@ -24,6 +24,7 @@ describe('Disco AI › Creatorverse › Creator Search', function () {
   before(async () => {
     // Launch app with Creator Search experiment enabled
     await testUtils.startApplicationAtPage('home', {
+      deviceIdOverride: "roku_test_automation_creator_in_search",
       experimentOverrides: {
         roku_search_creator_tile: {
           roku_search_creator_tile_v1: {
@@ -56,12 +57,12 @@ describe('Disco AI › Creatorverse › Creator Search', function () {
    * 1. Launch Tubi app
    * 2. Navigate to Search page
    * 3. Enter 'Watcher' in search
-   * 4. Verify at least one Creator Page tile (type = 'app') appears in results
+   * 4. Verify at least one Creator Page tile (type = 'creator') appears in results
    */
-  it('C878861 - Verify searching for creator name search result returns a Creator Page tile @search', async () => {
+  it('C878861 - Verify searching for creator name search result returns a Creator Page tile @search @creator', async () => {
     expect(searchResults.length).to.be.greaterThan(0, 'Search results should not be empty');
 
-    const hasCreatorTile = searchResults.some((item: any) => item.type === 'app');
+    const hasCreatorTile = searchResults.some((item: any) => item.type === 'creator');
     expect(hasCreatorTile).to.equal(true, 'Search results should contain a Creator Page tile');
   });
 
@@ -74,10 +75,10 @@ describe('Disco AI › Creatorverse › Creator Search', function () {
    * 3. Enter 'Watcher' in search
    * 4. Submit search query
    */
-  it('C878862 - Verify Creator Page tile ranked number 1 @search', async () => {
+  it('C878862 - Verify Creator Page tile ranked number 1 @search @creator', async () => {
     // Verify the first search result is a Creator Page tile
     const firstSearchResult = await testUtils.getCurrentlyFocusedGridItemContent('searchResultGrid');
-    expect(firstSearchResult.type).to.equal('app', 'First search result should be a Creator Page tile');
+    expect(firstSearchResult.type).to.equal('creator', 'First search result should be a Creator Page tile');
 
     // Verify creator content titles follow after the creator tile
     const hasCreatorTitlesAfterCreatorTile = searchResults.slice(1).some((item: any) => item.type === 'video' || item.type === 'series');
@@ -94,7 +95,7 @@ describe('Disco AI › Creatorverse › Creator Search', function () {
    * 4. Verify the AppItem grid tile is rendering a logo and title
    * 5. Verify the info panel shows a logo to the left of the creator name
    */
-  it('C878863 - Verify Creator tile UI layout @search', async () => {
+  it('C878863 - Verify Creator tile UI layout @search @creator', async () => {
     // Verify the AppItem grid tile is rendering a logo and title
     const appItemLogo = await testUtils.getNodeForElement('searchResultGridAppItemLogo');
     expect(appItemLogo.uri).to.be.a('string').and.not.be.empty;
@@ -121,7 +122,7 @@ describe('Disco AI › Creatorverse › Creator Search', function () {
    * 5. Select/click on the 'Watcher' Creator Page tile
    * 6. Verify the Creator Page (Collection Screen) opens with the creator name visible
    */
-  it('C878864 - Verify that clicking the Creator Page tile takes the user to the Creator Page @search', async () => {
+  it('C878864 - Verify that clicking the Creator Page tile takes the user to the Creator Page @search @creator', async () => {
     // Click on the Creator Page tile
     await ecp.sendKeypress(ecp.Key.Ok);
 
@@ -148,8 +149,9 @@ describe('Disco AI › Creatorverse › Creator Search', function () {
    * 3. Enter 'Watcher' in search
    * 4. Submit search query
    */
-  it('C2277742 - Verify when experiment is turned off, searching for creator name search does not return a Creator Page tile @search', async () => {
+  it('C2277742 - Verify when experiment is turned off, searching for creator name search does not return a Creator Page tile @search @creator', async () => {
     await testUtils.startApplicationAtPage('home', {
+      deviceIdOverride: "roku_test_automation_creator_in_search",
       experimentOverrides: {
         roku_search_creator_tile: {
           roku_search_creator_tile_v1: {
@@ -172,7 +174,7 @@ describe('Disco AI › Creatorverse › Creator Search', function () {
     const searchResults = await testUtils.getAllGridItemsContent('searchResultGrid');
     expect(searchResults.length).to.be.greaterThan(0, 'Search results should not be empty');
 
-    const hasCreatorTile = searchResults.some((item: any) => item.type === 'app');
+    const hasCreatorTile = searchResults.some((item: any) => item.type === 'creator');
     expect(hasCreatorTile).to.equal(false, 'Search results should NOT contain a Creator Page tile when experiment is disabled');
   });
 });

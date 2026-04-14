@@ -503,7 +503,7 @@ async function appendDataToJsonReport(branch) {
 // Pulled from the actual tests (recurses into subdirectories e.g. tests/analytics/)
 function getAvailableTags(folder = 'js/automated-tests/tests') {
   const tags = {};
-  const pattern = /it\([^@]*([@a-zA-Z_0-9,]*)/g;
+  const pattern = /it\([^@]*([@a-zA-Z_0-9, ]*)/g;
 
   function scanDir(dir) {
     const entries = fs.readdirSync(dir, { withFileTypes: true });
@@ -514,7 +514,7 @@ function getAvailableTags(folder = 'js/automated-tests/tests') {
       } else if (ent.name.endsWith('.ts')) {
         const fileContents = fs.readFileSync(filePath, 'utf-8');
         for (const match of fileContents.matchAll(pattern)) {
-          for (let tag of match[1].split(',')) {
+          for (let tag of match[1].split(/[\s,]+/)) {
             tag = tag.trim();
             if (tag.length === 0) continue;
             tags[tag] = true;

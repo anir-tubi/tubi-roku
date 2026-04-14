@@ -391,8 +391,17 @@ class TestUtils {
       user = await this.createRegisteredUser();
     }
 
-    if (user) {
-      deeplink['setRegistry'] = JSON.stringify(user.getRegistryAuthValues());
+    let registryValues = user ? user.getRegistryAuthValues() : {};
+
+    if (args.deviceIdOverride) {
+      registryValues['deviceinfo'] = {
+        ...(registryValues['deviceinfo'] || {}),
+        deviceId: args.deviceIdOverride
+      };
+    }
+
+    if (Object.keys(registryValues).length > 0) {
+      deeplink['setRegistry'] = JSON.stringify(registryValues);
     }
 
     let constantsUpdates = {};
@@ -2606,6 +2615,11 @@ type StartApplicationArgs = {
 
   /** Override default Statsig experiment configurations */
   experimentOverrides?: any;
+
+  /** Override the Tubi device ID via setRegistry. Writes to the
+   *  'deviceinfo.deviceId' registry key so it is picked up at app startup.
+   *  Useful for ensuring the device is part of a specific experiment segment. */
+  deviceIdOverride?: string;
 }
 
 
