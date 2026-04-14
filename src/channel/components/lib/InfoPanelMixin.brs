@@ -23,6 +23,7 @@ Function populateInfoPanelWithHomescreenStyleItemMode(content, infoPanel, isHome
 
   infoPanel.description = content.description
 
+  infoPanel.itemContent = invalid
   infoPanel.mode = mode
   infoPanel.title = content.title
   if isNonEmptyString(content.titleImageUri)
@@ -103,7 +104,6 @@ Function populateInfoPanelWithHomescreenStyleSportsMode(content, infoPanel)
   availabilityType = info.availabilityType
 
   lineOneData = {}
-  lineOneData.badgeText = info.badgeText
   lineOneData.hasCC = content.hasSubtitles
   lineOneData.hasAudioDescription = content.hasAudioDescription
   lineOneData.length = content.length
@@ -121,6 +121,7 @@ Function populateInfoPanelWithHomescreenStyleSportsMode(content, infoPanel)
   infoPanel.mode = m.constants.ui.infoPanelModes.sportsEvent
   lineTwoData.roundGroupInfo = content.roundGroupInfo
 
+  infoPanel.itemContent = content
   infoPanel.lineOneData = lineOneData
   infoPanel.lineTwoData = lineTwoData
 
@@ -246,13 +247,7 @@ End Function
 
 Function populateInfoPanelForLiveEvent(content, infoPanel)
   infoPanel.mode = m.constants.ui.infoPanelModes.item
-  badgeText = getTranslation("screenSearch_liveText")
-  badgeInfo = getLinearContentBadgeInfo(content.scheduleData, content.isReplay = true)
-  if badgeInfo <> invalid AND isNonEmptyString(badgeInfo.badgeText)
-    badgeText = badgeInfo.badgeText
-  end if
   lineOneData = {
-    badgeText: badgeText
     genres: content.genres
     hasCC: (content.hasSubtitles = true OR m._.empty(content.subtitleTracks) = false)
   }
@@ -272,6 +267,7 @@ Function populateInfoPanelForLiveEvent(content, infoPanel)
   infoPanel.description = content.description
   infoPanel.sotTopLabelSignals = content.sotTopLabelSignals
 
+  infoPanel.itemContent = content
   infoPanel.lineOneData = lineOneData
   infoPanel.lineTwoData = {}
 End Function

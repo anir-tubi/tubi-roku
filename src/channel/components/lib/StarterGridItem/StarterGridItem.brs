@@ -277,7 +277,7 @@ Function onItemContentChange(msg)
       end if
     end if
 
-    if (itemContent.scheduleData <> invalid OR itemContent.type = "linear") AND gridItemType <> "liveEventSpotlight" AND gridItemType <> "liveEventBanner"
+    if (itemContent.scheduleData <> invalid OR itemContent.type = "linear" OR itemContent.isReplay = true) AND gridItemType <> "liveEventSpotlight" AND gridItemType <> "liveEventBanner"
       m.availabilityBadge = createObject("roSGNode", "AvailabilityBadge")
       m.availabilityBadge.itemContent = itemContent
 

@@ -706,15 +706,14 @@ Function onItemFocused(msg)
 
     else if focusedContent.type = m.constants.ui.contentTypes.sportsEvent
       m.searchScreenInfoPanel.mode = m.constants.ui.infoPanelModes.sportsEvent
+      m.searchScreenInfoPanel.itemContent = focusedContent
 
       hasVideoresources = focusedContent.hasVideoresources
       airDatetime = focusedContent.airDatetime
       info = getAvailabilityTypeBadgeAndMatchTimeValues(airDatetime, hasVideoresources)
-      badgeText = info.badgeText
       matchTime = info.matchTime
 
       lineOneData = {
-        badgeText: badgeText
         hoursOfAiring: matchTime
         hasCC: (focusedContent.hasSubtitles = true OR m._.empty(focusedContent.subtitleTracks) = false)
         length: focusedContent.length

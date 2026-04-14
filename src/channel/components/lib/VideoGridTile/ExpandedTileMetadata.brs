@@ -401,6 +401,12 @@ Function metadataOnPosterContent(itemContent)
     m.channelInfoGroup = invalid
   end if
 
+  ' Remove network logo poster if it exists
+  if m.networkLogoPoster <> invalid
+    m.metadataGroup.removeChild(m.networkLogoPoster)
+    m.networkLogoPoster = invalid
+  end if
+
   prefixTextParts = []
   tags = itemContent.genres
   if isNonEmptyArray(tags) = true
@@ -474,8 +480,10 @@ Function metadataOnPosterContent(itemContent)
   if isDetailScreenInfoPanel = true
     displayRatingDescriptor(itemContent)
 
-    ' Display channel logo and name if available
-    if isNonEmptyString(itemContent.channelLogoShort) AND isNonEmptyString(itemContent.channelName)
+    networkLogoUri = resolveNetworkLogoUriFromContent(itemContent)
+    if isNonEmptyString(networkLogoUri)
+      displayNetworkLogo(networkLogoUri)
+    else if isNonEmptyString(itemContent.channelLogoShort) AND isNonEmptyString(itemContent.channelName)
       displayChannelInfo(itemContent.channelLogoShort, itemContent.channelName)
     end if
   end if
@@ -866,6 +874,20 @@ Function displayChannelInfo(channelLogoUri as String, channelName as String) as 
   ' Insert into metadata group and cache references
   m.metadataGroup.insertChild(channelInfoGroup, 0)
   m.channelInfoGroup = channelInfoGroup
+End Function
+
+
+' Displays a network logo poster above the channel info in the metadata group
+' @param logoUri - String, the URI for the network logo
+Function displayNetworkLogo(logoUri as String) as Void
+  m.networkLogoPoster = createPoster(logoUri, {
+    id: "networkLogoPoster"
+    loadWidth: 192
+    loadHeight: 102
+    loadDisplayMode: "limitSize"
+  })
+
+  m.metadataGroup.insertChild(m.networkLogoPoster, 0)
 End Function
 
 

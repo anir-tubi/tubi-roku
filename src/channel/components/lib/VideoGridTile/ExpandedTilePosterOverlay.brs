@@ -85,7 +85,7 @@ Function onItemContentChange(msg)
     end if
 
     availabilityBadge = invalid
-    if isAA(itemContent.scheduleData) = true OR itemContent.type = "linear"
+    if isAA(itemContent.scheduleData) = true OR itemContent.type = "linear" OR itemContent.isReplay = true
       availabilityBadge = createObject("roSGNode", "AvailabilityBadge")
       availabilityBadge.itemContent = itemContent
     end if

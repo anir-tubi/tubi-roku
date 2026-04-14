@@ -872,9 +872,12 @@ Function retrieveFoxListingResponseSuccess(response)
 
     m.foxListingEndpointResponse = response
 
-    listing = findFoxLiveProgram(m.foxListingEndpointResponse)
-    m.foxPlayerCurrentListing = listing
     foxVideoPlayerWrapperScreen = getScreenFromStackById(m.constants.ui.screenIds.foxVideoPlayerWrapperScreen)
+    tubiId = invalid
+    if foxVideoPlayerWrapperScreen <> invalid then tubiId = foxVideoPlayerWrapperScreen.tubiId
+
+    listing = findFoxLiveProgram(m.foxListingEndpointResponse, tubiId)
+    m.foxPlayerCurrentListing = listing
 
     if initialFoxListingRequest = true AND foxVideoPlayerWrapperScreen <> invalid AND listing <> invalid then
       foxVideoPlayerWrapperScreen.tubiId = listing.tubi_id
@@ -912,21 +915,28 @@ Function retrieveFoxListingResponseError(response)
 End Function
 
 
-Function findFoxLiveProgram(listing)
-  if isNonEmptyArray(listing) = true then
-    for each item in listing
-      ' Only using the entry if we have valid tubi id and start and endate.
-      asset = item.asset
-      if asset <> invalid AND asset.listing <> invalid AND asset.listing.tubi_id <> invalid AND asset.listing.startDate <> invalid AND asset.listing.endDate <> invalid then
-        ' Looking for the first program that is live
-        if isNowWithinTimePeriod(asset.listing.startDate, asset.listing.endDate) then
+' Finds the best in-progress program from the fox listing response.
+' @param listing: array of listing items from the fox listing endpoint
+' @param tubiId: tubi_id of the content node to prefer when multiple items are in-progress
+' @return: matched listing, first in-progress listing, or invalid
+Function findFoxLiveProgram(listing, tubiId = invalid)
+  if isNonEmptyArray(listing) = false then return invalid
+
+  firstInProgress = invalid
+
+  for each item in listing
+    asset = item.asset
+    if asset <> invalid AND asset.listing <> invalid AND asset.listing.tubi_id <> invalid AND asset.listing.startDate <> invalid AND asset.listing.endDate <> invalid then
+      if isNowWithinTimePeriod(asset.listing.startDate, asset.listing.endDate) then
+        if isNonEmptyString(tubiId) AND asset.listing.tubi_id = tubiId then
           return asset.listing
         end if
+        if firstInProgress = invalid then firstInProgress = asset.listing
       end if
-    end for
-  end if
+    end if
+  end for
 
-  return invalid
+  return firstInProgress
 End Function
 
 

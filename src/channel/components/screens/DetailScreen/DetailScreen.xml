@@ -170,6 +170,8 @@
     <field id="sotMetaData" alias="DetailInfoPanel.sotMetaData" />
     <field id="sotTopLabelSignals" alias="DetailInfoPanel.sotTopLabelSignals" />
 
+    <field id="eventLogoUri" type="string" alias="DetailInfoPanel.eventLogoUri" />
+
 
     <!-- OUTPUTS -->
 

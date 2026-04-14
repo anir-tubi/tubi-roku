@@ -475,6 +475,11 @@ Function onContentChange(msg) as Void
     m.Info.availabilityStarts = ""
   end if
 
+  if content.isReplay = true
+    m.Menu.numRows = 4
+    m.Menu.translation = [m.Menu.translation[0], 553]
+  end if
+
   add = false
   creator = content.creatorTensorApp
   if creator <> invalid then

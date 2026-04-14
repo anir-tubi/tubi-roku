@@ -177,9 +177,17 @@ End Function
 
 
 ' Observer callback for listingRefreshData field — delegates to BaseScreen's processListingRefreshData
+' Re-derives contentFocused from the RowList's current position after every refresh
 ' @param msg - Message containing AA keyed by scheduleId with listing data from the EPG API
 Function onListingRefreshData(msg) as Void
   processListingRefreshData(msg.getData())
+  if m.rowListNode <> invalid
+    rowItemFocused = m.rowListNode.rowItemFocused
+    if isNonEmptyArray(rowItemFocused) = true
+      m.top.contentFocused = getTubiContentNodeFromRowItem(rowItemFocused, m.metadataTranslate, m.top.isSignedInUser)
+      m.top.contentFocusedUpdated = true
+    end if
+  end if
 End Function
 
 

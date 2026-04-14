@@ -26,8 +26,8 @@ Function refreshAvailabilityFromItemContent(itemContent) as Void
     return
   end if
 
-  if itemContent.scheduleData <> invalid
-    isReplay = (itemContent.isReplay = true)
+  isReplay = (itemContent.isReplay = true)
+  if itemContent.scheduleData <> invalid OR isReplay
     badgeInfo = getLinearContentBadgeInfo(itemContent.scheduleData, isReplay)
   else
     currentProgram = getCurrentLiveProgram(itemContent)

@@ -341,6 +341,7 @@ Function populateDetailScreen(detailScreen, content, shouldResetButtonIndex = fa
       detailScreen.mode = m.constants.ui.infoPanelModes.sportsEvent
       detailScreen.isSeries = false
       lineOneData.badgeText = badgeText
+      lineOneData.badgeAvailability = availabilityType
       lineOneData.hoursOfAiring = matchTime
       lineTwoData.roundGroupInfo = content.roundGroupInfo
     else
@@ -418,6 +419,7 @@ Function populateDetailScreen(detailScreen, content, shouldResetButtonIndex = fa
 
     detailScreen.title = content.title
     detailScreen.description = stateSource.description
+    detailScreen.eventLogoUri = resolveNetworkLogoUriFromContent(content)
     detailScreen.lineOneData = lineOneData
     detailScreen.lineTwoData = lineTwoData
     detailScreen.starring = stateSource.actors
@@ -2048,8 +2050,11 @@ Function onCreatorSelected(msg)
 
   content = detailScreen.content
   if content <> invalid AND content.creatorTensorApp <> invalid then
-    appId = detailScreen.content.creatorTensorApp.id
-    showCollectionScreen(appId)
+    if content.creatorTensorApp.type <> m.constants.ui.appTypes.creator
+      showPivotDetailScreen(content.creatorTensorApp)
+    else
+      showCollectionScreen(content.creatorTensorApp.id)
+    end if
   end if
 End Function
 

@@ -185,6 +185,11 @@ Function cmsApi_createSeriesEpisodesBySeasonReqInfo(seriesId, season = 1, pageIn
   h = Int(creatorVodDetailScreenLogo[1] * m.constants.ui.imageSizeMultiplier)
   options.params["creator_tensor_app_images[logo]"] = "w" + w.toStr() + "h" + h.toStr() + "_logo"
 
+  creatorDetailScreenTitleArt = m.constants.ui.imageSizes.creatorDetailScreenTitleArt
+  tW = Int(creatorDetailScreenTitleArt[0] * m.constants.ui.imageSizeMultiplier)
+  tH = Int(creatorDetailScreenTitleArt[1] * m.constants.ui.imageSizeMultiplier)
+  options.params["creator_tensor_app_images[title_art]"] = "w" + tW.toStr() + "h" + tH.toStr() + "_title"
+
   options.params = m.setImageParams(["title", "landscape", "background"], options.params)
 
   capability = formatJson({ "content_types": ["se"] })

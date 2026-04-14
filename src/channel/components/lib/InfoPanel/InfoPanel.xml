@@ -229,8 +229,9 @@ content.category/categories,
             itemSpacings="[10]"
             vertAlignment="center"
             addItemSpacingAfterChild="true">
-            <Badge
-              id="FirstLineAvailabilityBadge" />
+            <AvailabilityBadge
+              id="FirstLineAvailabilityBadge"
+              visible="false" />
             <Label
               id="Line1"
               opacity="0.5">

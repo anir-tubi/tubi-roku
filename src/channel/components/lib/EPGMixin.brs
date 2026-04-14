@@ -54,7 +54,19 @@ End Function
 ' This function requires the importation of TimeUtils.brs, typeUtils.brs, Log.brs
 ' @param schedule: roSGNode, EPG program node
 ' @return: object, containing the badge info.
-Function getLinearContentBadgeInfo(schedule, isReplay = false)
+Function getLinearContentBadgeInfo(schedule = invalid, isReplay = false)
+  ' Replays always show the Replay badge regardless of schedule data
+  if isReplay = true
+    return {
+      availability: "replay",
+      badgeText: getTranslation("replay")
+    }
+  end if
+
+  if schedule = invalid
+    return invalid
+  end if
+
   currentDatetime = CreateObject("roDateTime")
   airDatetime = CreateObject("roDateTime")
   if schedule.startTime <> invalid AND schedule.endTime <> invalid
@@ -62,13 +74,7 @@ Function getLinearContentBadgeInfo(schedule, isReplay = false)
 
     hasEventEnded = isLessThanOrEqualToCurrentTime(schedule.endTime)
 
-    ' Replays always show the Replay badge regardless of timing state
-    if isReplay = true
-      return {
-        availability: "replay",
-        badgeText: getTranslation("replay")
-      }
-    else if airDatetime.asSeconds() <= currentDatetime.asSeconds() AND hasEventEnded = false
+    if airDatetime.asSeconds() <= currentDatetime.asSeconds() AND hasEventEnded = false
       return { availability: "live" }
     else if hasEventEnded = false
       if isTomorrow(schedule.startTime)
@@ -106,4 +112,29 @@ Function getLinearContentBadgeInfo(schedule, isReplay = false)
   end if
 
   return invalid
+End Function
+
+
+' Resolves a network logo URI from content node fields.
+' Priority: creatorTensorApp.images.title_art > scheduleData.channelLogo > inlineLogoUri > empty string
+' @param content: roSGNode or AA containing creatorTensorApp and/or scheduleData
+' @return: string, the resolved logo URI or empty string
+Function resolveNetworkLogoUriFromContent(content) as String
+  if content = invalid then return ""
+
+  creatorApp = content.creatorTensorApp
+  if isAA(creatorApp) AND isAA(creatorApp.images) AND isNonEmptyArray(creatorApp.images.title_art)
+    return creatorApp.images.title_art[0]
+  end if
+
+  scheduleData = content.scheduleData
+  if isAA(scheduleData) AND isNonEmptyString(scheduleData.channelLogo)
+    return scheduleData.channelLogo
+  end if
+
+  if isNonEmptyString(content.inlineLogoUri)
+    return content.inlineLogoUri
+  end if
+
+  return ""
 End Function

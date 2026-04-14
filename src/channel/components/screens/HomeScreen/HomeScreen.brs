@@ -125,9 +125,15 @@ End Function
 
 
 ' Observer callback for listingRefreshData field — delegates to BaseScreen's processListingRefreshData
+' Re-derives contentFocused from the CategoryGridList's current position after every refresh
 ' @param msg - Message containing AA keyed by scheduleId with listing data from the EPG API
 Function onListingRefreshData(msg) as Void
   processListingRefreshData(msg.getData())
+  focusedContent = m.CategoryGridList.rowFocusedItem
+  if focusedContent <> invalid
+    m.top.contentFocused = focusedContent
+    m.top.contentFocusedUpdated = true
+  end if
 End Function
 
 

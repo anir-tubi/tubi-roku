@@ -416,7 +416,11 @@ Function onVodDetailCtaSelectedButtonIdChange(msg) as Void
       showChannelDetailsScreen(screenContent.channelId)
     else if id = "creator"
       if screenContent.creatorTensorApp <> invalid
-        showCollectionScreen(screenContent.creatorTensorApp.id)
+        if screenContent.creatorTensorApp.type <> m.constants.ui.appTypes.creator
+          showPivotDetailScreen(screenContent.creatorTensorApp)
+        else
+          showCollectionScreen(screenContent.creatorTensorApp.id)
+        end if
       end if
     else if id = "removeFromHistory"
       removeHistoryFromVodDetailScreen(screenContent)

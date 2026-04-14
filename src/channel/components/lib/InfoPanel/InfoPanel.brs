@@ -72,6 +72,8 @@ Function init()
 
   m.sotTopLabel = m.top.findNode("sotTopLabel")
 
+  m.eventLogoSetByPartner = false
+
   m.top.observeFieldScoped("mode", "onModeChange")
   m.top.observeFieldScoped("titleTypography", "onTitleTypographyChange")
   m.top.observeFieldScoped("width", "onWidthChange")
@@ -98,7 +100,6 @@ Function init()
   m.top.observeFieldScoped("availabilityStarts", "onAvailabilityStartsChange")
   m.top.observeFieldScoped("eventLogoUri", "onEventLogoUriChange")
   m.offset.observeFieldScoped("translation", "onOffsetTranslationChange")
-  m.partnerLogo.observeFieldScoped("loadStatus", "onPosterLoadStatus")
   m.rating.observeFieldScoped("loadStatus", "onPosterLoadStatus")
   m.closedCaptions.observeFieldScoped("loadStatus", "onPosterLoadStatus")
   m.audioDescriptionPoster.observeFieldScoped("loadStatus", "onPosterLoadStatus")
@@ -645,12 +646,11 @@ Function onLineOneDataChange(msg)
 
     ' handle availability badge
     availabilityBadgeIsPresent = (m.firstLineAvailabilityBadge.getParent() <> invalid)
-    if isNonEmptyString(data.badgeText)
+    if m.firstLineAvailabilityBadge.isConfigured = true
       if availabilityBadgeIsPresent = false
         firstLineGroup.insertChild(m.firstLineAvailabilityBadge, insertIndex)
       end if
-
-      formatBadge(data.badgeText, m.firstLineAvailabilityBadge)
+      m.firstLineAvailabilityBadge.visible = true
       insertIndex++
     else
       if availabilityBadgeIsPresent = true
@@ -854,19 +854,22 @@ Function onLineOneDataChange(msg)
       firstLineGroup.removeChild(m.expireWarning)
     end if
 
-    ' handle parter logos
-    partnerLogoIsPresent = (m.partnerLogo.getParent() <> invalid)
-    if isNonEmptyString(data.partnerLogoUri) = true
-      if partnerLogoIsPresent = false
-        firstLineGroup.insertChild(m.partnerLogo, insertIndex)
+    ' Use partnerLogoUri as fallback for eventLogo when no higher-priority logo is set
+    if isNonEmptyString(m.eventLogo.uri) = false AND isNonEmptyString(data.partnerLogoUri) = true
+      eventLogoIsPresent = (m.eventLogo.getParent() <> invalid)
+      if eventLogoIsPresent = false
+        titleIndex = m.nodeHelpers.getChildIndex(m.offset, m.titleGroup)
+        if titleIndex >= 0
+          m.offset.insertChild(m.eventLogo, titleIndex)
+        end if
       end if
-
-      m.partnerLogo.uri = data.partnerLogoUri
-      insertIndex++
-    else
-      if partnerLogoIsPresent = true
-        firstLineGroup.removeChild(m.partnerLogo)
-      end if
+      m.eventLogo.uri = data.partnerLogoUri
+      m.eventLogoSetByPartner = true
+      shouldCalculateHeight()
+    else if m.eventLogoSetByPartner = true AND isNonEmptyString(data.partnerLogoUri) = false
+      m.eventLogo.uri = ""
+      m.eventLogoSetByPartner = false
+      shouldCalculateHeight()
     end if
 
     ' handle sotMetaData - append tubiPresentsLogo Poster to firstLineGroup if type is "tubiPresentsLogo"
@@ -977,7 +980,9 @@ End Function
 
 ' Passes itemContent to the AvailabilityBadge for linear content
 Function onItemContentChange(msg) as Void
-  m.linearAvailabilityBadge.itemContent = msg.getData()
+  itemContent = msg.getData()
+  m.linearAvailabilityBadge.itemContent = itemContent
+  m.firstLineAvailabilityBadge.itemContent = itemContent
 End Function
 
 
@@ -1241,6 +1246,9 @@ Function resetDefaultState()
   m.top.airDateTime = ""
   m.top.titleLogoUri = ""
 
+  m.eventLogo.uri = ""
+  m.eventLogoSetByPartner = false
+
 End Function
 
 
@@ -1294,8 +1302,7 @@ Function onModeChange()
       m.audioDescriptionPoster,
       m.rating,
       m.descriptorCode,
-      m.expireWarning,
-      m.partnerLogo
+      m.expireWarning
     ]
 
     appendChildrenToParent(firstLineGroupChildren, m.firstLineGroup)
@@ -1322,8 +1329,7 @@ Function onModeChange()
       m.audioDescriptionPoster,
       m.rating,
       m.descriptorCode,
-      m.expireWarning,
-      m.partnerLogo
+      m.expireWarning
     ]
 
     appendChildrenToParent(firstLineGroupChildren, m.firstLineGroup)
@@ -1358,8 +1364,7 @@ Function onModeChange()
       m.audioDescriptionPoster,
       m.rating,
       m.descriptorCode,
-      m.expireWarning,
-      m.partnerLogo
+      m.expireWarning
     ]
 
     appendChildrenToParent(firstLineGroupChildren, m.firstLineGroup)
@@ -1395,8 +1400,7 @@ Function onModeChange()
       m.audioDescriptionPoster,
       m.rating,
       m.descriptorCode,
-      m.expireWarning,
-      m.partnerLogo
+      m.expireWarning
     ]
 
     appendChildrenToParent(firstLineGroupChildren, m.firstLineGroup)
@@ -1606,13 +1610,14 @@ Function getSecondLineText(data)
   return text
 End Function
 
-' TODO: Need to refactor this function based on component/text
+' Applies styling to a Badge node based on availability type
 ' @text: string, the translated text that will appear on the badge
 ' @badgeComponent: a Badge node
-Function formatBadge(text, badgeComponent, iconUri = "")
+' @iconUri: string, optional icon URI (unused for availability badges)
+' @availability: string, optional availability type ("live", "onNow", "replay", "upcoming")
+Function formatBadge(text, badgeComponent)
   tubiLog("InfoPanel.formatBadge")
   theme = m.theme
-  uText = UCase(text)
   if theme <> invalid
     if badgeComponent.id = m.rottenTomatoBadge.id
       badgeComponent.showBackground = false
@@ -1623,9 +1628,10 @@ Function formatBadge(text, badgeComponent, iconUri = "")
     else
       badgeComponent.backgroundColor = theme.shadeColor
       badgeComponent.backgroundUri = "pkg:/images/rounded-background-$$RES$$.9.png"
+      badgeComponent.iconUri = ""
       badgeComponent.borderUri = ""
       badgeComponent.textColor = theme.primaryTextColor
-      badgeComponent.text = uText
+      badgeComponent.text = text
     end if
   end if
 
@@ -1643,9 +1649,11 @@ Function onEventLogoUriChange(msg)
       end if
     end if
     m.eventLogo.uri = eventLogoUri
+    m.eventLogoSetByPartner = false
   else if eventLogoIsPresent = true
     m.offset.removeChild(m.eventLogo)
     m.eventLogo.uri = ""
+    m.eventLogoSetByPartner = false
   end if
 
   shouldCalculateHeight()
