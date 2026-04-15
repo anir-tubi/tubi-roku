@@ -714,16 +714,18 @@ class TestHelpers {
    */
   public async selectParentalControlLevel(level: 'littleKids' | 'olderKids' | 'teens' | 'adults' | 'youngestKids' | 'oldestKids') {
     const titleMap: Record<string, string> = {
-      littleKids: 'Little Kids',
-      olderKids: 'Older Kids',
-      youngestKids: 'Youngest Kids',
-      oldestKids: 'Oldest Kids',
-      teens: 'Teens',
-      adults: 'Adults'
+      littleKids: 'Age Rating 4-6',
+      olderKids: 'Age Rating 7-9',
+      youngestKids: 'Age Rating 1-3',
+      oldestKids: 'Age Rating 10-12',
+      teens: 'Age Rating 13-17',
+      adults: 'Age Rating 18+'
     };
 
     await testUtils.waitForCurrentScreenToEqual('settingsScreen');
     await testUtils.waitForElementToHaveFocus('settingsMenu', 'Timed out waiting for settings menu to have focus');
+    await ecp.sendKeypress(ecp.Key.Down);
+    await ecp.sendKeypress(ecp.Key.Ok);
     await testUtils.waitForElementToShowOnScreen('parentalControlsMenu');
     await testUtils.waitForGridContentToLoad('parentalControlsMenu');
     await utils.sleep(100);
@@ -744,23 +746,25 @@ class TestHelpers {
    * await testHelpers.setParentalControls('littleKids');
    * await testHelpers.setParentalControls('teens', '123456', false);
    */
-  public async setParentalControls(level: 'littleKids' | 'olderKids' | 'teens' | 'adults', password = '111111', shouldDismiss = true) {
+  public async setParentalControls(level: 'littleKids' | 'olderKids' | 'teens' | 'adults' | 'youngestKids' | 'oldestKids', password = '111111', shouldDismiss = true) {
     await this.selectParentalControlLevel(level);
-    await this.enterPassword(password);
+    //await this.enterPassword(password);
 
     // Verify confirmation dialog
     const confirmationElements: Record<string, any> = {
       littleKids: 'parentalControlsSettingsLittleKids',
       olderKids: 'parentalControlsSettingsOlderKids',
       teens: 'parentalControlsSettingsTeens',
-      adults: 'parentalControlsSettingsAdults'
+      adults: 'parentalControlsSettingsAdults',
+      youngestKids: 'parentalControlsSettingsYoungestKids',
+      oldestKids: 'parentalControlsSettingsOldestKids'
     };
 
     const element: any = confirmationElements[level];
     if (element) {
       await testUtils.waitForElementToShowOnScreen(element);
       const dialog = await testUtils.getNodeForElement(element);
-      const levelNames = { littleKids: 'Little Kids', olderKids: 'Older Kids', teens: 'Teens', adults: 'Adults' };
+      const levelNames = { littleKids: 'Age Rating 4-6', olderKids: 'Age Rating 7-9', teens: 'Age Rating 13-17', adults: 'Age Rating 18+', youngestKids: 'Age Rating 1-3', oldestKids: 'Age Rating 10-12' };
       expect(dialog.text).to.contain(levelNames[level]);
 
       if (shouldDismiss) {

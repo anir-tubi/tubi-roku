@@ -2603,7 +2603,9 @@ enum ParentalRating {
   'adults' = 3,
   'teens' = 2,
   'olderKids' = 1,
-  'littleKids' = 0
+  'littleKids' = 0,
+  'youngestKids' = 4,
+  'oldestKids' = 5
 }
 
 

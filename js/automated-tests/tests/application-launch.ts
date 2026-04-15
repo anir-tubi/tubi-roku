@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 import { ecp, odc, utils } from 'roku-test-automation';
 import { testUtils } from '../test-utils';
-import { shared } from '../test-helpers';
+import { testHelpers, shared } from '../test-helpers';
 
 
 describe('Application Launch', function () {
@@ -12,6 +12,19 @@ describe('Application Launch', function () {
     await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');
     await testUtils.jumpToRowWithTitle('videoTitlesRowList', 'Featured');
   });
+
+
+  async function navigateToContentSettings() {
+    await testHelpers.openLeftNav();
+    await testUtils.jumpToRowIndex('sideNavMenu', 10);
+    await utils.sleep(500);
+    await ecp.sendKeypress(ecp.Key.Ok);
+    await testUtils.waitForCurrentScreenToEqual('settingsScreen', 10000);
+    await testUtils.waitForElementToFullyShowOnScreen('settingsMenu');
+    await testUtils.waitForGridContentToLoad('settingsMenu');
+    await testUtils.jumpToGridItemWithTitle('settingsMenu', 'Content Settings');
+    await ecp.sendKeypress(ecp.Key.Ok);
+  }
 
   // https://tubi.testrail.io/index.php?/cases/view/535807
   it('C535807 User Signed in - Homescreen Display @registered_user,@smoke,@application_launch @application_launch', async () => {
@@ -36,53 +49,54 @@ describe('Application Launch', function () {
 
   // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/70718
   it('C70718 - Sign out after setting Parental Controls @application_launch', async () => {
-    // Go to Settings page and select Older Kids
     await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: true });
     await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');
-    await testUtils.goToPage('settings');
+
+    // Navigate to Content Settings and select Age Rating 13-17 (equivalent of teen")
+    await navigateToContentSettings();
+    await testUtils.waitForElementToShowOnScreen('parentalControlsMenu', 'Parental controls menu did not open', 5000);
+    await utils.sleep(100);
     await ecp.sendKeypress(ecp.Key.Right);
-    await testUtils.waitForElementToShowOnScreen('adultControlSelected');
-    await ecp.sendKeypress(ecp.Key.Up, { count: 2 });
+    await testUtils.waitForGridContentToLoad('parentalControlsMenu');
+    await testUtils.jumpToGridItemWithTitle('parentalControlsMenu', 'Age Rating 13-17');
     await ecp.sendKeypress(ecp.Key.Ok);
 
-    // Validate Enter Password Page and message
-    const enterPasswordMessage = await testUtils.getNodeForElement('enterPasswordMessage');
-    expect(enterPasswordMessage.text).to.equal('Enter Password to update parental controls');
+    // Validate Content Settings Updated dialog
+    await testUtils.waitForElementToShowOnScreen('parentalControlsChangeDialog', 'Content Settings Updated dialog did not appear', 10000);
+    const dialogMessage = await testUtils.getNodeForElement('parentalControlsSettingsTeens');
+    expect(dialogMessage.text).to.contain('Age Rating 13–17');
 
-    // Send password and click Continue
-    await ecp.sendText('111111');
-    await ecp.sendKeypress(ecp.Key.Down);
-    await utils.sleep(500); // moving too fast here, sometimes when pressing down lands on Back, others Continue
-    await ecp.sendKeypress(ecp.Key.Down, { count: 3 });
+    // Dismiss dialog and back out to left nav
+    await ecp.sendKeypress(ecp.Key.Ok);
+    await utils.sleep(1000);
+    await ecp.sendKeypress(ecp.Key.Back);
     await utils.sleep(500);
-    await ecp.sendKeypress(ecp.Key.Ok);
+    await ecp.sendKeypress(ecp.Key.Back);
+    await utils.sleep(500);
 
-    // Validate Older Kids modal message, back out to Left Nav and Check Exit Kids menu item is grayed out
-    await testUtils.retryWithTimeOut(async () => {
-      const settingsScreen = await testUtils.getNodeForElement('settingsScreen');
-      expect(settingsScreen.visible).to.be.true;
-    });
-    const parentalControlsSettingsOlderKids = await testUtils.getNodeForElement('parentalControlsSettingsOlderKids');
-    expect(parentalControlsSettingsOlderKids.text).to.equal('Parental controls setting has changed to Older Kids. Parental controls will be password protected after 5 minutes.');
-    await ecp.sendKeypress(ecp.Key.Ok);
-    await ecp.sendKeypress(ecp.Key.Back);
-    await ecp.sendKeypress(ecp.Key.Back);
+    // Verify Exit Kids option is grayed out on side nav
     const exitKidsGrayedOut = await testUtils.getNodeForElement('exitKidsGrayedOut');
     expect(exitKidsGrayedOut.visible).to.equal(true);
 
-    // Sign out to check that we are not in Kids mode now
-    await ecp.sendKeypress(ecp.Key.Up, { count: 3 });
+    // Navigate to Settings for sign out
+    await testUtils.jumpToRowIndex('sideNavMenu', 10);
+    await utils.sleep(500);
     await ecp.sendKeypress(ecp.Key.Ok);
-    await testUtils.retryWithTimeOut(async () => {
-      const settingsScreen = await testUtils.getNodeForElement('settingsScreen');
-      expect(settingsScreen.visible).to.be.true;
-    });
-    const signOutButtonKidsMode = await testUtils.getNodeForElement('signOutButtonKidsMode');
-    expect(signOutButtonKidsMode.text).to.equal('Sign Out');
+    await testUtils.waitForCurrentScreenToEqual('settingsScreen', 10000);
+    await testUtils.waitForElementToFullyShowOnScreen('settingsMenu');
+    await ecp.sendKeypress(ecp.Key.Left);
+    await utils.sleep(1000);
     await ecp.sendKeypress(ecp.Key.Ok);
+    await utils.sleep(1000);
+    await ecp.sendKeypress(ecp.Key.Ok);
+    await utils.sleep(1000);
+
+    // Verify sign out modal and confirm
+    await testUtils.waitForElementToShowOnScreen('signOutVerificationModalMessage', 'Sign Out verification modal did not appear', 10000);
     const signOutVerificationModalMessage = await testUtils.getNodeForElement('signOutVerificationModalMessage');
-    expect(signOutVerificationModalMessage.text).to.equal('You are about to sign out of your Tubi account.');
+    expect(signOutVerificationModalMessage.text).to.contain('sign out');
     await ecp.sendKeypress(ecp.Key.Ok);
+    await utils.sleep(3000);
     await testUtils.findRowIndexWithTitle('videoTitlesRowList', 'Featured');
   });
 

@@ -1546,6 +1546,10 @@ const elements = typeCheckElements({
     keyPath:
       '#ContentController.#uiGroup.#ContentGroup.#screenStackGroup.#ScreenStack.2.0.#password.#rectBG',
   },
+  ConfirmPasswordBox: {
+    keyPath:
+      '#ContentController.#uiGroup.#ContentGroup.#screenStackGroup.#ScreenStack.1.#contentGroup.#passwordEntryKeyboard.0.#Keyboard'
+  },
 
   continueButtonSignInPage: {
     keyPath:
@@ -1978,7 +1982,7 @@ const elements = typeCheckElements({
   /** Kids menu item text */
   littleKidsMenuItemText: {
     keyPath:
-      '#ContentController.#uiGroup.#ContentGroup.#screenStackGroup.#ScreenStack.#categoryPanelListScreen.#PageGroup.#PanelSet.2.#MenuGroup.#Menu.2.#DetailsMenuTextParent.#DetailsMenuTextFocused',
+      '#ContentController.#uiGroup.#ContentGroup.#screenStackGroup.#ScreenStack.#categoryPanelListScreen.#PageGroup.#PanelSet.2.#MenuGroup.#Menu.3.#DetailsMenuTextParent.#DetailsMenuTextFocused',
   },
 
   //** Category Page Grid */
@@ -2134,7 +2138,7 @@ const elements = typeCheckElements({
   /** Autoplay controls Controls Menu item focused */
   AutoPlayControlsMenuItemFocused: {
     keyPath:
-      '#ContentController.#uiGroup.#ContentGroup.#screenStackGroup.#ScreenStack.#settingsScreen.#PanelSet.2.#SettingsMenuGroup.#SettingsMenu.1.#DetailsMenuTextParent.#DetailsMenuTextFocused',
+      '#ContentController.#uiGroup.#ContentGroup.#screenStackGroup.#ScreenStack.#settingsScreen.#PageGroup.#PanelSet.3.#Offset.#AutoPlayTimerContentGroup.#AutoPlayTimerMenu',
   },
 
   /** Continue Watching button in Categories */
