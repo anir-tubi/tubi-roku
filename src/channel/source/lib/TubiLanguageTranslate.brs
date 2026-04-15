@@ -2915,6 +2915,10 @@ Function getTranslation_es_MX()
       "description": "Program time Title for live program.",
       "message": "Comenzó a las"
     },
+    "epg_favorites": {
+      "description": "Label for the EPG / linear favorites category.",
+      "message": "Favoritos"
+    },
     "circular_counter_starts_in": {
       "description": "Text displayed in circular counter component to indicate countdown starting.",
       "message": "Pantalla completa en"
@@ -3255,6 +3259,14 @@ Function getTranslation_es_MX()
       "description": "label of the confirmation button of the dialog window that asks the user if they want to sign out of the app",
       "message": "Cerrar Sesión"
     },
+    "dialog_account_limit_reached_title": {
+      "description": "Title of the dialog shown when the user has reached the maximum number of accounts",
+      "message": "Límite de cuentas alcanzado"
+    },
+    "dialog_account_limit_reached_description": {
+      "description": "Description of the dialog shown when the user has reached the maximum number of accounts",
+      "message": "Máximo 8 cuentas en Tubi. Para agregar una nueva, cierra sesión en una existente desde Configuración."
+    },
     "error_check_birthdate_description": {
       "description": "message letting the user know that they were not able to be signed in",
       "message": "Hubo un error al inciar la sesión. Por favor, ingresa al canal y inicia la sesión de nuevo."
@@ -3475,6 +3487,10 @@ Function getTranslation_es_MX()
       "message": "Adultos",
       "note": "This translation is used as screenSettings_parentalControls_group_Adults, please double check that it is not needed before deleting"
     },
+    "screenSettings_parentalControls_instructions": {
+      "description": "Description of the parental controls screen",
+      "message": "Establece límites de clasificación para mantener el contenido adecuado. Si cambias esta opción, deberás registrarte o iniciar sesión en Tubi."
+    },
     "screenSettings_parentalControls_kids_instructions": {
       "description": "Description of the parental controls screen",
       "message": "Por restricciones de contenido, vuelve a la cuenta de adulto para actualizar tu configuración."
@@ -3581,19 +3597,19 @@ Function getTranslation_es_MX()
     },
     "screenSettings_error_parentalChanges_description_multi_account_group0": {
       "description": "Success message when content settings has changed to group 0 (Little Kids) in multi-account mode",
-      "message": "Serás dirigido a Tubi Kids.\n\n La configuración cambió a:\n Clasificación 4-6 (TV-G, G)."
+      "message": "Serás dirigido a Tubi Kids.\n\n La configuración cambió a:\n Clasificación 4-6 (TV-Y, TV-G, G)."
     },
     "screenSettings_error_parentalChanges_description_multi_account_group5": {
       "description": "Success message when content settings has changed to group 1 (Older Kids) in multi-account mode",
-      "message": "Serás dirigido a Tubi Kids.\n\n La configuración cambió a:\n Clasificación 10-12 (TV-PG, PG)."
+      "message": "Serás dirigido a Tubi Kids.\n\n La configuración cambió a:\n Clasificación 10-12 (Up to TV-PG / PG)."
     },
     "screenSettings_error_parentalChanges_description_multi_account_group2": {
       "description": "Success message when content settings has changed to group 2 (Teens) in multi-account mode",
-      "message": "La configuración cambió a: Adolescente (TV-14, PG-13)."
+      "message": "La configuración cambió a: Clasificación 13–17 (Hasta TV-14 / PG-13)."
     },
     "screenSettings_error_parentalChanges_description_multi_account_group3": {
       "description": "Success message when content settings has changed to group 3 (Adults) in multi-account mode",
-      "message": "La configuración cambió a: Adulto (TV-MA, R, NC-17)."
+      "message": "La configuración cambió a: Clasificación 18+ (Hasta TV-MA / R / NC-17)."
     },
     "screenSettings_error_parentalChanges_description_multi_account_group4": {
       "description": "Success message when content settings has changed to group 4 (Age Rating 1-3) in multi-account mode - user directed to Tubi Kids",
@@ -3601,7 +3617,7 @@ Function getTranslation_es_MX()
     },
     "screenSettings_error_parentalChanges_description_multi_account_group1": {
       "description": "Success message when content settings has changed to group 5 (Age Rating 7-9) in multi-account mode - user directed to Tubi Kids",
-      "message": "Serás dirigido a Tubi Kids.\n\n La configuración cambió a:\n Clasificación 7-9 (TV-Y7, TV-Y7-FV)."
+      "message": "Serás dirigido a Tubi Kids.\n\n La configuración cambió a:\n Clasificación 7-9 (TV-Y, TV-Y7, TV-Y7-FV, TV-G, G)."
     },
     "screenSettings_error_signInParental_description": {
       "description": "Description of message to let users know that they must be signed in to adjust the parental controls.",
@@ -3674,6 +3690,10 @@ Function getTranslation_es_MX()
     "onNow": {
       "description": "badge text to show program is not live but on now",
       "message": "Ahora"
+    },
+    "liveTomorrow": {
+      "description": "badge text for live content scheduled for tomorrow",
+      "message": "En vivo mañana"
     },
     "day_1": {
       "description": "shortened version Monday, formatted with , and a space",
@@ -3835,6 +3855,10 @@ Function getTranslation_es_MX()
       "description": "Label of button to allow users to display the list of episodes/seasons of the current video title. Should be title case.",
       "message": "Todos Los Capítulos"
     },
+    "screenDetails_button_episodes_container": {
+      "description": "Label of button to allow users to display the list of episodes/seasons of the current video title. Should be title case.",
+      "message": "Capítulos y más"
+    },
     "screenDetails_relatedTitles": {
       "description": "Label of button to allow users to view other video titles related to the current video title",
       "message": "Puede que también te guste"
@@ -3843,6 +3867,10 @@ Function getTranslation_es_MX()
       "description": "Label of button to allow users to play the current video title",
       "message": "Ver"
     },
+    "screenDetails_button_watch_replay": {
+      "description": "Label of button to allow users to watch a replay of a live event",
+      "message": "Ver repetición"
+    },
     "screenDetails_button_startOver": {
       "description": "Label of button to allow users to start over and play the current video title",
       "message": "Ver desde el principio"
@@ -3850,6 +3878,10 @@ Function getTranslation_es_MX()
     "screenDetails_button_startFromBeginning": {
       "description": "Label of button to start playing from the beginning",
       "message": "Empezar desde el inicio"
+    },
+    "screenDetails_button_restart": {
+      "description": "Label of button to restart playing from the beginning",
+      "message": "Reiniciar"
     },
     "screenDetails_button_like_instructions": {
       "description": "text to be place AFTER the text that indicates that the user 'liked' or 'disliked' the current video title. This appears once the button gains focus",
@@ -3886,6 +3918,10 @@ Function getTranslation_es_MX()
     "screenDetails_button_likeDislike": {
       "description": "Label of unfocused button to allow users to like or dislike the current video title",
       "message": "Me Gusta o No Me Gusta"
+    },
+    "screenDetails_button_rate": {
+      "description": "Label of button to rate the current video title",
+      "message": "Calificar"
     },
     "screenDetails_button_sign_in_to_set_reminder": {
       "description": "Label of button to allow users to set the reminder to the current video title when the user is not signed in.",
@@ -4901,9 +4937,17 @@ Function getTranslation_es_MX()
       "description": "Sign in to watch live button label.",
       "message": "Inicia sesión para ver"
     },
+    "live_time": {
+      "description": "badge text for live event happening later today with start time",
+      "message": "En vivo {time}"
+    },
     "starts_date": {
       "description": "date label used in air date countdown timer",
       "message": "COMIENZA {date}"
+    },
+    "live_date": {
+      "description": "date label for upcoming live event badge with date",
+      "message": "En vivo {date}"
     },
     "screenDetails_button_details": {
       "description": "Details button label used in linear detail screen",
@@ -4911,7 +4955,7 @@ Function getTranslation_es_MX()
     },
     "sign_in_watch_live": {
       "description": "Sign in to watch live button label.",
-      "message": "Inicia sesión para ver en vivo"
+      "message": "Inicia sesión para ver gratis"
     },
     "content_unavailable": {
       "description": "Button label when the content is unavailable",
@@ -4949,6 +4993,14 @@ Function getTranslation_es_MX()
       "description": "A title for the manage account screen",
       "message": "Para actualizar tu información o preferencias, escanea el código QR o visita la URL. Reinicia la app para ver los cambios."
     },
+    "screenSettings_name_prefix": {
+      "description": "Label showing the signed-in user name on the account settings panel",
+      "message": "Has iniciado sesión como {name}"
+    },
+    "screenSettings_email_prefix": {
+      "description": "Label showing the signed-in user email on the account settings panel",
+      "message": "Correo: {email}"
+    },
     "kids_screen_heading": {
       "description": "Heading of the kids screen",
       "message": "Elige un adulto para agregar una cuenta infantil"
@@ -4985,6 +5037,10 @@ Function getTranslation_es_MX()
       "description": "Heading of the sign up kids age selection screen",
       "message": "Elige una configuración de contenido"
     },
+    "kidsAgeSelection_sub_header": {
+      "description": "Subheading of the sign up kids age selection screen",
+      "message": "Obtén más información sobre clasificaciones en {url}"
+    },
     "kidsAgeSelection_top_header": {
       "description": "Top header of the sign up kids age selection screen",
       "message": "Configuración de cuenta Tubi Kids"
@@ -4992,6 +5048,10 @@ Function getTranslation_es_MX()
     "kidsAgeSelection_ageRatingLabel": {
       "description": "Age rating label of the kids age selection screen",
       "message": "Clasificación de edad"
+    },
+    "kidsAgeSelection_includedUpToLabel": {
+      "description": "Included up to label of the kids age selection screen",
+      "message": "Incluye contenido hasta"
     },
     "ParentalControlPinPad_header": {
       "description": "Header of the parental control pin pad screen",
@@ -5035,11 +5095,11 @@ Function getTranslation_es_MX()
     },
     "screenSettings_contentSetting_TEEN": {
       "description": "Content setting label for teen",
-      "message": "Adolescente (13-17 años)"
+      "message": "Clasificación 13-17"
     },
     "screenSettings_contentSetting_ADULT": {
       "description": "Content setting label for adult",
-      "message": "Adulto (18+ años)"
+      "message": "Clasificación 18+"
     },
     "screenSettings_contentSetting_YOUNGEST_CHILD": {
       "description": "Content setting label for youngest child",
@@ -5085,6 +5145,10 @@ Function getTranslation_es_MX()
       "description": "Terms text for Kids Account Setup screen",
       "message": "Al hacer clic en Empezar a ver, aceptas {url1} y {url2}"
     },
+    "screenSettings_contentSettings_instructions": {
+      "description": "Instructions text for content settings panel",
+      "message": "Establece límites de clasificación para ti y tus hijos y gestiona tu PIN para una visualización segura."
+    },
     "screenSettings_contentSettings_create_pinLabel": {
       "description": "Label for the create pin button",
       "message": "Crear PIN"
@@ -5119,7 +5183,11 @@ Function getTranslation_es_MX()
     },
     "ParentalControlPinInputScreen_forgot_pin_button_label": {
       "description": "Label of the forgot pin button in the parental control pin input screen",
-      "message": "¿Olvidaste el PIN?"
+      "message": "¿Olvidaste tu Pin?"
+    },
+    "button_text_updatePin": {
+      "description": "Label of the update pin button",
+      "message": "Actualizar PIN"
     },
     "screenSettings_pinPassword_title": {
       "description": "Title of the pin password screen",
@@ -5296,6 +5364,18 @@ Function getTranslation_es_MX()
     "restricted_content_title": {
       "description": "Title of the dialog window that is shown when a content is restricted",
       "message": "Contenido restringido"
+    },
+    "explore": {
+      "description": "Button text for exploring a hub or collection",
+      "message": "Explorar"
+    },
+    "content_settings_up_to": {
+      "description": "Label for the up to content setting",
+      "message": "Hasta {ratings}"
+    },
+    "content_settings_learn_more": {
+      "description": "Label for the learn more link",
+      "message": "Más información en {url}"
     }
   }
 End Function
@@ -5350,6 +5430,10 @@ Function getTranslation_fr_CA()
     "epg_started_at": {
       "description": "Program time Title for live program.",
       "message": "Commencé à"
+    },
+    "epg_favorites": {
+      "description": "Label for the EPG / linear favorites category.",
+      "message": "Favoris"
     },
     "circular_counter_starts_in": {
       "description": "Text displayed in circular counter component to indicate countdown starting.",
@@ -5695,6 +5779,14 @@ Function getTranslation_fr_CA()
       "description": "label of the confirmation button of the dialog window that asks the user if they want to sign out of the app",
       "message": "Déconnexion"
     },
+    "dialog_account_limit_reached_title": {
+      "description": "Title of the dialog shown when the user has reached the maximum number of accounts",
+      "message": "Limite de comptes atteinte"
+    },
+    "dialog_account_limit_reached_description": {
+      "description": "Description of the dialog shown when the user has reached the maximum number of accounts",
+      "message": "Maximum de 8 comptes sur Tubi. Pour en ajouter un, déconnectez-vous d’un compte existant dans les paramètres."
+    },
     "error_check_birthdate_description": {
       "description": "message letting the user know that they were not able to be signed in",
       "message": "Un problème est survenu lors de la tentative de connexion. Veuillez entrer dans la chaîne et vous connecter à nouveau."
@@ -5915,6 +6007,10 @@ Function getTranslation_fr_CA()
       "message": "Adultes",
       "note": "This translation is used as screenSettings_parentalControls_group_Adults, please double check that it is not needed before deleting"
     },
+    "screenSettings_parentalControls_instructions": {
+      "description": "Description of the parental controls screen",
+      "message": "Définissez des limites de classification pour un visionnement adapté à l’âge. Toute modification exige une connexion ou une inscription à Tubi."
+    },
     "screenSettings_parentalControls_kids_instructions": {
       "description": "Description of the parental controls screen",
       "message": "En raison des restrictions, retournez au compte adulte pour modifier vos paramètres de contenu."
@@ -6021,19 +6117,19 @@ Function getTranslation_fr_CA()
     },
     "screenSettings_error_parentalChanges_description_multi_account_group0": {
       "description": "Success message when content settings has changed to group 0 (Little Kids) in multi-account mode",
-      "message": "Vous serez dirigé vers Tubi Kids.\n\n Les paramètres ont été changés à :\n Cote d’âge 4-6 (TV-G, G)."
+      "message": "Vous serez dirigé vers Tubi Kids.\n\n Les paramètres ont été changés à :\n Cote d’âge 4-6 (TV-Y, TV-G, G)."
     },
     "screenSettings_error_parentalChanges_description_multi_account_group5": {
       "description": "Success message when content settings has changed to group 1 (Older Kids) in multi-account mode",
-      "message": "Vous serez dirigé vers Tubi Kids.\n\n Les paramètres ont été changés à :\n Cote d’âge 10-12 (TV-PG, PG)."
+      "message": "Vous serez dirigé vers Tubi Kids.\n\n Les paramètres ont été changés à :\n Cote d’âge 10-12 (Up to TV-PG / PG)."
     },
     "screenSettings_error_parentalChanges_description_multi_account_group2": {
       "description": "Success message when content settings has changed to group 2 (Teens) in multi-account mode",
-      "message": "Les paramètres ont été changés à : Adolescent (TV-14, PG-13)."
+      "message": "Les paramètres ont été changés à : Cote d’âge 13–17 (Jusqu’à TV-14 / PG-13)."
     },
     "screenSettings_error_parentalChanges_description_multi_account_group3": {
       "description": "Success message when content settings has changed to group 3 (Adults) in multi-account mode",
-      "message": "Les paramètres ont été changés à : Adulte (TV-MA, R, NC-17)."
+      "message": "Les paramètres ont été changés à : Cote d’âge 18+ (Jusqu’à TV-MA / R / NC-17)."
     },
     "screenSettings_error_parentalChanges_description_multi_account_group4": {
       "description": "Success message when content settings has changed to group 4 (Age Rating 1-3) in multi-account mode - user directed to Tubi Kids",
@@ -6041,7 +6137,7 @@ Function getTranslation_fr_CA()
     },
     "screenSettings_error_parentalChanges_description_multi_account_group1": {
       "description": "Success message when content settings has changed to group 5 (Age Rating 7-9) in multi-account mode - user directed to Tubi Kids",
-      "message": "Vous serez dirigé vers Tubi Kids.\n\n Les paramètres ont été changés à :\n Cote d’âge 7-9 (TV-Y7, TV-Y7-FV)."
+      "message": "Vous serez dirigé vers Tubi Kids.\n\n Les paramètres ont été changés à :\n Cote d’âge 7-9 (TV-Y, TV-Y7, TV-Y7-FV, TV-G, G)."
     },
     "screenSettings_error_signInParental_description": {
       "description": "Description of message to let users know that they must be signed in to adjust the parental controls.",
@@ -6114,6 +6210,10 @@ Function getTranslation_fr_CA()
     "onNow": {
       "description": "badge text to show program is not live but on now",
       "message": "En ondes"
+    },
+    "liveTomorrow": {
+      "description": "badge text for live content scheduled for tomorrow",
+      "message": "En direct demain"
     },
     "day_1": {
       "description": "shortened version Monday, formatted with , and a space",
@@ -6275,6 +6375,10 @@ Function getTranslation_fr_CA()
       "description": "Label of button to allow users to display the list of episodes/seasons of the current video title. Should be title case.",
       "message": "Tous les épisodes"
     },
+    "screenDetails_button_episodes_container": {
+      "description": "Label of button to allow users to display the list of episodes/seasons of the current video title. Should be title case.",
+      "message": "Épisodes et plus"
+    },
     "screenDetails_relatedTitles": {
       "description": "Label of button to allow users to view other video titles related to the current video title",
       "message": "Vous pourriez aussi aimer"
@@ -6283,6 +6387,10 @@ Function getTranslation_fr_CA()
       "description": "Label of button to allow users to play the current video title",
       "message": "Lecture"
     },
+    "screenDetails_button_watch_replay": {
+      "description": "Label of button to allow users to watch a replay of a live event",
+      "message": "Regarder la reprise"
+    },
     "screenDetails_button_startOver": {
       "description": "Label of button to allow users to start over and play the current video title",
       "message": "Lire depuis le début"
@@ -6290,6 +6398,10 @@ Function getTranslation_fr_CA()
     "screenDetails_button_startFromBeginning": {
       "description": "Label of button to start playing from the beginning",
       "message": "Reprendre depuis le début"
+    },
+    "screenDetails_button_restart": {
+      "description": "Label of button to restart playing from the beginning",
+      "message": "Recommencer"
     },
     "screenDetails_button_like_instructions": {
       "description": "text to be place AFTER the text that indicates that the user 'liked' or 'disliked' the current video title. This appears once the button gains focus",
@@ -6326,6 +6438,10 @@ Function getTranslation_fr_CA()
     "screenDetails_button_likeDislike": {
       "description": "Label of unfocused button to allow users to like or dislike the current video title",
       "message": "J'aime ou Je n'aime pas"
+    },
+    "screenDetails_button_rate": {
+      "description": "Label of button to rate the current video title",
+      "message": "Évaluer"
     },
     "screenDetails_button_sign_in_to_set_reminder": {
       "description": "Label of button to allow users to set the reminder to the current video title when the user is not signed in.",
@@ -7341,9 +7457,17 @@ Function getTranslation_fr_CA()
       "description": "Sign in to watch live button label.",
       "message": "Se connecter pour voir"
     },
+    "live_time": {
+      "description": "badge text for live event happening later today with start time",
+      "message": "En direct {time}"
+    },
     "starts_date": {
       "description": "date label used in air date countdown timer",
       "message": "DÉBUTE {date}"
+    },
+    "live_date": {
+      "description": "date label for upcoming live event badge with date",
+      "message": "En direct {date}"
     },
     "screenDetails_button_details": {
       "description": "Details button label used in linear detail screen",
@@ -7351,7 +7475,7 @@ Function getTranslation_fr_CA()
     },
     "sign_in_watch_live": {
       "description": "Sign in to watch live button label.",
-      "message": "Connexion pour en direct"
+      "message": "Connectez-vous pour regarder gratuit"
     },
     "content_unavailable": {
       "description": "Button label when the content is unavailable",
@@ -7389,6 +7513,14 @@ Function getTranslation_fr_CA()
       "description": "A title for the manage account screen",
       "message": "Pour mettre à jour vos infos ou préférences, scannez le code QR ou visitez l’URL. Redémarrez l’app pour voir les changements."
     },
+    "screenSettings_name_prefix": {
+      "description": "Label showing the signed-in user name on the account settings panel",
+      "message": "Vous êtes connecté en tant que {name}"
+    },
+    "screenSettings_email_prefix": {
+      "description": "Label showing the signed-in user email on the account settings panel",
+      "message": "Courriel : {email}"
+    },
     "kids_screen_heading": {
       "description": "Heading of the kids screen",
       "message": "Choisissez un adulte pour ajouter un compte enfants"
@@ -7425,6 +7557,10 @@ Function getTranslation_fr_CA()
       "description": "Heading of the sign up kids age selection screen",
       "message": "Choisissez un paramètre de contenu"
     },
+    "kidsAgeSelection_sub_header": {
+      "description": "Subheading of the sign up kids age selection screen",
+      "message": "En savoir plus sur les classifications à {url}"
+    },
     "kidsAgeSelection_top_header": {
       "description": "Top header of the sign up kids age selection screen",
       "message": "Configuration du compte Tubi Kids"
@@ -7432,6 +7568,10 @@ Function getTranslation_fr_CA()
     "kidsAgeSelection_ageRatingLabel": {
       "description": "Age rating label of the kids age selection screen",
       "message": "Cote d’âge"
+    },
+    "kidsAgeSelection_includedUpToLabel": {
+      "description": "Included up to label of the kids age selection screen",
+      "message": "Inclut du contenu jusqu’à"
     },
     "ParentalControlPinPad_header": {
       "description": "Header of the parental control pin pad screen",
@@ -7475,11 +7615,11 @@ Function getTranslation_fr_CA()
     },
     "screenSettings_contentSetting_TEEN": {
       "description": "Content setting label for teen",
-      "message": "Adolescent (13-17)"
+      "message": "Cote d’âge 13-17"
     },
     "screenSettings_contentSetting_ADULT": {
       "description": "Content setting label for adult",
-      "message": "Adulte (18+)"
+      "message": "Cote d’âge 18+"
     },
     "screenSettings_contentSetting_YOUNGEST_CHILD": {
       "description": "Content setting label for youngest child",
@@ -7525,6 +7665,10 @@ Function getTranslation_fr_CA()
       "description": "Terms text for Kids Account Setup screen",
       "message": "En cliquant sur Commencer à regarder, vous acceptez {url1} et {url2}"
     },
+    "screenSettings_contentSettings_instructions": {
+      "description": "Instructions text for content settings panel",
+      "message": "Définissez des limites de classification pour vous et vos enfants et gérez votre NIP pour un visionnement sécuritaire."
+    },
     "screenSettings_contentSettings_create_pinLabel": {
       "description": "Label for the create pin button",
       "message": "Créer un NIP"
@@ -7559,7 +7703,11 @@ Function getTranslation_fr_CA()
     },
     "ParentalControlPinInputScreen_forgot_pin_button_label": {
       "description": "Label of the forgot pin button in the parental control pin input screen",
-      "message": "NIP oublié"
+      "message": "Nip oublié ?"
+    },
+    "button_text_updatePin": {
+      "description": "Label of the update pin button",
+      "message": "Mettre à jour le NIP"
     },
     "screenSettings_pinPassword_title": {
       "description": "Title of the pin password screen",
@@ -7736,6 +7884,18 @@ Function getTranslation_fr_CA()
     "restricted_content_title": {
       "description": "Title of the dialog window that is shown when a content is restricted",
       "message": "Contenu restreint"
+    },
+    "explore": {
+      "description": "Button text for exploring a hub or collection",
+      "message": "Explorer"
+    },
+    "content_settings_up_to": {
+      "description": "Label for the up to content setting",
+      "message": "Jusqu’à {ratings}"
+    },
+    "content_settings_learn_more": {
+      "description": "Label for the learn more link",
+      "message": "En savoir plus à {url}"
     }
   }
 End Function
@@ -7743,6 +7903,10 @@ End Function
 
 Function getTranslation_en_GB()
   return {
+    "epg_favorites": {
+      "description": "Label for the EPG / linear favorites category.",
+      "message": "Favourites"
+    },
     "linear_player_signin_title": {
       "description": "title for linear player sign-in modal",
       "message": "Register or Sign In to stream"
