@@ -2050,7 +2050,7 @@ Function onCreatorSelected(msg)
 
   content = detailScreen.content
   if content <> invalid AND content.creatorTensorApp <> invalid then
-    if content.creatorTensorApp.type <> m.constants.ui.appTypes.creator
+    if lcase(content.creatorTensorApp.type) <> m.constants.ui.appTypes.creator
       showPivotDetailScreen(content.creatorTensorApp)
     else
       showCollectionScreen(content.creatorTensorApp.id)

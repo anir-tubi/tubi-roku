@@ -416,7 +416,7 @@ Function onVodDetailCtaSelectedButtonIdChange(msg) as Void
       showChannelDetailsScreen(screenContent.channelId)
     else if id = "creator"
       if screenContent.creatorTensorApp <> invalid
-        if screenContent.creatorTensorApp.type <> m.constants.ui.appTypes.creator
+        if lcase(screenContent.creatorTensorApp.type) <> m.constants.ui.appTypes.creator
           showPivotDetailScreen(screenContent.creatorTensorApp)
         else
           showCollectionScreen(screenContent.creatorTensorApp.id)
