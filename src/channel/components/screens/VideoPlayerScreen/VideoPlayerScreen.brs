@@ -2613,8 +2613,6 @@ End Function
 
 
 ' advanceDrmOnContent function gets triggered when player error occurs due to drm
-' When experiment roku_player_drm_order_hlsv6_widevine_v2 is enabled: if next is hlsv6_widevine_psshv0, fire exposure then use it.
-' When experiment is disabled: if next is hlsv6_widevine_psshv0, fire exposure then skip it and try the next resource.
 ' @contentNode: roSGNode, a TubiContentNode
 Function advanceDrmOnContent(contentNode)
   logDebug("VideoPlayer.advanceDrmOnContent")
@@ -2644,16 +2642,6 @@ Function advanceDrmOnContent(contentNode)
   end if
 
   if nextResource = invalid then return false
-
-  isExperimentEnabled = getStatsigExperimentResource("roku_player_improvement", "roku_player_drm_order_hlsv6_widevine_v2", false).enabled
-
-  if nextResource.type = m.constants.player.drmTypes.hlsv6Widevine
-    getStatsigExperimentResource("roku_player_improvement", "roku_player_drm_order_hlsv6_widevine_v2", true)
-    if isExperimentEnabled = false
-      contentNode.currentVideoResourceIndex = [nextCodecIndex, nextDrmIndex]
-      return advanceDrmOnContent(contentNode)
-    end if
-  end if
 
   if setDrmOnContent(contentNode, nextResource, [nextCodecIndex, nextDrmIndex]) = true
     sendVideoResourceFallbackToPlayerLogLib(currentResource, nextResource, "DRM")
