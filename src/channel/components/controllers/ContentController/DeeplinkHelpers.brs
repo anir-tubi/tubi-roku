@@ -1092,7 +1092,7 @@ Function parseSportsEventContentId(contentId) as Object
 End Function
 
 
-Function skipDetailScreenDeeplinkWrapper(refreshedContent)
+Function skipDetailScreenDeeplinkWrapper(refreshedContent) as Void
   ' This is a hack to handle cases where wrong media type is passed in the deeplink for fox player.
   if refreshedContent <> invalid AND refreshedContent.playerType = m.constants.ui.playerTypes.fox
     popScreen()
@@ -1100,6 +1100,15 @@ Function skipDetailScreenDeeplinkWrapper(refreshedContent)
   else if refreshedContent.type = m.constants.ui.contentTypes.linear
     handleSingleContentDeeplinkError(invalid) 'if the content type is linear, then do not show detailScreen instead show error dialog.
   else
+    isComingSoon = isComingSoonContent(refreshedContent)
+    if refreshedContent.policyMatch = false AND refreshedContent.hasVideoResources = false AND isComingSoon = false
+      if m.enteredFromDeepLink = true AND m.deeplinkContent <> invalid
+        sendDeeplinkAnalytics(m.deeplinkContent, refreshedContent, m.constants.deeplinks.entryPoints.video, m.Tracking, m.trackingLoggingTask, m.constants)
+      end if
+      resetDeeplinkValues()
+      popScreen()
+      return
+    end if
     skipDetailScreen(refreshedContent)
   end if
 End Function

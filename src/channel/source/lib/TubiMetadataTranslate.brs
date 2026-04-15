@@ -948,6 +948,10 @@ Function tubiMetadataTranslate_translateRecursive(contentFromServer as Object, t
     translatedContent.videoRenditions = contentFromServer.video_renditions
   end if
 
+  if isBoolean(contentFromServer.policy_match) = true
+    translatedContent.policyMatch = contentFromServer.policy_match
+  end if
+
   if contentFromServer.schedule_data <> invalid
     schedule = m.parseScheduleData(contentFromServer.schedule_data)
     if type(translatedContent) = "roAssociativeArray"

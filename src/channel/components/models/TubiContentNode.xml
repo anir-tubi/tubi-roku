@@ -151,6 +151,7 @@
     <!-- ID of a preview. It is used to send for analytic events -->
     <field id="previewId" type="string" />
     <field id="videoRenditions" type="stringarray" />
+    <field id="policyMatch" type="boolean" value="true" />
     <field id="scheduleData" type="assocarray" />
 
   </interface>

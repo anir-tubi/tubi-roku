@@ -1196,6 +1196,11 @@ Function executeVodDetailSuccessCallback(content, playbackSource, episodes = inv
     successCb = m.showVodDetailScreenCallback.success
     if successCb = skipDetailScreen OR successCb = skipDetailScreenDeeplinkWrapper
       isComingSoon = isComingSoonContent(content)
+      if content.policyMatch = false AND content.hasVideoResources = false AND isComingSoon = false
+        resetDeeplinkValues()
+        popScreen()
+        return
+      end if
       if isComingSoon = false
         playSelectedVodContent(content, playbackSource, episodes)
       end if
