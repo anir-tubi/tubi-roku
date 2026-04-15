@@ -446,6 +446,11 @@ const elements = typeCheckElements({
       '#ContentController.#uiGroup.#ContentGroup.#screenStackGroup.#ScreenStack.2.#contentGroup.#password.#rectBG',
   },
 
+  forgotPasswordEntryBox: {
+    keyPath:
+      '#ContentController.#uiGroup.#ContentGroup.#screenStackGroup.#ScreenStack.1.#contentGroup.#passwordEntryKeyboard.0.#Keyboard',
+  },
+
   /** Dialog box text for PC Settings Change for Older Kids */
   parentalControlsSettingsOlderKids: {
     keyPath:
@@ -1597,12 +1602,45 @@ const elements = typeCheckElements({
   parentalControlsMenu: {
     keyPath: '#ContentController.#uiGroup.#ContentGroup.#screenStackGroup.#ScreenStack.#settingsScreen.#PanelSet.3.#Offset.#ContentGroup.#ParentalControlsMenu',
   },
-
+  kidsParentalControlsMenu: {
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#screenStackGroup.#ScreenStack.#settingsScreen.#PageGroup.#PanelSet.4.#Offset.#ContentGroup.#ParentalControlsMenu',
+  },
+  adultParentalControlsMenu: {
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#screenStackGroup.#ScreenStack.#settingsScreen.#PageGroup.#PanelSet.4.#Offset.#ContentGroup.#ParentalControlsMenu.5',
+  },
   /** PC Dialog Settings Change box */
   parentalControlsChangeDialog: {
     keyPath: '#ContentController.#DialogBox.#ContentArea',
   },
 
+  /** PC Dialog Settings Change title */
+  parentalControlsDialogTitle: {
+    keyPath: '#ContentController.#DialogBox.#ContentArea.#Title',
+  },
+
+  /** Content Settings Accounts MarkupGrid */
+  AccountsList: {
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#screenStackGroup.#ScreenStack.#settingsScreen.#PanelSet.3.#Offset.#ContentGroup.#AccountsList',
+  },
+
+  parentalControlPinPad: {
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#screenStackGroup.#ScreenStack.2.1.#NumberPad',
+  },
+  parentalControlEnterPinPad: {
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#screenStackGroup.#ScreenStack.1.1.#NumberPad',
+  },
+  parentalControlForgotPinPadTitle: {
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#screenStackGroup.#ScreenStack.1.1.#pageHeader',
+  },
+  parentalControlConfirmPinTitle: {
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#screenStackGroup.#ScreenStack.2.1.#pageHeader',
+  },
+  parentalControlPinContinueButton: {
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#screenStackGroup.#ScreenStack.2.1.#buttonLayout.#continueButton',
+  },
+  parentalControlForgotPinContinueButton: {
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#screenStackGroup.#ScreenStack.1.1.#buttonLayout.#continueButton',
+  },
   /** Sign in password */
   passwordText: {
     keyPath:
@@ -1813,6 +1851,12 @@ const elements = typeCheckElements({
   settingsScreenHeader: {
     keyPath:
       '#ContentController.#uiGroup.#ContentGroup.#screenStackGroup.#ScreenStack.#settingsScreen.#PanelSet.3.#Offset.#ContentGroup.#TitleOne',
+  },
+
+  /** Sign Out button on Account panel */
+  signOutButton: {
+    keyPath:
+      '#ContentController.#uiGroup.#ContentGroup.#screenStackGroup.#ScreenStack.#settingsScreen.#PageGroup.#PanelSet.3.#Offset.0.#SignOutButtonLayoutGroup.#SignOutButton',
   },
 
   /** terms screen header */
@@ -2571,6 +2615,18 @@ const elements = typeCheckElements({
       '#ContentController.#uiGroup.#ContentGroup.#SideNav.#itemGroups.0.#mainItemsSelected',
   },
 
+  /** Add more accounts tooltip in sidenav (shown when user is in multi-account mode and visit count < 4) */
+  sideNavAddAccountsTooltip: {
+    keyPath:
+      '#ContentController.#uiGroup.#ContentGroup.#SideNav.#addAccountsTooltip',
+  },
+
+  /** Profile selection menu in sidenav (opens when profile item is selected in multi-account mode) */
+  profileSelectionMenu: {
+    keyPath:
+      '#ContentController.#uiGroup.#ContentGroup.#SideNav.#ProfileSelectionMenu',
+  },
+
   /** recommended poster */
   recommendedPoster: {
     keyPath:
@@ -2831,6 +2887,54 @@ const elements = typeCheckElements({
   emailInputScreenKeyboard: {
     keyPath:
       '#ContentController.#uiGroup.#ContentGroup.#screenStackGroup.#ScreenStack.#emailInputScreen.2.#Keyboard',
+  },
+
+  /** EmailInputOrAddKidsScreen - shown when adding account from profile menu (uses emailInputScreen id when pushed) */
+  emailInputOrAddKidsScreen: {
+    keyPath:
+      '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#emailInputScreen',
+  },
+
+  /** EmailInputOrAddKidsScreen Keyboard (EmailGroup > LayoutGroup > Keyboard) */
+  emailInputOrAddKidsScreenKeyboard: {
+    keyPath:
+      '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#emailInputScreen.#EmailGroup.1.#Keyboard',
+  },
+
+  /** EmailInputOrAddKidsScreen email text edit box */
+  emailInputOrAddKidsScreenEmailBox: {
+    keyPath:
+      '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#emailInputScreen.#EmailGroup.#emailLayout.0.#emailTextEditBox',
+  },
+
+  /** EmailInputOrAddKidsScreen ProfileMenu grid on Kids tab */
+  emailInputOrAddKidsScreenProfileMenu: {
+    keyPath:
+      '#ContentController.#uiGroup.#ContentGroup.#screenStackGroup.#ScreenStack.#emailInputScreen.#KidsGroup.#bottomTextGroup.#ProfileMenu',
+  },
+
+  /** Name input screen name text edit box (used for kids profile name) */
+  nameInputScreenNameBox: {
+    keyPath:
+      '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#nameInputScreen.#nameLayout.2.0',
+  },
+
+  /** Kids age selection screen page header */
+  kidsAgeSelectionScreenHeader: {
+    keyPath:
+      '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#kidsAgeSelectionScreen.#PageHeader',
+  },
+
+  /** Parental control PIN input screen page header */
+  parentalControlPinInputScreenHeader: {
+    keyPath:
+      '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#parentalControlPinInputScreen.1.#pageHeader',
+  },
+
+  /** Kids account setup screen page header */
+  kidsAccountSetupScreenHeader: {
+    keyPath:
+      '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#kidsAccountSetupScreen.#mainContentGroup.#formGroup.#headerGroup.#pageHeading',
   },
 
   /** Email test edit box */

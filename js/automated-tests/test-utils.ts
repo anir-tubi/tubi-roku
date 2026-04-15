@@ -74,6 +74,10 @@ enum ScreenIds {
   'signUpAgeVerificationScreen' = 'signUpAgeVerificationScreen',
   'rokuContinueWatchingConsentScreen' = 'rokuContinueWatchingConsentScreen',
   'pivotDetailScreen' = 'pivotDetailScreen',
+  'nameInputScreen' = 'nameInputScreen',
+  'kidsAccountSetupScreen' = 'kidsAccountSetupScreen',
+  'kidsAgeSelectionScreen' = 'kidsAgeSelectionScreen',
+  'parentalControlPinInputScreen' = 'parentalControlPinInputScreen',
   'collectionScreen' = 'collectionScreen'
 }
 
@@ -824,6 +828,22 @@ class TestUtils {
     }, timeout);
   }
 
+
+  public async jumpToProfile(elementOrElementId: ElementOrElementId, profileName: string, timeout = 10000) {
+
+
+    const profiles = await this.getAllGridItemsContent(elementOrElementId, timeout);
+    for (let i = 0; i < profiles.length; i++) {
+      let profile = profiles[i];
+      if (profile.shortdescriptionline1 === profileName) {
+        await this.jumpToRowIndex(elementOrElementId, i, timeout);
+        return;
+      }
+    }
+    throw new Error(`Could not find profile with short description line 1 "${profileName}"`);
+
+
+  }
 
   /**
    * Used to jump to a grid/list item with the title provided

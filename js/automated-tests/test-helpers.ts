@@ -712,10 +712,12 @@ class TestHelpers {
    * await testHelpers.selectParentalControlLevel('littleKids');
    * await testHelpers.selectParentalControlLevel('teens');
    */
-  public async selectParentalControlLevel(level: 'littleKids' | 'olderKids' | 'teens' | 'adults') {
+  public async selectParentalControlLevel(level: 'littleKids' | 'olderKids' | 'teens' | 'adults' | 'youngestKids' | 'oldestKids') {
     const titleMap: Record<string, string> = {
       littleKids: 'Little Kids',
       olderKids: 'Older Kids',
+      youngestKids: 'Youngest Kids',
+      oldestKids: 'Oldest Kids',
       teens: 'Teens',
       adults: 'Adults'
     };
@@ -767,6 +769,82 @@ class TestHelpers {
       }
     }
   }
+
+
+  /**
+  * HELPER: Generic parental control level selection
+  * 
+  * @param level - 'littleKids' | 'olderKids' | 'teens' | 'adults'
+  * 
+  * @example
+  * await testHelpers.selectParentalControlLevel('littleKids');
+  * await testHelpers.selectParentalControlLevel('teens');
+  */
+  public async selectParentalControlLevelV2(level: 'ageRating1To3' | 'ageRating4To6' | 'ageRating7To9' | 'ageRating10To12' | 'ageRatingTeens' | 'ageRatingAdults') {
+    await testUtils.waitForElementToFullyShowOnScreen('parentalControlsSettingsGroup');
+    await ecp.sendKeypress(ecp.Key.Right, { wait: 200 });
+
+    const levelMap = {
+      ageRating1To3: 1,
+      ageRating4To6: 2,
+      ageRating7To9: 3,
+      ageRating10To12: 4,
+      ageRatingTeens: 5,
+      ageRatingAdults: 6
+    };
+
+    const upCount = levelMap[level];
+    if (upCount > 0) {
+      await ecp.sendKeypress(ecp.Key.Up, { count: upCount, wait: 200 });
+    }
+
+    if (level === 'ageRatingTeens') {
+      await utils.sleep(2000);
+    }
+
+    await ecp.sendKeypress(ecp.Key.Ok);
+  }
+
+
+  /**
+   * HELPER: Sets parental controls and verifies confirmation
+   * 
+   * @param level - Parental control level
+   * @param password - Password to use (default: '111111')
+   * @param shouldDismiss - Whether to dismiss confirmation dialog (default: true)
+   * 
+   * @example
+   * await testHelpers.setParentalControls('littleKids');
+   * await testHelpers.setParentalControls('teens', '123456', false);
+   */
+  public async setParentalControlsV2(level: 'ageRating1To3' | 'ageRating4To6' | 'ageRating7To9' | 'ageRating10To12' | 'ageRatingTeens' | 'ageRatingAdults', password = '111111', shouldDismiss = true) {
+    await this.selectParentalControlLevelV2(level);
+    await this.enterPassword(password);
+
+    // Verify confirmation dialog
+    const confirmationElements: Record<string, any> = {
+      ageRating1To3: 'parentalControlsSettingsAgeRating1To3',
+      ageRating4To6: 'parentalControlsSettingsAgeRating4To6',
+      ageRating7To9: 'parentalControlsSettingsAgeRating7To9',
+      ageRating10To12: 'parentalControlsSettingsAgeRating10To12',
+      ageRatingTeens: 'parentalControlsSettingsAgeRatingTeens',
+      ageRatingAdults: 'parentalControlsSettingsAgeRatingAdults'
+    };
+
+    const element: any = confirmationElements[level];
+    if (element) {
+      await testUtils.waitForElementToShowOnScreen(element);
+      const dialog = await testUtils.getNodeForElement(element);
+      const levelNames = { ageRating1To3: 'Age Rating 1 - 3', ageRating4To6: 'Age Rating 4 - 6', ageRating7To9: 'Age Rating 7 - 9', ageRating10To12: 'Age Rating 10 - 12', ageRatingTeens: 'Age Rating Teens', ageRatingAdults: 'Age Rating Adults' };
+      expect(dialog.text).to.contain(levelNames[level]);
+
+      if (shouldDismiss) {
+        await ecp.sendKeypress(ecp.Key.Ok); // Dismiss dialog
+        await ecp.sendKeypress(ecp.Key.Ok); // Exit settings
+      }
+    }
+  }
+
 
   /**
    * HELPER: Generic password entry helper
@@ -1177,6 +1255,25 @@ class TestHelpers {
     await ecp.sendKeypress(ecp.Key.Down, { wait: 1000 });
     await ecp.sendKeypress(ecp.Key.Ok, { wait: 1000 });
     await ecp.sendKeypress(ecp.Key.Ok);
+    await testUtils.waitForElementToFullyShowOnScreen(emailInputElement);
+
+    // Use provided email or generate unique one
+    const emailToUse = email || this.generateTestEmail();
+
+    // Enter email and submit
+    await ecp.sendText(emailToUse);
+    await ecp.sendKeypress(ecp.Key.Right);
+    await ecp.sendKeypress(ecp.Key.Down, { count: 4, wait: 1000 });
+    await ecp.sendKeypress(ecp.Key.Ok);
+  }
+
+
+  public async completeRegistrationFlowMultiAccount(email?: string, emailInputElement: any = 'emailAddressBox') {
+    // Wait for modal and navigate through it
+    await utils.sleep(7000);
+    // await ecp.sendKeypress(ecp.Key.Down, { wait: 1000 });
+    // await ecp.sendKeypress(ecp.Key.Ok, { wait: 1000 });
+    // await ecp.sendKeypress(ecp.Key.Ok);
     await testUtils.waitForElementToFullyShowOnScreen(emailInputElement);
 
     // Use provided email or generate unique one
