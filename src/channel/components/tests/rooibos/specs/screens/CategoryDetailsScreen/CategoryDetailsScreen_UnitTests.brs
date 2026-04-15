@@ -49,8 +49,14 @@ Function categoryDetailsScreen_populateInfoPanelItem_test()
   controlInfoPanel.description = content.description
   controlInfoPanel.mode = "item"
   controlInfoPanel.calculateHeight = true
-  controlInfoPanel.sotMarkers = invalid
+  controlInfoPanel.titleLogoUri = ""
+  controlInfoPanel.itemContent = invalid
+  controlInfoPanel.sotMetaData = invalid
   controlInfoPanel.sotTopLabelSignals = invalid
+  controlInfoPanel.sotMarkers = invalid
+  controlInfoPanel.needsLogin = false
+  controlInfoPanel.reminderIsSet = false
+  controlInfoPanel.width = 960
   controlInfoPanel.lineOneData = {
     hasCC: content.hasSubtitles
     hasAudioDescription: content.hasAudioDescription
@@ -70,5 +76,10 @@ Function categoryDetailsScreen_populateInfoPanelItem_test()
   populatedInfoPanel = populateInfoPanel(emptyInfoPanel, content)
 
   ' can't test equality of nodes, so test if they have the same fields
-  m.assertEqual(populatedInfoPanel.getFields(), controlInfoPanel.getFields())
+  ' exclude calculatedHeight as it is render-derived and depends on observer timing
+  populatedFields = populatedInfoPanel.getFields()
+  controlFields = controlInfoPanel.getFields()
+  populatedFields.delete("calculatedHeight")
+  controlFields.delete("calculatedHeight")
+  m.assertEqual(populatedFields, controlFields)
 End Function

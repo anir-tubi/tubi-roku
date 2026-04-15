@@ -6,6 +6,7 @@ const filter = require('gulp-filter');
 const zip = require('gulp-zip');
 const env = require('gulp-env');
 const path = require('path');
+const net = require('net');
 const log = require('fancy-log');
 const mkdirp = require('mkdirp');
 const prompts = require('prompts');
@@ -575,8 +576,18 @@ function sideLoad(done) {
       log(`${options.config.toUpperCase()} channel launched.`);
 
       if (options.telnet === 'sametab') {
-        shell.config.silent = false;
-        shell.exec(`telnet ${options.target} 8085`, { async: true });
+        const socket = net.createConnection(8085, options.target, () => {
+          log(`Connected to ${options.target}:8085`);
+        });
+        socket.on('data', (data) => {
+          process.stdout.write(data.toString().replace(/\r\n/g, '\n'));
+        });
+        socket.on('error', (err) => {
+          log(`Telnet connection error: ${err.message}`);
+        });
+        socket.on('close', () => {
+          log('Telnet connection closed');
+        });
       }
     })
     .catch(err => {
