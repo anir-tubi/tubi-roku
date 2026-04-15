@@ -256,21 +256,22 @@ Function processCarouselAdContent(adID, assets, iValidUntil, aImageTracking = []
   end if
 
   '//::NOTE:: quartile pixels are currently not being returned, but if they ever do, they will be supported.
-  ' Add the ad info to the carousel node
-  adInfo = invalid
+  ' Always build adInfo with ad_id so markAdForPixelRefresh can key off it even when
+  ' the backend serves a carousel ad without a video asset (adInfo.media is only set
+  ' when a video stream is present).
+  ad_id = getAdID(adID) '// Ensure ad_id is a string or else there is a mismatch issue with RAF
+  adInfo = {
+    ad_id: ad_id
+    error: invalid
+    id: adID
+    impTracking: ""
+    type: "video"
+  }
   if videoData <> invalid
-    ad_id = getAdID(adID) '// Ensure ad_id is a string or else there is a mismatch issue with RAF
-    adInfo = {
-      ad_id: ad_id
-      error: invalid
-      id: adID
-      impTracking: ""
-      media: {
-        duration: videoData.duration
-        streamUrl: videoData.url
-        trackingEvents: {}
-      }
-      type: "video"
+    adInfo.media = {
+      duration: videoData.duration
+      streamUrl: videoData.url
+      trackingEvents: {}
     }
   end if
 
@@ -350,20 +351,22 @@ Function processSpotlightAdContent(adID, assets, iValidUntil, aImageTracking = [
     translatedThumb.videoPreviewUrl = videoData.url
   end if
 
-  adInfo = invalid
+  ' Always build adInfo with ad_id so markAdForPixelRefresh can key off it even when
+  ' the backend serves a spotlight ad without a video asset (adInfo.media is only set
+  ' when a video stream is present).
+  ad_id = getAdID(adID) '// Ensure ad_id is a string or else there is a mismatch issue with RAF
+  adInfo = {
+    ad_id: ad_id
+    error: invalid
+    id: adID
+    impTracking: ""
+    type: "video"
+  }
   if videoData <> invalid
-    ad_id = getAdID(adID) '// Ensure ad_id is a string or else there is a mismatch issue with RAF
-    adInfo = {
-      ad_id: ad_id
-      error: invalid
-      id: adID
-      impTracking: ""
-      media: {
-        duration: videoData.duration
-        streamUrl: videoData.url
-        trackingEvents: {}
-      }
-      type: "video"
+    adInfo.media = {
+      duration: videoData.duration
+      streamUrl: videoData.url
+      trackingEvents: {}
     }
   end if
   rowContentNode.adInfo = adInfo
@@ -419,6 +422,18 @@ Function processSkinAdRowContent(rowAdUnit, videoAdUnit) as Object
     if videoAssets.poster_image <> invalid AND isNonEmptyString(videoAssets.poster_image.url) = true
       sPosterURL = videoAssets.poster_image.url
     end if
+
+    ' Always build adInfo with ad_id so markAdForPixelRefresh can key off it even when
+    ' the backend serves a skin ad without a video asset (adInfo.media and impTracking are
+    ' only set when a video stream is present).
+    ad_id = getAdID(id) '// Ensure ad_id is a string or else there is a mismatch issue with RAF
+    adInfo = {
+      ad_id: ad_id
+      error: invalid
+      id: id
+      impTracking: ""
+      type: "video"
+    }
     if isNonEmptyArray(videoAssets.video) = true
       videoData = videoAssets.video[0]
       aImpTracking = []
@@ -426,18 +441,11 @@ Function processSkinAdRowContent(rowAdUnit, videoAdUnit) as Object
         aImpTracking = videoTrackers.imp
       end if
       if videoData <> invalid
-        ad_id = getAdID(id) '// Ensure ad_id is a string or else there is a mismatch issue with RAF
-        adInfo = {
-          ad_id: ad_id
-          error: invalid
-          id: id
-          impTracking: aImpTracking
-          media: {
-            duration: videoData.duration
-            streamUrl: videoData.url
-            trackingEvents: videoTrackers
-          }
-          type: "video"
+        adInfo.impTracking = aImpTracking
+        adInfo.media = {
+          duration: videoData.duration
+          streamUrl: videoData.url
+          trackingEvents: videoTrackers
         }
       end if
     end if
