@@ -238,7 +238,6 @@ async function buildInstalled() {
     };
   }
 
-  // TODO remove after fox video player is removed.
   // Only including with staging and production to speed up development deployments
   if (options.config === 'production' || options.config === 'staging') {
     const foxBuildTag = getFoxVideoPlayerBuildTag(options);
@@ -248,7 +247,7 @@ async function buildInstalled() {
     try {
       fs.copyFileSync(`fox-video-player-components/${foxVideoPlayerPkgName}`, `build/local/fox-video-player-components/${foxVideoPlayerPkgName}`);
     } catch (e) {
-      console.log(`Could not copy fox video player pkg file.  Make sure you have built the fox video player package and that the file fox-video-player-components/${foxVideoPlayerPkgName} exists.`);
+      throw Error(`Could not copy fox video player pkg file.  Make sure you have built the fox video player package and that the file fox-video-player-components/${foxVideoPlayerPkgName} exists.`);
     }
   }
 
