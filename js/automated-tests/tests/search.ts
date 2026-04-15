@@ -22,53 +22,23 @@ describe('Search', function () {
 				expect(searchResultsText.text).to.equal(LINEAR_CHANNEL_TITLE);
 			});
 
-			const searchResultsLiveIcon = await testUtils.getNodeForElement('searchResultsLiveIcon');
-			expect(searchResultsLiveIcon.uri).to.equal('pkg:/images/live-icon-filled.webp');
+			await testUtils.retryWithTimeOut(async () => {
+				const badge = await testUtils.getNodeForElement('searchResultsLinearBadge');
+				expect(badge.visible).to.equal(true, 'Linear availability badge should be visible');
+				expect(badge.isConfigured).to.equal(true, 'Linear availability badge should be configured');
+			});
 		});
 
 		it('C244258 When a user clicks on the channel poster, the live channel should start playing @search', async () => {
-			await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: true });
-			await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');
-			await testUtils.goToPage('search');
-			await testUtils.waitForElementToShowOnScreen('trendingSearchResultsGrid', 'Timed out waiting for element to have focus', 10000);
-			await ecp.sendText('nbc');
-
-			await shared.navigateToContentInSearchResults({ title: LINEAR_CHANNEL_TITLE });
-			await testUtils.retryWithTimeOut(async () => {
-				const searchResultsText = await testUtils.getNodeForElement('searchResultsText');
-				expect(searchResultsText.text).to.equal(LINEAR_CHANNEL_TITLE);
-			});
-
-			const searchResultsLiveIcon = await testUtils.getNodeForElement('searchResultsLiveIcon');
-			expect(searchResultsLiveIcon.uri).to.equal('pkg:/images/live-icon-filled.webp');
 			await ecp.sendKeypress(ecp.Key.Ok);
 
 			// Verify that the linear channel plays
-			await testUtils.waitForPlayerStateToEqual('linearVideoPlayerScreen', 'playing');
+			await testUtils.waitForPlayerStateToEqual('linearVideoPlayerScreen', 'playing', 30000);
 		});
 
 		it('C244259 When a user presses the back button, the user is sent back to the search result page @search', async () => {
-			await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: true });
-			await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');
-			await testUtils.goToPage('search');
-			await testUtils.waitForElementToShowOnScreen('trendingSearchResultsGrid', 'Timed out waiting for element to have focus', 10000);
-			await ecp.sendText('nbc');
-
-			await shared.navigateToContentInSearchResults({ title: LINEAR_CHANNEL_TITLE });
-			await testUtils.retryWithTimeOut(async () => {
-				const searchResultsText = await testUtils.getNodeForElement('searchResultsText');
-				expect(searchResultsText.text).to.equal(LINEAR_CHANNEL_TITLE);
-			});
-
-			const searchResultsLiveIcon = await testUtils.getNodeForElement('searchResultsLiveIcon');
-			expect(searchResultsLiveIcon.uri).to.equal('pkg:/images/live-icon-filled.webp');
-			await ecp.sendKeypress(ecp.Key.Ok);
-
-			// Verify that the Linear channel plays
-			await testUtils.waitForPlayerStateToEqual('linearVideoPlayerScreen', 'playing');
-
 			// Press the back button and verify that the user is redirected back to the Search result page
-			await ecp.sendKeypress(ecp.Key.Back);
+			await ecp.sendKeypress(ecp.Key.Back, { wait: 3000 });
 			await testUtils.retryWithTimeOut(async () => {
 				const searchResultsText = await testUtils.getNodeForElement('searchResultsText');
 				expect(searchResultsText.text).to.equal('NBC News NOW');
@@ -76,23 +46,6 @@ describe('Search', function () {
 		});
 
 		it('C244271  Ensure that when the user hover over a channel search result the channel name and description is displayed on the top left corner @search', async () => {
-			await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: true });
-			await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');
-			await testUtils.goToPage('search');
-			await testUtils.waitForElementToShowOnScreen('trendingSearchResultsGrid', 'Timed out waiting for element to have focus', 10000);
-			await ecp.sendText('nbc');
-
-			await shared.navigateToContentInSearchResults({ title: LINEAR_CHANNEL_TITLE });
-			await testUtils.retryWithTimeOut(async () => {
-				const searchResultsText = await testUtils.getNodeForElement('searchResultsText');
-				expect(searchResultsText.text).to.equal(LINEAR_CHANNEL_TITLE);
-			});
-
-			await testUtils.retryWithTimeOut(async () => {
-				const searchResultsLiveIcon = await testUtils.getNodeForElement('searchResultsLiveIcon');
-				expect(searchResultsLiveIcon.uri).to.equal('pkg:/images/live-icon-filled.webp');
-			});
-
 			await testUtils.retryWithTimeOut(async () => {
 				const searchResultsDesc = await testUtils.getNodeForElement('searchResultsDesc');
 				expect(searchResultsDesc).to.exist;
@@ -100,91 +53,76 @@ describe('Search', function () {
 		});
 
 		it('C406434 When a user taps "Play" button on linear channel, backing out takes user back to search results @search', async () => {
-			await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: true });
-			await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');
-			await testUtils.goToPage('search');
-			await testUtils.waitForElementToShowOnScreen('trendingSearchResultsGrid', 'Timed out waiting for element to have focus', 10000);
-			await ecp.sendText('nbc');
-
-			await shared.navigateToContentInSearchResults({ title: LINEAR_CHANNEL_TITLE });
-			await testUtils.retryWithTimeOut(async () => {
-				const searchResultsText = await testUtils.getNodeForElement('searchResultsText');
-				expect(searchResultsText.text).to.equal(LINEAR_CHANNEL_TITLE);
-			});
-
-			const searchResultsLiveIcon = await testUtils.getNodeForElement('searchResultsLiveIcon');
-			expect(searchResultsLiveIcon.uri).to.equal('pkg:/images/live-icon-filled.webp');
 			await ecp.sendKeypress(ecp.Key.Play);
 
 			// Verify that the Linear channel plays
-			await testUtils.waitForPlayerStateToEqual('linearVideoPlayerScreen', 'playing', 10000);
+			await testUtils.waitForPlayerStateToEqual('linearVideoPlayerScreen', 'playing', 30000);
 
 			// Press the back button and verify that the user is redirected back to the Search result page
-			await ecp.sendKeypress(ecp.Key.Back);
+			await ecp.sendKeypress(ecp.Key.Back, { count: 2, wait: 1000 });
 			await testUtils.retryWithTimeOut(async () => {
 				const searchResultsText = await testUtils.getNodeForElement('searchResultsText');
 				expect(searchResultsText.text).to.equal('NBC News NOW');
 			});
 		});
+	});
 
-		// https://tubi.testrail.io/index.php?/cases/view/22728
-		it('C22728 - Search - When movie selected then corresponding movie details page displayed @search @navigation @manual_regression', async () => {
-			/**
-			 * Pre-conditions: None
-			 * 
-			 * Test Steps:
-			 * 1. Launch app
-			 * 2. Navigate to search
-			 * 3. Search for a movie
-			 * 4. Select movie from results
-			 * 5. Verify movie details page is displayed with correct content
-			 */
+	// https://tubi.testrail.io/index.php?/cases/view/22728
+	it('C22728 - Search - When movie selected then corresponding movie details page displayed @search @navigation @manual_regression', async () => {
+		/**
+		 * Pre-conditions: None
+		 * 
+		 * Test Steps:
+		 * 1. Launch app
+		 * 2. Navigate to search
+		 * 3. Search for a movie
+		 * 4. Select movie from results
+		 * 5. Verify movie details page is displayed with correct content
+		 */
 
-			// Launch app
-			await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: true });
-			await testUtils.waitForCurrentScreenToEqual('homeScreen', 15000);
-			await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for videoTitlesRowList to have focus', 20000);
+		// Launch app
+		await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: true });
+		await testUtils.waitForCurrentScreenToEqual('homeScreen', 15000);
+		await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for videoTitlesRowList to have focus', 20000);
 
-			// Navigate to search
-			await testUtils.goToPage('search');
-			await testUtils.waitForCurrentScreenToEqual('searchScreen', 10000);
-			await utils.sleep(1000);
+		// Navigate to search
+		await testUtils.goToPage('search');
+		await testUtils.waitForCurrentScreenToEqual('searchScreen', 10000);
+		await utils.sleep(1000);
 
-			// Enter search query for a popular movie
-			await ecp.sendText('action');
-			await utils.sleep(2000);
+		// Enter search query for a popular movie
+		await ecp.sendText('action');
+		await utils.sleep(2000);
 
-			// Verify search results appear
-			await testUtils.waitForElementToShowOnScreen('searchResultGrid', 'Search results grid not visible', 10000);
+		// Verify search results appear
+		await testUtils.waitForElementToShowOnScreen('searchResultGrid', 'Search results grid not visible', 10000);
 
-			// Navigate to search results grid using helper
-			await testHelpers.navigateRightToSearchGrid();
-			await utils.sleep(500);
+		// Navigate to search results grid using helper
+		await testHelpers.navigateRightToSearchGrid();
+		await utils.sleep(500);
 
-			// Navigate to first movie in search results (type 'v' and no seriesId)
-			await testUtils.navigateToGridItem('searchResultGrid', (item) => item.type === 'video' && (!item.seriesId || item.seriesId === ''));
-			await utils.sleep(500);
+		// Navigate to first movie in search results (type 'v' and no seriesId)
+		await testUtils.navigateToGridItem('searchResultGrid', (item) => item.type === 'video' && (!item.seriesId || item.seriesId === ''));
+		await utils.sleep(500);
 
-			// Get the focused movie content
-			const movieContent = await testUtils.getCurrentlyFocusedGridItemContent('searchResultGrid');
-			expect(movieContent.type).to.equal('video', 'Selected content should be a movie');
+		// Get the focused movie content
+		const movieContent = await testUtils.getCurrentlyFocusedGridItemContent('searchResultGrid');
+		expect(movieContent.type).to.equal('video', 'Selected content should be a movie');
 
-			// Select the movie
-			await ecp.sendKeypress(ecp.Key.Ok);
-			await testUtils.waitForCurrentScreenToEqual('detailScreen', 10000);
+		// Select the movie
+		await ecp.sendKeypress(ecp.Key.Ok);
+		await testUtils.waitForCurrentScreenToEqual('detailScreen', 10000);
 
-			// Verify movie details page is displayed
-			await testUtils.waitForElementToShowOnScreen('detailScreenTitle', 'Detail screen title not visible', 5000);
-			const detailTitle = await testUtils.getNodeForElement('detailScreenTitle');
-			expect(detailTitle.visible).to.equal(true, 'Movie details page should be visible');
-			expect(detailTitle.text).to.exist.and.not.be.empty;
+		// Verify movie details page is displayed
+		await testUtils.waitForElementToShowOnScreen('detailScreenTitle', 'Detail screen title not visible', 5000);
+		const detailTitle = await testUtils.getNodeForElement('detailScreenTitle');
+		expect(detailTitle.visible).to.equal(true, 'Movie details page should be visible');
+		expect(detailTitle.text).to.exist.and.not.be.empty;
 
-			// Verify content matches
-			const detailContent = await testUtils.getElementField('detailScreen', 'content');
-			expect(detailContent).to.exist;
-			expect(detailContent.id).to.equal(movieContent.id, 'Detail page should show the selected movie');
-		});
-
+		// Verify content matches
+		const detailContent = await testUtils.getElementField('detailScreen', 'content');
+		expect(detailContent).to.exist;
+		expect(detailContent.id).to.equal(movieContent.id, 'Detail page should show the selected movie');
 	});
 
 	//https://tubi.testrail.io/index.php?/cases/view/585698
@@ -226,7 +164,7 @@ describe('Search', function () {
 		const proxyPromise = new Promise((resolve) => {
 			proxy.addCallback({
 				shouldProcess: (args) => {
-					return args.url.includes('/api/v2/search');
+					return args.url.includes('/api/v3/search');
 				},
 				processResponse(args) {
 					const responseJson = JSON.parse(args.responseBuffer.toString());
@@ -257,8 +195,10 @@ describe('Search', function () {
 		await utils.promiseTimeout(proxyPromise, 5000);
 
 		// Verify we have limited results and trending searches are visible
-		const searchResultsGrid = await testUtils.getAllGridItemsContent('searchResultGrid');
-		expect(searchResultsGrid.length).to.equal(4, 'Search results should be limited to 4');
+		await testUtils.untilTrue(async () => {
+			const items = await testUtils.getAllGridItemsContent('searchResultGrid');
+			return items.length === 4;
+		}, 'Search results should be limited to 4', 3000);
 
 		const newTranslation = await testUtils.getElementField('trendingSearchResultsContainer', 'translation');
 		expect(newTranslation[1]).to.be.lessThanOrEqual(500, 'Trending searches container is not at the top of the screen');

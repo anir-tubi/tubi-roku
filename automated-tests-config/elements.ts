@@ -1153,6 +1153,13 @@ const elements = typeCheckElements({
       '/TubiScene/ContentController/Group/Group/ScreenStack/SearchScreen/InfoPanel/LayoutGroup/LayoutGroup/Label',
   },
 
+  searchResultsLinearBadge: {
+    keyPath:
+      '#ContentController.#uiGroup.#ContentGroup.#screenStackGroup.#ScreenStack.#searchScreen.#SearchScreenInfoPanel.#infoPanelGroup.#Offset.#TwoLineInfo.#SecondLineGroup.#linearAvailabilityBadge',
+    xpath:
+      '/TubiScene/ContentController/Group/Group/ScreenStack/SearchScreen/InfoPanel/LayoutGroup/LayoutGroup/AvailabilityBadge',
+  },
+
   kidsSearchText: {
     keyPath:
       '#ContentController.#uiGroup.#ContentGroup.#screenStackGroup.#ScreenStack.#searchScreen.#SearchText',

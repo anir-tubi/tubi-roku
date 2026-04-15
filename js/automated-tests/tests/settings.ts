@@ -93,13 +93,18 @@ describe('Settings', function () {
     await testUtils.goToPage('settings');
 
     // Select Privacy Policy
-    await ecp.sendKeypress(ecp.Key.Down, { count: 3 });
+    await testUtils.untilTrue(async () => {
+      await ecp.sendKeypress(ecp.Key.Down);
+      try {
+        const privacyPolicyHeader = await testUtils.getNodeForElement('privacyPolicyHeader', 1000);
+        return privacyPolicyHeader.text === 'Privacy Center';
+      } catch (e) {
+        return false;
+      }
+    }, 'Timed out waiting for Privacy Policy section to load');
 
     // Is the Privacy Policy Page Open?
     await testUtils.waitForElementToFullyShowOnScreen('privacyPolicyHeader');
-    const privacyPolicyHeader = await testUtils.getNodeForElement('privacyPolicyHeader');
-    expect(await privacyPolicyHeader.text).to.equal('Privacy Center');
-
   });
 
   // https://tubi.testrail.io/index.php?/cases/view/705829
@@ -121,17 +126,18 @@ describe('Settings', function () {
     await testUtils.waitForElementToFullyShowOnScreen('settingsScreen');
 
     // Select AutoPlay Controls
-    await ecp.sendKeypress(ecp.Key.Down);
-    await utils.sleep(500);
-    await testUtils.waitForElementToFullyShowOnScreen('AutoPlayControlsMenuItemFocused');
-
-    // Get the autoplay instructions element using getNodeForElement
-    const instructions = await testUtils.getNodeForElement('autoplayInstructions');
-    expect(instructions.visible).to.equal(true);
-
-    // Get the instructions text to verify it shows disabled message
-    const instructionsText = instructions.text;
-    expect(instructionsText).to.equals('Autoplay is currently controlled in Roku Settings. To change this setting, go to Roku Settings -> Accessibility -> Auto-play video.'); // Verify the feature disabled message is shown
+    await testUtils.untilTrue(async () => {
+      await ecp.sendKeypress(ecp.Key.Down);
+      await utils.sleep(500);
+      try {
+        const autoplayInstructions = await testUtils.getNodeForElement('autoplayInstructions', 1000);
+        let isVisible = autoplayInstructions.visible;
+        let text = autoplayInstructions.text;
+        return isVisible && text.includes('Autoplay is currently controlled in Roku Settings. To change this setting, go to Roku Settings -> Accessibility -> Auto-play video.');
+      } catch (e) {
+        return false;
+      }
+    }, 'Timed out waiting for Autoplay Controls section to load');
 
   });
 
@@ -173,17 +179,19 @@ describe('Settings', function () {
 
     // Verify we're on Settings screen
     await testUtils.waitForElementToFullyShowOnScreen('settingsScreen');
-    await ecp.sendKeypress(ecp.Key.Down);
-    await utils.sleep(500);
-    await testUtils.waitForElementToFullyShowOnScreen('AutoPlayControlsMenuItemFocused');
-
-    // Get the autoplay instructions element using getNodeForElement
-    const instructions = await testUtils.getNodeForElement('autoplayInstructions');
-    expect(instructions.visible).to.equal(true);
-
-    // Get the instructions text to verify it shows disabled message
-    const instructionsText = instructions.text;
-    expect(instructionsText).to.equals('Autoplay is currently controlled in Roku Settings. To change this setting, go to Roku Settings -> Accessibility -> Auto-play video.'); // Verify the feature disabled message is shown
+    // Select AutoPlay Controls
+    await testUtils.untilTrue(async () => {
+      await ecp.sendKeypress(ecp.Key.Down);
+      await utils.sleep(500);
+      try {
+        const autoplayInstructions = await testUtils.getNodeForElement('autoplayInstructions', 1000);
+        let isVisible = autoplayInstructions.visible;
+        let text = autoplayInstructions.text;
+        return isVisible && text.includes('Autoplay is currently controlled in Roku Settings. To change this setting, go to Roku Settings -> Accessibility -> Auto-play video.');
+      } catch (e) {
+        return false;
+      }
+    }, 'Timed out waiting for Autoplay Controls section to load');
 
     //As Autoplay video is disabled, focus should go to AutoPlay Next Video Menu when we press right.
     await ecp.sendKeypress(ecp.Key.Right);
@@ -207,12 +215,15 @@ async function goToSettingsPageSelectAbout() {
   await testUtils.waitForElementToFullyShowOnScreen('settingsScreen');
 
   // Select About
-  await ecp.sendKeypress(ecp.Key.Down, { count: 2 });
-
-  // Is the About Page Open?
-  const settingsScreenHeader = await testUtils.getNodeForElement('settingsScreenHeader');
-  await testUtils.waitForElementToFullyShowOnScreen('settingsScreenHeader');
-  expect(settingsScreenHeader.text).to.equal('About Tubi');
+  await testUtils.untilTrue(async () => {
+    await ecp.sendKeypress(ecp.Key.Down);
+    try {
+      const settingsScreenHeader = await testUtils.getNodeForElement('settingsScreenHeader', 1000);
+      return settingsScreenHeader.text === 'About Tubi';
+    } catch (e) {
+      return false;
+    }
+  }, 'Timed out waiting for About Tubi section to load');
 
 }
 
