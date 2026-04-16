@@ -3601,7 +3601,7 @@ Function getTranslation_es_MX()
     },
     "screenSettings_error_parentalChanges_description_multi_account_group5": {
       "description": "Success message when content settings has changed to group 1 (Older Kids) in multi-account mode",
-      "message": "Serás dirigido a Tubi Kids.\n\n La configuración cambió a:\n Clasificación 10-12 (Up to TV-PG / PG)."
+      "message": "Serás dirigido a Tubi Kids.\n\n La configuración cambió a:\n Clasificación 10-12 (Hasta TV-PG / PG)."
     },
     "screenSettings_error_parentalChanges_description_multi_account_group2": {
       "description": "Success message when content settings has changed to group 2 (Teens) in multi-account mode",
