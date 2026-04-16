@@ -569,10 +569,11 @@ describe('Send Feedback Tests', function () {
     await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: true });
     // Set Parental Controls to Little Kids
     await testUtils.goToPage('settings');
+    await ecp.sendKeypress(ecp.Key.Down);
 
     // On Settings Page?
     const parentalControlsHeader = await testUtils.getNodeForElement('parentalControlsHeader');
-    expect(parentalControlsHeader.text).to.equal('Parental Controls');
+    expect(parentalControlsHeader.text).to.equal('Content Settings');
 
     // Set PC
     await ecp.sendKeypress(ecp.Key.Right);
@@ -581,11 +582,11 @@ describe('Send Feedback Tests', function () {
     await utils.sleep(800);
     await ecp.sendKeypress(ecp.Key.Ok);
 
-    await enterPasswordSettingsChange();
 
     // Verify Little Kids PC Settings Change dialog
     const parentalControlsSettingsLittleKids = await testUtils.getNodeForElement('parentalControlsSettingsLittleKids');
-    expect(parentalControlsSettingsLittleKids.text).to.equal('Parental controls setting has changed to Little Kids. Parental controls will be password protected after 5 minutes.');
+
+    expect(parentalControlsSettingsLittleKids.text).to.contains('You will be directed to Tubi Kids.');
     await ecp.sendKeypress(ecp.Key.Ok);
 
     // Back to home

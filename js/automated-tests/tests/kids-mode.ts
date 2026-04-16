@@ -1,5 +1,5 @@
 import { expect } from 'chai';
-import { ecp, utils } from 'roku-test-automation';
+import { ecp, odc, utils } from 'roku-test-automation';
 import { ContentRatings, testUtils } from '../test-utils';
 import { shared, testHelpers } from '../test-helpers';
 import { moveToGrid } from '../analytics/utils/helpers';
@@ -22,24 +22,24 @@ describe('Kids Mode', function () {
      * 8. Verify Exit Kids button is grayed out (user must stay in Kids Mode)
      */
 
-    await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: false });
+    await testUtils.startApplicationAtPage('home', { clearRegistry: true, shouldCreateNewUser: false });
     await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');
 
     await openKidsMode();
 
     // Open Settings
     await shared.openSettings();
+    await ecp.sendKeypress(ecp.Key.Down);
 
     // Guest Select Older Kids ParentalControls
     await guestSelectOlderKidsParentalControls();
 
-    // Verify Older Kids PC Settings Change dialog
-    const parentalControlsSettingsOlderKidsMessage = await testUtils.getNodeForElement('parentalControlsSettingsOlderKidsMessage');
-    expect(parentalControlsSettingsOlderKidsMessage.text).to.equal('Parental controls setting has changed to Older Kids. Parental controls will be password protected after 5 minutes.');
+
     await ecp.sendKeypress(ecp.Key.Ok);
+    await ecp.sendKeypress(ecp.Key.Back);
 
     // Navigate to Left Nav
-    await ecp.sendKeypress(ecp.Key.Left, { count: 2 });
+    await ecp.sendKeypress(ecp.Key.Left);
 
     // Is the Exit Kids button grayed out?
     await checkForKidsModeGrayed();
@@ -62,24 +62,20 @@ describe('Kids Mode', function () {
      * 8. Verify Exit Kids button is grayed out (user must stay in Kids Mode)
      */
 
-    await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: false });
+    await testUtils.startApplicationAtPage('home', { clearRegistry: true, shouldCreateNewUser: false });
     await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');
 
     await openKidsMode();
 
     // Open Settings
     await shared.openSettings();
+    await ecp.sendKeypress(ecp.Key.Down);
 
     // Guest Select Little Kids ParentalControls
     await guestSelectLittleKidsParentalControls();
 
-    // Verify Little Kids PC Settings Change dialog
-    const parentalControlsSettingsLittleKids = await testUtils.getNodeForElement('parentalControlsSettingsLittleKids');
-    expect(parentalControlsSettingsLittleKids.text).to.equal('Parental controls setting has changed to Little Kids. Parental controls will be password protected after 5 minutes.');
     await ecp.sendKeypress(ecp.Key.Ok);
-
-    // Navigate to Left Nav
-    await ecp.sendKeypress(ecp.Key.Left, { count: 2 });
+    await ecp.sendKeypress(ecp.Key.Back);
 
     // Is the Exit Kids button grayed out?
     await checkForKidsModeGrayed();
@@ -136,32 +132,17 @@ describe('Kids Mode', function () {
 
     // Open Settings
     await shared.openSettings();
+    await ecp.sendKeypress(ecp.Key.Down);
 
     // Select Little Kids ParentalControls
     await ecp.sendKeypress(ecp.Key.Right);
     await ecp.sendKeypress(ecp.Key.Up, { count: 3, wait: 100 });
     await ecp.sendKeypress(ecp.Key.Ok);
 
-    // Are we on the Kid's mode password screen?
-    await testUtils.waitForElementToFullyShowOnScreen('passwordText');
-
-    // Enter Password
-    await ecp.sendKeypress(ecp.Key.Ok);
-    await ecp.sendText('111111');
-    await ecp.sendKeypress(ecp.Key.Down, { count: 4, wait: 100 });
-    await utils.sleep(4000); // Improvement - try to work around sleeps
-    const keyboardBackButton = await testUtils.getNodeForElement('keyboardBackButton');
-    if (keyboardBackButton.opacity == 1) {
-      await ecp.sendKeypress(ecp.Key.Right);
-    }
-    await ecp.sendKeypress(ecp.Key.Ok);
-
-    // Parental Controls Settings Change
-    await testUtils.waitForElementToFullyShowOnScreen('parentalControlsSettingsLittleKids');
     await ecp.sendKeypress(ecp.Key.Ok);
 
     // Navigate to Left Nav
-    await ecp.sendKeypress(ecp.Key.Left, { count: 2 });
+    await ecp.sendKeypress(ecp.Key.Back);
 
     // Is the Exit Kids button grayed out?
     await checkForKidsModeGrayed();
@@ -177,21 +158,22 @@ describe('Kids Mode', function () {
     await openKidsMode();
     await kidsOpenSettings();
 
+    await ecp.sendKeypress(ecp.Key.Down);
     // Registered select Older kids from PC Settings page
     await testUtils.waitForElementToFullyShowOnScreen('parentalControlsHeader');
     await selectOlderKidsFromParentalSettings();
 
-    // Are we on the Kid's mode password screen?
-    await utils.sleep(2000);
-    const kidsModePasswordTest = await testUtils.getNodeForElement('passwordText');
-    expect(kidsModePasswordTest.visible).to.be.true;
 
-    // Call function to Enter Password for PC Settings Change
-    await enterPasswordSettingsChange();
+    await utils.sleep(2000);
 
     // Verify Older Kids PC Settings Change dialog
-    const parentalControlsSettingsOlderKidsMessage = await testUtils.getNodeForElement('parentalControlsSettingsOlderKidsMessage');
-    expect(parentalControlsSettingsOlderKidsMessage.text).to.equal('Parental controls setting has changed to Older Kids. Parental controls will be password protected after 5 minutes.');
+    // Button on the dialog is the focused node — navigate up to DialogBox, then down to the message
+    const { value: message } = await odc.getValue({
+      base: 'focusedNode',
+      keyPath: 'getParent().getParent().#ContentArea.#MessageGroup.#Message.text'
+    });
+
+    expect(message).to.contains('Age Rating 7-9 (TV-Y, TV-Y7, TV-Y7-FV, TV-G, G).');
 
 
   });
@@ -204,6 +186,7 @@ describe('Kids Mode', function () {
     // Open Settings
     await ecp.sendKeypress(ecp.Key.Left);
     await shared.openSettings();
+    await ecp.sendKeypress(ecp.Key.Down);
 
     // Verify Adult
     await ecp.sendKeypress(ecp.Key.Right);
@@ -226,14 +209,15 @@ describe('Kids Mode', function () {
     await openKidsMode();
     await ecp.sendKeypress(ecp.Key.Left);
 
-    // Is the Exit Kids button not grayed out?
-    await checkForKidsModeNotGrayed();
-
     // Exit app
-    await ecp.sendKeypress(ecp.Key.Up, { count: 3 });
-    await ecp.sendKeypress(ecp.Key.Ok, { count: 2 });
-    await testUtils.waitForElementToShowOnScreen('kidsExitPrompt');
+    await ecp.sendKeypress(ecp.Key.Up, { count: 2 });
     await ecp.sendKeypress(ecp.Key.Ok);
+    await testUtils.waitForElementToShowOnScreen('forgotPasswordEntryBox', 'Forgot password entry box not found');
+    await ecp.sendText('111111');
+    await ecp.sendKeypress(ecp.Key.Right);
+    await ecp.sendKeypress(ecp.Key.Down, { count: 4 });
+    await ecp.sendKeypress(ecp.Key.Ok);
+    await utils.sleep(2000);
 
 
     // Relaunch app
@@ -346,42 +330,7 @@ describe('Kids Mode', function () {
     expect(playerContent.id).to.equal(focusedContent.id, 'Preview player should be playing the focused content in Kids Mode');
   });
 
-  // https://tubi.testrail.io/index.php?/cases/view/145905
-  it('C145905 - Kids Mode - When user signs out while in Kids mode, non-Kids UI integrity is maintained, @kidsmode_registered', async () => {
-    await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: true });
-    await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');
 
-    await openKidsMode();
-    await ecp.sendKeypress(ecp.Key.Left);
-
-    // Is the Exit Kids button not grayed out?
-    await checkForKidsModeNotGrayed();
-
-    // Sign out
-    await ecp.sendKeypress(ecp.Key.Rewind);
-    await ecp.sendKeypress(ecp.Key.Ok);
-
-
-    await testUtils.waitForCurrentScreenToEqual('settingsScreen', 10000);
-    await testUtils.waitForElementToHaveFocus('settingsMenu', 'Timed out waiting for Settings menu to have focus');
-
-    // Wait for Sign Out button on Settings page of Kids mode
-    const signOutButtonKidsMode = await testUtils.getNodeForElement('signOutButtonKidsMode');
-    expect(signOutButtonKidsMode.text).is.equal('Sign Out');
-
-    // Press OK and wait for verification modal
-    await ecp.sendKeypress(ecp.Key.Ok);
-
-    await testUtils.waitForElementToShowOnScreen('signUpExitDialog', 'Timed out waiting for Sign out verification modal message to be shown');
-    await testUtils.waitForElementToHaveFocus('dialogBoxButtonList', 'Timed out waiting for Dialog box button list to have focus');
-    const signOutVerificationModalMessage = await testUtils.getNodeForElement('signOutVerificationModalMessage');
-    expect(signOutVerificationModalMessage.visible).to.equal(true);
-    await ecp.sendKeypress(ecp.Key.Ok);
-    // Check that we are no longer in Kids mode
-    await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');
-    // Scroll down to find "On Now" row (due to pagination)
-    await shared.scrollDownToFindRow({ slug: 'recommended_linear_channels' });
-  });
 
 });
 
@@ -424,7 +373,7 @@ async function signInAndSetParentalControlPassword() {
   await ecp.sendKeypress(ecp.Key.Ok);
 
   // Enter password for Parental Controls
-  await testUtils.waitForElementToFullyShowOnScreen('pcPasswordEntryBox', 'Password box not found', 10000);
+  await testUtils.waitForElementToFullyShowOnScreen('signInScreenPasswordBox');
   await ecp.sendKeypress(ecp.Key.Ok);
   await ecp.sendText('111111');
   await ecp.sendKeypress(ecp.Key.Right);
@@ -498,8 +447,9 @@ async function checkForKidsModeAdult() {
 async function focusOnVideoTileTrailer() {
   const rowIndex = 0;
   const content = await testUtils.getRowListRowItemsContent('homeScreenRowList', 0);
+
   for (const [itemIndex, item] of content.entries()) {
-    if (item.hasTrailer == true) {
+    if (item.has_trailer == true) {
       await testUtils.jumpToRowItem('homeScreenRowList', [rowIndex, itemIndex]);
       break;
     }

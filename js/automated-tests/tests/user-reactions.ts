@@ -224,36 +224,37 @@ async function openLeftNav() {
 
 async function setPCToOlderKids() {
   await testUtils.goToPage('settings');
+  await ecp.sendKeypress(ecp.Key.Down);
 
   // On Settings Page?
   const parentalControlsHeader = await testUtils.getNodeForElement('parentalControlsHeader');
-  expect(parentalControlsHeader.text).to.equal('Parental Controls');
+  expect(parentalControlsHeader.text).to.equal('Content Settings');
 
   // Set PC
   await selectOlderKidsFromParentalSettings();
-  await shared.enterPasswordSettingsChange();
+  //await shared.enterPasswordSettingsChange();
 
   // Verify Older Kids PC Settings Change dialog
   await testUtils.waitForElementToFullyShowOnScreen('parentalControlsSettingsOlderKids', 'Element not found', 7000);
   const parentalControlsSettingsOlderKids = await testUtils.getNodeForElement('parentalControlsSettingsOlderKids');
-  expect(parentalControlsSettingsOlderKids.text).to.equal('Parental controls setting has changed to Older Kids. Parental controls will be password protected after 5 minutes.');
+  expect(parentalControlsSettingsOlderKids.text).to.contains('You will be directed to Tubi Kids.');
   await ecp.sendKeypress(ecp.Key.Ok);
 }
 
 async function setPCToLittleKids() {
   await testUtils.goToPage('settings');
-
+  await ecp.sendKeypress(ecp.Key.Down);
   // On Settings Page?
   const parentalControlsHeader = await testUtils.getNodeForElement('parentalControlsHeader');
-  expect(parentalControlsHeader.text).to.equal('Parental Controls');
+  expect(parentalControlsHeader.text).to.equal('Content Settings');
 
   // Set PC
   await shared.selectLittleKidsFromParentalSettings();
-  await shared.enterPasswordSettingsChange();
+  // await shared.enterPasswordSettingsChange();
 
   // Verify Older Kids PC Settings Change dialog
   const parentalControlsSettingsLittleKids = await testUtils.getNodeForElement('parentalControlsSettingsLittleKids');
-  expect(parentalControlsSettingsLittleKids.text).to.equal('Parental controls setting has changed to Little Kids. Parental controls will be password protected after 5 minutes.');
+  expect(parentalControlsSettingsLittleKids.text).to.contains('You will be directed to Tubi Kids.');
   await ecp.sendKeypress(ecp.Key.Ok);
 }
 

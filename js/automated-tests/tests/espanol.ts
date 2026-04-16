@@ -15,18 +15,18 @@ describe('Espanol', function () {
 
     // Set Parental Controls to Little Kids
     await testUtils.goToPage('settings');
+    await ecp.sendKeypress(ecp.Key.Down);
 
     // On Settings Page?
     const parentalControlsHeader = await testUtils.getNodeForElement('parentalControlsHeader');
-    expect(parentalControlsHeader.text).to.equal('Parental Controls');
+    expect(parentalControlsHeader.text).to.equal('Content Settings');
 
     // Set PC
     await selectLittleKidsFromParentalSettings();
-    await enterPasswordSettingsChange();
 
     // Verify Little Kids PC Settings Change dialog
     const parentalControlsSettingsLittleKids = await testUtils.getNodeForElement('parentalControlsSettingsLittleKids');
-    expect(parentalControlsSettingsLittleKids.text).to.equal('Parental controls setting has changed to Little Kids. Parental controls will be password protected after 5 minutes.');
+    expect(parentalControlsSettingsLittleKids.text).to.contains('You will be directed to Tubi Kids.');
     await ecp.sendKeypress(ecp.Key.Ok);
 
     // Back to home
@@ -59,12 +59,16 @@ describe('Espanol', function () {
     const exitKidsOption = await testUtils.getNodeForElement('exitKidsOption');
     expect(exitKidsOption.visible).to.be.true;
 
-    // Select Espanol from Left Nav
-    await ecp.sendKeypress(ecp.Key.Down, { count: 6 });
-    await ecp.sendKeypress(ecp.Key.Ok);
-
-    // Verify Espanol Disabled for Kids mode
-    await verifyEspanolDisabledKids();
+    // Verify Espanol is not in the sidenav at all
+    await testUtils.waitForSideNavMenuToBeExpanded();
+    const menuItems = await testUtils.getAllRowListItemsContent('sideNavMenu');
+    const hasEspanolOption = menuItems.some((item: any) =>
+      item.title === 'Espanol' ||
+      item.TITLE === 'Espanol' ||
+      item.title === 'Español' ||
+      item.TITLE === 'Español'
+    );
+    expect(hasEspanolOption, 'Espanol option should not be present in Kids Mode sidenav').to.be.false;
 
 
   });
@@ -104,18 +108,18 @@ describe('Espanol', function () {
 
     // Set Parental Controls to Little Kids
     await testUtils.goToPage('settings');
+    await ecp.sendKeypress(ecp.Key.Down);
 
     // On Settings Page?
     const parentalControlsHeader = await testUtils.getNodeForElement('parentalControlsHeader');
-    expect(parentalControlsHeader.text).to.equal('Parental Controls');
+    expect(parentalControlsHeader.text).to.equal('Content Settings');
 
     // Set PC
     await shared.selectOlderKidsFromParentalSettings();
-    await enterPasswordSettingsChange();
 
     // Verify Little Kids PC Settings Change dialog
     const parentalControlsSettingsOlderKids = await testUtils.getNodeForElement('parentalControlsSettingsOlderKids');
-    expect(parentalControlsSettingsOlderKids.text).to.equal('Parental controls setting has changed to Older Kids. Parental controls will be password protected after 5 minutes.');
+    expect(parentalControlsSettingsOlderKids.text).to.contains('You will be directed to Tubi Kids.');
     await ecp.sendKeypress(ecp.Key.Ok);
 
     // Back to home
@@ -141,18 +145,18 @@ describe('Espanol', function () {
 
     // Set Parental Controls to Teens
     await testUtils.goToPage('settings');
+    await ecp.sendKeypress(ecp.Key.Down);
 
     // On Settings Page?
     const parentalControlsHeader = await testUtils.getNodeForElement('parentalControlsHeader');
-    expect(parentalControlsHeader.text).to.equal('Parental Controls');
+    expect(parentalControlsHeader.text).to.equal('Content Settings');
 
     // Set PC
     await selectTeensFromParentalSettings();
-    await enterPasswordSettingsChange();
 
     // Verify Teens PC Settings Change dialog
     const parentalControlsSettingsTeens = await testUtils.getNodeForElement('parentalControlsSettingsTeens');
-    expect(parentalControlsSettingsTeens.text).to.equal('Parental controls setting has changed to Teens. Parental controls will be password protected after 5 minutes.');
+    expect(parentalControlsSettingsTeens.text).to.contain('Age Rating 13–17 (Up to TV-14 / PG-13)');
     await ecp.sendKeypress(ecp.Key.Ok);
 
     // Back to home
