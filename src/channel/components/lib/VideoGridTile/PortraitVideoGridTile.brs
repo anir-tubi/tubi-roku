@@ -71,7 +71,7 @@ Function onItemContentChange(msg)
     end if
 
     sotPosterLabels = itemContent.sotPosterLabels
-    if isAA(sotPosterLabels) = true AND sotPosterLabels.count() > 0
+    if itemContent.isReplay <> true AND isAA(sotPosterLabels) = true AND sotPosterLabels.count() > 0
 
       badgeTextFont = m.bodySmall
       textColor = m.primaryTextColor

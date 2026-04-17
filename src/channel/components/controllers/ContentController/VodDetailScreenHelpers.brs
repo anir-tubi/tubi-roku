@@ -1188,6 +1188,7 @@ End Function
 Function executeVodDetailSuccessCallback(content, playbackSource, episodes = invalid) as Void
 
   if m.top.fadeInContentController = true
+    if content = invalid then return
     ' send deep-link analytics if the content was deep-linked to this screen.
     if m.enteredFromDeepLink = true AND m.deeplinkContent <> invalid
       sendDeeplinkAnalytics(m.deeplinkContent, content, m.constants.deeplinks.entryPoints.video, m.Tracking, m.trackingLoggingTask, m.constants)
@@ -1195,6 +1196,14 @@ Function executeVodDetailSuccessCallback(content, playbackSource, episodes = inv
 
     successCb = m.showVodDetailScreenCallback.success
     if successCb = skipDetailScreen OR successCb = skipDetailScreenDeeplinkWrapper
+      if content.playerType = m.constants.ui.playerTypes.fox
+        popScreen()
+        onDeeplinkLiveEventContentSuccess(content)
+        return
+      else if content.type = m.constants.ui.contentTypes.linear
+        handleSingleContentDeeplinkError(invalid)
+        return
+      end if
       isComingSoon = isComingSoonContent(content)
       if content.policyMatch = false AND content.hasVideoResources = false AND isComingSoon = false
         resetDeeplinkValues()

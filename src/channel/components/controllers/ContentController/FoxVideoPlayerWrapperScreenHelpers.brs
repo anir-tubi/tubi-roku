@@ -203,7 +203,7 @@ Function getFoxVideoPlayerConfig()
         "find": "{foxApiRoot}/v2.0/screens/sports-find",
         "home": "{foxApiRoot}/v2.0/screens/main",
         "live": "{foxApiRoot}/v2.0/screens/foxsportsconnected-live",
-        "liveAssetInfo": "{foxApiRoot}/v3.0/assetinfo/{assetId}",
+        "liveAssetInfo": "{foxApiRoot}/tubi/v3.0/assetinfo/{assetId}",
         "liveUpNextInfo": "{foxApiRoot}/v2.0/upnext/epglistings/{epgListingId}",
         "liveEPGListingInfo": "{foxApiRoot}/v2.0/epglistings/{epgListingId}",
         "movieDetail": "{foxApiRoot}/v2.0/screens/movie-detail/{showCode}",
@@ -222,7 +222,7 @@ Function getFoxVideoPlayerConfig()
       "foxApiRoot": m.constants.urls.foxApiBaseUrl
       "key": "tubi_roku",
       "mvpds": "{foxApiRoot}/v2.0/mvpds",
-      "watch": "{foxApiRoot}/v3.0/watchlive"
+      "watch": "{foxApiRoot}/tubi/v3.0/watchlive"
     },
     "analytics": {
       "appName": "Tubi",
