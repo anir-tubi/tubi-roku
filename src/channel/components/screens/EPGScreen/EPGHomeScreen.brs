@@ -16,12 +16,6 @@ Function init()
   m.containerMarkupGrid.observeFieldScoped("itemFocused", "onCategoryItemFocused")
   m.containerMarkupGrid.observeFieldScoped("focusedChild", "onCategoryGridFocusChange")
 
-  m.epgCategoriesVariant = "none"
-  epgCategoriesExperiment = getStatsigExperimentResource("roku_linear_epg_categories", "roku_linear_epg_categories_v1", false)
-  if epgCategoriesExperiment <> invalid AND epgCategoriesExperiment.variant <> invalid
-    m.epgCategoriesVariant = epgCategoriesExperiment.variant
-  end if
-
   ' Track if user is actively navigating to prevent unwanted video playback
   m.isUserNavigating = false
 
@@ -542,8 +536,6 @@ Function onTimeContentChange()
     m.top.contentReady = true
     m.InfoPanel.visible = true
     setupEpgBanner()
-
-    getStatsigExperimentResource("roku_linear_epg_categories", "roku_linear_epg_categories_v1", true)
   end if
 End Function
 
@@ -554,14 +546,9 @@ Function onContainersListChanged(msg)
   if containersList <> invalid AND m.containerMarkupGrid <> invalid
     handleEPGCategoriesVisibility()
 
-    if m.epgCategoriesVariant <> "none"
-      m.containerMarkupGrid.content = containersList
+    m.containerMarkupGrid.content = containersList
 
-      m.containerMarkupGrid.visible = false
-    else
-      m.containerMarkupGrid.content = invalid
-      m.containerMarkupGrid.visible = false
-    end if
+    m.containerMarkupGrid.visible = false
 
     ' Initialize theme for category grid focus styling
     if m.global <> invalid
@@ -574,9 +561,8 @@ End Function
 
 Function handleEPGCategoriesVisibility()
   if m.epgTimeGrid <> invalid
-    isCategoriesWithFavorites = (m.epgCategoriesVariant = "categories_with_favorites")
-    m.epgTimeGrid.channelGridFocusable = isCategoriesWithFavorites
-    m.epgTimeGrid.categoriesMenuVisible = (m.epgCategoriesVariant <> "none")
+    m.epgTimeGrid.channelGridFocusable = true
+    m.epgTimeGrid.categoriesMenuVisible = true
   end if
 End Function
 
@@ -593,7 +579,7 @@ End Function
 Function onEPGTimeGridFocusChange(msg)
   tubiLog("EPGHomeScreen.onEPGTimeGridFocusChange")
 
-  if m.containerMarkupGrid <> invalid AND m.epgCategoriesVariant <> "none"
+  if m.containerMarkupGrid <> invalid
     if m.epgTimeGrid.hasFocus() = true OR m.epgTimeGrid.isInFocusChain() = true
       if m.containerMarkupGrid.content <> invalid AND m.containerMarkupGrid.content.getChildCount() > 0
         m.containerMarkupGrid.visible = true
@@ -707,7 +693,7 @@ Function onKeyEvent(key as String, press as Boolean) as Boolean
       handlePlayInput()
       return true
     else if key = "back" OR key = "left"
-      if m.epgCategoriesVariant <> "none" AND m.epgTimeGrid.isInFocusChain() = true
+      if m.epgTimeGrid.isInFocusChain() = true
         if m.containerMarkupGrid <> invalid AND m.containerMarkupGrid.content <> invalid AND m.containerMarkupGrid.content.getChildCount() > 0
           sendEPGChannelToCategoryNavigateWithinPageEvent()
           m.containerMarkupGrid.setFocus(true)
@@ -715,7 +701,7 @@ Function onKeyEvent(key as String, press as Boolean) as Boolean
         end if
       end if
     else if key = "right"
-      if m.epgCategoriesVariant <> "none" AND m.containerMarkupGrid <> invalid AND m.containerMarkupGrid.hasFocus() = true
+      if m.containerMarkupGrid <> invalid AND m.containerMarkupGrid.hasFocus() = true
         sendEPGCategoryToChannelNavigateWithinPageEvent()
         m.epgTimeGrid.isChannelGridFocused = true
         m.epgTimeGrid.setFocus(true)
@@ -782,7 +768,7 @@ Function setFocusOnEpgTimeGrid()
   m.epgTimeGrid.setFocus(true)
   m.top.refreshEPGScreenVideoPlay = false
 
-  if m.containerMarkupGrid <> invalid AND m.epgCategoriesVariant <> "none" AND m.containerMarkupGrid.content <> invalid AND m.containerMarkupGrid.content.getChildCount() > 0
+  if m.containerMarkupGrid <> invalid AND m.containerMarkupGrid.content <> invalid AND m.containerMarkupGrid.content.getChildCount() > 0
     m.containerMarkupGrid.visible = true
   end if
 End Function

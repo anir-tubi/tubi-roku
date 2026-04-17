@@ -387,15 +387,7 @@ End Function
 
 ' @param response - roSGNode, translated EPG channel list with requestorID
 Function applyEpgChannelListToScreen(response)
-  epgCategoriesVariant = "none"
-  epgCategoriesExperiment = getStatsigExperimentResource("roku_linear_epg_categories", "roku_linear_epg_categories_v1", false)
-  if epgCategoriesExperiment <> invalid AND epgCategoriesExperiment.variant <> invalid
-    epgCategoriesVariant = epgCategoriesExperiment.variant
-  end if
-
-  if epgCategoriesVariant = "categories_with_favorites"
-    mergeLikedChannelsIntoEpgResponse(response)
-  end if
+  mergeLikedChannelsIntoEpgResponse(response)
 
   screen = getFromScreenCache(response.requestorID)
   if screen = invalid
@@ -966,26 +958,18 @@ End Function
 ' @param screen - EPGHomeScreen or LinearVideoPlayerScreen (has timeGridContent, containersList, channelIdSelected)
 ' @param contentId - channel id that was selected
 Function handleChannelSelectedForFavorites(screen, contentId)
-  epgCategoriesVariant = "none"
-  epgCategoriesExperiment = getStatsigExperimentResource("roku_linear_epg_categories", "roku_linear_epg_categories_v1", false)
-  if epgCategoriesExperiment <> invalid AND epgCategoriesExperiment.variant <> invalid
-    epgCategoriesVariant = epgCategoriesExperiment.variant
-  end if
-
-  if epgCategoriesVariant = "categories_with_favorites"
-    if isLoggedInUser() = true
-      if screen <> invalid AND contentId <> invalid
-        if isLinearChannelLiked(contentId) = true
-          action = m.constants.ui.likeDislikeActions.removeLike
-        else
-          action = m.constants.ui.likeDislikeActions.like
-        end if
-
-        handleAddRemoveFavorites(screen, action)
+  if isLoggedInUser() = true
+    if screen <> invalid AND contentId <> invalid
+      if isLinearChannelLiked(contentId) = true
+        action = m.constants.ui.likeDislikeActions.removeLike
+      else
+        action = m.constants.ui.likeDislikeActions.like
       end if
-    else
-      startSignIn(onChannelRatingUpdated)
+
+      handleAddRemoveFavorites(screen, action)
     end if
+  else
+    startSignIn(onChannelRatingUpdated)
   end if
 End Function
 
@@ -1109,35 +1093,27 @@ Function onFavoritesAddRemoveSuccess(requestBody)
         if sReturnedAction = m.constants.ui.likeDislikeActions.like
           if originalChannel <> invalid
 
-            epgCategoriesVariant = "none"
-            epgCategoriesExperiment = getStatsigExperimentResource("roku_linear_epg_categories", "roku_linear_epg_categories_v1", false)
-            if epgCategoriesExperiment <> invalid AND epgCategoriesExperiment.variant <> invalid
-              epgCategoriesVariant = epgCategoriesExperiment.variant
+            if epgScreen.hasField("containersList") = false
+              epgScreen.addField("containersList", "node", false)
+            end if
+            if epgScreen.containersList = invalid
+              epgScreen.containersList = CreateObject("roSGNode", "ContentNode")
             end if
 
-            if epgCategoriesVariant = "categories_with_favorites"
-              if epgScreen.hasField("containersList") = false
-                epgScreen.addField("containersList", "node", false)
+            favoritesContainerExists = false
+            if epgScreen.containersList.getChildCount() > 0
+              firstContainer = epgScreen.containersList.getChild(0)
+              if firstContainer <> invalid AND firstContainer.containerId = "favorite_channels"
+                favoritesContainerExists = true
               end if
-              if epgScreen.containersList = invalid
-                epgScreen.containersList = CreateObject("roSGNode", "ContentNode")
-              end if
+            end if
 
-              favoritesContainerExists = false
-              if epgScreen.containersList.getChildCount() > 0
-                firstContainer = epgScreen.containersList.getChild(0)
-                if firstContainer <> invalid AND firstContainer.containerId = "favorite_channels"
-                  favoritesContainerExists = true
-                end if
-              end if
-
-              if favoritesContainerExists = false
-                containerNode = CreateObject("roSGNode", "ContentNode")
-                containerNode.title = favoritesTitle
-                containerNode.addField("containerId", "string", false)
-                containerNode.containerId = "favorite_channels"
-                epgScreen.containersList.insertChild(containerNode, 0)
-              end if
+            if favoritesContainerExists = false
+              containerNode = CreateObject("roSGNode", "ContentNode")
+              containerNode.title = favoritesTitle
+              containerNode.addField("containerId", "string", false)
+              containerNode.containerId = "favorite_channels"
+              epgScreen.containersList.insertChild(containerNode, 0)
             end if
 
             favoriteChannel = originalChannel.clone(true)

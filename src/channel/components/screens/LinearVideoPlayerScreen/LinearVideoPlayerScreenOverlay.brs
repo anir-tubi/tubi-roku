@@ -33,12 +33,6 @@ Function init()
   m.EPG.observeField("focusedChild", "onEPGTimeGridFocusChange")
   m.top.observeField("containersList", "onContainersListChanged")
 
-  m.epgCategoriesVariant = "none"
-  epgCategoriesExperiment = getStatsigExperimentResource("roku_linear_epg_categories", "roku_linear_epg_categories_v1", false)
-  if epgCategoriesExperiment <> invalid AND epgCategoriesExperiment.variant <> invalid
-    m.epgCategoriesVariant = epgCategoriesExperiment.variant
-  end if
-
   '//Closed Captioning Nodes
   m.closedCaptioningGroup = m.top.findNode("closedCaptioningGroup")
   m.closedCaptioningButtonList = m.top.findNode("closedCaptioningButtonList")
@@ -230,17 +224,12 @@ Function onContainersListChanged(msg)
   containersList = msg.getData()
 
   if containersList <> invalid AND m.containerMarkupGrid <> invalid
-    if m.epgCategoriesVariant <> "none"
-      m.containerMarkupGrid.content = containersList
-      m.containerMarkupGrid.visible = false
-    else
-      m.containerMarkupGrid.content = invalid
-      m.containerMarkupGrid.visible = false
-    end if
+    m.containerMarkupGrid.content = containersList
+    m.containerMarkupGrid.visible = false
 
     if m.EPG <> invalid
-      m.EPG.channelGridFocusable = (m.epgCategoriesVariant = "categories_with_favorites")
-      m.EPG.categoriesMenuVisible = (m.epgCategoriesVariant <> "none")
+      m.EPG.channelGridFocusable = true
+      m.EPG.categoriesMenuVisible = true
     end if
   end if
 End Function
@@ -513,8 +502,7 @@ End Function
 
 Function onEPGTimeGridFocusChange(msg)
   tubiLog("LinearVideoPlayerScreenOverlay.onEPGTimeGridFocusChange")
-  ' Show category pills only when experiment is not control (same as EPGHomeScreen)
-  if m.containerMarkupGrid <> invalid AND m.epgCategoriesVariant <> "none"
+  if m.containerMarkupGrid <> invalid
     if m.EPG.hasFocus() = true OR m.EPG.isInFocusChain() = true
       if m.containerMarkupGrid.content <> invalid AND m.containerMarkupGrid.content.getChildCount() > 0
         m.containerMarkupGrid.visible = true
@@ -724,7 +712,7 @@ Function onKeyEvent(key as String, press as Boolean) as Boolean
     if key = "left"
       if m.EPG.isInFocusChain() = true
         '//if the EPG has focus, check if categories menu is visible first
-        if m.epgCategoriesVariant <> "none" AND m.containerMarkupGrid <> invalid AND m.containerMarkupGrid.visible = true AND m.containerMarkupGrid.content <> invalid AND m.containerMarkupGrid.content.getChildCount() > 0
+        if m.containerMarkupGrid <> invalid AND m.containerMarkupGrid.visible = true AND m.containerMarkupGrid.content <> invalid AND m.containerMarkupGrid.content.getChildCount() > 0
           ' Move focus to categories menu
           sendOverlayChannelToCategoryNavigateWithinPageEvent()
           m.containerMarkupGrid.setFocus(true)
@@ -740,7 +728,7 @@ Function onKeyEvent(key as String, press as Boolean) as Boolean
           setComponentInteractionForSideNavInVideoPlayerOverLay(userInteraction, m.sideNav.focusedButtonID)
           bKeyReacted = true
         end if
-      else if m.epgCategoriesVariant <> "none" AND m.containerMarkupGrid <> invalid AND m.containerMarkupGrid.isInFocusChain() = true
+      else if m.containerMarkupGrid <> invalid AND m.containerMarkupGrid.isInFocusChain() = true
         '//if the categories menu has focus, move focus to side nav
         if m.sideNav.visible = true
           slideTo(m.EPGHorizontalSlide, m.slideOutEPGTranslation, m.top.animationDuration)
@@ -760,7 +748,7 @@ Function onKeyEvent(key as String, press as Boolean) as Boolean
     else if key = "right"
       if m.bEPGVisible = true AND m.EPG.isInFocusChain() = false
         ' Check if focus is on side nav or categories menu
-        if m.epgCategoriesVariant <> "none" AND m.containerMarkupGrid <> invalid AND m.containerMarkupGrid.isInFocusChain() = true
+        if m.containerMarkupGrid <> invalid AND m.containerMarkupGrid.isInFocusChain() = true
           '//if the categories menu has focus, move focus to EPG
           sendOverlayCategoryToChannelNavigateWithinPageEvent()
           if m.EPG.channelGridFocusable = true
@@ -774,7 +762,7 @@ Function onKeyEvent(key as String, press as Boolean) as Boolean
           bKeyReacted = true
         else
           '//if the side nav has focus, move focus to categories menu (if visible) or EPG
-          if m.epgCategoriesVariant <> "none" AND m.containerMarkupGrid <> invalid AND m.containerMarkupGrid.visible = true AND m.containerMarkupGrid.content <> invalid AND m.containerMarkupGrid.content.getChildCount() > 0
+          if m.containerMarkupGrid <> invalid AND m.containerMarkupGrid.visible = true AND m.containerMarkupGrid.content <> invalid AND m.containerMarkupGrid.content.getChildCount() > 0
             m.containerMarkupGrid.setFocus(true)
             slideTo(m.EPGHorizontalSlide, m.originalEPGTranslation, m.top.animationDuration)
             m.sideNav.setOpenState = "closed"
@@ -797,7 +785,7 @@ Function onKeyEvent(key as String, press as Boolean) as Boolean
         m.sideNav.buttonToFocusID = m.constants.ui.linearSideNavIds.subtitles
         hideClosedCaptioningMenu() '//Hide the CC menu and display EPG again
         bKeyReacted = true
-      else if m.epgCategoriesVariant <> "none" AND m.containerMarkupGrid <> invalid AND m.containerMarkupGrid.isInFocusChain() = true
+      else if m.containerMarkupGrid <> invalid AND m.containerMarkupGrid.isInFocusChain() = true
         '//if the categories menu has focus, move focus to EPG
         m.EPG.setFocus(true)
         slideTo(m.EPGHorizontalSlide, m.originalEPGTranslation, m.top.animationDuration)

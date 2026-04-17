@@ -48,13 +48,7 @@ Function updateStarIcon()
     focusPercent = m.top.focusPercent
   end if
 
-  epgCategoriesVariant = "none"
-  epgCategoriesExperiment = getStatsigExperimentResource("roku_linear_epg_categories", "roku_linear_epg_categories_v1", false)
-  if epgCategoriesExperiment <> invalid AND epgCategoriesExperiment.variant <> invalid
-    epgCategoriesVariant = epgCategoriesExperiment.variant
-  end if
-
-  if focusPercent > 0.5 AND epgCategoriesVariant = "categories_with_favorites"
+  if focusPercent > 0.5
     m.starIcon.opacity = 1.0
 
     if item <> invalid AND item.isFavorite = true

@@ -104,12 +104,6 @@ Function StatsigExperimentsInterface(statsigExperimentsInfo) as Object
         }
       }
 
-      roku_linear_epg_categories: {
-        roku_linear_epg_categories_v1: {
-          default: { "variant": "none" } ' "none", "categories", "categories_with_favorites"
-        }
-      }
-
       roku_content_details_v6: {
         default: { "enabled": false, "is_expand_below": false, "is_episode_below": false }
       }
