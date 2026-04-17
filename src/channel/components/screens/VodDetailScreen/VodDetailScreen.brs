@@ -511,16 +511,19 @@ Function onContentContainerFocusIndexChange(msg)
       ' Adjust UI layout based on focus position
       isEpisodeContainerBelowFoldActive = (m.isEpisodeContainerBelowFold = true AND isSeriesContent = true)
 
+      ' Hide episodesContainer when additionalContentContainer gains focus,
+      ' show it whenever additionalContentContainer loses focus
+      if isEpisodeContainerBelowFoldActive = true
+        if componentGainingFocus.id = "additionalContentContainer"
+          m.episodesContainer.opacity = 0
+        else
+          m.episodesContainer.opacity = 1
+        end if
+      end if
+
       if focusedIndex = 1
         ' User is on action buttons - slide down to show buttons area
         slideTo(m.contentContainer, m.aboveFoldGradientTranslation, 0.3)
-        if isEpisodeContainerBelowFoldActive = true
-          m.contentContainer.itemSpacings = [60, 36, 0, 24]
-        else if m.isEpisodeContainerBelowFold = true
-          m.contentContainer.itemSpacings = [60, 0, m.sectionTabsSpacing, 24]
-        else
-          m.contentContainer.itemSpacings = [60, m.sectionTabsSpacing, 80]
-        end if
         fade(m.actionButtonList, "in", 0.3)
         ' Use foreground-10 when action buttons are focused
         m.sectionTabs.buttonBackgroundBlendColor = m.neutralColor2
@@ -529,7 +532,7 @@ Function onContentContainerFocusIndexChange(msg)
         if isEpisodeContainerBelowFoldActive = true AND componentGainingFocus.id = "episodesContainer"
           slideY = -315
         else if isEpisodeContainerBelowFoldActive = true AND componentGainingFocus.id = "additionalContentContainer"
-          slideY = -500 - m.episodesContainer.boundingRect().height
+          slideY = -370 - m.episodesContainer.boundingRect().height
         else
           slideY = -372
         end if
@@ -537,31 +540,6 @@ Function onContentContainerFocusIndexChange(msg)
         fade(m.actionButtonList, "out", 0.3)
         ' Use foreground-20 when section tabs are focused
         m.sectionTabs.buttonBackgroundBlendColor = m.neutralColor
-
-        ' Adjust spacing based on content type and selected section
-        ' Episodes need less bottom spacing (0) while other sections need more (51)
-        ' This is due to presence of season selector in episodes section.
-        content = m.top.content
-        isEpisodesSection = content <> invalid AND content.type = m.constants.ui.contentTypes.series AND m.top.selectedSection = "episodes"
-        bottomSpacing = 0 ' For episodes section
-        if isEpisodesSection = false then bottomSpacing = 42 ' For other sections
-
-        if isEpisodeContainerBelowFoldActive = true
-          episodesTopSpacing = 36
-          if componentGainingFocus.id = "episodesContainer"
-            episodesTopSpacing = 0
-          else if componentGainingFocus.id = "additionalContentContainer"
-            bottomSpacing = bottomSpacing + 176
-          end if
-          m.contentContainer.itemSpacings = [60, episodesTopSpacing, 0, bottomSpacing]
-        else if m.isEpisodeContainerBelowFold = true
-          m.contentContainer.itemSpacings = [60, 0, m.sectionTabsSpacing, bottomSpacing]
-        else
-          if componentGainingFocus.id = "additionalContentContainer"
-            bottomSpacing = bottomSpacing + 50
-          end if
-          m.contentContainer.itemSpacings = [60, m.sectionTabsSpacing, bottomSpacing]
-        end if
       end if
     end if
   end if
