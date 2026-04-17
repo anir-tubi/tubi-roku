@@ -5,16 +5,16 @@ import { moveToGrid } from '../analytics/utils/helpers';
 import { shared, testHelpers } from '../test-helpers';
 
 
-describe('Search', function () {
-	describe('Linear Search', function () {
-		const LINEAR_CHANNEL_TITLE = 'NBC News NOW';
+describe('Search @search', function () {
+	describe('Linear Search @search_linear', function () {
+		const LINEAR_CHANNEL_TITLE = 'LiveNOW from FOX';
 
-		it('C244256 When a user searches for a channel, the channel is shown in the search results @search', async () => {
+		it('C244256 When a user searches for a channel, the channel is shown in the search results', async () => {
 			await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: true });
 			await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');
 			await testUtils.goToPage('search');
 			await testUtils.waitForElementToShowOnScreen('trendingSearchResultsGrid', 'Timed out waiting for element to have focus', 10000);
-			await ecp.sendText('nbc');
+			await ecp.sendText('livenow');
 
 			await shared.navigateToContentInSearchResults({ title: LINEAR_CHANNEL_TITLE });
 			await testUtils.retryWithTimeOut(async () => {
@@ -29,30 +29,30 @@ describe('Search', function () {
 			});
 		});
 
-		it('C244258 When a user clicks on the channel poster, the live channel should start playing @search', async () => {
+		it('C244258 When a user clicks on the channel poster, the live channel should start playing', async () => {
 			await ecp.sendKeypress(ecp.Key.Ok);
 
 			// Verify that the linear channel plays
 			await testUtils.waitForPlayerStateToEqual('linearVideoPlayerScreen', 'playing', 30000);
 		});
 
-		it('C244259 When a user presses the back button, the user is sent back to the search result page @search', async () => {
+		it('C244259 When a user presses the back button, the user is sent back to the search result page', async () => {
 			// Press the back button and verify that the user is redirected back to the Search result page
 			await ecp.sendKeypress(ecp.Key.Back, { wait: 3000 });
 			await testUtils.retryWithTimeOut(async () => {
 				const searchResultsText = await testUtils.getNodeForElement('searchResultsText');
-				expect(searchResultsText.text).to.equal('NBC News NOW');
+				expect(searchResultsText.text).to.equal(LINEAR_CHANNEL_TITLE);
 			});
 		});
 
-		it('C244271  Ensure that when the user hover over a channel search result the channel name and description is displayed on the top left corner @search', async () => {
+		it('C244271  Ensure that when the user hover over a channel search result the channel name and description is displayed on the top left corner', async () => {
 			await testUtils.retryWithTimeOut(async () => {
 				const searchResultsDesc = await testUtils.getNodeForElement('searchResultsDesc');
 				expect(searchResultsDesc).to.exist;
 			});
 		});
 
-		it('C406434 When a user taps "Play" button on linear channel, backing out takes user back to search results @search', async () => {
+		it('C406434 When a user taps "Play" button on linear channel, backing out takes user back to search results', async () => {
 			await ecp.sendKeypress(ecp.Key.Play);
 
 			// Verify that the Linear channel plays
@@ -62,13 +62,13 @@ describe('Search', function () {
 			await ecp.sendKeypress(ecp.Key.Back, { count: 2, wait: 1000 });
 			await testUtils.retryWithTimeOut(async () => {
 				const searchResultsText = await testUtils.getNodeForElement('searchResultsText');
-				expect(searchResultsText.text).to.equal('NBC News NOW');
+				expect(searchResultsText.text).to.equal(LINEAR_CHANNEL_TITLE);
 			});
 		});
 	});
 
 	// https://tubi.testrail.io/index.php?/cases/view/22728
-	it('C22728 - Search - When movie selected then corresponding movie details page displayed @search @navigation @manual_regression', async () => {
+	it('C22728 - Search - When movie selected then corresponding movie details page displayed @navigation @manual_regression', async () => {
 		/**
 		 * Pre-conditions: None
 		 * 
@@ -126,7 +126,7 @@ describe('Search', function () {
 	});
 
 	//https://tubi.testrail.io/index.php?/cases/view/585698
-	it('C585698 - Should display trending searches under search results for no results scenario @search @manual_regression', async () => {
+	it('C585698 - Should display trending searches under search results for no results scenario @manual_regression', async () => {
 		// Launch Tubi and observe homescreen
 		await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: false });
 		await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');

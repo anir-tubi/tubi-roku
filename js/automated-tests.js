@@ -503,7 +503,8 @@ async function appendDataToJsonReport(branch) {
 // Pulled from the actual tests (recurses into subdirectories e.g. tests/analytics/)
 function getAvailableTags(folder = 'js/automated-tests/tests') {
   const tags = {};
-  const pattern = /it\([^@]*([@a-zA-Z_0-9, ]*)/g;
+  const linePattern = /^\s*(?:it|describe)\s*\(/;
+  const tagPattern = /@[a-zA-Z_0-9]+/g;
 
   function scanDir(dir) {
     const entries = fs.readdirSync(dir, { withFileTypes: true });
@@ -512,12 +513,11 @@ function getAvailableTags(folder = 'js/automated-tests/tests') {
       if (ent.isDirectory()) {
         scanDir(filePath);
       } else if (ent.name.endsWith('.ts')) {
-        const fileContents = fs.readFileSync(filePath, 'utf-8');
-        for (const match of fileContents.matchAll(pattern)) {
-          for (let tag of match[1].split(/[\s,]+/)) {
-            tag = tag.trim();
-            if (tag.length === 0) continue;
-            tags[tag] = true;
+        const lines = fs.readFileSync(filePath, 'utf-8').split('\n');
+        for (const line of lines) {
+          if (!linePattern.test(line)) continue;
+          for (const match of line.matchAll(tagPattern)) {
+            tags[match[0]] = true;
           }
         }
       }
@@ -527,13 +527,49 @@ function getAvailableTags(folder = 'js/automated-tests/tests') {
   return Object.keys(tags).sort();
 }
 
-// Used to output an updated list of tags for use in .github/workflows/automatedTests.yml file
+// Scans test files for tags and writes them directly into .github/workflows/automatedTests.yml
 function outputAvailableAutomatedTestTags(done) {
-  const tags = getAvailableTags();
+  const workflowPath = path.join(__dirname, '..', '.github', 'workflows', 'automatedTests.yml');
+  const markerComment = '          # The remaining options are generated using gulp outputAvailableAutomatedTestTags';
+  const nextSectionPattern = /^ {6}\w+:/;
 
-  for (const tag of tags) {
-    console.log(`- '${tag}'`);
+  const tags = getAvailableTags();
+  const yaml = fs.readFileSync(workflowPath, 'utf-8');
+  const lines = yaml.split('\n');
+
+  const markerIdx = lines.findIndex(l => l.trimEnd() === markerComment.trimEnd());
+  if (markerIdx === -1) {
+    done(new Error(`Could not find marker comment in ${workflowPath}`));
+    return;
   }
+
+  // Find where the tag options end (next input key at 6-space indentation)
+  let endIdx = markerIdx + 1;
+  while (endIdx < lines.length && !nextSectionPattern.test(lines[endIdx])) {
+    endIdx++;
+  }
+
+  // Collect old tags for diff reporting
+  const oldTags = new Set();
+  for (let i = markerIdx + 1; i < endIdx; i++) {
+    const match = lines[i].match(/@[a-zA-Z_0-9]+/);
+    if (match) oldTags.add(match[0]);
+  }
+
+  const newTagLines = tags.map(tag => `          - '${tag}'`);
+  const newTags = new Set(tags);
+
+  lines.splice(markerIdx + 1, endIdx - markerIdx - 1, ...newTagLines);
+  fs.writeFileSync(workflowPath, lines.join('\n'));
+
+  const added = tags.filter(t => !oldTags.has(t));
+  const removed = [...oldTags].filter(t => !newTags.has(t));
+
+  log(`Updated ${workflowPath} with ${tags.length} tags`);
+  if (added.length) log(`  Added: ${added.join(', ')}`);
+  if (removed.length) log(`  Removed: ${removed.join(', ')}`);
+  if (!added.length && !removed.length) log('  No changes');
+
   done();
 }
 
