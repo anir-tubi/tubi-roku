@@ -82,13 +82,8 @@ Function showVodDetailScreen(inputContent, playbackSource, successCb = invalid, 
     isPerformanceEnhanced = (v5Experiment <> invalid AND v5Experiment.variant = "performance_enhanced")
     screen.isPerformanceEnhanced = isPerformanceEnhanced
 
-    if isPerformanceEnhanced = true
-      m.relatedContentDebounceTimer = CreateObject("roSGNode", "Timer")
-      m.relatedContentDebounceTimer.duration = 2
-      m.relatedContentDebounceTimer.repeat = false
-      m.relatedContentDebounceTimer.observeFieldScoped("fire", "onRelatedContentDebounceTimerFired")
-      m.relatedContentDebounceTimer.control = "start"
-    else
+    isDeeplink = (isAA(playbackSource) = true AND playbackSource.srcForAds = m.constants.player.playbackOrigin.deeplink)
+    if m.ymalDisplay = "default" OR isDeeplink = true
       getYouMayAlsoLikeContent(content)
     end if
 
@@ -101,8 +96,9 @@ Function showVodDetailScreen(inputContent, playbackSource, successCb = invalid, 
       end if
     else
       ' During deep-link use case we already have the complete content node, so we can skip the fetch.
-      screen.wasContentFetchCompleted = content.hasVideoResources
-      if content.hasVideoResources <> true
+      hasResources = (isNonEmptyArray(content.videoResources) = true)
+      screen.wasContentFetchCompleted = hasResources
+      if hasResources <> true
         getSingleContentFromServer(content, onGetVodContentSuccess, onGetVodContentError)
       else
         onGetVodContentSuccess(content)
@@ -224,13 +220,21 @@ End Function
 ' @param error - Error response from API
 Function onGetVodContentError(error)
   tubiLog("VodDetailScreenHelpers.onGetVodContentError")
+  showVodDetailErrorModal(error, onGetVodContentRetry)
+End Function
+
+
+' Shows an error modal for detail screen fetch failures.
+' Non-retryable deeplink errors dismiss to home; all others use the supplied retry callback.
+' @param error - Error response from API
+' @param retryCallback - Function to invoke when the user selects retry
+Function showVodDetailErrorModal(error, retryCallback)
   screen = getDetailScreenFromStackWithId(m.constants.ui.screenIds.vodDetailScreen)
   if screen <> invalid AND screen.getSubtype() = "VodDetailScreen"
     screen.wasContentFetchCompleted = true
     showHideSpinner(false)
 
     content = screen.content
-    ' set up the error modal dialog
     errorCode = getUserFacingErrorCode(m.constants.errors.context.videoDetailScreen, m.constants.errors.subtypes.fetchError, error.code)
     dialogEvent = getDetailScreenDialogAnalyticEvent(content, "NETWORK_ERROR", errorCode, m.constants)
 
@@ -241,12 +245,13 @@ Function onGetVodContentError(error)
     }
 
     playbackSource = screen.playbackSource
-    ' 404 errors are not retryable - content ID is invalid
-    ' Showing retry button would result in an endless loop
-    if error <> invalid AND isInteger(error.code) = true AND error.code = 404 AND (isAA(playbackSource) = false OR playbackSource.srcForAds = m.constants.player.playbackOrigin.deeplink)
+    isDeeplink = (isAA(playbackSource) = false OR playbackSource.srcForAds = m.constants.player.playbackOrigin.deeplink)
+    isNonRetryable = (error <> invalid AND isInteger(error.code) = true AND (error.code = 404 OR error.code = 403 OR error.code = 451 OR error.code = 401 OR error.code = 422))
+
+    if isNonRetryable = true AND isDeeplink = true
       showErrorModal(modalInfo, invalid, invalid, onCloseErrorModal)
     else
-      showErrorModal(modalInfo, onGetVodContentRetry)
+      showErrorModal(modalInfo, retryCallback)
     end if
   end if
 End Function
@@ -262,6 +267,22 @@ Function onGetVodContentRetry()
     showHideSpinner(true)
     if content <> invalid
       getSingleContentFromServer(content, onGetVodContentSuccess, onGetVodContentError)
+    end if
+  end if
+End Function
+
+
+' Retry callback for series content fetch (season list / episodes errors)
+' Routes through onGetSeasonListFallbackSuccess so seasonList and episodes
+' are properly rebuilt after the retry succeeds.
+Function onGetSeriesContentRetry()
+  tubiLog("VodDetailScreenHelpers.onGetSeriesContentRetry")
+  screen = getDetailScreenFromStackWithId(m.constants.ui.screenIds.vodDetailScreen)
+  if screen <> invalid AND screen.getSubtype() = "VodDetailScreen"
+    content = screen.content
+    showHideSpinner(true)
+    if content <> invalid
+      getSingleContentFromServer(content, onGetSeasonListFallbackSuccess, onGetSeasonListFallbackError)
     end if
   end if
 End Function
@@ -380,11 +401,10 @@ Function onVodDetailCtaSelectedButtonIdChange(msg) as Void
       end if
     end if
 
-    if id = "play" OR id = "startFromBeginning"
-      playVideoContent(content, screen.playbackSource, 0)
-    else if id = "resume"
+    if id = "play" OR id = "startFromBeginning" OR id = "resume"
+      if fetchContentIfMissingResources(content, "onVodDetailCtaSelectedButtonIdChange") then return
       nowPos = 0
-      if history <> invalid AND history.nowPos > 0
+      if id = "resume" AND history <> invalid AND history.nowPos > 0
         nowPos = history.nowPos
       end if
       playVideoContent(content, screen.playbackSource, nowPos)
@@ -676,11 +696,7 @@ End Function
 ' @error: object, error information
 Function onGetSeriesEpisodesError(error)
   tubiLog("VodDetailScreenHelpers.onGetSeriesEpisodesError: " + formatJson(error))
-  screen = getDetailScreenFromStackWithId(m.constants.ui.screenIds.vodDetailScreen)
-  if screen <> invalid
-    screen.wasContentFetchCompleted = true
-  end if
-  showHideSpinner(false)
+  showVodDetailErrorModal(error, onGetSeriesContentRetry)
 End Function
 
 
@@ -1100,8 +1116,9 @@ Function onPlaySelectedEpisodeChange(msg) as Void
   tubiLog("VodDetailScreenHelpers.onPlaySelectedEpisodeChange")
   screen = msg.getRoSGNode()
   if screen <> invalid AND screen.id = m.constants.ui.screenIds.vodDetailScreen
+    screen.unobserveFieldScoped("wasContentFetchCompleted")
     selectedEpisode = screen.selectedEpisode
-    ' Set progress bar
+    if fetchContentIfMissingResources(selectedEpisode, "onPlaySelectedEpisodeChange") then return
     history = getHistory(selectedEpisode.id.toStr())
     nowPos = 0
     if history <> invalid AND isNumber(history.nowPos) = true
@@ -1131,7 +1148,7 @@ End Function
 ' @param content - Content node to play
 ' @param playbackSource - Playback source information for analytics
 ' @param episodes - Optional episodes list for series content
-Function playSelectedVodContent(content, playbackSource, episodes = invalid)
+Function playSelectedVodContent(content, playbackSource, episodes = invalid) as Void
   tubiLog("VodDetailScreenHelpers.playSelectedVodContent")
 
   isComingSoon = isComingSoonContent(content)
@@ -1164,6 +1181,10 @@ Function playSelectedVodContent(content, playbackSource, episodes = invalid)
         end if
       end if
     end if
+
+    screen = getDetailScreenFromStackWithId(m.constants.ui.screenIds.vodDetailScreen)
+    if screen <> invalid then screen.unobserveFieldScoped("wasContentFetchCompleted")
+    if fetchContentIfMissingResources(content, "onPlayableContentFetchCompleted") then return
 
     nowPos = 0
     if history <> invalid AND history.nowPos > 0
@@ -1226,6 +1247,17 @@ Function startPlaybackAfterAnimationComplete(screen)
   tubiLog("VodDetailScreenHelpers.startPlaybackAfterAnimationComplete")
   if screen <> invalid AND screen.content <> invalid
     executeVodDetailSuccessCallback(screen.content, screen.playbackSource, screen.episodes)
+  end if
+End Function
+
+
+' Observer callback that retries playback after content refetch completes
+Function onPlayableContentFetchCompleted(msg) as Void
+  screen = msg.getRoSGNode()
+  if screen = invalid then return
+  screen.unobserveFieldScoped("wasContentFetchCompleted")
+  if screen.content <> invalid
+    playVodContentFromDetailScreen(screen.content)
   end if
 End Function
 
@@ -1479,17 +1511,42 @@ Function refreshVodDetailScreenAfterPlayback(shouldSendAnalyticsEvent, reason) a
     if isAA(screen.playbackSource) = true AND screen.playbackSource.srcForAds = "deeplink"
       screen.focusRelatedContent = true
     end if
+
+    if m.ymalDisplay = "after_player" AND screen.relatedContent = invalid
+      getYouMayAlsoLikeContent(screen.content)
+    end if
   end if
 End Function
 
 
-' Debounced callback for fetching related content
-' Fires after a delay to avoid competing with primary content API calls
-Function onRelatedContentDebounceTimerFired()
-  screen = getDetailScreenFromStackWithId(m.constants.ui.screenIds.vodDetailScreen)
-  if screen <> invalid AND screen.content <> invalid AND screen.relatedContent = invalid
-    getYouMayAlsoLikeContent(screen.content)
+' Checks if content has video resources and is playable.
+' If not, refetches content from server and re-observes wasContentFetchCompleted
+' so the caller re-fires after fetch. Tracks m.resourceFetchAttempted to
+' prevent infinite retry loops on error.
+' @param content - Content node to check
+' @param callbackName - Observer handler name to re-fire after fetch completes
+' @return Boolean - true if not playable (caller should exit early), false if ready to play
+Function fetchContentIfMissingResources(content, callbackName = "") as Boolean
+  if content = invalid OR isNonEmptyArray(content.videoResources) = false
+    if m.resourceFetchAttempted = true
+      m.resourceFetchAttempted = false
+      showHideSpinner(false)
+      return true
+    end if
+    screen = getDetailScreenFromStackWithId(m.constants.ui.screenIds.vodDetailScreen)
+    if screen <> invalid AND screen.content <> invalid
+      m.resourceFetchAttempted = true
+      showHideSpinner(true)
+      screen.wasContentFetchCompleted = false
+      if isNonEmptyString(callbackName)
+        screen.observeFieldScoped("wasContentFetchCompleted", callbackName)
+      end if
+      getSingleContentFromServer(screen.content, onGetVodContentSuccess, onGetVodContentError)
+    end if
+    return true
   end if
+  m.resourceFetchAttempted = false
+  return false
 End Function
 
 
@@ -1588,11 +1645,7 @@ End Function
 ' @param error - Error response from API
 Function onGetSeasonListFallbackError(error)
   tubiLog("VodDetailScreenHelpers.onGetSeasonListFallbackError: " + formatJson(error))
-  screen = getDetailScreenFromStackWithId(m.constants.ui.screenIds.vodDetailScreen)
-  if screen <> invalid
-    screen.wasContentFetchCompleted = true
-  end if
-  showHideSpinner(false)
+  showVodDetailErrorModal(error, onGetSeriesContentRetry)
 End Function
 
 

@@ -9,6 +9,7 @@ Function init()
 
   topRef.observeFieldScoped("itemContent", "onItemContentChange")
   topRef.observeFieldScoped("currentEpisode", "onCurrentEpisodeChange")
+  topRef.observeFieldScoped("layoutChanged", "onLayoutChanged")
 End Function
 
 
@@ -55,6 +56,18 @@ Function renderInfoPanel(itemContent)
     m.additionalInfoItemsContainer.appendChild(m.directorItem)
   end if
 
+  alignMetadataGroup()
+End Function
+
+
+' Recalculates metadataGroup vertical alignment when child layout changes
+Function onLayoutChanged(msg) as Void
+  alignMetadataGroup()
+End Function
+
+
+' Aligns metadataGroup vertically so it fills at least minHeight
+Function alignMetadataGroup() as Void
   height = m.metadataGroup.boundingRect().height
   minHeight = m.top.minHeight
   if height < minHeight

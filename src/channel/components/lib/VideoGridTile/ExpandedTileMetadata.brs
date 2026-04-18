@@ -887,7 +887,19 @@ Function displayNetworkLogo(logoUri as String) as Void
     loadDisplayMode: "limitSize"
   })
 
+  m.networkLogoPoster.observeFieldScoped("loadStatus", "onNetworkLogoLoadStatusChange")
   m.metadataGroup.insertChild(m.networkLogoPoster, 0)
+End Function
+
+
+' Fires layoutChanged when the network logo finishes loading so parent
+' components can recalculate positioning based on the updated height.
+Function onNetworkLogoLoadStatusChange(msg) as Void
+  status = msg.getData()
+  if status = "ready" OR status = "failed"
+    m.networkLogoPoster.unobserveFieldScoped("loadStatus")
+    m.top.layoutChanged = true
+  end if
 End Function
 
 

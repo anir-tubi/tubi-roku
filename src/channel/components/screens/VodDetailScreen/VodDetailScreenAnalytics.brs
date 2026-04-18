@@ -69,7 +69,7 @@ End Function
 Function onButtonListNavigateWithinPageEventInfoChange(msg) as Void
   eventInfo = msg.getData()
   if eventInfo <> invalid
-    ' TODO: Remove this once we have a proper way to track vertical location for roku_content_details_v6
+    ' TODO: Remove this once we have a proper way to track vertical location for roku_content_details_v7
     if msg.getRoSGNode().isSameNode(m.actionButtonList)
       eventInfo.vertical_location = 1
     end if

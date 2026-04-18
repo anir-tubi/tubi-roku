@@ -540,8 +540,10 @@ Function sendDeeplinkAnalytics(deepLinkContent, refreshedContent, entryPoint, tr
 End Function
 
 
-Function handleLinearDeeplinkContent()
+Function handleLinearDeeplinkContent() as Void
   tubilog("DeeplinkHelpers.handleLinearDeeplinkContent")
+
+  if m.deeplinkContent = invalid then return
 
   if isParentalControlsAdultLevel() = false OR m.uiMode = m.constants.ui.modes.kidsAgeGate
     ' Display error message indicating to turn off the parental controls
@@ -778,7 +780,7 @@ End Function
 ' @sendTracking: boolean , this parameter is used to control whether NavigateToPage events needs to send or not. In case of deeplinks, no need to send NavigateToPage Event
 Function handleDeeplinkSeriesSuccessResponse(refreshedContent) as Void
   if refreshedContent <> invalid
-    experiment = getStatsigExperimentResource("", "roku_content_details_v6", false)
+    experiment = getStatsigExperimentResource("", "roku_content_details_v7", false)
     if experiment.enabled = true
       playVodContentFromDetailScreen(refreshedContent)
       return
@@ -933,7 +935,7 @@ End Function
 Function handleDeeplinkEpisodeSuccessResponse(refreshedContent) as Void
 
   if refreshedContent <> invalid AND m.deeplinkContent <> invalid
-    experiment = getStatsigExperimentResource("", "roku_content_details_v6", false)
+    experiment = getStatsigExperimentResource("", "roku_content_details_v7", false)
     if experiment.enabled = true
       refreshedContent.currentEpisodeId = m.deeplinkContent.id
       playVodContentFromDetailScreen(refreshedContent)

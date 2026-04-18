@@ -652,7 +652,7 @@ Function onVideoPlayerState(msg)
 
       if finishedContent.isTrailer = true
         isComingSoon = isComingSoonContent(finishedContent)
-        if isComingSoon = false AND getStatsigExperimentResource("roku_player_improvement", "roku_autoplay_after_trailer_v1", true).enabled = true
+        if isComingSoon = false
           stopVideoContent(videoPlayer)
           playActualContentFromDetailScreen()
         else
@@ -865,7 +865,7 @@ End Function
 Function returnToDetailScreenFromVideo(sendAnalyticsEvent, shouldUpdateEpisodeScreenContent, reason) as Void
   tubiLog("VideoHelpers.returnToDetailScreenFromVideo")
 
-  experiment = getStatsigExperimentResource("", "roku_content_details_v6", false)
+  experiment = getStatsigExperimentResource("", "roku_content_details_v7", false)
   if experiment.enabled = true
     ' Show new content details screen
     refreshVodDetailScreenAfterPlayback(sendAnalyticsEvent, reason)
@@ -1019,6 +1019,10 @@ Function returnToDetailScreenFromVideo(sendAnalyticsEvent, shouldUpdateEpisodeSc
       detailScreen.focusRelatedContent = true
     end if
 
+    if m.ymalDisplay = "after_player" AND detailScreen <> invalid AND detailScreen.relatedContent = invalid
+      getRelatedContent(detailScreen.content)
+    end if
+
   end if
 
   ' remove the video player screen to reveal the details screen (or episodes list screen)
@@ -1095,7 +1099,7 @@ Function onSkipTrailer(msg) as Void
   end if
 
 
-  experiment = getStatsigExperimentResource("", "roku_content_details_v6", false)
+  experiment = getStatsigExperimentResource("", "roku_content_details_v7", false)
   if experiment.enabled = true AND skipTrailer = true
     if isComingSoon = false
       videoPlayer = getFromScreenCache(m.constants.ui.screenIds.videoPlayerScreen)
@@ -1213,7 +1217,7 @@ Function onRetryPlayerError() as Void
 
   ' For VodDetailScreen (performance_enhanced): video resource URLs may have expired
   ' Fetch fresh content before retrying
-  if screen.getSubtype() = "VodDetailScreen" AND screen.isPerformanceEnhanced = true
+  if screen.getSubtype() = "VodDetailScreen"
     if screen.content <> invalid
       getSingleContentFromServer(screen.content, onFreshContentRetryComplete, onFreshContentRetryComplete)
       return

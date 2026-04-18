@@ -33,6 +33,7 @@ Function init()
 
   topRef.observeFieldScoped("focusedChild", "onScreenFocusChange")
   topRef.observeFieldScoped("contentUpdated", "onContentChange")
+  topRef.observeFieldScoped("relatedContent", "onRelatedContentChange")
   topRef.observeFieldScoped("userSignedIn", "onUserSignedInChange")
   topRef.observeFieldScoped("shouldRefreshButtonList", "refreshButtonList")
   m.relatedContentContainer.observeFieldScoped("navigateWithinPageInfo", "onNavigateWithinPageInfoChange")
@@ -53,6 +54,7 @@ Function init()
   topRef.observeFieldScoped("shouldRefreshScreen", "refreshScreen")
   topRef.observeFieldScoped("focusRelatedContent", "onFocusRelatedContent")
   topRef.observeFieldScoped("wasContentFetchCompleted", "onWasContentFetchCompletedChange")
+  m.videoMetadataPanel.observeFieldScoped("layoutChanged", "onMetadataPanelLayoutChanged")
 
   typographyConstants = getTypographyConstants()
   setTypographyOfLabel(m.contentTitleLabel, typographyConstants.ids.headerSmall)
@@ -63,7 +65,7 @@ Function init()
   m.isRatingsExpanded = false
   m.ratingsButtonIndex = -1
 
-  experiment = getStatsigExperimentResource("", "roku_content_details_v6", false)
+  experiment = getStatsigExperimentResource("", "roku_content_details_v7", false)
   ' TODO: This experiment has left exit always enabled. Remove if left exit will be disabled or dynamic
   ' m.isLeftBackExitEnabled = experiment <> invalid AND experiment.enable_left_button_exit = true
   m.isLeftBackExitEnabled = true
@@ -71,6 +73,10 @@ Function init()
   m.isAlwaysPrimaryButtons = experiment <> invalid AND experiment.enable_always_primary_buttons = true
   m.isButtonTitleBelowOnFocus = experiment <> invalid AND experiment.is_expand_below = true
   m.isEpisodeContainerBelowFold = experiment <> invalid AND experiment.is_episode_below = true
+  m.ymalDisplay = "default"
+  if experiment <> invalid AND isNonEmptyString(experiment.ymal_display)
+    m.ymalDisplay = experiment.ymal_display
+  end if
   m.actionButtonList.showFocusedLabelBelow = m.isButtonTitleBelowOnFocus
 
   m.focusedLabelBelow = CreateObject("roSGNode", "Label")
@@ -87,7 +93,7 @@ Function init()
   m.actionButtonList.observeFieldScoped("translation", "onFocusedLabelBelowParentTranslationChange")
 
   m.leftChevron.visible = m.isLeftBackExitEnabled
-  ' TODO: Temporary fix for section tabs spacing in roku_content_details_v6 experiment. Remove if sectionTabs will be visible
+  ' TODO: Temporary fix for section tabs spacing in roku_content_details_v7 experiment. Remove if sectionTabs will be visible
   if m.sectionTabs.visible = false
     m.sectionTabsSpacing = 0
   else
@@ -148,7 +154,7 @@ Function onScreenFocusChange()
       m.top.backgroundUriList = content.backgrounds
     end if
 
-    if content <> invalid AND m.top.isPerformanceEnhanced = true
+    if content <> invalid
       if shouldRefresh(content) = true
         m.top.refreshContent = true
       end if
@@ -167,10 +173,12 @@ End Function
 ' onContentContainerFocusIndexChange for the slide-up animation.
 Function onFocusRelatedContent() as Void
   if m.top.focusRelatedContent <> true then return
+  if shouldShowYmal() = false then return
+  if m.ymalDisplay = "after_player" AND m.top.relatedContent = invalid then return
 
   ymalIndex = getYmalTabIndex()
   m.sectionTabs.focusedIndex = ymalIndex
-  m.contentContainer.jumpToIndex = m.additionalContentIndex
+  m.contentContainer.jumpToIndex = getAdditionalContentIndex()
 End Function
 
 
@@ -192,8 +200,10 @@ Function onContentChange()
     ' if m.sectionTabs = invalid OR isNonEmptyArray(m.sectionTabs.buttons) = false
     '   renderSectionTabs()
     ' end if
-    m.relatedContentContainer.visible = true
-    m.additionalContentContainer.focusable = true
+    hasRelatedContent = (m.top.relatedContent <> invalid)
+    showYmal = shouldShowYmal()
+    m.relatedContentContainer.visible = showYmal AND (m.ymalDisplay <> "after_player" OR hasRelatedContent)
+    m.additionalContentContainer.focusable = showYmal AND (m.ymalDisplay <> "after_player" OR hasRelatedContent)
 
     if m.top.isInKidsMode = true
       m.gradient.uri = "pkg:/images/details_kids_above_fold_gradient_$$RES$$.webp"
@@ -211,9 +221,60 @@ Function onContentChange()
     '   m.episodesContainer.visible = true
     ' end if
 
-    height = m.videoMetadataPanel.boundingRect().height
-    m.contentGroup.translation = [0, 312 - height]
+    updateContentGroupPosition()
   end if
+End Function
+
+
+' Recalculates contentGroup vertical position when metadata panel height changes
+' (e.g., after network logo finishes loading asynchronously)
+Function onMetadataPanelLayoutChanged(msg) as Void
+  updateContentGroupPosition()
+End Function
+
+
+' Updates contentGroup translation based on current videoMetadataPanel height
+Function updateContentGroupPosition() as Void
+  height = m.videoMetadataPanel.boundingRect().height
+  m.contentGroup.translation = [0, 312 - height]
+End Function
+
+
+' Determines if YMAL should be shown based on ymalDisplay and playback source.
+' When ymalDisplay is "hidden", YMAL is still shown for deeplink entries so the
+' user has something to browse after playback ends.
+Function shouldShowYmal() as Boolean
+  if m.ymalDisplay = "hidden"
+    playbackSource = m.top.playbackSource
+    return isAA(playbackSource) AND playbackSource.srcForAds = "deeplink"
+  end if
+  return true
+End Function
+
+
+' Shows the related content container when YMAL arrives in after_player mode
+' Also handles deferred deeplink focus if focusRelatedContent was set before YMAL loaded
+Function onRelatedContentChange(msg)
+  if m.ymalDisplay = "after_player" AND msg.getData() <> invalid
+    m.relatedContentContainer.visible = true
+    m.additionalContentContainer.focusable = true
+    if m.top.focusRelatedContent = true
+      ymalIndex = getYmalTabIndex()
+      m.sectionTabs.focusedIndex = ymalIndex
+      additionalIndex = getAdditionalContentIndex()
+      m.contentContainer.jumpToIndex = additionalIndex
+    end if
+  end if
+End Function
+
+
+' Returns the child index of additionalContentContainer within contentContainer
+Function getAdditionalContentIndex() as Integer
+  for i = 0 to m.contentContainer.getChildCount() - 1
+    child = m.contentContainer.getChild(i)
+    if child.id = "additionalContentContainer" then return i
+  end for
+  return m.contentContainer.getChildCount() - 1
 End Function
 
 
@@ -348,14 +409,15 @@ Function renderSectionTabs()
       tabs.push(episodesTab)
     end if
 
-    ' More Like This tab - always show for related content
-    moreLikeThisTab = {
-      id: "moreLikeThis"
-      title: getTranslation("screenDetails_relatedTitles")
-      isPrimaryButton: true
-      trackingContext: createButtonAnalytics("moreLikeThis")
-    }
-    tabs.push(moreLikeThisTab)
+    if shouldShowYmal() = true
+      moreLikeThisTab = {
+        id: "moreLikeThis"
+        title: getTranslation("screenDetails_relatedTitles")
+        isPrimaryButton: true
+        trackingContext: createButtonAnalytics("moreLikeThis")
+      }
+      tabs.push(moreLikeThisTab)
+    end if
 
     ' Details tab - always show
     detailsTab = {
@@ -374,9 +436,9 @@ Function renderSectionTabs()
   end if
 
   playbackSource = m.top.playbackSource
-  if isAA(playbackSource) AND playbackSource.srcForAds = "deeplink"
+  if isAA(playbackSource) AND playbackSource.srcForAds = "deeplink" AND shouldShowYmal() = true
     ' TODO: Now at index 3 because of episodelistcontainer, change if we move back to SectionTabs
-    m.contentContainer.jumpToIndex = 2
+    m.contentContainer.jumpToIndex = getAdditionalContentIndex()
     m.sectionTabs.jumpToIndex = getYmalTabIndex()
   end if
 End Function
@@ -415,7 +477,7 @@ Function onSectionTabFocused(msg)
     if tabId = "details"
       m.videoDetailsPanel.itemContent = m.top.content
       m.videoDetailsPanel.visible = true
-    else if tabId = "moreLikeThis"
+    else if tabId = "moreLikeThis" AND shouldShowYmal() = true
       m.relatedContentContainer.visible = true
     else if tabId = "episodes"
       m.episodesContainer.visible = true

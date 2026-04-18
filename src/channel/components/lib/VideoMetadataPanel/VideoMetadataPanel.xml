@@ -25,6 +25,7 @@
     <field id="width" type="float" />
     <field id="descriptionWidth" type="float" value="0" />
     <field id="minHeight" alias="minHeightTransparentRectangle.height" />
+    <field id="layoutChanged" type="boolean" alwaysNotify="true" alias="infoPanel.layoutChanged" />
   </interface>
 
   <children>

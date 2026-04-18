@@ -104,8 +104,16 @@ Function StatsigExperimentsInterface(statsigExperimentsInfo) as Object
         }
       }
 
-      roku_content_details_v6: {
-        default: { "enabled": false, "is_expand_below": false, "is_episode_below": false }
+      ' VodDetailScreen layout and YMAL experiment
+      ' @param enabled - boolean: true to show VodDetailScreen, false for legacy DetailScreen
+      ' @param is_expand_below - boolean: true to show button title label below icon on focus
+      ' @param is_episode_below - boolean: true to render episode list below the fold
+      ' @param ymal_display - string: controls "You May Also Like" section visibility
+      '   "default"      - show YMAL on detail screen (control)
+      '   "hidden"       - remove YMAL entirely
+      '   "after_player" - show YMAL only after user exits the player
+      roku_content_details_v7: {
+        default: { "enabled": false, "is_expand_below": false, "is_episode_below": false, "ymal_display": "default" }
       }
 
       roku_sot_reverse_ui_test_detail_screen: {

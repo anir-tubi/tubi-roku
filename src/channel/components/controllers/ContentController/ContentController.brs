@@ -482,6 +482,12 @@ Function addControllerUi()
   getStatsigExperimentResource("", "roku_no_layer_experiment", true)
   getStatsigExperimentResource("", "roku_remove_container_json_v1", true)
 
+  contentDetailsExperiment = getStatsigExperimentResource("", "roku_content_details_v7", false)
+  m.ymalDisplay = "default"
+  if contentDetailsExperiment <> invalid AND isNonEmptyString(contentDetailsExperiment.ymal_display)
+    m.ymalDisplay = contentDetailsExperiment.ymal_display
+  end if
+
   ' Holds the screen stack group node
   m.global.screenStackGroup = m.top.findNode("screenStackGroup")
 End Function

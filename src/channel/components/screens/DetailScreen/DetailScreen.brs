@@ -1057,7 +1057,7 @@ Function handleMenuItemSelected(itemSelected)
 End Function
 
 
-Function onRelatedContentChange()
+Function onRelatedContentChange() as Void
   tubiLog("DetailScreen.onRelatedContentChange")
   relatedContent = m.top.relatedContent
   if relatedContent <> invalid
