@@ -484,13 +484,20 @@ Function onContentChange(msg) as Void
   add = false
   creator = content.creatorTensorApp
   if creator <> invalid then
-    if getStatsigExperimentResource("roku_creator_m2", "roku_creator_m2_v1", true).enabled = false then
-      return
+    if LCase(creator.type) = m.constants.ui.appTypes.explore
+      eventConfig = getExternalConfigValueFromGlobal("event", invalid)
+      if isAA(eventConfig) = false OR isAA(eventConfig.hub) = false OR isNowWithinTimePeriod(eventConfig.hub.start_time, eventConfig.hub.end_time) = false
+        add = false
+      else
+        add = true
+      end if
+    else
+      add = true
     end if
-
-    add = true
-    m.CreatorMenuItem.title = creator.title
-    m.CreatorMenuItem.iconUrl = creator.images.logo[0]
+    if add = true
+      m.CreatorMenuItem.title = creator.title
+      m.CreatorMenuItem.iconUrl = creator.images.logo[0]
+    end if
   end if
 
   creatorButtonIndex = m.NodeHelpers.getChildIndexById(m.Menu.content, m.CreatorMenuItem.id)

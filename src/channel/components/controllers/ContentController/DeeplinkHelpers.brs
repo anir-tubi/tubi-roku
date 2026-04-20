@@ -760,6 +760,13 @@ Function handleCollectionDeeplinkContent() as Void
     return
   end if
 
+  eventConfig = getExternalConfigValueFromGlobal("event", invalid)
+  if isAA(eventConfig) = false OR isAA(eventConfig.hub) = false OR isNowWithinTimePeriod(eventConfig.hub.start_time, eventConfig.hub.end_time) = false
+    resetDeeplinkValues()
+    showDefaultHomeScreen()
+    return
+  end if
+
   if m.enteredFromDeepLink = true
     sendDeeplinkAnalytics(m.deeplinkContent, m.deeplinkContent, m.constants.deeplinks.entryPoints.collection, m.Tracking, m.trackingLoggingTask, m.constants)
   end if

@@ -860,30 +860,36 @@ Function addSignInButton(buttons) as Void
 End Function
 
 
-' Adds creator button if content has a creator tensor app and experiment is enabled
+' Adds creator button if content has a creator tensor app
+' When the creator id matches the remote config hub id, validates dates before showing
 ' @param buttons - Array, the buttons list to append to
 ' @param content - Object, the content item
 Function addCreatorButton(buttons, content) as Void
   creator = content.creatorTensorApp
   if creator <> invalid
-    if getStatsigExperimentResource("roku_creator_m2", "roku_creator_m2_v1", true).enabled = true
-      iconUrl = ""
-      if creator.images <> invalid AND isNonEmptyArray(creator.images.logo)
-        iconUrl = creator.images.logo[0]
+    if LCase(creator.type) = m.constants.ui.appTypes.explore
+      eventConfig = getExternalConfigValueFromGlobal("event", invalid)
+      if isAA(eventConfig) = false OR isAA(eventConfig.hub) = false OR isNowWithinTimePeriod(eventConfig.hub.start_time, eventConfig.hub.end_time) = false
+        return
       end if
-
-      buttons.push({
-        id: "creator"
-        title: creator.title
-        iconUrl: iconUrl
-        iconWidth: 81
-        iconHeight: 81
-        padding: 12
-        disableIconBlend: true
-        displayOnlyIconTileWhenNotFocused: true
-        trackingContext: createButtonAnalytics("creator")
-      })
     end if
+
+    iconUrl = ""
+    if creator.images <> invalid AND isNonEmptyArray(creator.images.logo)
+      iconUrl = creator.images.logo[0]
+    end if
+
+    buttons.push({
+      id: "creator"
+      title: creator.title
+      iconUrl: iconUrl
+      iconWidth: 81
+      iconHeight: 81
+      padding: 12
+      disableIconBlend: true
+      displayOnlyIconTileWhenNotFocused: true
+      trackingContext: createButtonAnalytics("creator")
+    })
   end if
 End Function
 

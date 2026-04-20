@@ -281,6 +281,12 @@ End Function
 Function getHubButtonContent(itemContent) as Dynamic
   if m.top.isContentDetailsView = false then return invalid
 
+  if isAA(m.hubConfig) = true AND isNonEmptyString(m.hubConfig.id) = true
+    if isNowWithinTimePeriod(m.hubConfig.start_time, m.hubConfig.end_time) = false
+      return invalid
+    end if
+  end if
+
   if isAA(itemContent.creatorTensorApp) = true AND isNonEmptyString(itemContent.creatorTensorApp.id) = true
     hubTitle = itemContent.creatorTensorApp.title
     if isNonEmptyString(hubTitle) = true

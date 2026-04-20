@@ -49,7 +49,8 @@ Function parseSearchAPISuccess(fullResponse, reqInfo)
     isSignedInUser = reqInfo.isSignedInUser
   end if
 
-  filterCreatorAppsFromRawResponse(parsedResponse)
+  includeExplore = (reqInfo <> invalid AND reqInfo.includeExplore = true)
+  filterCreatorAppsFromRawResponse(parsedResponse, includeExplore)
   convertedMetadata = m.metadataTranslate.translateSearchResults(parsedResponse, isSignedInUser)
 
   parsedData = CreateObject("roSGNode", "SearchContentNode")
@@ -86,24 +87,29 @@ Function parseAutocompleteAPISuccess(fullResponse, reqInfo)
 End Function
 
 
-' Removes CREATOR app entries from the raw search API response before translation.
-' Other app types (PIVOT, EXPLORE) are always kept.
+' Removes CREATOR and optionally EXPLORE app entries from the raw search API response before translation.
 ' @param parsedResponse - raw AA from the V3 search API JSON
-Function filterCreatorAppsFromRawResponse(parsedResponse) as Void
+' @param includeExplore - boolean, when false removes EXPLORE apps (hub config missing or dates invalid)
+Function filterCreatorAppsFromRawResponse(parsedResponse, includeExplore = true) as Void
   apps = parsedResponse.apps
   if isNonEmptyAA(apps) <> true
     return
   end if
 
+  filterCreator = true
   if m.statSigExperiments <> invalid AND m.statSigExperiments.getExperimentResource("roku_search_creator_tile", "roku_search_creator_tile_v1").enabled = true
-    return
+    filterCreator = false
   end if
 
   for each appId in apps.keys()
     app = apps[appId]
-    if isAA(app) = true AND isNonEmptyString(app.type) = true AND LCase(app.type) = m.constants.ui.appTypes.creator
-      apps.delete(appId)
-      exit for
+    if isAA(app) = true AND isNonEmptyString(app.type) = true
+      appType = LCase(app.type)
+      if filterCreator = true AND appType = m.constants.ui.appTypes.creator
+        apps.delete(appId)
+      else if includeExplore = false AND appType = m.constants.ui.appTypes.explore
+        apps.delete(appId)
+      end if
     end if
   end for
 End Function

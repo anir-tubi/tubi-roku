@@ -113,6 +113,8 @@ Function searchFromScreen(searchText, personalizationID = invalid, inputDevice =
       inputDevice = m.constants.inputDevices.remote
     end if
     searchReqInfo = m.CmsApi.createSearchReqInfo(searchText, kidsMode, personalizationID, includeLinear)
+    eventConfig = getExternalConfigValueFromGlobal("event", invalid)
+    includeExplore = (isAA(eventConfig) = true AND isAA(eventConfig.hub) = true AND isNowWithinTimePeriod(eventConfig.hub.start_time, eventConfig.hub.end_time) = true)
     m.currentSearchScreenRequestInfo = m.makeRequest({
       url: searchReqInfo.url
       requestType: m.constants.reqNames.getSearchScreen
@@ -124,6 +126,7 @@ Function searchFromScreen(searchText, personalizationID = invalid, inputDevice =
       isSignedInUser: isLoggedInUser()
       searchText: searchText
       inputDevice: inputDevice
+      includeExplore: includeExplore
       analyticsScreenId: m.constants.ui.screenIds.searchScreen
     })
 

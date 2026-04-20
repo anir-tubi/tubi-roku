@@ -1160,7 +1160,7 @@ Function buildCategoryComponentInfo(content, analyticsRow, analyticsCol)
     if content.type = m.constants.ui.contentTypes.channel
       tile = m.Tracking.getUtilityTile(content, analyticsCol, tileRowIndex)
       categoryComponentInfo["utility_tile"] = tile
-    else if content.type <> "continue_watching_signed_out_user"
+    else if content.type <> "continue_watching_signed_out_user" AND content.gridItemType <> m.constants.ui.gridItemTypes.hubRowLockup
       tile = m.Tracking.getAnalyticsTile(content, analyticsCol, tileRowIndex)
       categoryComponentInfo["content_tile"] = tile
     end if
@@ -1219,7 +1219,7 @@ Function getTrackingComponentInfoOfCategoryGridList(gridItem, itemPosition)
     if gridItem.type = m.constants.ui.contentTypes.channel
       tile = m.Tracking.getUtilityTile(gridItem, itemPosition[1] + 1)
       componentValues["utility_tile"] = tile
-    else if gridItem.type <> "continue_watching_signed_out_user"
+    else if gridItem.type <> "continue_watching_signed_out_user" AND gridItem.gridItemType <> m.constants.ui.gridItemTypes.hubRowLockup
       tile = m.Tracking.getAnalyticsTile(gridItem, itemPosition[1] + 1)
       componentValues["content_tile"] = tile
     end if

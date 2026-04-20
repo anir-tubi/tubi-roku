@@ -476,7 +476,7 @@ Function onRenderTrackingChange(msg)
   MIN_VISIBLE_THRESHOLD = 1000
 
   ' Checking the item is of a certain type that we want to track viewable impression event for.
-  aAllowedTypes = ["series", "video", "linear", "adRowlistSpotlight", "adRowlistCarousel"]
+  aAllowedTypes = ["series", "video", "linear", "adRowlistSpotlight", "adRowlistCarousel", "sports_event"]
 
   if m.shouldTrackViewableImpressionEvent = true AND arrayIncludes(aAllowedTypes, content.type) = true then
     ' Minimum visible time in milli seconds.

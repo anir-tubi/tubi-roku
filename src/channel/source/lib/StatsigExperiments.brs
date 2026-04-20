@@ -145,12 +145,6 @@ Function StatsigExperimentsInterface(statsigExperimentsInfo) as Object
         default: { "no_layer": "no" }
       }
 
-      roku_creator_m2: {
-        roku_creator_m2_v1: {
-          default: { "enabled": true }
-        }
-      }
-
       roku_epg_shift: {
         roku_epg_shift_v1: {
           default: { "enabled": false }
