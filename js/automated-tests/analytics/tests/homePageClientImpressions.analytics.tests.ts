@@ -11,7 +11,6 @@ import SettingsPage from '../pages/settingsPage';
 
 describe('Client Impressions events', function () {
   beforeEach(async () => {
-    this.timeout(300000);
     await testUtils.startApplicationAtPage('home', {
       shouldCreateNewUser: true,
       isAutoplayEnabled : false,

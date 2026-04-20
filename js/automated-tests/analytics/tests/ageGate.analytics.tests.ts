@@ -17,7 +17,6 @@ import {
 import SignInEmailPage from '../pages/signInPage';
 
 describe('Age gate', function () {
-	this.timeout(300000);
 	beforeEach(async () => {
 		await createNewTestInProxy();
 		await testUtils.startApplicationAtPage('home', {

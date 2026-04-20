@@ -10,7 +10,6 @@ import SearchPage from '../pages/searchPage';
 
 describe('Client Impressions events', function () {
     beforeEach(async () => {
-        this.timeout(300000);
         await testUtils.startApplicationAtPage('search', {
             shouldCreateNewUser: false,
             isAutoplayEnabled : false,

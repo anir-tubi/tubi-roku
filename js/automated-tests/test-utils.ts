@@ -1073,7 +1073,7 @@ class TestUtils {
     await this.untilTrue(async () => {
       const { value } = await odc.getValue(element, { timeout: timeout });
       return !!value;
-    });
+    }, undefined, timeout);
   }
 
 
@@ -2171,6 +2171,7 @@ class RegisteredUser extends User {
       auth: {
         refreshtoken: this.userInfo.refresh_token,
         userid: `${this.userInfo.user_id}`,
+        name: this.userInfo.name,
         expiretime: '0'
       },
       visit: {

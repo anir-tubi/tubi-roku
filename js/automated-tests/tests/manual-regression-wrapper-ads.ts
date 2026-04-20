@@ -20,7 +20,7 @@ describe('Wrapper Ads and Skins Regression Tests', () => {
   });
 
   afterEach(async () => {
-    proxy.pause();
+    await proxy.pause();
   });
 
   // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/714505

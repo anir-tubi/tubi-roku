@@ -9,7 +9,6 @@ import {
 } from '../verification/subtitles';
 
 describe('Subtitles events', function () {
-	this.timeout(300000);
 	beforeEach(async () => {
 		await createNewTestInProxy();
 		await testUtils.startApplicationAtPage('movies', {

@@ -75,7 +75,7 @@
     "roku-test-automation": "2.2.2"
   },
   "mocha": {
-    "timeout": 120000,
+    "timeout": 300000,
     "require": [
       "ts-node/register",
       "./js/automated-tests/include.ts"

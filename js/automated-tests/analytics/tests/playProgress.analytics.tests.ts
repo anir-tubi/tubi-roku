@@ -14,7 +14,6 @@ import {
 } from '../verification/playProgressVerification';
 
 describe('Play progress', function () {
-	this.timeout(300000);
 	beforeEach(async () => {
 		await createNewTestInProxy();
 		await testUtils.startApplicationAtPage('movies', {

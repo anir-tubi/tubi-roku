@@ -1093,7 +1093,7 @@ describe('HomeGrid Video Tiles', function () {
     // Validate that video tile overlay group is visible in kids mode
     const overlayGroup = await testUtils.getNodeForElement('videoTileOverlayGroup');
     const isVisible = overlayGroup.visible == true && overlayGroup.opacity == 1;
-    expect(isVisible).to.equal(false, 'videoTileOverlayGroup should be visible in kids mode');
+    expect(isVisible).to.equal(true, 'videoTileOverlayGroup should be visible in kids mode');
 
     // Validate that inline video preview player container has opacity 0 (not showing video preview in kids mode)
     // Wait for UI to update to Kids Mode state

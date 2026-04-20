@@ -13,7 +13,6 @@ import {
 } from '../verification/espanol';
 
 describe('Espanol Events', function () {
-	this.timeout(300000);
 	beforeEach(async () => {
 		await createNewTestInProxy();
 		await testUtils.startApplicationAtPage('espanol', {

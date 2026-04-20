@@ -6,9 +6,6 @@ import type { ElementOrElementId } from '../../../automated-tests-config/element
 
 
 describe('Video Preview', function () {
-  // Increase timeout for video preview tests as they wait for video playback
-  this.timeout(300000); // 5 minutes
-
   // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/257895
   it('C257895 - Verify that High TVT Evergreen titles will have Video Preview clips @videopreview', async () => {
     const user = await testUtils.createRegisteredUser();

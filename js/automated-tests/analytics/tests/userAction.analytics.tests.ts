@@ -5,7 +5,6 @@ import { createNewTestInProxy } from '../utils/network/qaProxy';
 import { verifyC112684 } from '../verification/navigateToPage';
 
 describe('User action', function () {
-	this.timeout(300000);
 	beforeEach(async () => {
 		await createNewTestInProxy();
 		await testUtils.startApplicationAtPage('home', {

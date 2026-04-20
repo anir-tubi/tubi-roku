@@ -352,8 +352,7 @@ describe('Browse While Watching', function () {
         await testUtils.waitForElementToHaveFocus('movieScreenRowList', 'Timed out waiting for Rowlist to have focus');
         // Step 2: Play any VOD (Title A)
         await ecp.sendKeypress(ecp.Key.Play);
-        await testUtils.waitForPlayerStateToEqual('videoPlayerScreen', 'playing', 10000);
-        await utils.sleep(3000);
+        await testUtils.waitForPlayerStateToEqual('videoPlayerScreen', 'playing');
         // Get Title A name
         const titleAContent = await testUtils.getElementField('videoPlayerScreen', 'content');
         const titleA = titleAContent.title;
@@ -368,9 +367,9 @@ describe('Browse While Watching', function () {
         await utils.sleep(2000);
         await ecp.sendKeypress(ecp.Key.Down);
         await utils.sleep(1000);
+        await ecp.sendKeypress(ecp.Key.Right, { count: 2, wait: 500 });
         await ecp.sendKeypress(ecp.Key.Ok);
-        await testUtils.waitForPlayerStateToEqual('videoPlayerScreen', 'playing', 10000);
-        await utils.sleep(3000);
+        await testUtils.waitForPlayerStateToEqual('videoPlayerScreen', 'playing');
         // Get Title B name
         const titleBContent = await testUtils.getElementField('videoPlayerScreen', 'content');
         const titleB = titleBContent.title;
@@ -387,9 +386,9 @@ describe('Browse While Watching', function () {
         await utils.sleep(2000);
         await ecp.sendKeypress(ecp.Key.Down);
         await utils.sleep(1000);
+        await ecp.sendKeypress(ecp.Key.Right, { count: 2, wait: 500 });
         await ecp.sendKeypress(ecp.Key.Ok);
-        await testUtils.waitForPlayerStateToEqual('videoPlayerScreen', 'playing', 10000);
-        await utils.sleep(3000);
+        await testUtils.waitForPlayerStateToEqual('videoPlayerScreen', 'playing');
         // Get Title C name
         const titleCContent = await testUtils.getElementField('videoPlayerScreen', 'content');
         const titleC = titleCContent.title;

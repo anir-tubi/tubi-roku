@@ -5,7 +5,6 @@ import { createNewTestInProxy } from '../utils/network/qaProxy';
 import { verifyC215937 } from '../verification/skipRecap';
 
 describe('Skip Recap', function () {
-	this.timeout(300000);
 	beforeEach(async () => {
 		await createNewTestInProxy();
 		await testUtils.startApplicationAtPage('home', {

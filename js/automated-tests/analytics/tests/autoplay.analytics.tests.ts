@@ -19,7 +19,6 @@ import {
 } from '../verification/autoplay';
 
 describe('Autoplay Analytics', function () {
-	this.timeout(300000);
 	beforeEach(async () => {
 		await createNewTestInProxy();
 		await testUtils.startApplicationAtPage('movies', {

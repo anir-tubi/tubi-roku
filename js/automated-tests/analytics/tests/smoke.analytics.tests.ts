@@ -8,7 +8,6 @@ import { verifyC130135 } from '../verification/playProgressVerification';
 import { verifyC21386andC21388andC21379 } from '../verification/subtitles';
 
 describe('SmokeTests', function () {
-	this.timeout(300000);
 	beforeEach(async () => {
 		await createNewTestInProxy();
 	});

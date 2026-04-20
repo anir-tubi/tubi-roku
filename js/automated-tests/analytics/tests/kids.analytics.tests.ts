@@ -16,7 +16,6 @@ import {
 import { expect } from 'chai';
 
 describe('Kids Events', function () {
-	this.timeout(300000);
 	beforeEach(async () => {
 		await createNewTestInProxy();
 		await testUtils.startApplicationAtPage('home', {

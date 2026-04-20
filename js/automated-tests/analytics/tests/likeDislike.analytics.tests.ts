@@ -40,7 +40,6 @@ import SearchPage from '../pages/searchPage';
 
 describe('Like Dislike events', function () {
 	beforeEach(async () => {
-		this.timeout(300000);
 		await createNewTestInProxy();
 	});
 

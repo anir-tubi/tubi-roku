@@ -16,7 +16,7 @@ describe('Application Launch', function () {
 
   async function navigateToContentSettings() {
     await testHelpers.openLeftNav();
-    await testUtils.jumpToRowIndex('sideNavMenu', 10);
+    await testUtils.jumpToRowWithTitle('sideNavMenu', 'Settings');
     await utils.sleep(500);
     await ecp.sendKeypress(ecp.Key.Ok);
     await testUtils.waitForCurrentScreenToEqual('settingsScreen', 10000);
@@ -27,7 +27,7 @@ describe('Application Launch', function () {
   }
 
   // https://tubi.testrail.io/index.php?/cases/view/535807
-  it('C535807 User Signed in - Homescreen Display @registered_user,@smoke,@application_launch @application_launch', async () => {
+  it('C535807 User Signed in - Homescreen Display @registered_user,@smoke,@application_launch', async () => {
     await testUtils.retryWithTimeOut(async () => {
       await testUtils.assertUserIsSignedIn();
     });
@@ -79,7 +79,7 @@ describe('Application Launch', function () {
     expect(exitKidsGrayedOut.visible).to.equal(true);
 
     // Navigate to Settings for sign out
-    await testUtils.jumpToRowIndex('sideNavMenu', 10);
+    await testUtils.jumpToRowWithTitle('sideNavMenu', 'Settings');
     await utils.sleep(500);
     await ecp.sendKeypress(ecp.Key.Ok);
     await testUtils.waitForCurrentScreenToEqual('settingsScreen', 10000);
@@ -152,11 +152,10 @@ describe('Application Launch', function () {
     await testUtils.waitForElementToHaveFocus('movieScreenRowList', 'Timed out waiting for Rowlist to have focus');
 
 
-    // Jump To Continue Watching Row
+    // Jump To Continue Watching Row and verify it shows actual content, not the guest sign-up prompt
     await shared.scrollDownToFindRow({ slug: 'continue_watching', rowListElementId: 'movieScreenRowList' });
-    await testUtils.waitForElementToFullyShowOnScreen('infoPanelTitleMovies');
-    const infoPanelTitleMovies = await testUtils.getNodeForElement('infoPanelTitleMovies');
-    expect(infoPanelTitleMovies.text).to.not.equal('Sign Up to Save Your Progress');
+    const focusedContent = await testUtils.getCurrentlyFocusedGridItemContent('movieScreenRowList');
+    expect(focusedContent.type).to.not.equal('continue_watching_signed_out_user', 'Registered user should not see the sign-up prompt in Continue Watching row');
   });
 
   // https://tubi.testrail.io/index.php?/cases/view/114199

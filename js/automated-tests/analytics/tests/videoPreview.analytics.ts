@@ -10,7 +10,6 @@ import {
 } from '../verification/autoplay';
 
 describe('Video preview', function () {
-	this.timeout(300000);
 	beforeEach(async () => {
 		await createNewTestInProxy();
 		await testUtils.startApplicationAtPage('movies', {

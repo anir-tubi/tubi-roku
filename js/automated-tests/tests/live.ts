@@ -102,12 +102,24 @@ describe('Live', function () {
         await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');
         await shared.scrollDownToFindRow({ slug: 'recommended_linear_channels', maxScrolls: 40 });
 
-        // Verify that full video plays after preview video is playing
+        // Verify linear preview is playing within the tile (not fullscreen)
+        await testUtils.waitForPlayerStateToEqual('linearVideoPlayerScreen', 'playing');
+        const previewFullscreen = await testUtils.getElementField('linearVideoPlayerScreen', 'fullscreen');
+        expect(previewFullscreen).to.be.false;
 
-        await testUtils.waitForPlayerStateToEqual('linearVideoPlayerScreen', 'playing', 20000);
+        // Capture the content ID so we can verify the same channel plays in fullscreen
+        const previewContentId = await testUtils.getElementField('linearVideoPlayerScreen', 'content.id');
 
-        // Verify that full linear video is playing
-        await testUtils.waitForPlayerStateToEqual('linearVideoPlayerScreen', 'playing', 20000);
+        // Wait for auto-transition from preview to fullscreen
+        await utils.sleep(15000);
+
+        // Verify the linear player is now fullscreen and still playing the same content
+        await testUtils.waitForPlayerStateToEqual('linearVideoPlayerScreen', 'playing');
+        const fullscreenValue = await testUtils.getElementField('linearVideoPlayerScreen', 'fullscreen');
+        expect(fullscreenValue).to.be.true;
+
+        const fullscreenContentId = await testUtils.getElementField('linearVideoPlayerScreen', 'content.id');
+        expect(fullscreenContentId).to.equal(previewContentId);
     });
 
     async function startLiveFeed() {

@@ -53,7 +53,6 @@ import {
 
 describe('My List events', function () {
 	beforeEach(async () => {
-		this.timeout(300000);
 		await createNewTestInProxy();
 		await testUtils.startApplicationAtPage('movies', {
 			shouldCreateNewUser: false,

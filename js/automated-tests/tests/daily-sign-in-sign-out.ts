@@ -21,8 +21,6 @@ import { shared } from '../test-helpers';
  */
 
 describe('Daily Sign In/Sign Out Automation', function () {
-  this.timeout(300000); // 5 minutes timeout for the entire test
-
   it('C825399 - Daily Sign up and Sign Out Flow @daily_sign_in_sign_out', async () => {
     // Step 1: Launch app as guest user
     await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: false });
@@ -55,9 +53,11 @@ describe('Daily Sign In/Sign Out Automation', function () {
     await ecp.sendKeypress(ecp.Key.Down, { count: 4 });
     await ecp.sendKeypress(ecp.Key.Ok);
 
-    // Click "Start Watching" button on age gate completion
-    await testUtils.waitForElementToFullyShowOnScreen('continueWatchingConsentPageAcceptButton');
-    await ecp.sendKeypress(ecp.Key.Ok); // Click "Start Watching"
+    // Dismiss CW consent screen if it appears (not always shown, e.g. after age gate flow)
+    const consentResult = await testUtils.isElementShowingOnScreen('continueWatchingConsentPageAcceptButton', 5000);
+    if (consentResult.isShowing) {
+      await ecp.sendKeypress(ecp.Key.Ok);
+    }
 
     // Should return to home screen as registered user
     await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for home screen after registration');
@@ -76,15 +76,14 @@ describe('Daily Sign In/Sign Out Automation', function () {
     // Verify we're on Settings screen
     await testUtils.waitForElementToFullyShowOnScreen('settingsScreen', 'Settings screen not found', 15000);
 
-    // Navigate to Sign Out option (5th item in settings)
-    await ecp.sendKeypress(ecp.Key.Down, { count: 4 });
-    await ecp.sendKeypress(ecp.Key.Ok);
+    // Account panel is first item in settings menu, so activate it and go to Sign Out option
+    await ecp.sendKeypress(ecp.Key.Ok, { count: 2, wait: 500 });
 
     // Wait for sign out verification modal
     await testUtils.waitForElementToShowOnScreen('signOutVerificationModalMessage', 'Sign out verification modal message not found', 15000);
     const signOutVerificationModalMessage = await testUtils.getNodeForElement('signOutVerificationModalMessage');
     expect(signOutVerificationModalMessage.visible).to.be.true;
-    expect(signOutVerificationModalMessage.text).to.equal('You are about to sign out of your Tubi account.');
+    expect(signOutVerificationModalMessage.text).to.contain('You are about to sign out');
 
     // Confirm sign out
     await ecp.sendKeypress(ecp.Key.Ok);

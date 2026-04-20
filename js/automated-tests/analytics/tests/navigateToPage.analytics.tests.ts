@@ -22,7 +22,6 @@ import { verifyC3856 } from '../verification/pageLoad';
 
 describe('Navigate To Page', function () {
 	beforeEach(async () => {
-		this.timeout(300000);
 		await createNewTestInProxy();
 		await testUtils.startApplicationAtPage('home', {
 			shouldCreateNewUser: false,
