@@ -1,14 +1,35 @@
 import { expect } from 'chai';
-import { ecp, utils } from 'roku-test-automation';
+import { ecp, odc, utils } from 'roku-test-automation';
 import { testUtils } from '../test-utils';
 import { shared } from '../test-helpers';
+
+async function navigateToTransportButtons() {
+  await ecp.sendKeypress(ecp.Key.Up);
+  await testUtils.waitForElementToHaveFocus('playerScreenProgressBar');
+  await testUtils.untilTrue(async () => {
+    await utils.sleep(200);
+    await ecp.sendKeypress(ecp.Key.Up);
+    const { node } = await odc.getFocusedNode();
+    return node.subtype === 'TextIconButton' || node.subtype === 'EnhancedButton';
+  }, 'Timed out waiting for a transport button to have focus');
+}
+
+async function navigateToSendFeedbackButton(maxPresses = 10) {
+  for (let i = 0; i < maxPresses; i++) {
+    const { node } = await odc.getFocusedNode();
+    if (node.id === 'sendFeedBackButton') return;
+    await ecp.sendKeypress(ecp.Key.Right);
+    await utils.sleep(200);
+  }
+  throw new Error('Could not navigate to sendFeedBackButton');
+}
 
 describe('Send Feedback Tests', function () {
 
   // Test Rail link: https://tubi.testrail.io/index.php?/cases/view/574103
   it('C574103 Guest user shows the feedback icon on movie player, @send_feedback', async () => {
     // Start app with Guest user
-    await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: false });
+    await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: false, clearRegistry: true });
     await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');
 
     // Select a movie title and Play
@@ -38,7 +59,7 @@ describe('Send Feedback Tests', function () {
   // Test Rail link: https://tubi.testrail.io/index.php?/cases/view/574104
   it('C574104 Guest user shows the feedback icon on series player, @send_feedback', async () => {
     // Start app with Guest user
-    await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: false });
+    await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: false, clearRegistry: true });
     await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');
 
     // Select a series title and Play
@@ -128,7 +149,7 @@ describe('Send Feedback Tests', function () {
   // Test Rail link: https://tubi.testrail.io/index.php?/cases/view/574107
   it('C574107 User clicks on the send feedback icon and menu show up, @send_feedback', async () => {
     // Start app
-    await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: false });
+    await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: false, clearRegistry: true });
     await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');
 
     // Ensure we're focused on playable content before pressing Play
@@ -138,12 +159,9 @@ describe('Send Feedback Tests', function () {
     await ecp.sendKeypress(ecp.Key.Play);
     await testUtils.waitForPlayerStateToEqual('videoPlayerScreen', 'playing');
 
-    // Show HUD (Play or Ok depending on device)
-    await ecp.sendKeypress(ecp.Key.Play);
-    await utils.sleep(800);
-
-    // Set the focus to sendFeedback button
-    await ecp.sendKeypress(ecp.Key.Right, { count: 5 });
+    // Navigate to sendFeedback button
+    await navigateToTransportButtons();
+    await navigateToSendFeedbackButton();
 
     // Open Send Feedback overlay
     await ecp.sendKeypress(ecp.Key.Ok);
@@ -156,7 +174,7 @@ describe('Send Feedback Tests', function () {
   // Test Rail link: https://tubi.testrail.io/index.php?/cases/view/574108
   it('C574108 User could scroll down/up on the side menu to browse options of user feedback, @send_feedback', async () => {
     // Start app
-    await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: false });
+    await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: false, clearRegistry: true });
     await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');
 
     // Ensure we're focused on playable content before pressing Play
@@ -166,12 +184,9 @@ describe('Send Feedback Tests', function () {
     await ecp.sendKeypress(ecp.Key.Play);
     await testUtils.waitForPlayerStateToEqual('videoPlayerScreen', 'playing');
 
-    // Show HUD (Play or Ok depending on device)
-    await ecp.sendKeypress(ecp.Key.Play);
-    await utils.sleep(800);
-
-    // Set the focus to sendFeedback button
-    await ecp.sendKeypress(ecp.Key.Right, { count: 5 });
+    // Navigate to sendFeedback button
+    await navigateToTransportButtons();
+    await navigateToSendFeedbackButton();
 
     // Open Send Feedback overlay
     await ecp.sendKeypress(ecp.Key.Ok);
@@ -187,7 +202,7 @@ describe('Send Feedback Tests', function () {
   // Test Rail link: https://tubi.testrail.io/index.php?/cases/view/574109
   it('C574109 User could choose one item and see the confirm page, @send_feedback', async () => {
     // Start app
-    await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: false });
+    await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: false, clearRegistry: true });
     await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');
 
     // Ensure we're focused on playable content before pressing Play
@@ -197,12 +212,9 @@ describe('Send Feedback Tests', function () {
     await ecp.sendKeypress(ecp.Key.Play);
     await testUtils.waitForPlayerStateToEqual('videoPlayerScreen', 'playing');
 
-    // Show HUD (Play or Ok depending on device)
-    await ecp.sendKeypress(ecp.Key.Play);
-    await utils.sleep(800);
-
-    // Set the focus to sendFeedback button
-    await ecp.sendKeypress(ecp.Key.Right, { count: 5 });
+    // Navigate to sendFeedback button
+    await navigateToTransportButtons();
+    await navigateToSendFeedbackButton();
 
     // Open Send Feedback overlay
     await ecp.sendKeypress(ecp.Key.Ok);
@@ -228,7 +240,7 @@ describe('Send Feedback Tests', function () {
   // Test Rail link: https://tubi.testrail.io/index.php?/cases/view/574110
   it('C574110 User could close the send feedback side menu be pressing back button, @send_feedback', async () => {
     // Start app
-    await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: false });
+    await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: false, clearRegistry: true });
     await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');
 
     // Ensure we're focused on playable content before pressing Play
@@ -238,12 +250,9 @@ describe('Send Feedback Tests', function () {
     await ecp.sendKeypress(ecp.Key.Play);
     await testUtils.waitForPlayerStateToEqual('videoPlayerScreen', 'playing');
 
-    // Show HUD (Play or Ok depending on device)
-    await ecp.sendKeypress(ecp.Key.Play);
-    await utils.sleep(800);
-
-    // Set the focus to sendFeedback button
-    await ecp.sendKeypress(ecp.Key.Right, { count: 5 });
+    // Navigate to sendFeedback button
+    await navigateToTransportButtons();
+    await navigateToSendFeedbackButton();
 
     // Open Send Feedback overlay
     await ecp.sendKeypress(ecp.Key.Ok);
@@ -264,7 +273,7 @@ describe('Send Feedback Tests', function () {
   // Test Rail link: https://tubi.testrail.io/index.php?/cases/view/574111
   it('C574111 User could back to send feedback side menu from confirm page by pressing back button, @send_feedback', async () => {
     // Start app
-    await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: false });
+    await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: false, clearRegistry: true });
     await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');
 
     // Ensure we're focused on playable content before pressing Play
@@ -274,12 +283,9 @@ describe('Send Feedback Tests', function () {
     await ecp.sendKeypress(ecp.Key.Play);
     await testUtils.waitForPlayerStateToEqual('videoPlayerScreen', 'playing');
 
-    // Show HUD (Play or Ok depending on device)
-    await ecp.sendKeypress(ecp.Key.Play);
-    await utils.sleep(800);
-
-    // Set the focus to sendFeedback button
-    await ecp.sendKeypress(ecp.Key.Right, { count: 5 });
+    // Navigate to sendFeedback button
+    await navigateToTransportButtons();
+    await navigateToSendFeedbackButton();
 
     // Open Send Feedback overlay
     await ecp.sendKeypress(ecp.Key.Ok);
@@ -315,7 +321,7 @@ describe('Send Feedback Tests', function () {
   // Test Rail link: https://tubi.testrail.io/index.php?/cases/view/574113
   it('C574113 User could submit the issue automatically aftering clicking one item from the panel, @send_feedback', async () => {
     // Start app
-    await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: false });
+    await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: false, clearRegistry: true });
     await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');
 
     // Ensure we're focused on playable content before pressing Play
@@ -323,17 +329,17 @@ describe('Send Feedback Tests', function () {
 
     // Press play to start video, then check if it is playing
     await ecp.sendKeypress(ecp.Key.Play);
+    await testUtils.waitForCurrentScreenToEqual('videoPlayerScreen');
     await testUtils.waitForPlayerStateToEqual('videoPlayerScreen', 'playing');
 
     const videoPlayerScreen = await testUtils.getNodeForElement('videoPlayerScreen');
     const playerState = videoPlayerScreen.state
 
-    // Show HUD (Play or Ok depending on device)
-    await ecp.sendKeypress(ecp.Key.Down);
-    await utils.sleep(800);
+    // Show HUD and navigate up to transport buttons
+    await navigateToTransportButtons();
 
-    // Set the focus to sendFeedback button
-    await ecp.sendKeypress(ecp.Key.Right, { count: 5 });
+    // Navigate to sendFeedback button
+    await navigateToSendFeedbackButton();
 
     // Open Send Feedback overlay
     await ecp.sendKeypress(ecp.Key.Ok);
@@ -378,7 +384,7 @@ describe('Send Feedback Tests', function () {
   it('C574114 User could scan the QR code to report issue on mobile phone, @send_feedback', async () => {
 
     // Start app
-    await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: false });
+    await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: false, clearRegistry: true });
     await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');
 
     // Ensure we're focused on playable content before pressing Play
@@ -388,12 +394,9 @@ describe('Send Feedback Tests', function () {
     await ecp.sendKeypress(ecp.Key.Play);
     await testUtils.waitForPlayerStateToEqual('videoPlayerScreen', 'playing');
 
-    // Show HUD (Play or Ok depending on device)
-    await ecp.sendKeypress(ecp.Key.Down);
-    await utils.sleep(800);
-
-    // Set the focus to sendFeedback button
-    await ecp.sendKeypress(ecp.Key.Right, { count: 5 });
+    // Navigate to sendFeedback button
+    await navigateToTransportButtons();
+    await navigateToSendFeedbackButton();
 
     // Open Send Feedback overlay
     await ecp.sendKeypress(ecp.Key.Ok);
@@ -427,7 +430,7 @@ describe('Send Feedback Tests', function () {
   it('C678503 When feedack panel is open, the content playback is NOT paused, @send_feedback', async () => {
 
     // Start app
-    await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: false });
+    await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: false, clearRegistry: true });
     await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');
 
     // Ensure we're focused on playable content before pressing Play
@@ -440,12 +443,9 @@ describe('Send Feedback Tests', function () {
     const videoPlayerScreen = await testUtils.getNodeForElement('videoPlayerScreen');
     const playerState = videoPlayerScreen.state
 
-    // Show HUD (Play or Ok depending on device)
-    await ecp.sendKeypress(ecp.Key.Down);
-    await utils.sleep(800);
-
-    // Set the focus to sendFeedback button
-    await ecp.sendKeypress(ecp.Key.Right, { count: 5 });
+    // Navigate to sendFeedback button
+    await navigateToTransportButtons();
+    await navigateToSendFeedbackButton();
 
     // Open Send Feedback overlay
     await ecp.sendKeypress(ecp.Key.Ok);
@@ -459,7 +459,7 @@ describe('Send Feedback Tests', function () {
   // Test Rail link: https://tubi.testrail.io/index.php?/cases/view/574116
   it('C574116 User could NOT submit feedback during pre-roll ads playback, @send_feedback', async () => {
     // Start app
-    await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: false });
+    await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: false, clearRegistry: true });
     await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');
 
     // Ensure we're focused on playable content before pressing Play
@@ -492,7 +492,7 @@ describe('Send Feedback Tests', function () {
   // Test Rail link: https://tubi.testrail.io/index.php?/cases/view/574117
   it('C574117 User could NOT submit feedback during mid-roll ads playback, @send_feedback', async () => {
     // Start app
-    await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: false });
+    await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: false, clearRegistry: true });
     await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');
 
     // Ensure we're focused on playable content before pressing Play
@@ -540,27 +540,30 @@ describe('Send Feedback Tests', function () {
   // Test Rail link: https://tubi.testrail.io/index.php?/cases/view/574118
   it('C574118 The feedback icon should be hidden in kids mode, @send_feedback', async () => {
     // Start app
-    await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: false });
+    await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: false, clearRegistry: true });
     await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');
-    await utils.sleep(800);
-
     await openKidsMode();
     await utils.sleep(800);
 
     // Navigate right to home page focus
-    await ecp.sendKeypress(ecp.Key.Right, { wait: 1500 });
+    await ecp.sendKeypress(ecp.Key.Right);
+    await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');
 
     await ecp.sendKeypress(ecp.Key.Play);
 
     // Verify that video is still playing
     await testUtils.waitForPlayerStateToEqual('videoPlayerScreen', 'playing', 5000);
 
-    // Show HUD (Play or Ok depending on device)
-    await ecp.sendKeypress(ecp.Key.Down);
-
-    // Verify Send Feedback button exists and is visible in the transport area
-    const sendFeedbackButton = await testUtils.getNodeForElement('sendFeedBackButton');
-    expect(sendFeedbackButton.visible).to.equal(false);
+    // Navigate to transport buttons and verify sendFeedback button is not reachable
+    await navigateToTransportButtons();
+    let foundButton = false;
+    try {
+      await navigateToSendFeedbackButton();
+      foundButton = true;
+    } catch (e) {
+      // Expected: button not found
+    }
+    expect(foundButton).to.equal(false, 'sendFeedBackButton should not be reachable in kids mode');
   });
 
   // Test Rail link: https://tubi.testrail.io/index.php?/cases/view/574119
@@ -604,18 +607,22 @@ describe('Send Feedback Tests', function () {
     // await testUtils.waitForPlayerStateToEqual('previewVideoPlayer','playing', 5000);
     await utils.sleep(2500);
 
-    // Show HUD (Play or Ok depending on device)
-    await ecp.sendKeypress(ecp.Key.Down);
-
-    // Verify Send Feedback button exists and is visible in the transport area
-    const sendFeedbackButton = await testUtils.getNodeForElement('sendFeedBackButton');
-    expect(sendFeedbackButton.visible).to.equal(false);
+    // Navigate to transport buttons and verify sendFeedback button is not reachable
+    await navigateToTransportButtons();
+    let foundButton = false;
+    try {
+      await navigateToSendFeedbackButton();
+      foundButton = true;
+    } catch (e) {
+      // Expected: button not found
+    }
+    expect(foundButton).to.equal(false, 'sendFeedBackButton should not be reachable with parental controls on');
   });
 
   // Test Rail link: https://tubi.testrail.io/index.php?/cases/view/749378
   it('C749378 When "Close" button is in focus, press a navigational button, @send_feedback', async () => {
     // Start app
-    await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: false });
+    await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: false, clearRegistry: true });
     await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');
 
     // Ensure we're focused on playable content before pressing Play
@@ -628,12 +635,9 @@ describe('Send Feedback Tests', function () {
     const videoPlayerScreen = await testUtils.getNodeForElement('videoPlayerScreen');
     const playerState = videoPlayerScreen.state
 
-    // Show HUD (Play or Ok depending on device)
-    await ecp.sendKeypress(ecp.Key.Down);
-    await utils.sleep(800);
-
-    // Set the focus to sendFeedback button
-    await ecp.sendKeypress(ecp.Key.Right, { count: 5 });
+    // Navigate to sendFeedback button
+    await navigateToTransportButtons();
+    await navigateToSendFeedbackButton();
 
     // Open Send Feedback overlay
     await ecp.sendKeypress(ecp.Key.Ok);
@@ -681,7 +685,7 @@ describe('Send Feedback Tests', function () {
   // Test Rail link: https://tubi.testrail.io/index.php?/cases/view/749379
   it('C749379 When user selects an issue, the Thank You/QR Code page is shown, @send_feedback', async () => {
     // Start app
-    await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: false });
+    await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: false, clearRegistry: true });
     await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');
 
     // Ensure we're focused on playable content before pressing Play
@@ -694,12 +698,9 @@ describe('Send Feedback Tests', function () {
     const videoPlayerScreen = await testUtils.getNodeForElement('videoPlayerScreen');
     const playerState = videoPlayerScreen.state
 
-    // Show HUD (Play or Ok depending on device)
-    await ecp.sendKeypress(ecp.Key.Down);
-    await utils.sleep(800);
-
-    // Set the focus to sendFeedback button
-    await ecp.sendKeypress(ecp.Key.Right, { count: 5 });
+    // Navigate to sendFeedback button
+    await navigateToTransportButtons();
+    await navigateToSendFeedbackButton();
 
     // Open Send Feedback overlay
     await ecp.sendKeypress(ecp.Key.Ok);

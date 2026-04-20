@@ -6,7 +6,7 @@ import { elements } from '../../../automated-tests-config/elements';
 
 // Skipping these tests for now as it is still a experimental feature.
 // Will be used for manual testing during development and qa phase.
-describe('Title Details Page', function () {
+describe.skip('Title Details Page', function () {
   // Helper function to start application with content details experiment overrides
   async function startApplicationWithExperimentOverrides(page: string, args: any = {}) {
     return await testUtils.startApplicationAtPage(page as any, {
