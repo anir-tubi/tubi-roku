@@ -14,12 +14,22 @@ Function init()
   m.top.observeFieldScoped("show", "onShow")
   m.top.opacity = 0
   m.infoPaneBg.uri = "pkg:/images/tab_short_component_alt_$$RES$$.9.png"
+
+  if m.global <> invalid
+    m.global.observeFieldScoped("theme", "onThemeChange")
+  end if
+
   onThemeChange()
 End Function
 
 
-Function onThemeChange()
-  theme = getThemeFromGlobal()
+Function onThemeChange(msg = invalid)
+  if msg <> invalid
+    theme = msg.getData()
+  else
+    theme = getThemeFromGlobal()
+  end if
+
   typographyConstants = getTypographyConstants()
   setTypographyOfLabel(m.infoPaneText, typographyConstants.ids.bodySmall)
   defaultStyleColor = ""

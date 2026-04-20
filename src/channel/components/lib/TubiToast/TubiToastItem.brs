@@ -13,6 +13,10 @@ Function init()
   typographyConstants = getTypographyConstants()
   setTypographyOfLabel(m.infoPaneText, typographyConstants.ids.bodySmall)
 
+  if m.global <> invalid
+    m.global.observeFieldScoped("theme", "onThemeChange")
+  end if
+
   onThemeChange()
 End Function
 
