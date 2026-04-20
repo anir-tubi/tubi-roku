@@ -509,7 +509,11 @@ Function handleItemSelected(selectedPosition)
       if itemSelected <> invalid
         m.top.contentSelected = itemSelected
       end if
-    else if (category.id = m.constants.ui.categoryIds.guestUserMyStuff OR category.gridItemType = emptyContainerGridItemType)
+    else if category.id = m.constants.ui.categoryIds.guestUserMyStuff AND m.top.signedIn <> true
+      ' Guest user selected the sign-up tile — trigger registration flow
+      setSignUpButtonSelectedIndicator()
+    else if category.gridItemType = emptyContainerGridItemType
+      ' Signed-in user with all-empty content — go home
       m.top.homeButtonSelected = true
     end if
   end if
