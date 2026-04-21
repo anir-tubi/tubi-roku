@@ -2166,7 +2166,7 @@ Function tubiMetadataTranslate_buildContinueWatchingSignedOutUserCategoryAA(cont
     childAA = {
       id: m.constants.ui.contentTypes.historySignedOutUser
       subtype: "TubiContentNode"
-      type: "cwso"
+      type: m.contentTypes.historySignedOutUser
       title: sTitle
       description: sDescription
       gridItemType: m.constants.ui.gridItemTypes.historySignedOutUser
