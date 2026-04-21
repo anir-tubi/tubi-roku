@@ -4353,11 +4353,12 @@ Function getEventHubTileAA(entryType = invalid)
     id: hub.id
     title: hub.title
     description: hub.container_description
-    titleImageUri: hub.title_art
+    titleImageUrl: hub.title_art
     hdGridPosterUrl: hub.logo
     gridItemType: m.constants.ui.gridItemTypes.eventHubTile
     titleTypography: getTypographyConstants().ids.bodySmallStrong
     type: m.constants.ui.appTypes.pivot
     containerId: hub.container_id
+    backgrounds: [hub.background]
   }
 End Function

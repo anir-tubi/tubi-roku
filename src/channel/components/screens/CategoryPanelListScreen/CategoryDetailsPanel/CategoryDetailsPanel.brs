@@ -325,8 +325,8 @@ Function populateInfoPanel(infoPanel, content)
       infoPanel.title = content.title
       infoPanel.description = content.description
       infoPanel.titleLogoUri = content.logo
-      if isNonEmptyString(content.titleImageUri)
-        infoPanel.eventLogoUri = content.titleImageUri
+      if isNonEmptyString(content.titleImageUrl)
+        infoPanel.eventLogoUri = content.titleImageUrl
       else
         infoPanel.eventLogoUri = ""
       end if

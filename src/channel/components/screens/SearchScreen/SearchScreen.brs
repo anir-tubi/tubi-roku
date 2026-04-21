@@ -736,10 +736,11 @@ Function onItemFocused(msg)
 
     else if arrayIncludes(m.constants.ui.appTypes.keys(), focusedContent.type) = true
       m.searchScreenInfoPanel.mode = m.constants.ui.infoPanelModes.app
-      m.searchScreenInfoPanel.titleLogoUri = focusedContent.logo
-      if isNonEmptyString(focusedContent.titleImageUri)
-        m.searchScreenInfoPanel.eventLogoUri = focusedContent.titleImageUri
+      if isNonEmptyString(focusedContent.titleImageUrl)
+        m.searchScreenInfoPanel.eventLogoUri = focusedContent.titleImageUrl
+        m.searchScreenInfoPanel.titleLogoUri = ""
       else
+        m.searchScreenInfoPanel.titleLogoUri = focusedContent.logo
         m.searchScreenInfoPanel.eventLogoUri = ""
       end if
     else

@@ -618,14 +618,17 @@ Function cmsApi_setAppImageParams(existingParams = {})
   imageSizes = m.constants.ui.imageSizes
   background = imageSizes.background
   tileLogo = imageSizes.creatorTileLogo
+  titleArt = imageSizes.titleArt
 
   if m.constants.ui.imageSizeMultiplier < 1 then
     background = m.convertImageSizeFor720p(background)
     tileLogo = m.convertImageSizeFor720p(tileLogo)
+    titleArt = m.convertImageSizeFor720p(titleArt)
   end if
 
   existingParams["app_images[background_tb]"] = "w" + background[0].toStr() + "h" + background[1].toStr() + "_hero"
   existingParams["app_images[logo]"] = "w" + tileLogo[0].toStr() + "h" + tileLogo[1].toStr() + "_logo"
+  existingParams["app_images[title_art]"] = "w" + titleArt[0].toStr() + "h" + titleArt[1].toStr() + "_title"
 
   return existingParams
 End Function

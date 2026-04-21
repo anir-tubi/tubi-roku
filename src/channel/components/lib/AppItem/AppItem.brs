@@ -17,6 +17,8 @@ Function init() as Void
   topRef.observeFieldScoped("width", "onSizeChange")
   topRef.observeFieldScoped("height", "onSizeChange")
 
+  m.constants = getConstantsFromGlobal()
+
   if m.global <> invalid
     m.global.observeFieldScoped("theme", "onThemeChange")
   end if
@@ -58,6 +60,8 @@ Function onItemContentChange(msg = invalid) as Void
   typographyOverrides = { lineSpacing: 2 }
   if isNonEmptyString(itemContent.titleTypography)
     setTypographyOfLabel(m.title, itemContent.titleTypography, typographyOverrides)
+  else if itemContent.type = m.constants.ui.appTypes.explore
+    setTypographyOfLabel(m.title, m.typographyConstants.ids.bodySmallStrong, typographyOverrides)
   else
     setTypographyOfLabel(m.title, m.typographyConstants.ids.bodyMediumStrong, typographyOverrides)
   end if
