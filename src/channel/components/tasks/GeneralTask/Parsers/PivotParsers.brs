@@ -26,10 +26,10 @@ Function parsePivotsSuccess(response, _reqInfo) as Dynamic
   ' Build content structure for RowList: rootContent → rowNode → itemNodes
   rootContent = CreateObject("roSGNode", "ContentNode")
 
-  ' Get remove_pivots list from roku_pivots_v_1_3 experiment
+  ' Get remove_pivots list from roku_pivots_v_1_4 experiment
   removePivots = []
   if m.statSigExperiments <> invalid
-    pivotExperiment = m.statSigExperiments.getExperimentResource("", "roku_pivots_v_1_3")
+    pivotExperiment = m.statSigExperiments.getExperimentResource("", "roku_pivots_v_1_4")
     if pivotExperiment <> invalid AND isNonEmptyArray(pivotExperiment.remove_pivots) = true
       removePivots = pivotExperiment.remove_pivots
     end if

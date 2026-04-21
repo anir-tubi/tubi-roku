@@ -341,9 +341,9 @@ Function fetchHomeScreen(homeScreen, useCache = false)
   homeScreen.enableVideoTiles = isVideoTileEnabledScreen(screenId)
   isPivotExperimentEnabled = false
   if UCase(m.constants.deviceInfo.countryCode) = "US"
-    isPivotExperimentEnabled = getStatsigExperimentResource("", "roku_pivots_v_1_3", true).enabled = true
+    isPivotExperimentEnabled = getStatsigExperimentResource("", "roku_pivots_v_1_4", true).enabled = true
   end if
-  ' TODO: Remove mock server override once roku_pivots_v_1_3 experiment is graduated
+  ' TODO: Remove mock server override once roku_pivots_v_1_4 experiment is graduated
   if m.constants.settings.mockServerEnabled = true
     isPivotExperimentEnabled = true
   end if

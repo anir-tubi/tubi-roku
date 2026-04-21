@@ -157,7 +157,7 @@ Function StatsigExperimentsInterface(statsigExperimentsInfo) as Object
         }
       }
 
-      roku_pivots_v_1_3: {
+      roku_pivots_v_1_4: {
         default: { "enabled": false, "treatment_group": "control", "background_enabled": false, "remove_pivots": [] }
       }
 

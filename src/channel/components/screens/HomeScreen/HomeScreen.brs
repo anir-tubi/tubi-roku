@@ -1585,7 +1585,7 @@ End Function
 
 
 ' Resets focus from PivotList to CategoryGridList
-' Part of roku_pivots_v_1_3 experiment - remove if experiment is not positive
+' Part of roku_pivots_v_1_4 experiment - remove if experiment is not positive
 Function onFocusCategoryGridList(_msg = invalid) as Void
   m.top.lastFocusedList = ""
   m.CategoryGridList.setFocus(true)
