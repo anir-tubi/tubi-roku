@@ -137,19 +137,32 @@ End Function
 Function onSettingsSignOutSelected()
   tubiLog("SettingsScreenHelpers.onSettingsSignOutSelected")
 
-
   pageInfo = m.Tracking.getAnalyticsPage("account_page", { account_page_type: "ACCOUNT" })
-
-  dialogEvent = {
-    type: "dialog"
-    values: {
-      dialog_type: "SIGN_OUT" 'DialogType enum - TODO use a "SIGN_OUT" type when it becomes available in protos
-      pageOneof: pageInfo 'settings_page doesn't exist in protos
-      dialog_action: "SHOW"
-      dialog_sub_type: "sign-out"
+  if isUserInMultiAccount() = false
+    dialogEvent = {
+      type: "dialog"
+      values: {
+        dialog_type: "INFORMATION" 'DialogType enum - TODO use a "SIGN_OUT" type when it becomes available in protos
+        pageOneof: pageInfo 'settings_page doesn't exist in protos
+        dialog_action: "SHOW"
+        dialog_sub_type: "sign-out-settings"
+      }
     }
-  }
-  showSignOutProfileWithKidsModal(dialogEvent, m.trackingLoggingTask, onSignOutProfileSelected)
+    showSignOutModal(dialogEvent, m.trackingLoggingTask, onSignOutModalSelected)
+  else
+    dialogEvent = {
+      type: "dialog"
+      values: {
+        dialog_type: "SIGN_OUT" 'DialogType enum - TODO use a "SIGN_OUT" type when it becomes available in protos
+        pageOneof: pageInfo 'settings_page doesn't exist in protos
+        dialog_action: "SHOW"
+        dialog_sub_type: "sign-out"
+      }
+    }
+    showSignOutProfileWithKidsModal(dialogEvent, m.trackingLoggingTask, onSignOutProfileSelected)
+  end if
+
+
   'Send ComponentInteractionEvent
   button_component = {
     button_type: "TEXT"
