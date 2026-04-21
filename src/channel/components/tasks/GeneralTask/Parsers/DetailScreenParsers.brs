@@ -159,6 +159,18 @@ Function parseSeasonListSuccess(fullResponse, reqInfo)
   if parsedResponse <> invalid AND parsedResponse.episodes_by_season <> invalid
     seasonSelectorContent = CreateObject("roSGNode", "ContentNode")
     episodesBySeason = parsedResponse.episodes_by_season
+    ' API may return episodes_by_season as an AA keyed by season number; normalize to array
+    ' During fail safe, the API returns a string instead of an AA.
+    if isNonEmptyAA(episodesBySeason) = true
+      episodesArray = []
+      for each key in episodesBySeason.keys()
+        entry = episodesBySeason[key]
+        if isAA(entry) = true
+          episodesArray.push(entry)
+        end if
+      end for
+      episodesBySeason = episodesArray
+    end if
     seasonNumbers = []
     for each item in episodesBySeason
       seasonNum = item.season.toStr()
