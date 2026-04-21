@@ -1001,7 +1001,7 @@ Function setSideNavForProfileSelected(authInfo)
 End Function
 
 
-Function showWelcomeProfileToast(authInfo = invalid)
+Function showWelcomeProfileToast(authInfo = invalid, isAlreadySignedIn = false)
   if isUserInMultiAccount() = true
     if authInfo = invalid
       authInfo = m.tubiAuthUpdate.getAuthInfo()
@@ -1013,13 +1013,22 @@ Function showWelcomeProfileToast(authInfo = invalid)
     end if
 
     if isNonEmptyString(name) = true
-      headerText = getTranslation("new_account_welcome_header", { "name": name })
+
+      if isAlreadySignedIn = true
+        msgTxt = getTranslation("auth_already_signed_in_welcome_message", { "name": name })
+      else
+        msgTxt = getTranslation("new_account_welcome_header", { "name": name })
+      end if
+
+      messageFont = getTypographyConstants().ids.subHeaderSmall
+
       profileInitial = Ucase(name.left(1))
       toastInfo = {
         message: ""
         selfDestructTimer: 5
         imageUri: authInfo.avatarUrl
-        headerText: headerText
+        message: msgTxt
+        messageFont: messageFont
         profileInitial: profileInitial
       }
 

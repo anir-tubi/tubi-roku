@@ -2591,5 +2591,9 @@
   "content_settings_learn_more": {
     "description": "Label for the learn more link",
     "message": "Learn more at {url}"
+  },
+  "auth_already_signed_in_welcome_message": {
+    "description": "A message that lets the user know they've been signed in with the given email",
+    "message": "You're already signed in as {name}"
   }
 }

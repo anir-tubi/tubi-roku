@@ -900,9 +900,9 @@ Function tubiAuth_formatAuthInfoFromServer(serverAuthInfo)
   if serverAuthInfo.has_age <> invalid then authInfo.hasAge = serverAuthInfo.has_age.toStr()
   if serverAuthInfo.user_uuid <> invalid then authInfo.userUuid = serverAuthInfo.user_uuid
   if serverAuthInfo.has_pin <> invalid then authInfo.hasPin = serverAuthInfo.has_pin.toStr()
-  if serverAuthInfo.tubi_id <> invalid then authInfo.tubiId = serverAuthInfo.tubi_id.toStr()
+  if serverAuthInfo.tubi_id <> invalid then authInfo.tubiId = serverAuthInfo.tubi_id
   if serverAuthInfo.email <> invalid then authInfo.email = serverAuthInfo.email
-  if serverAuthInfo.parent_tubi_id <> invalid then authInfo.parentId = serverAuthInfo.parent_tubi_id.toStr()
+  if serverAuthInfo.parent_tubi_id <> invalid then authInfo.parentId = serverAuthInfo.parent_tubi_id
   if serverAuthInfo.parental_rating_v2 <> invalid then authInfo.parentalRating = serverAuthInfo.parental_rating_v2.toStr()
   if serverAuthInfo.pwexpts <> invalid then authInfo.pwExpTs = serverAuthInfo.pwexpts.toStr()
 

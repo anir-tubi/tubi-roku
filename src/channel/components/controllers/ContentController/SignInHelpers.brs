@@ -656,9 +656,13 @@ End Function
 ' onSignInResponse callback is triggered when the sign In is success
 ' @response: assocarray or invalid, the response of signIn API in the form of AA or invalid if called from onQueryStatusOfMagicLinkResponse
 Function onSignInResponse(response)
+  'you need to check the isAlreadySignedIn before handleRegistration writes/updates the profile auth info, otherwise getProfileAuthInfo would always return data
+  isAlreadySignedIn = false
+  if response.tubi_id <> invalid then
+    isAlreadySignedIn = (m.tubiAuthUpdate.getProfileAuthInfo(response.tubi_id).count() > 0)
+  end if
 
   handleRegistrationForMultipleAccounts(response)
-
 
   event = {
     type: "account"
@@ -718,7 +722,7 @@ Function onSignInResponse(response)
   end if
 
   onActivationSuccess()
-  showWelcomeProfileToast()
+  showWelcomeProfileToast(invalid, isAlreadySignedIn)
 End Function
 
 

@@ -76,6 +76,13 @@ Function onShow(_msg)
 
   'Message
   if inputArgs.message <> invalid AND inputArgs.message <> ""
+    typographyConstants = getTypographyConstants()
+    if inputArgs.messageFont <> invalid AND inputArgs.messageFont <> "" AND typographyConstants.ids[inputArgs.messageFont] <> invalid
+      setTypographyOfLabel(m.infoPaneText, inputArgs.messageFont)
+    else
+      setTypographyOfLabel(m.infoPaneText, typographyConstants.ids.bodySmall)
+    end if
+
     m.infoPaneText.text = inputArgs.message
     m.infoPaneText.visible = true
     m.infoPaneText.scale = [1, 1]

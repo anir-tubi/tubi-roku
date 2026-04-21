@@ -2884,6 +2884,7 @@ End Function
 ' @selfDestructTimer: integer, number of seconds toast should be displayed
 ' @headerColor: colorstring for HeaderText
 ' @messageColor: colorString for message
+' @messageFont : string, font to be used for message from typographyConstants
 ' @backGroundColor : toast background color
 ' @imageWidth: interger, width of the image if imageUri is provided.
 ' @imageHeight: interger, height of the image if imageUri is provided.
