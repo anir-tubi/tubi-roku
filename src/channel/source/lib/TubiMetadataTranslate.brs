@@ -1404,6 +1404,10 @@ End Function
 Function tubiMetadataTranslate_translateContainer(contentToTranslate, fullJson, sOrientation = "", bFullData = false, contentMode = "homeScreen", screenId = "", isSignedInUser = false, isKidsMode = false, uiMode = "standard", requestContext = {}) as Object
   tubiLog("TubiMetadataTranslate.translateContainer")
   translated = CreateObject("roSGNode", "CategoryContentNode")
+  if not isAA(contentToTranslate)
+    logWarn("translateContainer received invalid contentToTranslate", "clientWarn", "translate-container-invalid-input")
+    return translated
+  end if
   container = contentToTranslate.container
   contents = contentToTranslate.contents
   contentsJson = m.getContentsJson(contentToTranslate, fullJson)
@@ -2044,6 +2048,10 @@ End Function
 '@fullJson: string, the full json formatted response
 Function tubiMetadataTranslate_getContentsJson(parsedJson, fullJson)
   contentsJson = ""
+
+  if not isNonEmptyString(fullJson) OR not isAA(parsedJson)
+    return contentsJson
+  end if
 
   'Doing string operations to isolate the contents portion of the JSON matrix response is ~4x faster than re-formatting the JSON
   contentsIdentifier = Chr(34) + "contents" + Chr(34) + ":{"

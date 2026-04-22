@@ -173,6 +173,7 @@ Function parseSeasonListSuccess(fullResponse, reqInfo)
     end if
     seasonNumbers = []
     for each item in episodesBySeason
+      if item.season = invalid then continue for
       seasonNum = item.season.toStr()
       episodesBySeasonArray = item.episodes
       episodes = []
@@ -228,8 +229,11 @@ Function parseSeriesEpisodesBySeasonSuccess(fullResponse, reqInfo)
 
   episodesNode = CreateObject("roSGNode", "TubiContentNode")
   m.metadataTranslate.translateRecursive(parsedResponse, episodesNode, reqInfo.isSignedInUser)
-  children = episodesNode.getChild(0).getChildren(-1, 0)
-  seasonNode.appendChildren(children)
+  firstChild = episodesNode.getChild(0)
+  if firstChild <> invalid
+    children = firstChild.getChildren(-1, 0)
+    seasonNode.appendChildren(children)
+  end if
 
   content = episodesNode.getFields()
   if content <> invalid

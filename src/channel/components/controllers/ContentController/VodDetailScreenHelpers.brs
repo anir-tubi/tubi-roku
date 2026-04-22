@@ -1162,7 +1162,9 @@ Function playSelectedVodContent(content, playbackSource, episodes = invalid) as 
       ' Honor a specific episode ID (e.g. from episode deeplink) before falling back to history
       if isNonEmptyString(content.currentEpisodeId)
         deeplinkEpisodeId = content.currentEpisodeId
-        episode = m.nodeHelpers.getChildById(episodes, deeplinkEpisodeId)
+        if isNode(episodes)
+          episode = m.nodeHelpers.getChildById(episodes, deeplinkEpisodeId)
+        end if
       end if
 
       if episode = invalid
