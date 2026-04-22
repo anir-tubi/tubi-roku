@@ -54,8 +54,8 @@ var REPORT_DIR = process.env.REPORT_DIR || 'allure-report';
  * @param {Object} data - The payload object (will be JSON-stringified)
  * @returns {Promise<{statusCode: number, data: Object}>} Parsed response
  */
-function postJSON(url, data) {
-  return new Promise(function(resolve, reject) {
+function postJSON(url, data, timeoutMs) {
+  return new Promise(function (resolve, reject) {
     var body = JSON.stringify(data);
     var parsed = new URL(url);
     var transport = parsed.protocol === 'https:' ? https : http;
@@ -71,15 +71,21 @@ function postJSON(url, data) {
       }
     };
 
-    var req = transport.request(options, function(res) {
+    var req = transport.request(options, function (res) {
       var responseBody = '';
-      res.on('data', function(chunk) { responseBody += chunk; });
-      res.on('end', function() {
+      res.on('data', function (chunk) { responseBody += chunk; });
+      res.on('end', function () {
         var parsed;
-        try { parsed = JSON.parse(responseBody); } catch(e) { parsed = responseBody; }
+        try { parsed = JSON.parse(responseBody); } catch (e) { parsed = responseBody; }
         resolve({ statusCode: res.statusCode, data: parsed });
       });
     });
+
+    if (timeoutMs > 0) {
+      req.setTimeout(timeoutMs, function () {
+        req.destroy(new Error('Request timed out after ' + timeoutMs + 'ms'));
+      });
+    }
 
     req.on('error', reject);
     req.write(body);
@@ -185,7 +191,7 @@ function actionStart() {
 
   console.log('Starting test run: platform=' + PLATFORM);
 
-  return postJSON(baseUrl + '/test-run/start', payload).then(function(response) {
+  return postJSON(baseUrl + '/test-run/start', payload).then(function (response) {
     handleResponse(response, 'Test run started successfully', 'Failed to start test run');
 
     var resData = response.data || {};
@@ -233,12 +239,14 @@ function actionComplete() {
     ' F:' + payload.summary.failed +
     ' S:' + payload.summary.skipped + ')');
 
-  return postJSON(baseUrl + '/test-run/complete', payload).then(function(response) {
+  return postJSON(baseUrl + '/test-run/complete', payload).then(function (response) {
     handleResponse(response, 'Test run completed successfully', 'Failed to complete test run');
   });
 }
 
 // --- send-suites: POST /api/test-suite/result for each suite ---
+
+var SUITE_REQUEST_TIMEOUT_MS = 30000;
 
 /**
  * Sends a single suite's test results to the dashboard.
@@ -268,7 +276,7 @@ function sendSuiteResult(baseUrl, suite, index) {
     }
   };
 
-  return postJSON(baseUrl + '/test-suite/result', payload).then(function(response) {
+  return postJSON(baseUrl + '/test-suite/result', payload, SUITE_REQUEST_TIMEOUT_MS).then(function (response) {
     var ok = response.statusCode >= 200 && response.statusCode < 300;
     console.log('  [' + (index + 1) + '] "' + suiteName + '" -> HTTP ' + response.statusCode +
       (ok ? ' (tests: ' + counts.total + ', P:' + counts.passed + ' F:' + counts.failed + ' S:' + counts.skipped + ')' : ' (ERROR)'));
@@ -277,19 +285,29 @@ function sendSuiteResult(baseUrl, suite, index) {
 }
 
 /**
- * Sends suite results one at a time to avoid overwhelming the API.
+ * Sends suite results one at a time, continuing on error.
+ * Failures are logged and counted but do not stop subsequent suites.
  * @param {string} baseUrl - Dashboard API base URL
  * @param {Array<Object>} suites - Array of Allure suite tree nodes
  * @param {number} index - Current index in the array
- * @returns {Promise<void>}
+ * @param {number} failCount - Running count of failed sends
+ * @returns {Promise<number>} Total number of failed sends
  */
-function sendSequentially(baseUrl, suites, index) {
+function sendSequentially(baseUrl, suites, index, failCount) {
+  if (failCount === undefined) failCount = 0;
   if (index >= suites.length) {
-    return Promise.resolve();
+    return Promise.resolve(failCount);
   }
-  return sendSuiteResult(baseUrl, suites[index], index).then(function() {
-    return sendSequentially(baseUrl, suites, index + 1);
-  });
+  return sendSuiteResult(baseUrl, suites[index], index)
+    .then(function (response) {
+      var ok = response.statusCode >= 200 && response.statusCode < 300;
+      return sendSequentially(baseUrl, suites, index + 1, ok ? failCount : failCount + 1);
+    })
+    .catch(function (err) {
+      var suiteName = suites[index].name || ('Suite ' + index);
+      console.error('  [' + (index + 1) + '] "' + suiteName + '" -> FAILED: ' + err.message);
+      return sendSequentially(baseUrl, suites, index + 1, failCount + 1);
+    });
 }
 
 /**
@@ -315,8 +333,13 @@ function actionSendSuites() {
 
   console.log('Sending ' + topLevelSuites.length + ' suite results to dashboard');
 
-  return sendSequentially(baseUrl, topLevelSuites, 0).then(function() {
-    console.log('Sent ' + topLevelSuites.length + ' suite results');
+  return sendSequentially(baseUrl, topLevelSuites, 0).then(function (failCount) {
+    var successCount = topLevelSuites.length - failCount;
+    console.log('Suite results sent: ' + successCount + '/' + topLevelSuites.length + ' succeeded' +
+      (failCount > 0 ? ', ' + failCount + ' failed' : ''));
+    if (failCount > 0) {
+      console.error('WARNING: ' + failCount + ' suite(s) failed to send to the dashboard');
+    }
   });
 }
 
@@ -345,7 +368,7 @@ function actionSendSuite() {
   var suiteName = (payload.suite && payload.suite.name) || 'unknown';
   console.log('Sending suite result: ' + suiteName);
 
-  return postJSON(baseUrl + '/test-suite/result', payload).then(function(response) {
+  return postJSON(baseUrl + '/test-suite/result', payload).then(function (response) {
     handleResponse(response, 'Suite result sent: ' + suiteName, 'Failed to send suite result: ' + suiteName);
   });
 }
@@ -394,7 +417,7 @@ function readTestCaseDetails(reportDir, uids) {
         testCases[uids[i]] = JSON.parse(fs.readFileSync(filePath, 'utf-8'));
         loaded++;
       }
-    } catch(e) { /* skip unreadable files */ }
+    } catch (e) { /* skip unreadable files */ }
   }
   console.log('Loaded ' + loaded + '/' + uids.length + ' test case details');
   return testCases;
@@ -449,7 +472,7 @@ function actionPushReport() {
     ', suites=' + suiteCount + ', failedTests=' + failedUids.length +
     ', size=' + (payloadSize / 1024).toFixed(1) + 'KB');
 
-  return postJSON(apiUrl, payload).then(function(response) {
+  return postJSON(apiUrl, payload).then(function (response) {
     var resData = response.data || {};
     var resDetail = resData.data || {};
 
@@ -480,7 +503,7 @@ if (!actionFn) {
   process.exit(1);
 }
 
-actionFn().catch(function(err) {
+actionFn().catch(function (err) {
   console.error('Error in ' + action + ': ' + err.message);
   process.exit(1);
 });
