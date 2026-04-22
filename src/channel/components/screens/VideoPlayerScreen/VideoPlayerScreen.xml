@@ -513,43 +513,15 @@
         vertAlignment="top"
         horizAlignment="custom"
         opacity="1.0">
-        <LayoutGroup
+        <EnhancedButtonList
           id="TransportButtons"
           layoutDirection="horiz"
           vertAlignment="top"
           horizAlignment="right"
-          itemSpacings="[12]"
-          translation="[1730, 0]">
-          <TextIconButton
-            id="StartButton"
-            uri="pkg:/images/icon-resume.webp"
-            hasUnfocusedBackground="true"
-            iconWidth="36"
-            iconHeight="36"
-            alwaysShowLabel="false" />
-          <TextIconButton
-            id="EndButton"
-            uri="pkg:/images/transport/sgplayer/icon-to-end.webp"
-            hasUnfocusedBackground="true"
-            iconWidth="36"
-            iconHeight="36"
-            alwaysShowLabel="false" />
-          <TextIconButton
-            id="closedCaptionAudioButton"
-            uri="pkg:/images/transport/sgplayer/icon-subtitles.webp"
-            hasUnfocusedBackground="true"
-            iconWidth="36"
-            iconHeight="36"
-            alwaysShowLabel="false" />
-          <TextIconButton
-            id="sendFeedBackButton"
-            uri="pkg:/images/transport/sgplayer/icon-help.webp"
-            hasUnfocusedBackground="true"
-            iconWidth="36"
-            iconHeight="36"
-            alwaysShowLabel="false"
-            visible="false" />
-        </LayoutGroup>
+          translation="[1730, 0]"
+          buttonSpacing="[12]"
+          buttonHeight="72"
+          padding="18" />
         <TubiProgressBar
           id="ProgressBar"
           height="16"
@@ -595,23 +567,19 @@
 
     </Group>  <!-- HUD -->
 
-    <TextIconButton
+    <EnhancedButton
       id="SkipTrailerTextIconButton"
-      uri="pkg:/images/transport/sgplayer/icon-movie-series.webp"
-      hasUnfocusedBackground="true"
-      iconWidth="36"
-      iconHeight="36"
-      alwaysShowLabel="true"
+      height="72"
+      padding="18"
+      backgroundUri="pkg:/images/pill_top_nav_$$RES$$.9.png"
       translation="[192, 783]"
       opacity="0.0" />
 
-    <TextIconButton
+    <EnhancedButton
       id="skipCuepointsTextIconButton"
-      uri="pkg:/images/transport/sgplayer/icon-skip-intro-nonfocus.webp"
-      hasUnfocusedBackground="true"
-      iconWidth="36"
-      iconHeight="36"
-      alwaysShowLabel="false"
+      height="72"
+      padding="18"
+      backgroundUri="pkg:/images/pill_top_nav_$$RES$$.9.png"
       visible="false" />
 
     <Group

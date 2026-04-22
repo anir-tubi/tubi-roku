@@ -2173,6 +2173,12 @@ const elements = typeCheckElements({
       '#ContentController.#uiGroup.#ContentGroup.#screenStackGroup.#ScreenStack.#videoPlayerScreen.#HUD.#Transport.#TransportButtons.#closedCaptionAudioButton',
   },
 
+  /** Icon Poster inside transport CC/audio EnhancedButton (uri lives here, not on the Group) */
+  closedCaptionAudioButtonIcon: {
+    keyPath:
+      '#ContentController.#uiGroup.#ContentGroup.#screenStackGroup.#ScreenStack.#videoPlayerScreen.#HUD.#Transport.#TransportButtons.#closedCaptionAudioButton.#icon',
+  },
+
   /** Send Feedback button shown on the player transport HUD */
   sendFeedBackButton: {
     keyPath:

@@ -5,6 +5,14 @@ import { User, testUtils } from '../test-utils';
 import { shared } from '../test-helpers';
 import { count, timeEnd } from 'console';
 
+const SUBTITLES_GLYPH_SNIPPET = 'pkg:/images/transport/sgplayer/icon-subtitles';
+
+/** Transport CC control is EnhancedButton; ODC exposes the subtitle glyph on the inner Poster `#icon`. */
+async function assertClosedCaptionTransportShowsSubtitlesIcon() {
+  const ccIconPoster = await testUtils.getNodeForElement('closedCaptionAudioButtonIcon');
+  expect(ccIconPoster.uri, 'CC transport icon Poster should set uri').to.be.a('string').and.to.contain(SUBTITLES_GLYPH_SNIPPET);
+}
+
 describe('Multiple Audio', function () {
   // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/403409
   it('C403409 - Video Player - New Audio / subtitle icon @multiple_audio', async () => {
@@ -14,8 +22,7 @@ describe('Multiple Audio', function () {
     await testUtils.waitForPlayerStateToEqual('videoPlayerScreen', 'playing');
 
     // Closed Caption audio button present?
-    const closedCaptionAudioButton = await testUtils.getNodeForElement('closedCaptionAudioButton');
-    expect(closedCaptionAudioButton.uri).to.contain('pkg:/images/transport/sgplayer/icon-subtitles');
+    await assertClosedCaptionTransportShowsSubtitlesIcon();
 
   });
 
@@ -30,8 +37,7 @@ describe('Multiple Audio', function () {
 
     // Closed Caption audio button present?
     await utils.sleep(800);
-    const closedCaptionAudioButton = await testUtils.getNodeForElement('closedCaptionAudioButton');
-    expect(closedCaptionAudioButton.uri).to.contain('pkg:/images/transport/sgplayer/icon-subtitles');
+    await assertClosedCaptionTransportShowsSubtitlesIcon();
 
     // Navigate right to open Options
     await ecp.sendKeypress(ecp.Key.Up);
@@ -65,8 +71,7 @@ describe('Multiple Audio', function () {
 
     // Closed Caption audio button present?
     await ecp.sendKeypress(ecp.Key.Ok);
-    const closedCaptionAudioButton = await testUtils.getNodeForElement('closedCaptionAudioButton');
-    expect(closedCaptionAudioButton.uri).to.contain('pkg:/images/transport/sgplayer/icon-subtitles');
+    await assertClosedCaptionTransportShowsSubtitlesIcon();
 
     // Navigate right to open Options
     await ecp.sendKeypress(ecp.Key.Right, { count: 3 });

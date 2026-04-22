@@ -35,8 +35,12 @@ End Function
 Function onCurrentSubtitleTrackChanged(msg)
   m.currentSubtitleTrack = msg.getData()
 
+  ' Initial track sync from VideoPlayer (before the user ever opens the CC overlay) must not raise wasBackButtonSelected
+  ' or the player will think the overlay was dismissed and will move focus to the transport CC control.
   if m.isCCOrAudioSelectedFromFirmware = true
-    m.top.wasBackButtonSelected = true
+    if m.playerSideOverlay <> invalid
+      m.top.wasBackButtonSelected = true
+    end if
   else
     updateSubtitleModeAndSubtitleTrackUI()
   end if
@@ -46,8 +50,11 @@ End Function
 Function onCurrentAudioTrackChange(msg)
   m.currentAudioTrack = msg.getData()
 
+  ' See onCurrentSubtitleTrackChanged: avoid wasBack on initial parent-driven track sync.
   if m.isCCOrAudioSelectedFromFirmware = true
-    m.top.wasBackButtonSelected = true
+    if m.playerSideOverlay <> invalid
+      m.top.wasBackButtonSelected = true
+    end if
   else
     updateAudioTrackUI()
   end if
@@ -549,8 +556,11 @@ End Function
 Function onGlobalCaptionModeChange(msg)
   m.globalCaptionMode = msg.getData()
 
+  ' See onCurrentSubtitleTrackChanged: avoid wasBack on initial parent-driven caption mode sync.
   if m.isCCOrAudioSelectedFromFirmware = true
-    m.top.wasBackButtonSelected = true
+    if m.playerSideOverlay <> invalid
+      m.top.wasBackButtonSelected = true
+    end if
   else
     updateSubtitleModeAndSubtitleTrackUI()
   end if

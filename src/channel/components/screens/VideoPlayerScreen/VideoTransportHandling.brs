@@ -52,39 +52,24 @@ Function onKeyEvent(key as String, press as Boolean) as Boolean
           'user is in skip ahead mode (the progress bar is focused) and wants to skip back.
         else if m.focusedNode.isSameNode(m.progressBar) = true AND isActiveVideoState(m.VideoState, m.Video)
           handleSkipVideo(-10)
-
         else
-          buttonComponent = m.TransportButtons
-          if m.TransportLayoutGroup <> invalid
-            buttonComponent = m.TransportLayoutGroup
-          end if
 
-          if m.focusedNode.isSameNode(m.skipCuepointsButton) = true
-            m.focusedButtonIndex = buttonComponent.getChildCount()
-          end if
-
-          'navigate the transport buttons, skipping disabled ones
-          if m.focusedButtonIndex = 0
-
-            if m.top.isTrailer = true
-              skipIndex = m.NodeHelpers.getChildIndexById(m.HUD, m.SkipTrailerButton.id)
-              if skipIndex >= 0
-                '//Make sure the skip button is available in the HUD before setting focus to the button
-                setFocusToComponent(m.SkipTrailerButton)
-              else
-                return false
-              end if
-            else
-              return false
+          if m.top.isTrailer = true
+            skipIndex = m.NodeHelpers.getChildIndexById(m.HUD, m.SkipTrailerButton.id)
+            if skipIndex >= 0
+              '//Make sure the skip button is available in the HUD before setting focus to the button
+              setFocusToComponent(m.SkipTrailerButton)
             end if
           else
-            for i = m.focusedButtonIndex - 1 to 0 step -1
-              button = buttonComponent.getChild(i)
-              if button.enabled then
-                setFocusToComponent(button, true)
-                exit for
+            if m.focusedNode.isSameNode(m.skipCuepointsButton) = true
+              transportLeftOfSkip = getTransportControlLeftOfSkipCuepoints()
+              if transportLeftOfSkip <> invalid
+                setFocusToComponent(transportLeftOfSkip)
               end if
-            end for
+            else
+              setFocusToComponent(m.StartButton)
+            end if
+
           end if
         end if
 
@@ -104,30 +89,15 @@ Function onKeyEvent(key as String, press as Boolean) as Boolean
 
         else
 
-          buttonComponent = m.TransportButtons
-          if m.TransportLayoutGroup <> invalid
-            buttonComponent = m.TransportLayoutGroup
-          end if
-
-          buttonCount = buttonComponent.getChildCount()
-
-          if m.focusedButtonIndex = buttonCount - 1
-            if m.skipCuepointsButton.visible = true
-              setFocusToComponent(m.skipCuepointsButton)
-            else if m.top.isTrailer = true
+          if m.top.isTrailer = true
+            if m.focusedNode.isSameNode(m.SkipTrailerButton) = true
               setFocusToComponent(m.StartButton)
-            else
-              return false
             end if
           else
-            'navigate the transport buttons, skipping disabled ones
-            for i = m.focusedButtonIndex + 1 to buttonCount - 1
-              button = buttonComponent.getChild(i)
-              if button.enabled then
-                setFocusToComponent(button, true)
-                exit for
-              end if
-            end for
+            if m.skipCuepointsButton.visible = true
+              setFocusToComponent(m.skipCuepointsButton)
+            end if
+
           end if
 
         end if
@@ -156,8 +126,6 @@ Function onKeyEvent(key as String, press as Boolean) as Boolean
 
         else if m.focusedNode.isSameNode(m.skipCuepointsButton) = true
           return false
-        else if m.focusedNode.isSameNode(m.progressBar) = false
-          setFocusToComponent(m.progressBar)
         else
           return false
         end if
@@ -504,7 +472,11 @@ Function handleSkipTrailer()
   hideBrowseWhileWatching()
   resetTransportButtons()
 
-  setFocusToComponent(m.progressBar)
+  if m.skipCuepointsButton.visible = true
+    setFocusToComponent(m.skipCuepointsButton)
+  else
+    setFocusToComponent(m.progressBar)
+  end if
 End Function
 
 
@@ -562,14 +534,35 @@ Function goToNext()
 End Function
 
 
+Function dispatchTransportButtonAction(focusButtonId as String) as Void
+  if focusButtonId = "" then return
+
+  if focusButtonId = "StartButton"
+    setComponentInteractionInfo("play_from_beginning")
+    goToStart()
+  else if focusButtonId = "EndButton"
+    setComponentInteractionInfo("next_episode")
+    goToNext()
+  else if focusButtonId = "closedCaptionAudioButton"
+    stopPauseAdTimer()
+    if m.isPixelFiredForCurrentPauseAd = false
+      sendPauseAdPixel(m.constants.pauseAd.pixelTypes.notUsedPixel, "exit_pre_pod")
+    end if
+    showClosedCaptionAudioTrackOverlay()
+  else if focusButtonId = "sendFeedBackButton"
+    showSendFeedbackOverlay()
+  end if
+End Function
+
+
+' Transport list icon OK: EnhancedButtonList buttonSelected -> onTransportButtonSelected -> dispatchTransportButtonAction.
+' Skip trailer OK: standalone SkipTrailerTextIconButton wasSelected -> onSkipTrailerButtonWasSelected -> handleSkipTrailer.
 Function handleOk()
   if m.Video.isInFocusChain() = true AND m.UpNext.opacity <> 0
     backOutOfUpNext()
   else if m.HUD.opacity = 0 AND m.skipCuepointsButton.hasFocus() = false
     showTransport()
     showBrowseWhileWatching()
-  else if m.sendFeedBackButton.hasFocus() = true
-    showSendFeedbackOverlay()
   else if m.focusedNode.isSameNode(m.ProgressBar) = true
     handlePlayPause()
   else if m.focusedNode.isSameNode(m.skipCuepointsButton) = true
@@ -577,35 +570,8 @@ Function handleOk()
   else if m.focusedNode.isSameNode(m.SkipTrailerButton) = true
     handleSkipTrailer()
   else
-    'do action based on the current focused button
-    buttonComponent = m.TransportButtons
-    if m.TransportLayoutGroup <> invalid
-      buttonComponent = m.TransportLayoutGroup
-    end if
-
-    focusButtonId = buttonComponent.getChild(m.focusedButtonIndex).id
-
-    if focusButtonId = m.SkipTrailerButton.id
-      handleSkipTrailer()
-    else if focusButtonId = m.StartButton.id
-      if focusButtonId = m.StartButton.id
-        setComponentInteractionInfo("play_from_beginning")
-      end if
-      goToStart()
-    else if focusButtonId = m.EndButton.id
-      if focusButtonId = m.EndButton.id
-        setComponentInteractionInfo("next_episode")
-      end if
-      goToNext()
-    else if focusButtonId = m.closedCaptionAudioButton.id
-      stopPauseAdTimer()
-      if m.isPixelFiredForCurrentPauseAd = false
-        sendPauseAdPixel(m.constants.pauseAd.pixelTypes.notUsedPixel, "exit_pre_pod")
-      end if
-      showClosedCaptionAudioTrackOverlay()
-    else if focusButtonId = m.sendFeedBackButton.id
-      showSendFeedbackOverlay()
-    end if
+    ' Voice "ok" calls handleOk directly; remote OK uses EnhancedButton wasSelected -> onTransportButtonSelected.
+    dispatchTransportButtonAction(m.focusedNode.id)
   end if
 End Function
 
@@ -861,7 +827,6 @@ Function showClosedCaptionAudioTrackOverlay()
   m.closedCaptionAndAudioSelectionOverlay.availableClosedCaptionTracks = m.video.availableSubtitleTracks
   m.closedCaptionAndAudioSelectionOverlay.availableAudioTracks = m.video.availableAudioTracks
   m.closedCaptionAndAudioSelectionOverlay.setFocus(true)
-  m.closedCaptionAudioButton.focusState = false
   fade(m.closedCaptionAndAudioSelectionOverlayGroup, "in", 0.6)
   m.isClosedCaptionAudioOverlayShowing = true
   trackingPageInfo = m.top.trackingPageInfo
@@ -1119,7 +1084,11 @@ Function endScrub(shouldJump = false)
   hideBrowseWhileWatching(false)
   resetTransportButtons()
 
-  setFocusToComponent(m.progressBar)
+  if m.skipCuepointsButton.visible = true
+    setFocusToComponent(m.skipCuepointsButton)
+  else
+    setFocusToComponent(m.progressBar)
+  end if
   fade(m.controlIcon, "out", 0.2)
 
   if shouldJump = true
@@ -1304,12 +1273,10 @@ End Function
 
 ' reset the buttons on transport UI
 Function resetTransportButtons()
-  m.SkipTrailerButton.focusState = false
-  m.StartButton.focusState = false
-  m.EndButton.focusState = false
-  m.closedCaptionAudioButton.focusState = false
-  if m.sendFeedBackButton.hasField("focusState") = true
-    m.sendFeedBackButton.focusState = false
+  buttonComponent = m.TransportButtons
+
+  if buttonComponent.hasField("focusedIndex") = true
+    buttonComponent.focusedIndex = -1
   end if
 End Function
 
@@ -1322,32 +1289,55 @@ Function setFocusToPlaybackControl(sayAudioText = false)
 End Function
 
 
+' Transport order (left-to-right): Start, End (series), CC/audio, Send feedback (when shown). Skip cuepoints sits to the right.
+' When feedback is omitted (e.g. KIDS_MODE), focus must move to the next control left, not an invalid node.
+Function getTransportControlLeftOfSkipCuepoints() as Object
+  if m.sendFeedBackButton <> invalid then return m.sendFeedBackButton
+  if m.closedCaptionAudioButton <> invalid then return m.closedCaptionAudioButton
+  if m.EndButton <> invalid then return m.EndButton
+  if m.StartButton <> invalid then return m.StartButton
+  return invalid
+End Function
+
+
 'If the passed component is focusable, then it sets the focus to component or else it sets focus to m.top
 '
 '@component: roSGNode, child node of videoplayerscreen
 '@sayAudioText: boolean, true if we want to announce the audio guide.
 '
 'side effects... updates the m.focusedNode with passed component
-'side effects... if the passed component is button, then it updates the m.focusedButtonIndex with button index
 Function setFocusToComponent(component, sayAudioText = false)
+  if component = invalid then return false
+
   m.focusedNode = component
   'set focused/unfocused UI on each button in the transport bar as necessary
 
   buttonComponent = m.TransportButtons
-  if m.TransportLayoutGroup <> invalid
-    buttonComponent = m.TransportLayoutGroup
-  end if
+  transportChildFocused = false
 
   for i = 0 to buttonComponent.getChildCount() - 1
     button = buttonComponent.getChild(i)
-    if component.id = button.id AND button.hasField("focusState") = true
-      m.focusedButtonIndex = i
-      button.focusState = true
-    else if button.hasField("focusState") = true
-      button.focusState = false
+    isFocusedButton = (component.id = button.id)
+
+    if isFocusedButton = true
+      transportChildFocused = true
+      if button.hasField("focusState") = true
+        button.focusState = true
+      end if
+      if buttonComponent.hasField("focusedIndex") = true
+        buttonComponent.focusedIndex = i
+      end if
+    else
+      if button.hasField("focusState") = true
+        button.focusState = false
+      end if
       button.setFocus(false)
     end if
   end for
+
+  if transportChildFocused = false AND buttonComponent.hasField("focusedIndex") = true
+    buttonComponent.focusedIndex = -1
+  end if
 
   if isFocusable(component) = true
     m.focusedNode.setFocus(true)
@@ -1361,9 +1351,12 @@ Function setFocusToComponent(component, sayAudioText = false)
   ' When we focus on the skip cuepoints button.
   ' When the user navigates within the transport bar.
   ' When the user moves focus into the transport control icon from the progress bar.
+  ' Transport list children announce via EnhancedButtonList buttonFocused -> onTransportButtonFocused (FocusControlLayoutGroup handles L/R).
   if sayAudioText = true
     sayFocusedButtonAudioGuide(component.id)
   end if
+
+  return true
 
 End Function
 
@@ -1382,11 +1375,15 @@ Function isFocusable(component)
     focusable = true
   else if component.isSameNode(m.progressBar) = true
     focusable = true
-  else if component.isSameNode(m.sendFeedBackButton) = true
+  else if m.sendFeedBackButton <> invalid AND component.isSameNode(m.sendFeedBackButton) = true
     focusable = true
   else if component.isSameNode(m.SkipTrailerButton) = true
     focusable = true
-  else if component.isSameNode(m.StartButton) = true
+  else if m.StartButton <> invalid AND component.isSameNode(m.StartButton) = true
+    focusable = true
+  else if m.EndButton <> invalid AND component.isSameNode(m.EndButton) = true
+    focusable = true
+  else if m.closedCaptionAudioButton <> invalid AND component.isSameNode(m.closedCaptionAudioButton) = true
     focusable = true
   end if
 
@@ -1425,7 +1422,7 @@ Function removeFocusForAllChildComponents()
     m.progressBar.setFocus(false)
   end if
 
-  if m.sendFeedbackButton.isInFocusChain() = true
+  if m.sendFeedbackButton <> invalid AND m.sendFeedbackButton.isInFocusChain() = true
     m.sendFeedbackButton.setFocus(false)
   end if
 
@@ -1433,11 +1430,7 @@ End Function
 
 
 Function isFocusOnPlayerControl()
-
   buttonComponent = m.TransportButtons
-  if m.TransportLayoutGroup <> invalid
-    buttonComponent = m.TransportLayoutGroup
-  end if
 
   for i = 0 to buttonComponent.getChildCount() - 1
     transportButton = buttonComponent.getChild(i)
@@ -1458,13 +1451,13 @@ Function sayFocusedButtonAudioGuide(focusButtonId)
 
   if focusButtonId = m.SkipTrailerButton.id
     audioGuideText = audioGuideHints.skipTrailerButtonHint
-  else if focusButtonId = m.StartButton.id
+  else if focusButtonId = "StartButton"
     audioGuideText = audioGuideHints.playFromBeginningButtonHint
-  else if focusButtonId = m.EndButton.id
+  else if focusButtonId = "EndButton"
     audioGuideText = audioGuideHints.goToNextVideoButtonHint
-  else if focusButtonId = m.closedCaptionAudioButton.id
+  else if focusButtonId = "closedCaptionAudioButton"
     audioGuideText = audioGuideHints.closedCaptionAudioButtonHint
-  else if focusButtonId = m.sendFeedBackButton.id
+  else if focusButtonId = "sendFeedBackButton"
     audioGuideText = audioGuideHints.sendFeedbackButtonHint
   end if
 
@@ -1603,7 +1596,7 @@ Function handleSkipCuepointsButtonOnAnimateTransport(direction)
 
   if direction = "in"
     if isNonEmptyString(currentCuepoint) = true
-      if canSkipCuepointsButtonBeShown(currentCuepoint, true) = true AND m.skipCuepointsButtonTimer = invalid AND isNonEmptyString(m.skipCuepointsButton.text) = true
+      if canSkipCuepointsButtonBeShown(currentCuepoint, true) = true AND m.skipCuepointsButtonTimer = invalid AND isNonEmptyString(getSkipCuepointsButtonTitle()) = true
         showSkipCuepointsButton()
       end if
       slideTo(m.skipCuepointsButton, [skipCuepointsButtonTransLation[0], m.skipCuepointsButtonUpTranslation], 0.6)
@@ -1611,9 +1604,13 @@ Function handleSkipCuepointsButtonOnAnimateTransport(direction)
 
     if m.skipCuepointsButton.visible = true
       width = m.skipCuepointsButton.boundingRect().width + 12
-      m.TransportButtons.translation = [m.TransportButtonsXTranslation - width, transportButtonsTranslation[1]]
+      shifted = [m.TransportButtonsXTranslation - width, transportButtonsTranslation[1]]
+      m.TransportButtons.translation = shifted
+      m.TransportButtons.translationOverride = shifted
     else
-      m.TransportButtons.translation = [m.TransportButtonsXTranslation, transportButtonsTranslation[1]]
+      docked = [m.TransportButtonsXTranslation, transportButtonsTranslation[1]]
+      m.TransportButtons.translation = docked
+      m.TransportButtons.translationOverride = docked
     end if
 
   else if direction = "out"
@@ -2136,7 +2133,9 @@ Function animateTransportAndBrowseWhileWatching(direction)
     m.BrowseWhileWatching.close = true
 
     if m.skipCuepointsButtonTimer = invalid
-      m.TransportButtons.translation = [m.TransportButtonsXTranslation, 0]
+      dockedTransport = [m.TransportButtonsXTranslation, 0]
+      m.TransportButtons.translation = dockedTransport
+      m.TransportButtons.translationOverride = dockedTransport
     end if
 
     if m.isBWWLandscapeEnabled = true

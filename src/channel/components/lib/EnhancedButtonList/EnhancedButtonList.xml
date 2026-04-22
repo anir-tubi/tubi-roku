@@ -25,6 +25,8 @@
     <field id="showInactiveFocusState" type="boolean" value="false" />
     <field id="padding" type="integer" value="48" />
     <field id="showFocusedLabelBelow" type="boolean" value="false" />
+    <!-- Resting translation for layout when the parent moves this node; keeps internal scroll offsets correct (do not set from internal list scrolling). -->
+    <field id="translationOverride" type="array" />
 
     <!-- OUTPUTS -->
     <field id="buttonSelected" type="assocarray" alwaysNotify="true" />

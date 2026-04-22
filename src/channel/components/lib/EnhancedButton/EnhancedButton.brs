@@ -383,7 +383,7 @@ End Function
 
 
 ' Handles key press events for button selection
-' Triggers wasSelected field when OK or play key is pressed
+' Triggers wasSelected when OK or play is pressed.
 ' @param key - String, the key that was pressed
 ' @param press - Boolean, true if key was pressed (not released)
 ' @return Boolean - True if event was handled, false otherwise

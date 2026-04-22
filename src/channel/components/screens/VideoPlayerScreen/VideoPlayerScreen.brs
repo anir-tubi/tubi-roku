@@ -242,6 +242,7 @@ Function init()
   m.RemainingMinimizedLabel = m.top.findNode("RemainingMinimizedLabel")
 
   m.TopOverlay = m.top.findNode("TopOverlay")
+  m.TitleGroup = m.TopOverlay.findNode("TitleGroup")
   m.ScrubTimer = m.top.findNode("ScrubTimer")
   m.HUD = m.top.findNode("HUD")
   m.AdHeadsUp = m.top.findNode("AdHeadsUp")
@@ -252,11 +253,12 @@ Function init()
   m.VideoBrowseWhileWatchingOverlay = m.top.findNode("VideoBrowseWhileWatchingOverlay")
 
   m.skipCuepointsButton = m.top.findNode("skipCuepointsTextIconButton")
-  m.skipCuepointsButton.alwaysShowLabel = true
-  m.SkipTrailerButton = m.top.findNode("SkipTrailerTextIconButton")
-  m.SkipTrailerButton.alwaysShowLabel = true
   m.skipCuepointsButton.visible = true
-  m.skipCuepointsButton.observeFieldScoped("selected", "onSkipCuepointsButtonSelected")
+  m.skipCuepointsButton.observeFieldScoped("wasSelected", "onSkipCuepointsButtonWasSelected")
+  m.SkipTrailerButton = m.top.findNode("SkipTrailerTextIconButton")
+  m.SkipTrailerButton.observeFieldScoped("wasSelected", "onSkipTrailerButtonWasSelected")
+  initSkipCuepointsEnhancedButton()
+  initSkipTrailerEnhancedButton()
 
   m.top.playbackSource = {
     "srcForAnalytic": m.constants.player.playbackSource.unknown
@@ -355,10 +357,10 @@ Function init()
   m.quickSeekLabel = m.top.findNode("quickSeekLabel")
 
   m.typographyConstants = getTypographyConstants()
-  bindTransportButtons()
+  setupTransportButtons()
+  primeTransportButtonList()
 
   m.focusedNode = m.progressBar
-  m.focusedButtonIndex = 0
 
   m.lastPingTime = 0
   m.lastSavedPosition = 0
@@ -642,6 +644,9 @@ Function onSendFeedBackOverlayItemSelected(msg)
       showQRCodeScreen()
     else
       hideSendFeedbackOverlay()
+      if m.sendFeedBackButton <> invalid
+        setFocusToComponent(m.sendFeedBackButton)
+      end if
     end if
   end if
 End Function
@@ -722,6 +727,10 @@ Function onCloseSendFeedbackOverlay(msg)
   if isCloseSendFeedbackOverlay = true AND qrCodeOverlay <> invalid
     hideSendFeedbackOverlay()
     m.sendFeedbackSelectionOverlay.removeChild(qrCodeOverlay)
+
+    if m.sendFeedBackButton <> invalid
+      setFocusToComponent(m.sendFeedBackButton)
+    end if
   end if
 
 End Function
@@ -757,7 +766,7 @@ Function setSkipCuepointsButtonTextAndTimer(skipCuepointsTitle as String, skipCu
   m.skipCuepointsButtonTimer.repeat = false
   m.skipCuepointsButtonTimer.observeFieldScoped("fire", "autoHideSkipCuepointsButton")
   m.skipCuepointsButtonTimer.control = "start"
-  m.skipCuepointsButton.text = skipCuepointsTitle
+  setSkipCuepointsButtonTitle(skipCuepointsTitle)
   m.lastShownSkipCuepointType = skipCuepointType
   showSkipCuepointsButton()
 End Function
@@ -829,6 +838,7 @@ Function slideTransportButtons(offsetLeft as Boolean, width = 0 as Integer)
   end if
 
   destination = [targetX, transportButtonsTranslation[1]]
+  m.TransportButtons.translationOverride = destination
   return slideTo(m.TransportButtons, destination, 0.6)
 End Function
 
@@ -864,7 +874,7 @@ End Function
 
 
 Function clearSkipCuepointsButtonAndTimer()
-  m.skipCuepointsButton.text = ""
+  setSkipCuepointsButtonTitle("")
   clearSkipCuepointsTimer()
   if m.focusedNode.isSameNode(m.skipCuepointsButton) = true AND m.HUD.opacity > 0
     componentToFocus = m.progressBar
@@ -1086,18 +1096,6 @@ Function onContentChange() as Void
   logDebug("VideoPlayer.onContentChange")
   stopVideo()
 
-  if m.top.isTrailer = false AND m.top.appMode <> "KIDS_MODE"
-    if m.sendFeedBackButton.hasField("enabled") = true
-      m.sendFeedBackButton.enabled = true
-    end if
-    m.sendFeedBackButton.visible = true
-  else
-    if m.sendFeedBackButton.hasField("enabled") = true
-      m.sendFeedBackButton.enabled = false
-    end if
-    m.sendFeedBackButton.visible = false
-  end if
-
   if m.top.content <> invalid
     'set page tracking values for analytics
     m.top.trackingPageInfo = {
@@ -1112,7 +1110,9 @@ Function onContentChange() as Void
     }
 
     m.UpNext.videoId = m.top.content.id
+    updateTransportButtons(m.top.content)
   end if
+
 End Function
 
 
@@ -1712,7 +1712,7 @@ Function onVideoPositionChange(msg) as Void
         skipEarlyCredits = getTranslation("skipEarlyCredits_Player")
         setSkipCuepointsButtonTextAndTimer(skipEarlyCredits, constants.player.skipCuepointsButtonTypes.earlyCredits)
       end if
-    else if m.skipCuepointsButton.text <> ""
+    else if getSkipCuepointsButtonTitle() <> ""
       clearSkipCuepointsButtonAndTimer()
     end if
   end if
@@ -2319,7 +2319,6 @@ Function resetVideoPlayerState(content = invalid)
   m.ratingOverlay.opacity = 0
   m.showRatings = true
   m.ratingInterval = 0
-  m.focusedButtonIndex = 0
   m.brandingLogo.opacity = 0
   m.subtitleSelectionOverlay.hide = true
   m.showSubtitleSelection = false
@@ -2537,78 +2536,238 @@ Function onDisplayTitleArt(msg)
 End Function
 
 
-Function updateTransportButtons(content)
-  m.SkipTrailerButton.enabled = false
+' Resting translation for the transport EnhancedButtonList (parent positioning only, no in-list scroll).
+' When skip-cuepoints is visible the bar is shifted left; otherwise uses m.TransportButtonsXTranslation.
+Function getTransportButtonsRestingTranslation() as Object
+  y = 0
+  if m.TransportButtons <> invalid
+    t = m.TransportButtons.translation
+    if isNonEmptyArray(t) = true
+      y = t[1]
+    end if
+  end if
+  if m.skipCuepointsButton <> invalid AND m.skipCuepointsButton.visible = true
+    width = m.skipCuepointsButton.boundingRect().width + 12
+    return [m.TransportButtonsXTranslation - width, y]
+  end if
+  return [m.TransportButtonsXTranslation, y]
+End Function
+
+
+Function updateTransportButtons(content) as Void
+  if type(content) <> "roSGNode" then return
+
+  restingTranslation = getTransportButtonsRestingTranslation()
+  if restingTranslation <> invalid AND m.TransportButtons <> invalid
+    m.TransportButtons.translationOverride = restingTranslation
+  end if
+
+  ' Set list styling before assigning buttons — onButtonsChange/createButton reads these synchronously.
+  m.TransportButtons.buttonBackgroundUri = "pkg:/images/pill_top_nav_$$RES$$.9.png"
+  m.TransportButtons.buttonSpacing = [12]
+  m.TransportButtons.buttonHeight = 72
+  m.TransportButtons.padding = 18
+
+  updateSkipTrailerTransportButton(false, "")
   isComingSoon = isComingSoonContent(content)
 
   m.ProgressBar.highlightPointer = true
 
-  childrenCount = m.TransportButtons.getChildCount()
-  m.TransportButtons.removeChildrenIndex(childrenCount, 0)
   m.HUD.removeChild(m.SkipTrailerButton)
 
   if content.isTrailer = true
     m.Transport.translation = [0, 783]
     m.thumbnailMaxYOffset = 870
     if isComingSoon = false
-      m.SkipTrailerButton.enabled = true
-
+      trailerTitle = ""
       if content.type = "series"
-        m.SkipTrailerButton.text = getTranslation("videoPlayer_button_watchSeries")
+        trailerTitle = getTranslation("videoPlayer_button_watchSeries")
       else
-        m.SkipTrailerButton.text = getTranslation("videoPlayer_button_watchMovie")
+        trailerTitle = getTranslation("videoPlayer_button_watchMovie")
       end if
+      updateSkipTrailerTransportButton(true, trailerTitle)
 
       'Thumbnail should be placed as the last child of the HUD component so that transport buttons or components do not overlay it.
       m.HUD.insertChild(m.SkipTrailerButton, m.HUD.getChildCount() - 1)
     end if
 
-    m.StartButton.uri = "pkg:/images/icon-resume.webp"
-    m.TransportButtons.appendChild(m.StartButton)
+    m.TransportButtons.buttons = [transportIconButtonFields("StartButton", getTranslation("screenDetails_button_startOver"), "pkg:/images/icon-resume.webp", false)]
   else
     m.Transport.translation = [0, 744]
     m.thumbnailMaxYOffset = 825
-    m.StartButton.uri = "pkg:/images/icon-resume.webp"
-    m.TransportButtons.appendChild(m.StartButton)
+
+    specs = [transportIconButtonFields("StartButton", getTranslation("screenDetails_button_startOver"), "pkg:/images/icon-resume.webp", false)]
 
     if content.parentType = "series"
-      m.TransportButtons.appendChild(m.EndButton)
+      specs.push(transportIconButtonFields("EndButton", getTranslation("videoPlayer_button_nextEpisode"), "pkg:/images/transport/sgplayer/icon-to-end.webp", false))
     end if
 
-    if m.closedCaptionAudioButton.visible = true
-      m.TransportButtons.appendChild(m.closedCaptionAudioButton)
+    if isVideoCcOrAudioAvailable() = true
+      specs.push(transportIconButtonFields("closedCaptionAudioButton", getTranslation("videoPlayer_button_audio_subtitles"), getClosedCaptionTransportIconUri(), false))
     end if
 
-    if m.sendFeedBackButton.visible = true
-      m.TransportButtons.appendChild(m.sendFeedBackButton)
+    if showSendFeedbackInTransport() = true
+      specs.push(transportIconButtonFields("sendFeedBackButton", getTranslation("send_feedback_overlay_title"), "pkg:/images/transport/sgplayer/icon-help.webp", false))
     end if
+
+    m.TransportButtons.buttons = specs
   end if
+
+  cacheTransportButtonRefsFromTransportList()
 
   m.TitleGroup.translation = [m.constants.ui.translations.player.marginX, 0]
 End Function
 
 
-' Caches transport control nodes from XML and applies translated labels for TextIconButton instances.
-Function bindTransportButtons()
-
-  m.StartButton = m.TransportButtons.findNode("StartButton")
-  m.StartButton.text = getTranslation("screenDetails_button_startOver")
-
-  m.EndButton = m.TransportButtons.findNode("EndButton")
-  m.EndButton.text = getTranslation("videoPlayer_button_nextEpisode")
-
-  m.closedCaptionAudioButton = m.TransportButtons.findNode("closedCaptionAudioButton")
-  m.closedCaptionAudioButton.text = getTranslation("videoPlayer_button_audio_subtitles")
-
-  m.sendFeedBackButton = m.TransportButtons.findNode("sendFeedBackButton")
-  m.sendFeedBackButton.text = getTranslation("send_feedback_overlay_title")
-
+' Wires transport EnhancedButtonList observer and skip-trailer layout.
+Function setupTransportButtons() as Void
+  m.TransportButtons.observeFieldScoped("buttonFocused", "onTransportButtonFocused")
+  m.TransportButtons.observeFieldScoped("buttonSelected", "onTransportButtonSelected")
   m.SkipTrailerButton.translation = [m.marginX, m.SkipTrailerButton.translation[1]]
+End Function
 
-  if m.top.appMode <> "KIDS_MODE"
-    m.sendFeedBackButton.visible = true
+
+Function primeTransportButtonList() as Void
+  content = m.top.content
+  if content = invalid
+    content = createTransportButtonsPlaceholderContent()
   end if
+  updateTransportButtons(content)
+End Function
 
+
+Function createTransportButtonsPlaceholderContent() as Object
+  node = CreateObject("roSGNode", "TubiContentNode")
+  node.isTrailer = false
+  node.parentType = ""
+  node.type = "movie"
+  return node
+End Function
+
+
+Function cacheTransportButtonRefsFromTransportList() as Void
+  m.StartButton = m.TransportButtons.findNode("StartButton")
+  m.EndButton = m.TransportButtons.findNode("EndButton")
+  m.closedCaptionAudioButton = m.TransportButtons.findNode("closedCaptionAudioButton")
+  m.sendFeedBackButton = m.TransportButtons.findNode("sendFeedBackButton")
+End Function
+
+
+Function transportIconButtonFields(id as String, text as String, iconUrl as String, disabled as Boolean) as Object
+  return {
+    id: id
+    title: text
+    iconUrl: iconUrl
+    disabled: disabled
+  }
+End Function
+
+
+Function isVideoCcOrAudioAvailable() as Boolean
+  if m.Video = invalid then return false
+  return m.Video.availableAudioTracks.Count() > 1 OR m.Video.availableSubtitleTracks.Count() > 0
+End Function
+
+
+Function showSendFeedbackInTransport() as Boolean
+  return m.top.isTrailer = false AND m.top.appMode <> "KIDS_MODE"
+End Function
+
+
+Function getClosedCaptionTransportIconUri() as String
+  captionMode = "Off"
+  if m.Video <> invalid AND m.Video.globalCaptionMode <> invalid
+    captionMode = m.Video.globalCaptionMode
+  end if
+  if captionMode = "Off"
+    return "pkg:/images/transport/sgplayer/icon-subtitles.webp"
+  end if
+  return "pkg:/images/transport/sgplayer/icon-subtitles-enabled.webp"
+End Function
+
+
+Function onTransportButtonFocused(msg as Object) as Void
+  m.lastButtonPressPos = m.playerPosition
+  data = msg.getData()
+  if data <> invalid
+    if data.button <> invalid
+      m.focusedNode = data.button
+    end if
+    if isNonEmptyString(data.id)
+      sayFocusedButtonAudioGuide(data.id)
+    end if
+  end if
+End Function
+
+
+Function onTransportButtonSelected(msg as Object) as Void
+  data = msg.getData()
+  if data = invalid OR data.id = invalid OR data.id = "" then return
+  dispatchTransportButtonAction(data.id)
+End Function
+
+
+Function updateSkipTrailerTransportButton(enabled as Boolean, title as String) as Void
+  if m.SkipTrailerButton = invalid then return
+
+  buttonContent = CreateObject("roSGNode", "ContentNode")
+  buttonContent.update({
+    id: "SkipTrailerTextIconButton"
+    title: title
+    iconUrl: "pkg:/images/transport/sgplayer/icon-movie-series.webp"
+    isPrimaryButton: true
+    disabled: (enabled <> true)
+  }, true)
+
+  m.SkipTrailerButton.itemContent = buttonContent
+End Function
+
+
+Function initSkipTrailerEnhancedButton() as Void
+  updateSkipTrailerTransportButton(false, "")
+End Function
+
+
+Function initSkipCuepointsEnhancedButton() as Void
+  if m.skipCuepointsButton = invalid then return
+
+  buttonContent = CreateObject("roSGNode", "ContentNode")
+  buttonContent.update({
+    id: "skipCuepointsTextIconButton"
+    title: ""
+    iconUrl: "pkg:/images/transport/sgplayer/icon-skip-intro-nonfocus.webp"
+    isPrimaryButton: true
+  }, true)
+
+  m.skipCuepointsButton.itemContent = buttonContent
+End Function
+
+
+Function getSkipCuepointsButtonTitle() as String
+  if m.skipCuepointsButton = invalid OR m.skipCuepointsButton.itemContent = invalid then return ""
+  t = m.skipCuepointsButton.itemContent.title
+  if t = invalid then return ""
+  return t
+End Function
+
+
+Function setSkipCuepointsButtonTitle(title as String) as Void
+  if m.skipCuepointsButton = invalid OR m.skipCuepointsButton.itemContent = invalid then return
+  m.skipCuepointsButton.itemContent.update({ title: title }, true)
+End Function
+
+
+Function onSkipCuepointsButtonWasSelected(msg as Object) as Void
+  if msg.getData() <> true then return
+  m.skipCuepointsButton.wasSelected = false
+  onSkipCuepointsButtonSelected()
+End Function
+
+
+Function onSkipTrailerButtonWasSelected(msg as Object) as Void
+  if msg.getData() <> true then return
+  m.SkipTrailerButton.wasSelected = false
+  handleSkipTrailer()
 End Function
 
 
@@ -3126,10 +3285,35 @@ Function getCreditCuepointsFromContent(content)
 End Function
 
 
-Function setCCAudioTransportBarVisibility()
-  isCCOrAudioAvailable = m.Video.availableAudioTracks.Count() > 1 OR m.Video.availableSubtitleTracks.Count() > 0
-  m.closedCaptionAudioButton.visible = (isCCOrAudioAvailable = true)
-  m.closedCaptionAudioButton.enabled = (isCCOrAudioAvailable = true)
+' Applies CC/audio transport visibility from available tracks without rebuilding the transport row.
+' Full rebuild (updateTransportButtons) drops all buttons, resets layout and focus, and retriggers list scroll state.
+Function setCCAudioTransportBarVisibility() as Void
+  shouldShow = isVideoCcOrAudioAvailable()
+
+  if m.closedCaptionAudioButton <> invalid
+
+    if shouldShow = true
+      m.closedCaptionAudioButton.visible = true
+      m.closedCaptionAudioButton.itemContent.update({
+        disabled: false
+        iconUrl: getClosedCaptionTransportIconUri()
+      }, true)
+    else
+      m.closedCaptionAudioButton.visible = false
+      m.closedCaptionAudioButton.itemContent.update({
+        disabled: true
+      }, true)
+    end if
+
+    return
+  end if
+
+  content = m.top.content
+  if shouldShow = true AND content <> invalid
+    if content.isTrailer = true then return
+
+    updateTransportButtons(content)
+  end if
 End Function
 
 
@@ -3148,9 +3332,18 @@ End Function
 Function onWasCCBackButtonSelectedChange(msg)
   wasBackSelected = msg.getData()
   if wasBackSelected = true
-    hideClosedCaptionAudioTrackOverlay()
-    hideSubtitleSelectionOverlay()
-    m.closedCaptionAudioButton.focusState = true
+    ' Real dismiss: user had the CC/audio overlay on screen. Initial track sync from the video node can
+    ' set wasBackButtonSelected without the overlay being visible; ignore to keep focus on the progress bar.
+    if m.isClosedCaptionAudioOverlayShowing <> true
+      m.closedCaptionAndAudioSelectionOverlay.wasBackButtonSelected = false
+    else
+      hideClosedCaptionAudioTrackOverlay()
+      hideSubtitleSelectionOverlay()
+
+      if m.closedCaptionAudioButton <> invalid AND m.closedCaptionAudioButton.visible = true
+        setFocusToComponent(m.closedCaptionAudioButton)
+      end if
+    end if
   end if
 End Function
 
@@ -3159,6 +3352,9 @@ Function onWasBackORLeftButtonSelectedForSendFeedback(msg)
   wasBackOrLeftSelected = msg.getData()
   if wasBackOrLeftSelected = true
     hideSendFeedbackOverlay()
+    if m.sendFeedBackButton <> invalid
+      setFocusToComponent(m.sendFeedBackButton)
+    end if
   end if
 End Function
 
@@ -3170,12 +3366,15 @@ End Function
 
 
 ' @captionMode: string, will contain the current caption mode, "On"/"Off"/"Instant replay" are the possible values
-Function setAudioSubtitleTransportBarIcon(captionMode)
-  if captionMode = "Off"
-    m.closedCaptionAudioButton.uri = "pkg:/images/transport/sgplayer/icon-subtitles.webp"
-  else
-    m.closedCaptionAudioButton.uri = "pkg:/images/transport/sgplayer/icon-subtitles-enabled.webp"
+Function setAudioSubtitleTransportBarIcon(captionMode) as Void
+  if m.closedCaptionAudioButton = invalid OR m.closedCaptionAudioButton.itemContent = invalid then return
+
+  iconUri = "pkg:/images/transport/sgplayer/icon-subtitles.webp"
+  if captionMode <> "Off"
+    iconUri = "pkg:/images/transport/sgplayer/icon-subtitles-enabled.webp"
   end if
+
+  m.closedCaptionAudioButton.itemContent.update({ iconUrl: iconUri }, true)
 End Function
 
 

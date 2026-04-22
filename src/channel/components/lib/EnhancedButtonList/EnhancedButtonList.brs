@@ -12,6 +12,8 @@ Function init() as Void
   topRef.observeFieldScoped("focusedChild", "onButtonListFocusChange")
   topRef.observeFieldScoped("focusedIndex", "onFocusedIndexChange")
   topRef.observeFieldScoped("jumpToIndex", "onListJumpToIndexChange")
+  topRef.observeFieldScoped("translationOverride", "onTranslationOverrideChange")
+
   m.originalTranslation = topRef.translation
 
   if m.global <> invalid
@@ -39,6 +41,16 @@ Function onThemeChange(msg = invalid) as Void
 End Function
 
 
+' Updates the resting translation used for internal scroll math when the parent sets translationOverride.
+' @param msg - Message containing the translationOverride array from the parent
+Function onTranslationOverrideChange(msg as Object) as Void
+  override = msg.getData()
+  if isNonEmptyArray(override) = true
+    m.originalTranslation = [override[0], override[1]]
+  end if
+End Function
+
+
 ' Handles focus changes for the button list
 ' Updates inactive focus state when list loses focus and showInactiveFocusState is enabled
 ' @param _msg - Message object containing focus change data (unused)
@@ -57,6 +69,13 @@ End Function
 ' Clears existing buttons and creates new ones from the provided button data
 ' @param msg - Message object containing buttons array
 Function onButtonsChange(msg as Object) as Void
+  topRef = m.top
+  override = topRef.translationOverride
+  if isNonEmptyArray(override) = true
+    m.originalTranslation = [override[0], override[1]]
+  else
+    m.originalTranslation = topRef.translation
+  end if
   buttons = msg.getData()
 
   m.nodeHelpers.removeAllChildren(m.top)
@@ -198,6 +217,7 @@ End Function
 ' @param msg - Message object containing focused index
 Function onFocusedIndexChange(msg as Object) as Void
   topRef = m.top
+
   index = msg.getData()
 
   animated = false
@@ -231,6 +251,7 @@ End Function
 ' Called after scroll animation completes, or immediately if no animation was triggered.
 Function adjustForPartiallyRenderedButton() as Void
   topRef = m.top
+
   componentGainingFocus = topRef.componentGainingFocus
   if componentGainingFocus <> invalid AND componentGainingFocus.renderTracking = "partial"
     direction = -1
