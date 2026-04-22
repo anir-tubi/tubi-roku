@@ -28,16 +28,13 @@ describe('MyStuff', function () {
     await shared.openMyStuffPage();
 
     // Check unlock button and screen text for Guest user
-    await testUtils.waitForElementToFullyShowOnScreen('myStuffEmptyScreen');
-    const unlockNowForMyStuff = await testUtils.getNodeForElement('unlockNowForMyStuff');
-    expect(unlockNowForMyStuff.text).to.equal('Unlock Now');
-    const myStuffGuestScreenTextTitle = await testUtils.getNodeForElement('myStuffGuestScreenTextTitle');
-    expect(myStuffGuestScreenTextTitle.text).to.equal('Make Tubi Yours for Free (Forever)');
-    const myStuffGuestScreenTextSubTitle = await testUtils.getNodeForElement('myStuffGuestScreenTextSubTitle');
-    expect(myStuffGuestScreenTextSubTitle.text).to.equal('Find your favorites fast, pick up where you left off–all in one place.');
-    const myStuffGuestScreenTextBlurb = await testUtils.getNodeForElement('myStuffGuestScreenTextBlurb');
-    expect(myStuffGuestScreenTextBlurb.text).to.equal('And always free.');
-
+    await testUtils.waitForElementToShowOnScreen('myStuffEmptyStateTile');
+    const signUpButton = await testUtils.getNodeForElement('myStuffEmptyStateTileSignUpButton');
+    expect(signUpButton.text).to.equal('Sign Up Now');
+    const tileTitle = await testUtils.getNodeForElement('myStuffEmptyStateTileTitle');
+    expect(tileTitle.text).to.equal('Sign Up to Save Your Stuff');
+    const tileDescription = await testUtils.getNodeForElement('myStuffEmptyStateTileDescription');
+    expect(tileDescription.text).to.equal('Find your favorites fast, pick up where you left off — all in one place. Free forever.');
   });
 
   // https://tubi.testrail.io/index.php?/cases/view/148846
@@ -75,9 +72,8 @@ describe('MyStuff', function () {
     await ecp.sendKeypress(ecp.Key.Down, { count: 4 });
     await ecp.sendKeypress(ecp.Key.Ok);
 
-    // Click "Start Watching" button on age gate completion
-    await testUtils.waitForElementToFullyShowOnScreen('continueWatchingConsentPageAcceptButton');
-    await ecp.sendKeypress(ecp.Key.Ok); // Click "Start Watching"
+    // Dismiss CW consent screen if it appears (not always shown, e.g. after age gate flow)
+    await shared.dismissCWConsentScreenIfPresent();
 
     // Should return to home screen as registered user
     await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for home screen after registration');
@@ -118,11 +114,7 @@ describe('MyStuff', function () {
     await shared.openMyStuffPage();
 
     // Verify empty My Stuff page for Guest
-    await testUtils.waitForElementToFullyShowOnScreen('myStuffEmptyScreen');
-
-    // Capture focus node ID before sign-up
-    const { node: focusedNodeBeforeSignUp } = await odc.getFocusedNode();
-    const focusIdBeforeSignUp = focusedNodeBeforeSignUp.id;
+    await testUtils.waitForElementToShowOnScreen('myStuffEmptyStateTile');
 
     // Select Unlock button to start registration
     await ecp.sendKeypress(ecp.Key.Ok);
@@ -131,24 +123,15 @@ describe('MyStuff', function () {
     await shared.completeSignUpFlow();
 
     await testUtils.waitForCurrentScreenToEqual('myStuffScreen', 10000);
-
-    // Verify focus has changed after sign-up (confirms user went through the flow)
-    await utils.sleep(2000); // Allow time for screen transition
-    const { node: focusedNodeAfterSignUp } = await odc.getFocusedNode();
-    expect(focusedNodeAfterSignUp.id).to.not.equal(focusIdBeforeSignUp, 'Focus should have changed during sign-up flow');
-
-    // Verify user landed back on My Stuff page - check for either empty screen or grid
-    // (No navigation needed - user should already be here)
     await utils.sleep(1000); // Allow UI to settle
-    const emptyScreen = await testUtils.getNodeForElement('myStuffRegUserEmptyScreen');
-    const grid = await testUtils.getNodeForElement('myStuffGrid');
 
-    // Either empty screen or grid should be visible (but not both)
-    const emptyScreenVisible = emptyScreen && emptyScreen.visible === true;
-    const gridVisible = grid && grid.visible === true;
-
-    // Note: Message goes as 2nd param to expect(), not to .to.be.true
-    expect(emptyScreenVisible || gridVisible, 'Either myStuffRegUserEmptyScreen or myStuffGrid should be visible after sign-up').to.be.true;
+    // Verify the tile title changed from the guest version to the signed-in empty state version.
+    // Both states use MyStuffEmptyStateTile with the same internal node IDs, so focus node ID
+    // is not a reliable signal — but the title text is distinct:
+    //   Guest:     "Sign Up to Save Your Stuff"
+    //   Signed-in: "My Stuff is Empty"
+    const tileTitle = await testUtils.getNodeForElement('myStuffEmptyStateTileTitle');
+    expect(tileTitle.text).to.equal('My Stuff is Empty', 'After registration, tile title should show signed-in empty state');
 
   });
 
@@ -174,8 +157,8 @@ describe('MyStuff', function () {
     // Check that CW displays titles with history
     await testUtils.waitForElementToFullyShowOnScreen('continueWatchingRow');
     const continueWatchingRowPoster = await testUtils.getNodeForElement('continueWatchingRowPoster');
-    expect(continueWatchingRowPoster.id).to.equal('gradientPoster');
-    expect(continueWatchingRowPoster.width).to.equal(520);
+    expect(continueWatchingRowPoster.id).to.equal('poster');
+    expect(continueWatchingRowPoster.width).to.equal(310);
 
     // Check the My List displays no titles and displays correct indicators and text
     await ecp.sendKeypress(ecp.Key.Down);
@@ -241,8 +224,8 @@ describe('MyStuff', function () {
     await testUtils.waitForElementToHaveFocus('myStuffGrid', 'Timed out waiting for Continue Watching Row to have focus');
     await shared.jumpToRowListPosition('myStuffGrid', 0, 0);
     const continueWatchingRowPoster = await testUtils.getNodeForElement('continueWatchingRowPoster');
-    expect(continueWatchingRowPoster.id).to.equal('gradientPoster');
-    expect(continueWatchingRowPoster.width).to.equal(520);
+    expect(continueWatchingRowPoster.id).to.equal('poster');
+    expect(continueWatchingRowPoster.width).to.equal(310);
     await ecp.sendKeypress(ecp.Key.Ok);
     await testUtils.waitForCurrentScreenToEqual('detailScreen', 2000);
     await testUtils.waitForElementToFullyShowOnScreen('detailScreenTitle');
@@ -314,8 +297,8 @@ describe('MyStuff', function () {
     await ecp.sendKeypress(ecp.Key.Up);
     await testUtils.waitForElementToFullyShowOnScreen('continueWatchingRow');
     const continueWatchingRowPoster = await testUtils.getNodeForElement('continueWatchingRowPoster');
-    expect(continueWatchingRowPoster.id).to.equal('gradientPoster');
-    expect(continueWatchingRowPoster.width).to.equal(520);
+    expect(continueWatchingRowPoster.id).to.equal('poster');
+    expect(continueWatchingRowPoster.width).to.equal(310);
 
     // Select the title and remove from history
     await ecp.sendKeypress(ecp.Key.Ok);
@@ -345,40 +328,36 @@ describe('MyStuff', function () {
     await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');
 
     await shared.openMyStuffPage();
-    await utils.sleep(2000); // Wait for My Stuff page to load before navigation
-    await ecp.sendKeypress(ecp.Key.Down);
 
-    // Check the My List displays no titles and displays correct indicators and text
-    await testUtils.waitForElementToFullyShowOnScreen('continueWatchingRow');
-    await ecp.sendKeypress(ecp.Key.Down);
-    await utils.sleep(500);
+    // Navigate to My List row (row 1) and the 2nd item (index 1)
+    await testUtils.waitForElementToHaveFocus('myStuffGrid', 'Timed out waiting for My Stuff grid to have focus');
+    await shared.jumpToRowListPosition('myStuffGrid', 1, 1);
+    await utils.sleep(1000);
     await testUtils.waitForElementToFullyShowOnScreen('myListScreenTitle');
 
     // Select the 2nd title and check the title name
-    await ecp.sendKeypress(ecp.Key.Left);
     await ecp.sendKeypress(ecp.Key.Ok);
-    await testUtils.waitForElementToFullyShowOnScreen('detailScreenTitle');
-    const detailScreenTitle = await testUtils.getNodeForElement('detailScreenTitle');
-    const detailScreenTitle1 = detailScreenTitle.text;
+    await testUtils.waitForElementToFullyShowOnScreen('detailScreenTitle', 'Timed out waiting for detail screen title', 15000);
+    const detailScreenTitle1 = await testUtils.getNodeForElement('detailScreenTitle');
 
-    // Back to My List to remove the 3rd title
-    await ecp.sendKeypress(ecp.Key.Back);
+    // Back to My List, move to the rightmost (3rd) title and open it
+    await ecp.sendKeypress(ecp.Key.Back, { wait: 1000 });
     await ecp.sendKeypress(ecp.Key.Right);
     await ecp.sendKeypress(ecp.Key.Ok);
-    await testUtils.waitForElementToFullyShowOnScreen('detailScreenTitle');
-    await utils.sleep(2000);
+    await testUtils.waitForElementToFullyShowOnScreen('detailScreenTitle', 'Timed out waiting for detail screen title after Right', 15000);
     await testUtils.selectAndVerifyDetailPageMenuItem('removeFromMyList');
     await testUtils.waitForElementToNotShowOnScreen('removeFromMyListButton', 'Button not shown on screen', 15000);
 
-    // Verify that the focus has moved to 2nd title and check title
-    await utils.sleep(2000); // had to add sleep to get next line to work
-    await ecp.sendKeypress(ecp.Key.Back);
-    await testUtils.waitForElementToFullyShowOnScreen('myListScreenTitle');
-    const myListScreenTitle = await testUtils.getNodeForElement('myListScreenTitle');
-    const myListScreenTitle2 = myListScreenTitle.text;
-    expect(detailScreenTitle1).to.equal(myListScreenTitle2);
+    // Verify that the focus has moved to the 2nd title (the one to the left of the removed 3rd)
+    await utils.sleep(2000);
+    await ecp.sendKeypress(ecp.Key.Back, { wait: 1000 });
+    await ecp.sendKeypress(ecp.Key.Ok);
+    await testUtils.waitForElementToFullyShowOnScreen('detailScreenTitle', 'Timed out waiting for detail screen after removal', 15000);
+    const detailScreenTitle2 = await testUtils.getNodeForElement('detailScreenTitle');
+    expect(detailScreenTitle2.text).to.equal(detailScreenTitle1.text);
 
   });
+
   // https://tubi.testrail.io/index.php?/cases/view/421112
   it('C421112 Registered User - Selecting the back button twice on the My Stuff page expands the left menu and goes to the home menu item, @mystuff', async () => {
 
@@ -389,13 +368,17 @@ describe('MyStuff', function () {
     await shared.openMyStuffPage();
 
     // Check that user is on My Stuff Screen (empty)
-    await testUtils.waitForElementToFullyShowOnScreen('myStuffRegUserEmptyScreen');
+    await testUtils.waitForElementToShowOnScreen('myStuffEmptyStateTile');
 
     // Press back twice
-    await ecp.sendKeypress(ecp.Key.Back, { count: 2 });
+    await ecp.sendKeypress(ecp.Key.Back, { wait: 1000, count: 2 });
 
     // Expect Home Side Nav item to be highlighted and on Home page
-    await testUtils.waitForElementToFullyShowOnScreen('leftNavHomeButtonLabel');
+    await testUtils.waitForCurrentScreenToEqual('homeScreen', 15000);
+    const leftNavHomeLabel = await testUtils.getNodeForElement('leftNavHomeLabel');
+    expect(leftNavHomeLabel.text).to.equal('Home');
+    const homeColor = await testUtils.getElementColorField('leftNavHomeLabel', 'color');
+    expect(homeColor).to.equal('#FFFFFFFF');
 
   });
 
@@ -409,14 +392,13 @@ describe('MyStuff', function () {
     await shared.openMyStuffPage();
 
     // Check that user is on My Stuff Screen (empty)
-    await testUtils.waitForElementToFullyShowOnScreen('myStuffRegUserEmptyScreen');
-    await testUtils.waitForElementToFullyShowOnScreen('goHomeButtonMyStuff');
+    await testUtils.waitForElementToShowOnScreen('myStuffEmptyStateTile');
 
-    // Press the Go Home button
+    // Press the action button on the empty state tile (triggers "go home" for signed-in users)
     await ecp.sendKeypress(ecp.Key.Ok);
 
     // Expect redirect to Home page
-    await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');
+    await testUtils.waitForCurrentScreenToEqual('homeScreen', 15000);
 
   });
 
@@ -432,21 +414,18 @@ describe('MyStuff', function () {
     await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');
 
     await shared.openMyStuffPage();
-    await utils.sleep(2000); // Wait for My Stuff page to load
 
     // Check that CW displays no titles and has correct text for empty row
     await testUtils.waitForElementToFullyShowOnScreen('continueWatchingRow');
-    await utils.sleep(2000);
     const emptyMyStuffContainerContent1 = await testUtils.getCurrentlyFocusedRowListRowItemsContent('emptyMyStuffContainer');
     expect(emptyMyStuffContainerContent1[0].title).to.equal("You're All Caught Up!");
     expect(emptyMyStuffContainerContent1[0].description).to.equal("Movies and series you haven’t finished will show up here.");
 
 
     // Check that My List displays titles 
-    await ecp.sendKeypress(ecp.Key.Down);
-    await utils.sleep(2000);
+    await ecp.sendKeypress(ecp.Key.Down, { wait: 500 });
     const myListPosterContent = await testUtils.getNodeForElement('myListPoster');
-    expect(myListPosterContent.height).is.equal(360);
+    expect(myListPosterContent.width).is.equal(310);
 
   });
 
@@ -469,20 +448,19 @@ describe('MyStuff', function () {
     await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');
 
     await shared.openMyStuffPage();
-    await utils.sleep(2000); // Wait for My Stuff page to load before navigation
 
     // Verify that the title appears in CW section of My Stuff page
     await ecp.sendKeypress(ecp.Key.Up);
     await testUtils.waitForElementToFullyShowOnScreen('continueWatchingRow');
     const continueWatchingRowPoster = await testUtils.getNodeForElement('continueWatchingRowPoster');
-    expect(continueWatchingRowPoster.id).to.equal('gradientPoster');
-    expect(continueWatchingRowPoster.width).to.equal(520);
+    expect(continueWatchingRowPoster.id).to.equal('poster');
+    expect(continueWatchingRowPoster.width).to.equal(310);
 
     // Check the My List displays titles 
     await ecp.sendKeypress(ecp.Key.Down);
     await utils.sleep(2000);
-    const myListPosterContent = await testUtils.getNodeForElement('myListPoster');
-    expect(myListPosterContent.height).is.equal(360);
+    const myListPoster = await testUtils.getNodeForElement('myListPoster');
+    expect(myListPoster.width).is.equal(310);
 
   });
 
@@ -492,7 +470,7 @@ describe('MyStuff', function () {
 
     // Create user with watch list and history
     const user = await testUtils.createRegisteredUser();
-    await createWatchList(user);
+    await createWatchListThreeTitles(user);
     await shared.createFlexibleUserHistory(user, [
       { rating: 'G', contentType: 'movie', limit: 10, watchTime: 600 },
       { rating: 'TV-Y7', contentType: 'series', limit: 3, watchTime: 600 },
@@ -513,14 +491,7 @@ describe('MyStuff', function () {
     await testUtils.waitForElementToFullyShowOnScreen('settingsScreen');
 
     // Turn off video previews
-    await ecp.sendKeypress(ecp.Key.Down);
-    // Waiting until the autoplay preview section is fully shown on screen.
-    await testUtils.waitForElementToFullyShowOnScreen('autoplayPreviewOn');
-    await ecp.sendKeypress(ecp.Key.Ok);
-    await utils.sleep(2000); // Improvement
-    await ecp.sendKeypress(ecp.Key.Down);
-    await utils.sleep(2000); // Improvement
-    await ecp.sendKeypress(ecp.Key.Ok);
+    await navigateToAndDisableVideoPreview();
 
     // Navigate to My Stuff screen
     await ecp.sendKeypress(ecp.Key.Back, { count: 2 });
@@ -534,10 +505,9 @@ describe('MyStuff', function () {
 
     // Move down and check My List
     // Check the My List displays titles 
-    await ecp.sendKeypress(ecp.Key.Down);
-    await utils.sleep(2000);
+    await ecp.sendKeypress(ecp.Key.Down, { wait: 3000 });
     const myListPosterContent = await testUtils.getNodeForElement('myListPoster');
-    expect(myListPosterContent.height).is.equal(360);
+    expect(myListPosterContent.width).is.equal(310);
 
     // Check that video preview is not playing when autoplay preview is turned off on My List Row
     await testUtils.waitForPlayerStateToEqual('previewVideoPlayer', ['stopped', '', 'none']);
@@ -595,7 +565,7 @@ describe('MyStuff', function () {
     await ecp.sendKeypress(ecp.Key.Down);
     await utils.sleep(2000);
     const myListPosterContent = await testUtils.getNodeForElement('myListPoster');
-    expect(myListPosterContent.height).is.equal(360);
+    expect(myListPosterContent.width).is.equal(310);
 
     // Check that video preview is playing when autoplay preview is turned on -  My List Row
     await testUtils.waitForPlayerStateToEqual('previewVideoPlayer', 'playing');
@@ -621,7 +591,7 @@ describe('MyStuff', function () {
     await ecp.sendKeypress(ecp.Key.Down);
     await utils.sleep(2000);
     const myListPosterContent = await testUtils.getNodeForElement('myListPoster');
-    expect(myListPosterContent.height).is.equal(360);
+    expect(myListPosterContent.width).is.equal(310);
 
     // Check that video preview is playing when autoplay preview is turned on -  My List Row
     await testUtils.waitForPlayerStateToEqual('previewVideoPlayer', 'playing');
@@ -632,7 +602,7 @@ describe('MyStuff', function () {
 
     // Create user with history
     const user = await testUtils.createRegisteredUser();
-    await createWatchList(user);
+    await createWatchListThreeTitles(user);
 
     // Launch app on Home page
     await testUtils.startApplicationAtPage('home', { user: user });
@@ -644,16 +614,15 @@ describe('MyStuff', function () {
 
     // Move down and check My List
     // Check the My List displays titles 
-    await ecp.sendKeypress(ecp.Key.Down);
-    await utils.sleep(2000);
+    await ecp.sendKeypress(ecp.Key.Down, { wait: 2000 });
     const myListPosterContent = await testUtils.getNodeForElement('myListPoster');
-    expect(myListPosterContent.height).is.equal(360);
+    expect(myListPosterContent.width).is.equal(310);
 
     // Check that video preview is playing when autoplay preview is turned on -  My List Row
     await testUtils.waitForPlayerStateToEqual('previewVideoPlayer', 'playing', 10000);
 
     // Switch focus to another title and verify preview is playing
-    await ecp.sendKeypress(ecp.Key.Right);
+    await ecp.sendKeypress(ecp.Key.Right, { wait: 2000 });
     await testUtils.waitForPlayerStateToEqual('previewVideoPlayer', 'playing', 10000);
 
 
@@ -699,7 +668,7 @@ describe('MyStuff', function () {
     await ecp.sendKeypress(ecp.Key.Ok);
     await testUtils.waitForElementToFullyShowOnScreen('resumePlayingButton');
     const correctTitle = await testUtils.getNodeForElement('titleMovieDetailsTitle');
-    expect(correctTitle.text).to.equal('The Masked Singer');
+    expect(correctTitle.text).to.equal('The Freak Brothers');
 
   });
 
@@ -774,6 +743,7 @@ describe('MyStuff', function () {
     expect(correctTitle.text).to.equal('Zapped');
 
   });
+
   // https://tubi.testrail.io/index.php?/cases/view/439646
   it('C439646 - Kids - Registered User - Video Preview does not play when Autoplay Previews is Off @mystuff', async () => {
 
@@ -800,18 +770,9 @@ describe('MyStuff', function () {
     await testUtils.waitForElementToFullyShowOnScreen('settingsScreen');
 
     // Turn off video previews
-    await ecp.sendKeypress(ecp.Key.Down);
-    // Waiting until the autoplay preview section is fully shown on screen.
-    await testUtils.waitForElementToFullyShowOnScreen('autoplayPreviewOn');
-    await ecp.sendKeypress(ecp.Key.Ok);
-    await utils.sleep(2000); // Improvement
-    await ecp.sendKeypress(ecp.Key.Down);
-    await utils.sleep(2000); // Improvement
-    await ecp.sendKeypress(ecp.Key.Ok);
-    await testUtils.waitForElementToFullyShowOnScreen('previewOff');
+    await navigateToAndDisableVideoPreview();
 
     // Navigate to My Stuff screen
-    await utils.sleep(1000);
     await ecp.sendKeypress(ecp.Key.Back, { count: 2 });
 
     // Expect Home Side Nav item to be highlighted and on Home page
@@ -826,7 +787,7 @@ describe('MyStuff', function () {
     await ecp.sendKeypress(ecp.Key.Down);
     await utils.sleep(2000);
     const myListPosterContent = await testUtils.getNodeForElement('myListPoster');
-    expect(myListPosterContent.height).is.equal(360);
+    expect(myListPosterContent.width).is.equal(310);
 
     // Check that video preview is not playing when autoplay preview is turned off on My List Row
     await testUtils.waitForPlayerStateToEqual('previewVideoPlayer', ['stopped', '', 'none']);
@@ -857,7 +818,7 @@ describe('MyStuff', function () {
 
     // Verify My List shows only kids-appropriate content
     const myListPoster = await testUtils.getNodeForElement('myListPoster');
-    expect(myListPoster.visible).to.equal(true);
+    expect(myListPoster.width).is.equal(310);
 
     // Get all content items in My List and verify each has kids-appropriate rating
     const myListContent = await testUtils.getCurrentlyFocusedRowListRowItemsContent('queueRowList');
@@ -884,6 +845,21 @@ describe('MyStuff', function () {
 
 });
 
+async function navigateToAndDisableVideoPreview() {
+  await testUtils.untilTrue(async () => {
+    await ecp.sendKeypress(ecp.Key.Down);
+    await utils.sleep(500);
+    try {
+      const autoplayPreviewOn = await testUtils.getNodeForElement('autoplayPreviewOn', 1000);
+      return autoplayPreviewOn.visible === true;
+    } catch (e) {
+      return false;
+    }
+  }, 'Timed out waiting for Autoplay Controls section to load');
+  await ecp.sendKeypress(ecp.Key.Ok, { wait: 500 });
+  await ecp.sendKeypress(ecp.Key.Down, { wait: 500 });
+  await ecp.sendKeypress(ecp.Key.Ok, { wait: 500 });
+}
 
 async function createWatchList(user) {
   // Create a user with mix of little kids and non-little kid rated titles with history
@@ -908,8 +884,8 @@ async function createHistoryEvergreenMovieTitle(user) {
 }
 
 async function createHistoryEvergreenSeriesTitle(user) {
-  // Create a watch list one Evergreen title movie
-  const contentId = await user.getContentById(300005163);
+  // Create a watch list one Evergreen title series - The Freak Brothers (ID: 300007896)
+  const contentId = await user.getContentById(300007896);
   await user.addContentToViewHistory(contentId, 500);
 }
 
@@ -949,19 +925,12 @@ async function createHistoryForPlayingTitle() {
 
 
 // Check Empty My Stuff Screen for Registered User
-
 async function checkEmptyMyStuffScreenRegistered() {
-  await testUtils.waitForElementToShowOnScreen('myStuffRegUserEmptyScreen');
-  await testUtils.waitForElementToShowOnScreen('goHomeButtonMyStuff');
-  const goHomeButtonMyStuff = await testUtils.getNodeForElement('goHomeButtonMyStuff');
-  expect(goHomeButtonMyStuff.text).to.equal('Go Home');
-  const myStuffRegisteredScreenTextTitle = await testUtils.getNodeForElement('myStuffRegScreenTitle');
-  expect(myStuffRegisteredScreenTextTitle.text).to.equal('My Stuff is Empty');
-  const myStuffRegScreenSubTitle = await testUtils.getNodeForElement('myStuffRegScreenSubTitle');
-  expect(myStuffRegScreenSubTitle.text).to.equal('Find your favorites fast, pick up where you left off–all in one place.');
-  const myStuffRegScreenSubTitle2 = await testUtils.getNodeForElement('myStuffRegScreenSubTitle2');
-  expect(myStuffRegScreenSubTitle2.text).to.equal('Use the bookmark button to save series and movies to My List, and quickly get back to what you were watching with Continue Watching.');
-
+  await testUtils.waitForElementToShowOnScreen('myStuffEmptyStateTile');
+  const tileTitle = await testUtils.getNodeForElement('myStuffEmptyStateTileTitle');
+  expect(tileTitle.text).to.equal('My Stuff is Empty');
+  const tileDescription = await testUtils.getNodeForElement('myStuffEmptyStateTileDescription');
+  expect(tileDescription.text).to.equal('Use the bookmark button to save series and movies to My List, and quickly get back to what you were watching with Continue Watching.');
 }
 
 async function createMixedKidsAndAdultContent(user) {

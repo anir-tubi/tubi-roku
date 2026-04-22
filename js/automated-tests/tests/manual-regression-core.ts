@@ -2813,7 +2813,7 @@ describe('Core Manual Regression Tests', function () {
   });
 
 
-  it('C439674 - Guest User: Selecting My Stuff and registering displays empty My Stuff page @manual_regression @my_stuff', async () => {
+  it('C439674 - Guest User: Selecting My Stuff and registering displays empty My Stuff page @manual_regression @mystuff', async () => {
     /**
      * Pre-conditions:
      * - Enrolled in Treatment for My Stuff v3 experiment
@@ -2827,8 +2827,7 @@ describe('Core Manual Regression Tests', function () {
      * 5. Go through the sign up flow
      * 
      * Expected:
-     * - The empty My Stuff page is displayed with Go to Home button
-     * - Background should match design
+     * - The empty My Stuff page is displayed with "Find More to Watch" button
      */
 
     // Launch app as guest
@@ -2836,46 +2835,34 @@ describe('Core Manual Regression Tests', function () {
     await testUtils.waitForCurrentScreenToEqual('homeScreen', 15000);
     await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for videoTitlesRowList to have focus', 20000);
 
-
-
     // Navigate to My Stuff via side nav
     await testUtils.goToPage('myStuff');
     await testUtils.waitForCurrentScreenToEqual('myStuffScreen', 10000);
-    await testUtils.waitForElementToHaveFocus('guestMenu', 'Timed out waiting for guestMenu to have focus', 20000);
 
     await ecp.sendKeypress(ecp.Key.Ok);
     // Complete sign up flow (dismisses "Let's create your account" modal, then enters email/password)
     await testHelpers.completeSignUpFlow();
 
-    // Wait for sign up to complete and My Stuff screen to appear
-    await utils.sleep(5000);
-
     // Verify My Stuff screen is displayed (may take longer due to sign up process)
-    await testUtils.waitForCurrentScreenToEqual('myStuffScreen', 30000);
+    await testUtils.waitForCurrentScreenToEqual('myStuffScreen', 10000);
 
-    // Look for registered user empty screen
-    const regUserEmptyScreen = await testUtils.getNodeForElement('myStuffRegUserEmptyScreen');
-    expect(regUserEmptyScreen?.visible).to.be.true;
+    // Verify the empty state tile is shown in the RowList (video tiles path)
+    await testUtils.waitForElementToShowOnScreen('myStuffEmptyStateTile');
 
-    // Look for "Go to Home" button
-    const goToHomeButton = await testUtils.getNodeForElement('goHomeButtonMyStuff');
-    if (goToHomeButton) {
-      expect(goToHomeButton.visible || goToHomeButton.opacity > 0).to.be.true;
-    } else {
-      // Try alternate button ID
-      const altGoToHomeButton = await testUtils.getNodeForElement('goHomeMyStuffButton');
-      expect(altGoToHomeButton?.visible || altGoToHomeButton?.opacity > 0).to.be.true;
-    }
+    const tileTitle = await testUtils.getNodeForElement('myStuffEmptyStateTileTitle');
+    expect(tileTitle.text).to.equal('My Stuff is Empty');
 
-    // Verify background poster is present
-    const backgroundPoster = await testUtils.getNodeForElement('backgroundPoster');
-    if (backgroundPoster && backgroundPoster.uri) {
-    }
+    const tileDescription = await testUtils.getNodeForElement('myStuffEmptyStateTileDescription');
+    expect(tileDescription.text).to.equal('Use the bookmark button to save series and movies to My List, and quickly get back to what you were watching with Continue Watching.');
+
+    // Verify "Find More to Watch" button text
+    const buttonLabel = await testUtils.getNodeForElement('myStuffEmptyStateTileSignUpButton');
+    expect(buttonLabel.text).to.equal('Find More to Watch');
 
   });
 
 
-  it('C439677 - Registered User: My Stuff with Continue Watching and empty My List @manual_regression @my_stuff', async () => {
+  it('C439677 - Registered User: My Stuff with Continue Watching and empty My List @manual_regression @mystuff', async () => {
     /**
      * Pre-conditions:
      * - Enrolled in Treatment for My Stuff v3 experiment
@@ -2943,7 +2930,7 @@ describe('Core Manual Regression Tests', function () {
   });
 
 
-  it('C439678 - Registered User: My Stuff with empty Continue Watching and My List @manual_regression @my_stuff', async () => {
+  it('C439678 - Registered User: My Stuff with empty Continue Watching and My List @manual_regression @mystuff', async () => {
     /**
      * Pre-conditions:
      * - Enrolled in Treatment for My Stuff v3 experiment
@@ -2999,7 +2986,7 @@ describe('Core Manual Regression Tests', function () {
   });
 
 
-  it('C439741 - Registered User: Kids Mode - My Stuff shows only Kids rated titles @manual_regression @my_stuff @kids', async () => {
+  it('C439741 - Registered User: Kids Mode - My Stuff shows only Kids rated titles @manual_regression @mystuff @kids', async () => {
     /**
      * Pre-conditions:
      * - Enrolled in Treatment for My Stuff v3 experiment

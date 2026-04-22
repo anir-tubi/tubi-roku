@@ -79,7 +79,6 @@ on:
           - '@midroll'
           - '@movies'
           - '@multiple_audio'
-          - '@my_stuff'
           - '@mystuff'
           - '@navigation'
           - '@network'

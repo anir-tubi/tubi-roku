@@ -54,10 +54,7 @@ describe('Daily Sign In/Sign Out Automation', function () {
     await ecp.sendKeypress(ecp.Key.Ok);
 
     // Dismiss CW consent screen if it appears (not always shown, e.g. after age gate flow)
-    const consentResult = await testUtils.isElementShowingOnScreen('continueWatchingConsentPageAcceptButton', 5000);
-    if (consentResult.isShowing) {
-      await ecp.sendKeypress(ecp.Key.Ok);
-    }
+    await shared.dismissCWConsentScreenIfPresent();
 
     // Should return to home screen as registered user
     await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for home screen after registration');

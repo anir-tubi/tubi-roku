@@ -962,10 +962,10 @@ class TestHelpers {
    * HELPER: Adds specific evergreen series to user's history
    * 
    * @param user - User API instance
-   * @param contentId - Series ID (default: 300005163 - reliable evergreen series)
+   * @param contentId - Series ID (default: 300007896 - The Freak Brothers, reliable evergreen series)
    * @param watchTimeSeconds - Watch time in seconds (default: 500)
    */
-  public async createHistoryForEvergreenSeries(user: any, contentId = 300005163, watchTimeSeconds = 500) {
+  public async createHistoryForEvergreenSeries(user: any, contentId = 300007896, watchTimeSeconds = 500) {
     const content = await user.getContentById(contentId);
     await user.addContentToViewHistory(content, watchTimeSeconds);
   }
@@ -2746,10 +2746,29 @@ class TestHelpers {
     await ecp.sendKeypress(ecp.Key.Down, { count: 4 });
     await ecp.sendKeypress(ecp.Key.Ok);
 
-    await testUtils.waitForCurrentScreenToEqual('rokuContinueWatchingConsentScreen');
-    await ecp.sendKeypress(ecp.Key.Ok);
+    // Dismiss CW consent screen if it appears (not always shown, e.g. after age gate flow)
+    await this.dismissCWConsentScreenIfPresent();
 
     return email;
+  }
+
+  /**
+   * HELPER: Dismisses the Roku Continue Watching consent screen if it is currently showing.
+   * 
+   * USE WHEN:
+   *   - After registration or age gate flows where the CW consent screen may optionally appear
+   *   - The screen is not guaranteed to show, so this safely no-ops if it is absent
+   */
+  public async dismissCWConsentScreenIfPresent(): Promise<void> {
+    await utils.sleep(3000);
+    try {
+      const currentScreen = await testUtils.getElementField('screenStack', '-1', 2000);
+      if (currentScreen.id === 'rokuContinueWatchingConsentScreen') {
+        await ecp.sendKeypress(ecp.Key.Ok);
+      }
+    } catch (_e) {
+      // Screen check timed out — consent screen not present, continue
+    }
   }
 }
 

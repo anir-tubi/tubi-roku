@@ -762,6 +762,26 @@ const elements = typeCheckElements({
       '#ContentController.#uiGroup.#ContentGroup.#screenStackGroup.#ScreenStack.#myStuffScreen.#PageGroup.#SignedOutUI',
   },
 
+  myStuffEmptyStateTile: {
+    keyPath:
+      '#ContentController.#uiGroup.#ContentGroup.#screenStackGroup.#ScreenStack.#myStuffScreen.#PageGroup.#ContentArea.#RowList.0.items.0.#signUpButton',
+  },
+
+  myStuffEmptyStateTileTitle: {
+    keyPath:
+      '#ContentController.#uiGroup.#ContentGroup.#screenStackGroup.#ScreenStack.#myStuffScreen.#PageGroup.#ContentArea.#RowList.0.items.0.#title',
+  },
+
+  myStuffEmptyStateTileDescription: {
+    keyPath:
+      '#ContentController.#uiGroup.#ContentGroup.#screenStackGroup.#ScreenStack.#myStuffScreen.#PageGroup.#ContentArea.#RowList.0.items.0.#description',
+  },
+
+  myStuffEmptyStateTileSignUpButton: {
+    keyPath:
+      '#ContentController.#uiGroup.#ContentGroup.#screenStackGroup.#ScreenStack.#myStuffScreen.#PageGroup.#ContentArea.#RowList.0.items.0.#signUpButton.#label',
+  },
+
   myStuffRegUserEmptyScreen: {
     keyPath:
       '#ContentController.#uiGroup.#ContentGroup.#screenStackGroup.#ScreenStack.#myStuffScreen.#PageGroup.#AllEmptyUI',
@@ -1379,7 +1399,7 @@ const elements = typeCheckElements({
   //** CW Row populated (poster) */
   continueWatchingRowPoster: {
     keyPath:
-      '#ContentController.#uiGroup.#ContentGroup.#screenStackGroup.#ScreenStack.#myStuffScreen.#PageGroup.#ContentArea.#RowList.0.items.0.1.#posterLayout.#Poster.#gradientPoster',
+      '#ContentController.#uiGroup.#ContentGroup.#screenStackGroup.#ScreenStack.#myStuffScreen.#PageGroup.#ContentArea.#RowList.0.items.0.#poster',
   },
 
   //** CW Category Row poster */
@@ -1408,12 +1428,6 @@ const elements = typeCheckElements({
   queueRowList: {
     keyPath:
       '#ContentController.#uiGroup.#ContentGroup.#screenStackGroup.#ScreenStack.#myStuffScreen.#PageGroup.#ContentArea.#RowList',
-  },
-
-  /** Call to action button on My Stuff page (Press back for menu) */
-  myStuffCallToAction: {
-    keyPath:
-      '#ContentController.#uiGroup.#ContentGroup.#screenStackGroup.#ScreenStack.#myStuffScreen.#nav.#ScreenNavigationHint.#callToAction',
   },
 
   /** Categories page grid */
@@ -1747,10 +1761,6 @@ const elements = typeCheckElements({
     keyPath: '#ContentController.#uiGroup.#ContentGroup.#screenStackGroup.#ScreenStack.2.#AgeVerificationPageText.#AgeVerificationPageHeader',
   },
 
-  continueWatchingConsentScreen: {
-    keyPath: '#ContentController.#uiGroup.#ContentGroup.#screenStackGroup.#ScreenStack.#rokuContinueWatchingConsentScreen.0.#heading',
-  },
-
   /** OneTrust consent banner (GDPR Initial Consent screen) */
   otBanner: {
     keyPath: '#ContentController.#oneTrustViews.#OTBanner',
@@ -1915,12 +1925,6 @@ const elements = typeCheckElements({
   privacyPageScroller: {
     keyPath:
       '#ContentController.#uiGroup.#ContentGroup.#screenStackGroup.#ScreenStack.#settingsScreen.#PanelSet.3.#Offset.#ContentGroup.#Text.2',
-  },
-
-  /** empty My Stuff page */
-  emptyMyStuffPage: {
-    keyPath:
-      '#ContentController.#uiGroup.#ContentGroup.#screenStackGroup.#ScreenStack.#myStuffScreen.#ContentArea',
   },
 
   /** category on category page */
@@ -2700,11 +2704,6 @@ const elements = typeCheckElements({
   myStuffGuestScreenTextBlurb: {
     keyPath:
       '#ContentController.#uiGroup.#ContentGroup.#screenStackGroup.#ScreenStack.#myStuffScreen.#PageGroup.#SignedOutUI.#SignedOutUIBlurb',
-  },
-
-  emptyMyStuffButton: {
-    keyPath:
-      '#ContentController.#uiGroup.#ContentGroup.#screenStackGroup.#ScreenStack.#myStuffScreen.#PageGroup.#AllEmptyUI.#AllEmptyUIMenu.0.#DetailsMenuTextParent.#DetailsMenuTextFocused',
   },
 
   myStuffAllEmptyUIMenu: {
