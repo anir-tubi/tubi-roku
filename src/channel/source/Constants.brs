@@ -594,6 +594,16 @@ Function getConstants()
   constants.idsToLog = {}
 
   constants.urls = {}
+
+  'Tubi User Service url
+  constants.urls.tubiUserServiceBase = "https://tus-http.production-public.tubi.io"
+  if constants.settings.mode <> "production" AND constants.settings.stagingApis = true
+    constants.urls.tubiUserServiceBase = "https://tus-http.staging-public.tubi.io"
+  end if
+
+  ' Dynamic ad load url
+  constants.urls.adOverride = constants.urls.tubiUserServiceBase + "/api/v1/ad_override"
+
   'ad server url
   constants.urls.adsBaseUrlRainmaker = "https://rainmaker.staging-public.tubi.io/api/v2/rev/vod/"
   if constants.settings.mode = "production" OR constants.settings.mode = "staging"

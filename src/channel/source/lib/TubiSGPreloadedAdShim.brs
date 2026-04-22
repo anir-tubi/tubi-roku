@@ -97,7 +97,6 @@ Function tubiSGPreloadedAdShim_handleControlMessage(state, control, content)
       stop: "reset"
     }
     "adsCompleted": {
-      '
       play: "playAds"
       stop: "reset"
     }

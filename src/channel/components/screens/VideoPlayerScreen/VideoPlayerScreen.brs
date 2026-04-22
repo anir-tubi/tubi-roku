@@ -983,6 +983,8 @@ Function playContent()
       end if
 
       if fetchPreroll = true
+        getStatsigExperimentResource("roku_dynamic_ad_load", "roku_dynamic_ad_load_v1")
+
         updatePlayerLogLib(m.playerLogLib, "setAdType", "preroll")
 
         ' Start pre-roll fetch
@@ -1771,6 +1773,8 @@ Function onVideoPositionChange(msg) as Void
 
     ' Fetch midroll ads if conditions are met
     if isCuepointPrefetchTimeReached = true AND m.UpNext.opacity = 0 AND potentialCuepoint > 0
+      getStatsigExperimentResource("roku_dynamic_ad_load", "roku_dynamic_ad_load_v1")
+
       m.top.adPosition = potentialCuepoint
       m.top.adControl = "midroll"
       updatePlayerLogLib(m.playerLogLib, "setAdType", "midroll")

@@ -165,6 +165,12 @@ Function StatsigExperimentsInterface(statsigExperimentsInfo) as Object
         default: { "enabled": false }
       }
 
+      roku_dynamic_ad_load: {
+        roku_dynamic_ad_load_v1: {
+          default: { "enabled": false }
+        }
+      }
+
       roku_branded_scrubber: {
         roku_branded_scrubber_v1: {
           default: { "enabled": false }

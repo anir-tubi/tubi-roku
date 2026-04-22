@@ -167,7 +167,7 @@ async function buildInstalled() {
     '!src/channel/**/*.md',
     '!src/channel/components/controllers/StarterController/**',
     '!src/channel/components/tasks/GeneralTask/StarterGeneralTask.xml',
-    '!src/channel/components/tasks/GeneralTask/StarterGeneralTask.brs',
+    '!src/channel/components/tasks/GeneralTask/StarterGeneralTask.brs'
   ];
 
   let testSources = [

@@ -1,4 +1,5 @@
-Function TubiAds(constants, requestInstance, requestQueue, auth, tracking, adContentType, tcfString = invalid, userConsentsOptOutStatus = invalid, isGdprValue = false)
+Function TubiAds(constants, requestInstance, requestQueue, auth, tracking, adContentType, tcfString = invalid, userConsentsOptOutStatus = invalid, isGdprValue = false, statsigExperimentsLib = invalid)
+
   'Add Support for Roku Advertising Framework
   roAdFramework = Roku_Ads()
 
@@ -95,6 +96,8 @@ Function TubiAds(constants, requestInstance, requestQueue, auth, tracking, adCon
     isGDPR: isGdprValue
     adMessagePort: adMessagePort
     isAdultParentalLevel: true
+    statsigExperiments: statsigExperimentsLib
+    dynamicAdCache: {} ' Cache for dynamic ad load experiment to store ad override params at the content id level
   }
 End Function
 
@@ -220,9 +223,85 @@ End Function
 ' @episode: node, TubiContentNode for a video (movie or episode)
 ' @breakPos: integer, the preroll or midroll playback position at which the break occurs
 Function tubiAds_populateUrlRainmaker(episode, breakPos = 0) as String
-  params = m.getRainmakerParams(episode, breakPos)
+  adsOverrideParams = {}
+
+  if m.statsigExperiments <> invalid then
+    result = m.statSigExperiments.getExperimentResource("roku_dynamic_ad_load", "roku_dynamic_ad_load_v1")
+    if result <> invalid AND result.enabled = true then
+      contentId = episode.id
+      currentTime = createObject("roDateTime").asSeconds()
+
+      ' If we have a cached result and it hasn't expired use that instead of making a new network request
+      if m.dynamicAdCache[contentId] <> invalid AND m.dynamicAdCache[contentId].expireTime <> invalid then
+        if m.dynamicAdCache[contentId].expireTime > currentTime then
+          if m.dynamicAdCache[contentId].params <> invalid then
+            adsOverrideParams = m.dynamicAdCache[contentId].params
+          end if
+        else
+          ' If the cached result has expired then remove it from the cache
+          m.dynamicAdCache.delete(contentId)
+        end if
+      else
+        options = {}
+        authInfo = m.auth.getAuthInfo()
+        if authInfo <> invalid AND authInfo.accessToken <> invalid then
+          options.headers = m.auth.getAuthHeaders(authInfo.accessToken, true)
+        end if
+
+        ' If we are in the experiment then we need to do an extra call to pass along ad load info to rainmaker
+        url = m.request.addParamsToUrl(m.constants.urls.adOverride, {
+          content_id: contentId
+          platform: m.constants.analyticsPlatform
+          now_pos: breakPos.toStr()
+        })
+        tubiReq = m.request.createAsync(url, "adOverride", options)
+
+        port = createObject("roMessagePort")
+        if tubiReq.start(port) = true then
+          msg = wait(5000, port)
+
+          if type(msg) = "roUrlEvent" then
+            responseCode = msg.getResponseCode()
+
+            if responseCode >= 200 AND responseCode < 400 then
+              responseHeaders = msg.getResponseHeaders()
+              cacheControl = responseHeaders["Cache-Control"]
+              if cacheControl = invalid then
+                cacheControl = "private, max-age=300"
+              end if
+
+              regex = CreateObject("roRegex", "max-age=(\d+)", "i")
+              match = regex.match(cacheControl)
+              maxAge = 0
+              if match.count() > 1 then
+                maxAge = match[1].toInt()
+              end if
+
+              ' If we got a valid result write it to tmp and then have RAF read it from there
+              adsOverrideResponse = msg.getString()
+              adsOverrideJson = parseJson(adsOverrideResponse)
+              if adsOverrideJson <> invalid AND adsOverrideJson.result <> invalid AND adsOverrideJson.personalization_id <> invalid then
+                adsOverrideParams = adsOverrideJson.result
+                adsOverrideParams["personalization_id"] = adsOverrideJson.personalization_id
+
+                m.dynamicAdCache[contentId] = {
+                  "params": adsOverrideParams
+                  "expireTime": currentTime + maxAge
+                }
+              end if
+            end if
+          end if
+        end if
+      end if
+    end if
+  end if
+
+  params = {}
+  params.append(adsOverrideParams)
+  params.append(m.getRainmakerParams(episode, breakPos))
   baseUrl = m.constants.urls.adsBaseUrlRainmaker + m.constants.analyticsPlatform
   paramAddedUrl = m.request.addParamsToUrl(baseUrl, params)
+
   return paramAddedUrl
 End Function
 
@@ -392,7 +471,7 @@ Function tubiAds_retrieveAds(adsUrl, adInsertionMethod)
     requestOptions.headers["x-tubi-paln"] = givn
   end if
 
-  if m.isGDPR = true 'bs:disable-line 1001 LINT1001
+  if m.isGDPR = true
     requestOptions.headers["X-Tubi-TCF-String"] = m.tcfString
   end if
 
@@ -556,7 +635,6 @@ Function tubiAds_getAdsListViaRoku(episode, breakPos)
     end if
   end if
 
-  m.adResponseTime = -1
   'get the url for making the ad call
   rainmakerVastUrl = m.populateUrlRainmaker(episode, breakPos)
   adFetchTimer = createObject("roTimeSpan")
