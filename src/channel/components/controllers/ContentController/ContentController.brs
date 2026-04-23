@@ -4048,7 +4048,12 @@ Function processUserPlayAction(content, screen, playbackSource = {}) as Void
       end if
     end if
   else if content.scheduleData <> invalid OR content.isReplay = true
-    showLinearDetailScreen(content, playbackSource, false, skipDetailScreen)
+    isEventLive = content.isReplay <> true AND isAA(content.scheduleData) AND isNowWithinTimePeriod(content.scheduleData.startTime, content.scheduleData.endTime)
+    if isEventLive = true AND playerType = m.constants.ui.playerTypes.fox
+      playLinearVideoWithFoxPlayer(content)
+    else
+      showLinearDetailScreen(content, playbackSource, false, skipDetailScreen)
+    end if
   else if contentType = m.constants.ui.contentTypes.linear
     selectLinearContent(content)
   else

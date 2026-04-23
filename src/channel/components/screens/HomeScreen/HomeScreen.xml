@@ -184,6 +184,7 @@
            the "play" input transport deeplink was triggered
       -->
     <field id="contentToPlay" type="node" />
+    <field id="playSelected" type="boolean" alwaysNotify="true" />
 
     <!-- set to the tubi content of the item which was focused on. alwaysNotify is required. Most
     video content is always unique for the same content (b/c of the nature of

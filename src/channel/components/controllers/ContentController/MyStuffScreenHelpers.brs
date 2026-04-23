@@ -18,7 +18,7 @@ Function showMyStuffScreen()
   else
 
     screen = CreateObject("roSGNode", "MyStuffScreen")
-    screen.observeFieldScoped("contentSelected", "onMyStuffContentSelected")
+    screen.observeFieldScoped("tileSelected", "onMyStuffContentSelected")
     screen.observeFieldScoped("navigateWithinPageInfo", "onNavigateWithinPageInfoChange")
     screen.observeFieldScoped("transportVoiceResponse", "onTransportVoiceResponse")
     screen.observeFieldScoped("contentToPlay", "onContentToPlay")
@@ -362,14 +362,14 @@ End Function
 
 
 ' Show the detail screen for the selected content
-Function onMyStuffContentSelected(msg)
+Function onMyStuffContentSelected(msg) as Void
   tubiLog("MyStuffScreenHelpers.onMyStuffContentSelected")
-  content = msg.getData()
   screen = msg.getRoSGNode()
+  content = screen.contentSelected
+
+  if content = invalid then return
+
   if content.type <> m.constants.ui.contentTypes.emptyContainer
-    '//NOTE: If the content type is empty, then it is most likely the user has no items in a myList row  (i.e. continue watching, myList)
-    ' and the user attempted to click on an empty row.
-    ' Nothing should happen.
     playbackSource = {
       "srcForAnalytic": m.constants.player.playbackSource.unknown
       "srcForAds": m.constants.player.playbackOrigin.container

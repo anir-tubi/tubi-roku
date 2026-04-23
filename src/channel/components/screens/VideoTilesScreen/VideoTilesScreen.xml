@@ -78,6 +78,7 @@
 
     <!-- Set to the contentNode of the RowList item which was selected -->
     <field id="contentSelected" type="node" />
+    <field id="tileSelected" type="boolean" alwaysNotify="true" />
 
     <!-- Set to the contentNode of the RowList item which was focused -->
     <field id="contentFocused" type="node" />

@@ -55,7 +55,7 @@ Function showHomeScreen(constants, screenID = "")
     homeScreen.observeFieldScoped("focusLost", "onHomeScreenFocusLost")
     homeScreen.observeFieldScoped("visible", "onHomeScreenVisibilityChange")
     homeScreen.observeFieldScoped("tileSelected", "onContentSelected")
-    homeScreen.observeFieldScoped("contentToPlay", "onContentToPlay")
+    homeScreen.observeFieldScoped("playSelected", "onContentToPlay")
     homeScreen.observeFieldScoped("transportVoiceResponse", "onTransportVoiceResponse")
     homeScreen.observeFieldScoped("loadCategoryForIds", "onLoadCategoryForIds")
     homeScreen.observeFieldScoped("stopLinearVideoPlayer", "onStopLinearVideoPlayer")
@@ -1921,12 +1921,14 @@ Function onContentSelected(msg) as Void
 End Function
 
 
-Function onContentToPlay(msg)
-  content = msg.getData()
-  contentType = content.type
+Function onContentToPlay(msg) as Void
   screen = msg.getRoSGNode()
-  containerId = getCurrentFocusedContainerId(screen, content)
+  content = screen.contentToPlay
 
+  if content = invalid then return
+
+  contentType = content.type
+  containerId = getCurrentFocusedContainerId(screen, content)
 
   if contentType <> m.constants.ui.contentTypes.adRowlistCarousel AND contentType <> m.constants.ui.contentTypes.adRowlistSpotlight
     playbackSource = {

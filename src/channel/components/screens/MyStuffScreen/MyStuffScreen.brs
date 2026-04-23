@@ -508,6 +508,7 @@ Function handleItemSelected(selectedPosition)
       m.top.trackingComponentInfo = getTrackingComponentInfoOfRowList(itemSelected, selectedPosition)
       if itemSelected <> invalid
         m.top.contentSelected = itemSelected
+        m.top.tileSelected = true
       end if
     else if category.id = m.constants.ui.categoryIds.guestUserMyStuff AND m.top.signedIn <> true
       ' Guest user selected the sign-up tile — trigger registration flow
