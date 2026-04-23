@@ -103,11 +103,11 @@ Function onProfileSelected(msg)
 
   if parentScreen <> invalid
     parentScreenType = parentScreen.getSubtype()
+    sendAccountSelectionEvent(profileSelected, parentScreenType)
   end if
 
   handleBeforeProfileSelection(parentScreenType)
 
-  sendAccountSelectionEvent(profileSelected, parentScreenType)
 
   if profileSelected = "add_profile"
     showAddProfileScreen()
@@ -143,22 +143,26 @@ Function sendAccountSelectionEvent(profileSelected, parentScreenType)
 
     ' send account_selection_event
     if isNonEmptyString(trackingPage) = true AND profileSelected <> "add_profile"
-
+      selectedUserId = invalid
       profileAuthInfo = m.tubiAuthUpdate.getProfileAuthInfo(profileSelected)
       if isNonEmptyString(profileAuthInfo.userId) = true
         selectedUserId = profileAuthInfo.userId.toInt()
-      else
-        selectedUserId = 0
+      end if
+
+      values = {
+        pageOneof: m.Tracking.getAnalyticsPage(trackingPage, {})
+      }
+
+      if selectedUserId <> invalid
+        values.selected_user_id = selectedUserId
       end if
 
       trackingEvent = {
         type: "account_selection"
-        values: {
-          pageOneof: m.Tracking.getAnalyticsPage(trackingPage, {})
-          selected_user_id: selectedUserId
-        }
+        values: values
       }
       m.trackingLoggingTask.trackEvent = trackingEvent
+
     end if
   end if
 
