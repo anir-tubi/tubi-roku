@@ -87,6 +87,13 @@ screens), fullscreen (detail, search screens)
     </Group>
 
     <Poster
+      id="sideNavBackground"
+      opacity="0"
+      uri="pkg:/images/background-masks/spotlight-horizontal-gradient.png"
+      width="1920"
+      height="1080" />
+
+    <Poster
       id="fullScreenPosterGradient2"
       opacity="0"
       width="1920"

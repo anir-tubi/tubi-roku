@@ -38,6 +38,7 @@ Function init()
   m.maskLayer11BlendColor2 = topRef.findNode("maskLayer11BlendColor2")
   m.maskLayer2 = topRef.findNode("maskLayer2")
 
+  m.sideNavBackground = topRef.findNode("sideNavBackground")
   m.fullScreenPosterGradient = topRef.findNode("fullScreenPosterGradient")
   m.adDisplayGradient = topRef.findNode("adDisplayGradient")
   m.fullScreenPosterLeftGradient = topRef.findNode("fullScreenPosterLeftGradient")
@@ -176,6 +177,7 @@ Function newBackgroundSet()
       fade(m.fullScreenPosterGradient, "out", 0.5)
       fade(m.fullScreenPosterGradient2, "out", 0.5)
       fade(m.adDisplayGradient, "out", 0.5)
+      fade(m.sideNavBackground, "out", 0.5)
     else if arrayIncludes([backgroundTypes.fullScreen2, backgroundTypes.spotlight, backgroundTypes.skinAd], backgroundType)
       '// fullScreen2 displays the images in full screen with a vertical gradient overlay that is more opaque on the bottom.
       fade(m.circularMaskLayer, "out", 0.5)
@@ -183,6 +185,11 @@ Function newBackgroundSet()
       fade(m.defaultBackground, "out", 0.5)
       fade(m.fullScreenPosterGradient, "out", 0.5)
       fade(m.adDisplayGradient, "out", 0.5)
+      if backgroundType = backgroundTypes.spotlight
+        fade(m.sideNavBackground, "in", 0.5)
+      else
+        fade(m.sideNavBackground, "out", 0.5)
+      end if
       if m.top.screenId = m.constants.ui.screenIds.vodDetailScreen
         fade(m.fullScreenPosterGradient2, "out", 0)
       else
@@ -195,6 +202,7 @@ Function newBackgroundSet()
       fade(m.fullScreenPosterGradient, "out", 0.5)
       fade(m.fullScreenPosterGradient2, "out", 0.5)
       fade(m.adDisplayGradient, "in", 0.5)
+      fade(m.sideNavBackground, "out", 0.5)
     else
       fade(m.circularMaskLayer, "in", 0.5)
       ' Showing the poster group. Posters will automatically animate with width shrink effect due to update in the background info.
@@ -203,6 +211,7 @@ Function newBackgroundSet()
       fade(m.fullScreenPosterGradient, "out", 0.5)
       fade(m.fullScreenPosterGradient2, "out", 0.5)
       fade(m.adDisplayGradient, "out", 0.5)
+      fade(m.sideNavBackground, "out", 0.5)
     end if
   end if
 
