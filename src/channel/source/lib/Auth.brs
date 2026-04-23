@@ -1364,8 +1364,16 @@ Function tubiAuth_copyProfileToMainAuth(profileId)
   if isNonEmptyString(profileId)
     profileAuthInfo = m.getProfileAuthInfo(profileId)
     if profileAuthInfo.count() > 0
-      m.deleteAuthInfo()
       sec = createObject("roRegistrySection", m.authRegSection)
+      existingKeys = sec.getKeyList()
+
+      ' Remove keys from main auth that are not in profileAuthInfo
+      for each key in existingKeys
+        if profileAuthInfo[key] = invalid
+          sec.delete(key)
+        end if
+      end for
+
       sec.writeMulti(profileAuthInfo)
       sec.flush()
     end if
