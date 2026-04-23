@@ -64,7 +64,7 @@ describe('Application Launch', function () {
     // Validate Content Settings Updated dialog
     await testUtils.waitForElementToShowOnScreen('parentalControlsChangeDialog', 'Content Settings Updated dialog did not appear', 10000);
     const dialogMessage = await testUtils.getNodeForElement('parentalControlsSettingsTeens');
-    expect(dialogMessage.text).to.contain('Age Rating 13–17');
+    expect(dialogMessage.text).to.contain('Age Rating 13-17');
 
     // Dismiss dialog and back out to left nav
     await ecp.sendKeypress(ecp.Key.Ok);

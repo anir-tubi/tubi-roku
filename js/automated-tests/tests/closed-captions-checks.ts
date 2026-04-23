@@ -1,5 +1,5 @@
 import { expect } from 'chai';
-import { odc, ecp, utils } from 'roku-test-automation';
+import { ecp, utils } from 'roku-test-automation';
 import type { RegisteredUser } from '../test-utils';
 import { testUtils } from '../test-utils';
 import { shared } from '../test-helpers';
@@ -24,7 +24,7 @@ describe('Closed Captions Checks', function () {
     await ecp.sendKeypress(ecp.Key.Ok);
     // Verify that video is playing
     await testUtils.waitForPlayerStateToEqual('linearVideoPlayerScreen', 'playing', 25000);
-    await ecp.sendKeypress(ecp.Key.Left, { count: 2, wait: 500 });
+    await ecp.sendKeypress(ecp.Key.Left, { count: 4, wait: 500 });
     await utils.sleep(100);
     await ecp.sendKeypress(ecp.Key.Up);
     await utils.sleep(100);
@@ -41,23 +41,16 @@ describe('Closed Captions Checks', function () {
     await utils.sleep(1000);
 
     await testUtils.goToPage('search');
-    await testUtils.waitForCurrentScreenToEqual('searchScreen');
-    // If so, send search terms
-    await ecp.sendText('l');
-    await testUtils.retryWithTimeOut(async () => {
-      const searchHintText = await testUtils.getNodeForElement('searchHintText');
-      expect(searchHintText.text).to.match(/\d+ titles found/);
-    }, 30000);
-    // Call function to navigate right to search results grid
-    await navigateRightToGrid();
+    await testUtils.waitForElementToShowOnScreen('trendingSearchResultsGrid', 'Timed out waiting for search screen', 10000);
+    await ecp.sendText('t');
 
-    // Select item and Play button
-    await utils.sleep(2000);
+    await shared.navigateRightToSearchGrid();
+
     await ecp.sendKeypress(ecp.Key.Ok);
 
     await testUtils.waitForElementToNotShowOnScreen('contentControllerSpinner', 'contentControllerSpinner is still shown', 10000);
     await testUtils.waitForCurrentScreenToEqual('detailScreen');
-    await testUtils.waitForElementToShowOnScreen('detailScreenTitle', 'title not shown', 10000);
+    await testUtils.waitForElementToShowOnScreen('detailScreenTitle', 'title not shown', 20000);
 
     // Wait for detail screen menu to load with items and have focus
     await testUtils.retryWithTimeOut(async () => {
@@ -72,8 +65,7 @@ describe('Closed Captions Checks', function () {
 
 
     await ecp.sendKeypress(ecp.Key.Play);
-    await utils.sleep(1000);
-    await testUtils.waitForCurrentScreenToEqual('videoPlayerScreen');
+    await testUtils.waitForCurrentScreenToEqual('videoPlayerScreen', 120000);
 
     // Verify that video is playing
     await testUtils.waitForPlayerStateToEqual('videoPlayerScreen', 'playing', 20000);
@@ -99,7 +91,7 @@ describe('Closed Captions Checks', function () {
     await ecp.sendKeypress(ecp.Key.Ok);
     // Verify that video is playing
     await testUtils.waitForPlayerStateToEqual('linearVideoPlayerScreen', 'playing', 25000);
-    await ecp.sendKeypress(ecp.Key.Left, { count: 2, wait: 500 });
+    await ecp.sendKeypress(ecp.Key.Left, { count: 4, wait: 500 });
     await utils.sleep(100);
     await ecp.sendKeypress(ecp.Key.Up);
     await utils.sleep(100);
@@ -118,18 +110,11 @@ describe('Closed Captions Checks', function () {
     await utils.sleep(1000);
 
     await testUtils.goToPage('search');
-    await testUtils.waitForCurrentScreenToEqual('searchScreen');
-    // If so, send search terms
-    await ecp.sendText('l');
-    await testUtils.retryWithTimeOut(async () => {
-      const searchHintText = await testUtils.getNodeForElement('searchHintText');
-      expect(searchHintText.text).to.match(/\d+ titles found/);
-    }, 50000);
-    // Call function to navigate right to search results grid
-    await navigateRightToGrid();
+    await testUtils.waitForElementToShowOnScreen('trendingSearchResultsGrid', 'Timed out waiting for search screen', 10000);
+    await ecp.sendText('the');
 
-    // Select item and Play button
-    await utils.sleep(2000);
+    await shared.navigateRightToSearchGrid();
+
     await ecp.sendKeypress(ecp.Key.Ok);
 
     await testUtils.waitForElementToNotShowOnScreen('contentControllerSpinner', 'contentControllerSpinner is still shown', 10000);
@@ -150,7 +135,7 @@ describe('Closed Captions Checks', function () {
 
     await utils.sleep(1000);
     await ecp.sendKeypress(ecp.Key.Play);
-    await testUtils.waitForCurrentScreenToEqual('videoPlayerScreen');
+    await testUtils.waitForCurrentScreenToEqual('videoPlayerScreen', 120000);
 
     // Verify that video is playing
     await testUtils.waitForPlayerStateToEqual('videoPlayerScreen', 'playing', 20000);
@@ -167,11 +152,3 @@ describe('Closed Captions Checks', function () {
 
 });
 
-// Navigate right until the grid is in focus
-async function navigateRightToGrid() {
-  await testUtils.untilTrue(async () => {
-    await ecp.sendKeypress(ecp.Key.Right);
-    const { node } = await odc.getFocusedNode();
-    return node.id === 'ResultGrid';
-  }, 'ResultGrid never obtained focus');
-}

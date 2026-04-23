@@ -90,7 +90,7 @@ describe('Parental Controls', function () {
 
     await navigateToContentSettings();
     await selectContentSetting('Age Rating 13-17');
-    await verifyContentSettingsDialog('Age Rating 13–17');
+    await verifyContentSettingsDialog('Age Rating 13-17');
     await backToHomeFromContentSettings();
     await testUtils.waitForCurrentScreenToEqual('homeScreen', 15000);
 
@@ -224,7 +224,7 @@ describe('Parental Controls', function () {
 
     await navigateToContentSettings();
     await selectContentSetting('Age Rating 13-17');
-    await verifyContentSettingsDialog('Age Rating 13–17');
+    await verifyContentSettingsDialog('Age Rating 13-17');
     await backToHomeFromContentSettings();
     await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus', 15000);
 
@@ -291,7 +291,7 @@ describe('Parental Controls', function () {
 
     await navigateToContentSettings();
     await selectContentSetting('Age Rating 13-17');
-    await verifyContentSettingsDialog('Age Rating 13–17');
+    await verifyContentSettingsDialog('Age Rating 13-17');
     await backToHomeFromContentSettings();
     await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus', 15000);
 
@@ -327,7 +327,7 @@ describe('Parental Controls', function () {
     // First change: set to Teen
     await navigateToContentSettings();
     await selectContentSetting('Age Rating 13-17');
-    await verifyContentSettingsDialog('Age Rating 13–17');
+    await verifyContentSettingsDialog('Age Rating 13-17');
 
     // Second change within 5 minutes: should show dialog without password
     await selectContentSetting('Age Rating 10-12');
@@ -532,7 +532,7 @@ describe('Parental Controls', function () {
 
     await navigateToContentSettings();
     await selectContentSetting('Age Rating 13-17');
-    await verifyContentSettingsDialog('Age Rating 13–17');
+    await verifyContentSettingsDialog('Age Rating 13-17');
     await backToHomeFromContentSettings();
     await utils.sleep(2000);
     await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus', 15000);

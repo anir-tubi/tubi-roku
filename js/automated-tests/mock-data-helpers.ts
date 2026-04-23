@@ -80,7 +80,7 @@ class MockDataHelpers {
     return new Promise((resolve) => {
       proxy.addCallback({
         shouldProcess: (args) => {
-          return args.url.includes('/api/v7/homescreen');
+          return args.url.includes('/api/v8/homescreen');
         },
         processResponse: (args) => {
           const now = new Date();

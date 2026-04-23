@@ -2100,7 +2100,7 @@ describe("Pivots Row Position and Sticky Behavior", function () {
     );
 
     // Step 2: Scroll to pivots row from featured row (navigate up to pivots)
-    await ecp.sendKeypress(ecp.Key.Up);
+    await ecp.sendKeypress(ecp.Key.Back);
 
     // Verify pivot list is focused
     await testUtils.waitForElementToHaveFocus(

@@ -1,28 +1,7 @@
 import { expect } from 'chai';
-import { ecp, odc, utils } from 'roku-test-automation';
+import { ecp, utils } from 'roku-test-automation';
 import { testUtils } from '../test-utils';
 import { shared } from '../test-helpers';
-
-async function navigateToTransportButtons() {
-  await ecp.sendKeypress(ecp.Key.Up);
-  await testUtils.waitForElementToHaveFocus('playerScreenProgressBar');
-  await testUtils.untilTrue(async () => {
-    await utils.sleep(200);
-    await ecp.sendKeypress(ecp.Key.Up);
-    const { node } = await odc.getFocusedNode();
-    return node.subtype === 'TextIconButton' || node.subtype === 'EnhancedButton';
-  }, 'Timed out waiting for a transport button to have focus');
-}
-
-async function navigateToSendFeedbackButton(maxPresses = 10) {
-  for (let i = 0; i < maxPresses; i++) {
-    const { node } = await odc.getFocusedNode();
-    if (node.id === 'sendFeedBackButton') return;
-    await ecp.sendKeypress(ecp.Key.Right);
-    await utils.sleep(200);
-  }
-  throw new Error('Could not navigate to sendFeedBackButton');
-}
 
 describe('Send Feedback Tests', function () {
 
@@ -160,8 +139,8 @@ describe('Send Feedback Tests', function () {
     await testUtils.waitForPlayerStateToEqual('videoPlayerScreen', 'playing');
 
     // Navigate to sendFeedback button
-    await navigateToTransportButtons();
-    await navigateToSendFeedbackButton();
+    await shared.navigateToTransportButtons();
+    await shared.navigateToSendFeedbackButton();
 
     // Open Send Feedback overlay
     await ecp.sendKeypress(ecp.Key.Ok);
@@ -185,8 +164,8 @@ describe('Send Feedback Tests', function () {
     await testUtils.waitForPlayerStateToEqual('videoPlayerScreen', 'playing');
 
     // Navigate to sendFeedback button
-    await navigateToTransportButtons();
-    await navigateToSendFeedbackButton();
+    await shared.navigateToTransportButtons();
+    await shared.navigateToSendFeedbackButton();
 
     // Open Send Feedback overlay
     await ecp.sendKeypress(ecp.Key.Ok);
@@ -213,8 +192,8 @@ describe('Send Feedback Tests', function () {
     await testUtils.waitForPlayerStateToEqual('videoPlayerScreen', 'playing');
 
     // Navigate to sendFeedback button
-    await navigateToTransportButtons();
-    await navigateToSendFeedbackButton();
+    await shared.navigateToTransportButtons();
+    await shared.navigateToSendFeedbackButton();
 
     // Open Send Feedback overlay
     await ecp.sendKeypress(ecp.Key.Ok);
@@ -251,8 +230,8 @@ describe('Send Feedback Tests', function () {
     await testUtils.waitForPlayerStateToEqual('videoPlayerScreen', 'playing');
 
     // Navigate to sendFeedback button
-    await navigateToTransportButtons();
-    await navigateToSendFeedbackButton();
+    await shared.navigateToTransportButtons();
+    await shared.navigateToSendFeedbackButton();
 
     // Open Send Feedback overlay
     await ecp.sendKeypress(ecp.Key.Ok);
@@ -284,8 +263,8 @@ describe('Send Feedback Tests', function () {
     await testUtils.waitForPlayerStateToEqual('videoPlayerScreen', 'playing');
 
     // Navigate to sendFeedback button
-    await navigateToTransportButtons();
-    await navigateToSendFeedbackButton();
+    await shared.navigateToTransportButtons();
+    await shared.navigateToSendFeedbackButton();
 
     // Open Send Feedback overlay
     await ecp.sendKeypress(ecp.Key.Ok);
@@ -336,10 +315,10 @@ describe('Send Feedback Tests', function () {
     const playerState = videoPlayerScreen.state
 
     // Show HUD and navigate up to transport buttons
-    await navigateToTransportButtons();
+    await shared.navigateToTransportButtons();
 
     // Navigate to sendFeedback button
-    await navigateToSendFeedbackButton();
+    await shared.navigateToSendFeedbackButton();
 
     // Open Send Feedback overlay
     await ecp.sendKeypress(ecp.Key.Ok);
@@ -395,8 +374,8 @@ describe('Send Feedback Tests', function () {
     await testUtils.waitForPlayerStateToEqual('videoPlayerScreen', 'playing');
 
     // Navigate to sendFeedback button
-    await navigateToTransportButtons();
-    await navigateToSendFeedbackButton();
+    await shared.navigateToTransportButtons();
+    await shared.navigateToSendFeedbackButton();
 
     // Open Send Feedback overlay
     await ecp.sendKeypress(ecp.Key.Ok);
@@ -444,8 +423,8 @@ describe('Send Feedback Tests', function () {
     const playerState = videoPlayerScreen.state
 
     // Navigate to sendFeedback button
-    await navigateToTransportButtons();
-    await navigateToSendFeedbackButton();
+    await shared.navigateToTransportButtons();
+    await shared.navigateToSendFeedbackButton();
 
     // Open Send Feedback overlay
     await ecp.sendKeypress(ecp.Key.Ok);
@@ -555,10 +534,10 @@ describe('Send Feedback Tests', function () {
     await testUtils.waitForPlayerStateToEqual('videoPlayerScreen', 'playing', 5000);
 
     // Navigate to transport buttons and verify sendFeedback button is not reachable
-    await navigateToTransportButtons();
+    await shared.navigateToTransportButtons();
     let foundButton = false;
     try {
-      await navigateToSendFeedbackButton();
+      await shared.navigateToSendFeedbackButton();
       foundButton = true;
     } catch (e) {
       // Expected: button not found
@@ -608,10 +587,10 @@ describe('Send Feedback Tests', function () {
     await utils.sleep(2500);
 
     // Navigate to transport buttons and verify sendFeedback button is not reachable
-    await navigateToTransportButtons();
+    await shared.navigateToTransportButtons();
     let foundButton = false;
     try {
-      await navigateToSendFeedbackButton();
+      await shared.navigateToSendFeedbackButton();
       foundButton = true;
     } catch (e) {
       // Expected: button not found
@@ -636,8 +615,8 @@ describe('Send Feedback Tests', function () {
     const playerState = videoPlayerScreen.state
 
     // Navigate to sendFeedback button
-    await navigateToTransportButtons();
-    await navigateToSendFeedbackButton();
+    await shared.navigateToTransportButtons();
+    await shared.navigateToSendFeedbackButton();
 
     // Open Send Feedback overlay
     await ecp.sendKeypress(ecp.Key.Ok);
@@ -699,8 +678,8 @@ describe('Send Feedback Tests', function () {
     const playerState = videoPlayerScreen.state
 
     // Navigate to sendFeedback button
-    await navigateToTransportButtons();
-    await navigateToSendFeedbackButton();
+    await shared.navigateToTransportButtons();
+    await shared.navigateToSendFeedbackButton();
 
     // Open Send Feedback overlay
     await ecp.sendKeypress(ecp.Key.Ok);

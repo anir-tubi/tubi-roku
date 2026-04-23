@@ -3246,7 +3246,7 @@ const elements = typeCheckElements({
 
   /** playerScreenProgressBar */
   playerScreenProgressBar: {
-    keyPath: '#ContentController.#uiGroup.#ContentGroup.#videoPlayerScreen.#HUD.#Transport.#TubiProgressBar',
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#videoPlayerScreen.#HUD.#Transport.#ProgressBar',
   },
 
   /** browseWhileWatchingMetadata */

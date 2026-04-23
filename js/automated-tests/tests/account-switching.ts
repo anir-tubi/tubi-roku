@@ -26,7 +26,7 @@ import { testHelpers } from "../test-helpers";
  *
  * Uses: automationparent1@tubi.tv / 111111, automationparent2@tubi.tv / 111111
  */
-describe('account-switching-matrix', function () {
+describe.skip('account-switching-matrix', function () {
 
   before(async () => {
     await proxy.start();

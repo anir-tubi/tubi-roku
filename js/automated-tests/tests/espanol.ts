@@ -156,7 +156,7 @@ describe('Espanol', function () {
 
     // Verify Teens PC Settings Change dialog
     const parentalControlsSettingsTeens = await testUtils.getNodeForElement('parentalControlsSettingsTeens');
-    expect(parentalControlsSettingsTeens.text).to.contain('Age Rating 13–17 (Up to TV-14 / PG-13)');
+    expect(parentalControlsSettingsTeens.text).to.contain('Age Rating 13-17 (Up to TV-14 / PG-13)');
     await ecp.sendKeypress(ecp.Key.Ok);
 
     // Back to home

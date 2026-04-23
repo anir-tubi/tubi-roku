@@ -197,7 +197,7 @@ describe('multi-account', function () {
 
     await testUtils.waitForElementToShowOnScreen('parentalControlsChangeDialog', 'Content Settings Updated dialog did not appear', 10000);
     const dialogMessage = await testUtils.getNodeForElement('parentalControlsSettingsTeens');
-    expect(dialogMessage.text).to.contain('Age Rating 13–17 (Up to TV-14 / PG-13)');
+    expect(dialogMessage.text).to.contain('Age Rating 13-17 (Up to TV-14 / PG-13)');
 
     await ecp.sendKeypress(ecp.Key.Ok);
     await utils.sleep(1000);

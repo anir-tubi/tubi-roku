@@ -77,12 +77,13 @@ describe('Details Page', function () {
       expect(detailScreenTitle.visible).to.equal(true);
       await ecp.sendKeypress(ecp.Key.Play);
       await shared.createHistory();
-      await utils.sleep(2000); // Improvement - try to work around sleeps
-      await ecp.sendKeypress(ecp.Key.Ok);
-      await utils.sleep(2000);
-      await ecp.sendKeypress(ecp.Key.Back);
-      await utils.sleep(2000);
-      await ecp.sendKeypress(ecp.Key.Back);
+
+      await testUtils.untilTrue(async () => {
+        await ecp.sendKeypress(ecp.Key.Back);
+        const screen = await testUtils.getElementField('screenStack', '-1');
+        return screen.id === 'detailScreen';
+      }, 'Never navigated back to detailScreen', 10000);
+      await utils.sleep(1000);
 
       // Check for Resume button
       await testUtils.retryWithTimeOut(async () => {
@@ -119,6 +120,8 @@ describe('Details Page', function () {
 
       // Create history
       await ecp.sendKeypress(ecp.Key.Play);
+      await testUtils.waitForCurrentScreenToEqual('videoPlayerScreen', 5000);
+      await testUtils.waitForPlayerStateToEqual('videoPlayerScreen', 'playing', 5000);
       await shared.createHistory();
 
       // Back out of the video player to land on Details page
@@ -130,7 +133,7 @@ describe('Details Page', function () {
         const resumePlayingButton = await testUtils.getNodeForElement('resumePlayingButton');
         expect(resumePlayingButton.text).to.equal('Resume Playing');
       });
-
+      await utils.sleep(1000);
       // Press Play from Beginning and check playback
       await testUtils.selectAndVerifyDetailPageMenuItem('playFromBeginning');
 
@@ -162,6 +165,8 @@ describe('Details Page', function () {
       // Verify and select the Play button
 
       await testUtils.selectAndVerifyDetailPageMenuItem('play');
+      await testUtils.waitForCurrentScreenToEqual('videoPlayerScreen', 5000);
+      await testUtils.waitForPlayerStateToEqual('videoPlayerScreen', 'playing', 5000);
 
       // Create history
       //await ecp.sendKeypress(ecp.Key.Play);
@@ -171,13 +176,12 @@ describe('Details Page', function () {
       const position = await testUtils.getPlayerPosition();
       const currentposition = position;
 
-      // Back to Details page
-      await utils.sleep(2000); // Improvement - try to work around sleeps
-      await ecp.sendKeypress(ecp.Key.Ok);
-      await utils.sleep(2000);
-      await ecp.sendKeypress(ecp.Key.Back);
-      await utils.sleep(2000);
-      await ecp.sendKeypress(ecp.Key.Back);
+      await testUtils.untilTrue(async () => {
+        await ecp.sendKeypress(ecp.Key.Back);
+        const screen = await testUtils.getElementField('screenStack', '-1');
+        return screen.id === 'detailScreen';
+      }, 'Never navigated back to detailScreen', 10000);
+      await utils.sleep(1000);
 
       // Select Resume and check for playback
 
@@ -216,11 +220,14 @@ describe('Details Page', function () {
       await shared.createHistory();
 
       // Back to Details page
-      await utils.sleep(2000);
-      await ecp.sendKeypress(ecp.Key.Back);
+      await testUtils.untilTrue(async () => {
+        await ecp.sendKeypress(ecp.Key.Back);
+        const screen = await testUtils.getElementField('screenStack', '-1');
+        return screen.id === 'detailScreen';
+      }, 'Never navigated back to detailScreen', 10000);
+      await utils.sleep(1000);
 
       // Check that movie has history by clicking the Remove from History Button
-      await utils.sleep(2500);
       await testUtils.selectAndVerifyDetailPageMenuItem('removeFromHistory');
 
       // Verify that Remove from History changes to Add to My List
@@ -246,12 +253,12 @@ describe('Details Page', function () {
       await shared.createHistory();
 
       // Back out of the video player to land on Details page
-      await utils.sleep(2000); // Improvement - try to work around sleeps
-      await ecp.sendKeypress(ecp.Key.Ok);
-      await utils.sleep(2000);
-      await ecp.sendKeypress(ecp.Key.Back);
-      await utils.sleep(2000);
-      await ecp.sendKeypress(ecp.Key.Back);
+      await testUtils.untilTrue(async () => {
+        await ecp.sendKeypress(ecp.Key.Back);
+        const screen = await testUtils.getElementField('screenStack', '-1');
+        return screen.id === 'detailScreen';
+      }, 'Never navigated back to detailScreen', 10000);
+      await utils.sleep(1000);
 
       // Check that movie has history
       await testUtils.retryWithTimeOut(async () => {
@@ -285,13 +292,13 @@ describe('Details Page', function () {
 
       // Create history
       await shared.createHistory();
-      await utils.sleep(2000); // Improvement - try to work around sleeps
-      await ecp.sendKeypress(ecp.Key.Ok);
-      await utils.sleep(2000);
-      await ecp.sendKeypress(ecp.Key.Back);
-      await utils.sleep(2000); // Improvement - try to work around sleeps
-      await ecp.sendKeypress(ecp.Key.Back);
 
+      await testUtils.untilTrue(async () => {
+        await ecp.sendKeypress(ecp.Key.Back);
+        const screen = await testUtils.getElementField('screenStack', '-1');
+        return screen.id === 'detailScreen';
+      }, 'Never navigated back to detailScreen', 10000);
+      await utils.sleep(1000);
 
       // Check that Resume has progress bar
       await testUtils.retryWithTimeOut(async () => {
@@ -465,15 +472,17 @@ describe('Details Page', function () {
       await shared.createHistory();
 
       // Back to Details page
-      await utils.sleep(2000);
-      await ecp.sendKeypress(ecp.Key.Back);
+      await testUtils.untilTrue(async () => {
+        await ecp.sendKeypress(ecp.Key.Back);
+        const screen = await testUtils.getElementField('screenStack', '-1');
+        return screen.id === 'detailScreen';
+      }, 'Never navigated back to detailScreen', 10000);
+      await utils.sleep(1000);
 
       // Check that UI has Resume button
-      await utils.sleep(2000);
       await testUtils.waitForElementToFullyShowOnScreen('resumePlayingButton');
 
       // Verify that UI also has a Play button
-      await utils.sleep(2000); // Improvement
       await testUtils.selectAndVerifyDetailPageMenuItem('playFromBeginning');
     });
 

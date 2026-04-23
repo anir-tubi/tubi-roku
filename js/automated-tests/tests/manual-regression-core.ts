@@ -970,12 +970,9 @@ describe('Core Manual Regression Tests', function () {
     await ecp.sendKeypress(ecp.Key.Play);
     await testUtils.waitForPlayerStateToEqual('videoPlayerScreen', 'playing');
 
-    // Show HUD (Play or Ok depending on device)
-    await ecp.sendKeypress(ecp.Key.Play);
-    await utils.sleep(800);
-
-    // Set the focus to sendFeedback button
-    await ecp.sendKeypress(ecp.Key.Right, { count: 5 });
+    // Navigate to transport buttons then to sendFeedback button
+    await testHelpers.navigateToTransportButtons();
+    await testHelpers.navigateToSendFeedbackButton();
 
     // Open Send Feedback overlay
     await ecp.sendKeypress(ecp.Key.Ok);
@@ -1021,12 +1018,9 @@ describe('Core Manual Regression Tests', function () {
     await ecp.sendKeypress(ecp.Key.Play);
     await testUtils.waitForPlayerStateToEqual('videoPlayerScreen', 'playing');
 
-    // Show HUD (Play or Ok depending on device)
-    await ecp.sendKeypress(ecp.Key.Play);
-    await utils.sleep(800);
-
-    // Set the focus to sendFeedback button
-    await ecp.sendKeypress(ecp.Key.Right, { count: 5 });
+    // Navigate to transport buttons then to sendFeedback button
+    await testHelpers.navigateToTransportButtons();
+    await testHelpers.navigateToSendFeedbackButton();
 
     // Open Send Feedback overlay
     await ecp.sendKeypress(ecp.Key.Ok);
@@ -1068,12 +1062,9 @@ describe('Core Manual Regression Tests', function () {
     await ecp.sendKeypress(ecp.Key.Play);
     await testUtils.waitForPlayerStateToEqual('videoPlayerScreen', 'playing');
 
-    // Show HUD (Play or Ok depending on device)
-    await ecp.sendKeypress(ecp.Key.Down);
-    await utils.sleep(800);
-
-    // Set the focus to sendFeedback button
-    await ecp.sendKeypress(ecp.Key.Right, { count: 5 });
+    // Navigate to transport buttons then to sendFeedback button
+    await testHelpers.navigateToTransportButtons();
+    await testHelpers.navigateToSendFeedbackButton();
 
     // Open Send Feedback overlay
     await ecp.sendKeypress(ecp.Key.Ok);
@@ -1102,27 +1093,30 @@ describe('Core Manual Regression Tests', function () {
      */
 
     // Start app
-    await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: false });
+    await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: false, clearRegistry: true });
     await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');
-    await utils.sleep(800);
-
     await testHelpers.openKidsMode();
     await utils.sleep(800);
 
     // Navigate right to home page focus
     await ecp.sendKeypress(ecp.Key.Right);
+    await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');
 
     await ecp.sendKeypress(ecp.Key.Play);
 
     // Verify that video is still playing
     await testUtils.waitForPlayerStateToEqual('videoPlayerScreen', 'playing', 5000);
 
-    // Show HUD (Play or Ok depending on device)
-    await ecp.sendKeypress(ecp.Key.Down);
-
-    // Verify Send Feedback button exists and is visible in the transport area
-    const sendFeedbackButton = await testUtils.getNodeForElement('sendFeedBackButton');
-    expect(sendFeedbackButton.visible).to.equal(false);
+    // Navigate to transport buttons and verify sendFeedback button is not reachable
+    await testHelpers.navigateToTransportButtons();
+    let foundButton = false;
+    try {
+      await testHelpers.navigateToSendFeedbackButton();
+      foundButton = true;
+    } catch (e) {
+      // Expected: button not found
+    }
+    expect(foundButton).to.equal(false, 'sendFeedBackButton should not be reachable in kids mode');
   });
 
 

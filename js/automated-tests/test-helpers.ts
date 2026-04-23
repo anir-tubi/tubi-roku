@@ -345,6 +345,42 @@ class TestHelpers {
   }
 
   /**
+   * HELPER: Navigates up from player to transport buttons (play/pause, send feedback, etc.)
+   *
+   * USE WHEN:
+   *   - Video is playing and HUD needs to be shown
+   *   - Need to reach transport button area above progress bar
+   */
+  public async navigateToTransportButtons() {
+    await ecp.sendKeypress(ecp.Key.Up);
+    await testUtils.waitForElementToHaveFocus('playerScreenProgressBar');
+    await testUtils.untilTrue(async () => {
+      await utils.sleep(200);
+      await ecp.sendKeypress(ecp.Key.Up);
+      await utils.sleep(200);
+      const { node } = await odc.getFocusedNode();
+      return node.subtype === 'TextIconButton' || node.subtype === 'EnhancedButton';
+    }, 'Timed out waiting for a transport button to have focus');
+  }
+
+  /**
+   * HELPER: Navigates right through transport buttons until sendFeedBackButton is focused
+   *
+   * USE WHEN:
+   *   - Already on a transport button (call navigateToTransportButtons first)
+   *   - Need to open the send feedback overlay
+   */
+  public async navigateToSendFeedbackButton(maxPresses = 10) {
+    for (let i = 0; i < maxPresses; i++) {
+      const { node } = await odc.getFocusedNode();
+      if (node.id === 'sendFeedBackButton') return;
+      await ecp.sendKeypress(ecp.Key.Right);
+      await utils.sleep(200);
+    }
+    throw new Error('Could not navigate to sendFeedBackButton');
+  }
+
+  /**
    * HELPER: Navigates right until search grid has focus (search screen specific)
    * 
    * USE WHEN:
@@ -355,7 +391,7 @@ class TestHelpers {
    */
   public async navigateRightToSearchGrid() {
     // Wait for ResultGrid to show first (prevents edge case bugs)
-    await testUtils.waitForElementToShowOnScreen('searchResultGrid');
+    await testUtils.waitForElementToShowOnScreen('searchResultGrid', 'Timed out waiting for search result grid to show', 120000);
     await testUtils.untilTrue(async () => {
       await ecp.sendKeypress(ecp.Key.Right);
       const { value: id } = await odc.getValue({
@@ -363,7 +399,7 @@ class TestHelpers {
         keyPath: 'id'
       });
       return id === 'ResultGrid';
-    }, 'ResultGrid never obtained focus');
+    }, 'ResultGrid never obtained focus', 120000);
   }
 
   /**
@@ -1269,6 +1305,7 @@ class TestHelpers {
     await ecp.sendKeypress(ecp.Key.Right);
     await ecp.sendKeypress(ecp.Key.Down, { count: 4, wait: 1000 });
     await ecp.sendKeypress(ecp.Key.Ok);
+    await utils.sleep(2000);
   }
 
 
@@ -1288,6 +1325,7 @@ class TestHelpers {
     await ecp.sendKeypress(ecp.Key.Right);
     await ecp.sendKeypress(ecp.Key.Down, { count: 4, wait: 1000 });
     await ecp.sendKeypress(ecp.Key.Ok);
+    await utils.sleep(2000);
   }
 
   /* ═══════════════════════════════════════════════════════════════════
@@ -1569,15 +1607,24 @@ class TestHelpers {
     maxRowsToSearch = 5,
     contentType?: string
   ): Promise<[number, number] | []> {
-    // Get all content grouped by row
-    const rowsContent = await testUtils.getAllRowListItemsContentGroupedByRow(rowListElementId);
+    const liveEventsGridTypes = ['liveEventSpotlight', 'liveEventBanner'];
+    // Get all content grouped by row and row-level metadata in parallel
+    const [rowsContent, rowsMetadata] = await Promise.all([
+      testUtils.getAllRowListItemsContentGroupedByRow(rowListElementId),
+      testUtils.getAllRowListRowsMetadata(rowListElementId)
+    ]);
     // Search through rows up to maxRowsToSearch
     for (let rowIndex = 0; rowIndex < Math.min(rowsContent.length, maxRowsToSearch); rowIndex++) {
+      const rowMetadata = rowsMetadata[rowIndex];
+      if (rowMetadata && liveEventsGridTypes.includes(rowMetadata.gridItemType)) {
+        continue;
+      }
+
       const rowContent = rowsContent[rowIndex];
       // Search through items in this row
       for (let colIndex = 0; colIndex < rowContent.length; colIndex++) {
         const item = rowContent[colIndex];
-        if (item.type.includes('ad')) {
+        if (!item || !item.type || item.type.includes('ad')) {
           continue;
         }
 
@@ -2250,7 +2297,7 @@ class TestHelpers {
     return new Promise((resolve) => {
       proxy.addCallback({
         shouldProcess: (args) => {
-          return args.url.includes('/api/v7/homescreen');
+          return args.url.includes('/api/v8/homescreen');
         },
         processResponse: (args) => {
           const responseJson = JSON.parse(args.responseBuffer.toString());
@@ -2342,7 +2389,7 @@ class TestHelpers {
     return new Promise((resolve) => {
       proxy.addCallback({
         shouldProcess: (args) => {
-          return args.url.includes('/api/v7/homescreen');
+          return args.url.includes('/api/v8/homescreen');
         },
         processResponse: (args) => {
           const responseJson = JSON.parse(args.responseBuffer.toString());
@@ -2433,7 +2480,7 @@ class TestHelpers {
     return new Promise((resolve) => {
       proxy.addCallback({
         shouldProcess: (args) => {
-          return args.url.includes('/api/v7/homescreen');
+          return args.url.includes('/api/v8/homescreen');
         },
         processResponse: (args) => {
           const responseJson = JSON.parse(args.responseBuffer.toString());
@@ -2749,6 +2796,7 @@ class TestHelpers {
     // Dismiss CW consent screen if it appears (not always shown, e.g. after age gate flow)
     await this.dismissCWConsentScreenIfPresent();
 
+    await utils.sleep(2000);
     return email;
   }
 

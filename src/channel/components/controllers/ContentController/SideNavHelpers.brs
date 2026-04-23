@@ -138,7 +138,7 @@ Function onSideNavItemSelected()
   ' screenIdToSideNavId map in constants to point multiple screen ids (home, movies, tv)
   ' to a single side nav id and we will not need a function like getSideNavIdAssociatedWithScreen()
   currentScreenSideNavId = getSideNavIdAssociatedWithScreen(currentScreenNow)
-  if currentScreenSideNavId <> itemSelectedId
+  if currentScreenNow <> invalid AND currentScreenSideNavId <> itemSelectedId
     '// If a new screen is to be called, then collapse the side nav and remember which side nav button was last clicked
     bNewScreenCalledSuccess = false
 
@@ -592,7 +592,7 @@ Function getSideNavIdAssociatedWithScreen(screen)
 
   idsAssociatedWithHome = {}
 
-  if screen.id <> invalid
+  if screen <> invalid AND screen.id <> invalid
     if idsAssociatedWithHome[screen.id] <> invalid
       sideNavId = m.constants.ui.sideNavIds.home
     else if m.constants.ui.screenIdToSideNavId[screen.id] <> invalid

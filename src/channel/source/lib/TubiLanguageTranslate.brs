@@ -1019,7 +1019,7 @@ Function getTranslation_en_US()
     },
     "screenSettings_error_parentalChanges_description_multi_account_group2": {
       "description": "Success message when content settings has changed to group 2 (Teens) in multi-account mode",
-      "message": "Content Settings changed to: Age Rating 13–17 (Up to TV-14 / PG-13)."
+      "message": "Content Settings changed to: Age Rating 13-17 (Up to TV-14 / PG-13)."
     },
     "screenSettings_error_parentalChanges_description_multi_account_group3": {
       "description": "Success message when content settings has changed to group 3 (Adults) in multi-account mode",

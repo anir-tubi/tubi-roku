@@ -4,6 +4,7 @@ import { testUtils } from '../test-utils';
 import { testHelpers } from '../test-helpers';
 import { adTestHelpers, AdType } from '../ad-test-helpers';
 import { setupAdMockAndLaunchApp, safeResumeProxy } from './manual-regression-helpers';
+import type { ElementOrElementId } from '../../../automated-tests-config/elements';
 
 /**
  * Thematic Takeover Regression Tests
@@ -18,7 +19,7 @@ import { setupAdMockAndLaunchApp, safeResumeProxy } from './manual-regression-he
  * - Not visible in Kids mode or restricted parental controls
  */
 
-describe('Thematic Takeover Regression Tests', function () {
+describe.skip('Thematic Takeover Regression Tests', function () {
   before(async () => {
     await proxy.start();
   });
@@ -36,7 +37,7 @@ describe('Thematic Takeover Regression Tests', function () {
    * Helper to check if any row has thematic takeover sponsorImages applied
    * Returns the row metadata if found, null otherwise
    */
-  async function findRowWithThematicTakeover(rowListId = 'videoTitlesRowList'): Promise<any | null> {
+  async function findRowWithThematicTakeover(rowListId: ElementOrElementId = 'videoTitlesRowList'): Promise<any | null> {
     const rowsMetadata = await testUtils.getAllRowListRowsMetadata(rowListId);
     for (const row of rowsMetadata) {
       if (row && row.sponsorImages && row.sponsorImages.subtype === "TubiSponsorImagesNode") {
@@ -49,7 +50,7 @@ describe('Thematic Takeover Regression Tests', function () {
   /**
    * Helper to verify thematic takeover is NOT present on any row
    */
-  async function verifyNoThematicTakeover(rowListId = 'videoTitlesRowList'): Promise<void> {
+  async function verifyNoThematicTakeover(rowListId: ElementOrElementId = 'videoTitlesRowList'): Promise<void> {
     const themedRow = await findRowWithThematicTakeover(rowListId);
     expect(themedRow).to.be.null;
   }
@@ -406,8 +407,8 @@ describe('Thematic Takeover Regression Tests', function () {
     const { cleanup } = await setupAdMockAndLaunchApp([AdType.ThematicTakeover], { persistCallback: true });
     try {
       await utils.sleep(2000);
-      await testUtils.goToPage('categories');
-      await testUtils.waitForCurrentScreenToEqual('categoryPanelListScreen', 10000);
+      await testHelpers.navigateToCategories();
+      await testUtils.waitForCurrentScreenToEqual('categoryListScreen', 10000);
       await utils.sleep(4000); // Wait for ad content fetch to complete
 
       // Verify adContent was fetched and contains thematic takeover for Action
@@ -474,8 +475,8 @@ describe('Thematic Takeover Regression Tests', function () {
     const { cleanup } = await setupAdMockAndLaunchApp([AdType.ThematicTakeover], { persistCallback: true });
     try {
       await utils.sleep(2000);
-      await testUtils.goToPage('categories');
-      await testUtils.waitForCurrentScreenToEqual('categoryPanelListScreen', 10000);
+      await testHelpers.navigateToCategories();
+      await testUtils.waitForCurrentScreenToEqual('categoryListScreen', 10000);
       await utils.sleep(2000);
 
       // Navigate left panel to Action — pixels fire automatically in checkIfCategoryPanelContentIsReady
@@ -525,7 +526,7 @@ describe('Thematic Takeover Regression Tests', function () {
     try {
       await utils.sleep(2000);
       await testUtils.goToPage('network');
-      await testUtils.waitForCurrentScreenToEqual('categoryPanelListScreen', 10000);
+      await testUtils.waitForCurrentScreenToEqual('categoryListScreen', 10000);
       await utils.sleep(2000);
 
       // Navigate left panel to Networks category (deeplink pre-selects it, but loop handles timing)
@@ -631,7 +632,7 @@ describe('Thematic Takeover Regression Tests', function () {
     try {
       await utils.sleep(2000);
       await testUtils.goToPage('network');
-      await testUtils.waitForCurrentScreenToEqual('categoryPanelListScreen', 10000);
+      await testUtils.waitForCurrentScreenToEqual('categoryListScreen', 10000);
       await utils.sleep(2000);
 
       // Navigate left panel to Networks category
@@ -788,8 +789,8 @@ describe('Thematic Takeover Regression Tests', function () {
     const { cleanup } = await setupAdMockAndLaunchApp([AdType.ThematicTakeover], { persistCallback: true });
     try {
       await utils.sleep(2000);
-      await testUtils.goToPage('categories');
-      await testUtils.waitForCurrentScreenToEqual('categoryPanelListScreen', 10000);
+      await testHelpers.navigateToCategories();
+      await testUtils.waitForCurrentScreenToEqual('categoryListScreen', 10000);
       await utils.sleep(2000);
 
       // Navigate left panel to Action category

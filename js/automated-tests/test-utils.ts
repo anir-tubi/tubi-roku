@@ -476,6 +476,7 @@ class TestUtils {
       temporary_name: true
     };
     await user.create(credentials);
+    await utils.sleep(2000);
     return user;
   }
 
