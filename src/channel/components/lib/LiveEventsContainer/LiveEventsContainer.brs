@@ -21,6 +21,9 @@ Function init() as Void
   m.networkLogo.loadWidth = networkLogoSize[0]
 
   m.closedCaptions = topRef.findNode("ClosedCaptionPoster")
+  m.ratingGroup = topRef.findNode("ratingGroup")
+  m.ratingLabel = topRef.findNode("ratingLabel")
+  m.ratingBackground = topRef.findNode("ratingBackground")
   m.genres = topRef.findNode("genres")
   m.availabilityBadge = topRef.findNode("availabilityBadge")
 
@@ -40,6 +43,7 @@ Function init() as Void
   typographyConstants = getTypographyConstants()
   setTypographyOfLabel(m.description, typographyConstants.ids.bodyMedium)
   setTypographyOfLabel(m.genres, typographyConstants.ids.bodySmall)
+  setTypographyOfLabel(m.ratingLabel, typographyConstants.ids.bodyExtraSmallStrong)
   setTypographyOfLabel(m.titleLabel, typographyConstants.ids.headerMedium)
 
   m.tracking = TubiTrackingInfo(m.constants)
@@ -78,6 +82,7 @@ Function onThemeChange(msg = invalid) as Void
     m.uhdAvailableBadge.borderUri = ""
     m.uhdAvailableBadge.textColor = theme.primaryTextColor
     m.genres.color = theme.primaryTextColor
+    m.ratingLabel.color = theme.secondaryTextColor
     m.titleLabel.color = theme.primaryTextColor
     m.focused2Color = theme.focused2Color
     m.backgroundColor = theme.backgroundColor
@@ -155,6 +160,8 @@ Function onItemContentChange() as Void
     end if
 
     m.closedCaptions.visible = (itemContent.hasSubtitles = true)
+
+    setRatingBadge(itemContent.rating)
 
     m.contentSection.opacity = 1.0
 
@@ -453,4 +460,25 @@ Function onSponsorChange() as Void
     return
   end if
   resolveNetworkLogoUri(itemContent.getParent())
+End Function
+
+
+' Sets the rating badge visibility and sizing based on content rating
+' @param rating - String, the content rating (e.g., "TV-14", "PG-13")
+Function setRatingBadge(rating) as Void
+  if not isNonEmptyString(rating)
+    m.ratingGroup.visible = false
+    return
+  end if
+
+  ratingLabel = m.ratingLabel
+  ratingLabel.width = 0
+  ratingLabel.text = UCase(rating)
+
+  badgeWidth = ratingLabel.boundingRect().width + 24
+  badgeWidth = ensureDivisibleBy3(badgeWidth)
+
+  ratingLabel.width = badgeWidth
+  m.ratingBackground.width = badgeWidth
+  m.ratingGroup.visible = true
 End Function
