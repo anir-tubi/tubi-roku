@@ -109,8 +109,6 @@ Function setupVideoPlayer(content, playbackSource = { "srcForAnalytic": "unknown
   if videoPlayer = invalid
     videoPlayer = CreateObject("roSGNode", "VideoPlayerScreen")
     videoPlayer.id = m.constants.ui.screenIds.videoPlayerScreen
-    ' onVideoPlayerVisibleChange exists in ContentController
-    videoPlayer.observeFieldScoped("visible", "onVideoPlayerVisibleChange")
     videoPlayer.observeFieldScoped("transportVoiceResponse", "onTransportVoiceResponse")
     videoPlayer.observeFieldScoped("getPauseAd", "onGetPauseAd")
     videoPlayer.observeFieldScoped("requestVideoPlayerScrubberShowcase", "onRequestVideoPlayerScrubberShowcase")
@@ -125,6 +123,11 @@ Function setupVideoPlayer(content, playbackSource = { "srcForAnalytic": "unknown
     initVideoTracking(videoPlayer, youboraEnabledVod) 'initializeYoubora
     setInScreenCache(videoPlayer)
   end if
+
+  ' Always bind: cache may come from preview preroll warm (no observers on create), or observers
+  ' were cleared by unobserveAllScoped when the screen was popped from the stack.
+  videoPlayer.unobserveFieldScoped("visible")
+  videoPlayer.observeFieldScoped("visible", "onVideoPlayerVisibleChange")
 
   passVideoReferenceToYouboraPlugin(videoPlayer, youboraEnabledVod)
 

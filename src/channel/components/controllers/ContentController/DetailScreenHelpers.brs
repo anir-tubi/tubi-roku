@@ -140,6 +140,9 @@ Function showDetailScreen(content, sendTrackingOnResponse = true, successCb = in
       seriesContent = getFromContentCache(content.id)
     end if
 
+    ' Reuse /content from home preview preroll warm (roku_player_request_ads_when_preview_nearly_ends) when ids match
+    previewFetchedContent = getPreviewFetchedContentForDetailIfMatching(content)
+
     ' don't send tracking in case of series until we resolve series episode and send tracking if we already populate the detail screen to avoid wrong order of events
     if sendTrackingOnResponse = true
       if m.isScreenLoaded = true OR seriesContent <> invalid
@@ -169,7 +172,10 @@ Function showDetailScreen(content, sendTrackingOnResponse = true, successCb = in
     end if
 
     if content.type = m.constants.ui.contentTypes.series
-      if seriesContent <> invalid
+      if previewFetchedContent <> invalid
+        successCallback(previewFetchedContent)
+        clearPreviewFetchedContent()
+      else if seriesContent <> invalid
         'we already have the series content in the cache and don't need to fetch it, so we can just call the successCallback
         successCallback(seriesContent)
       else
@@ -177,7 +183,12 @@ Function showDetailScreen(content, sendTrackingOnResponse = true, successCb = in
       end if
 
     else
-      getSingleContentFromServer(content, successCallback, errorCallback)
+      if previewFetchedContent <> invalid
+        successCallback(previewFetchedContent)
+        clearPreviewFetchedContent()
+      else
+        getSingleContentFromServer(content, successCallback, errorCallback)
+      end if
     end if
 
     if m.ymalDisplay = "default"

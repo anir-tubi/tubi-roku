@@ -206,6 +206,13 @@ Function StatsigExperimentsInterface(statsigExperimentsInfo) as Object
       roku_unblock_homescreen_fail_v1: {
         default: { "enabled": false }
       }
+
+      roku_player_request_ads_when_preview_nearly_ends: {
+        roku_player_request_ads_when_preview_nearly_ends_v1: {
+          default: { "enabled": false }
+        }
+      }
+
     }
     statsigExperimentsInfo: statsigExperimentsInfo
     getExperimentResource: statsigExperiments_getExperimentResource

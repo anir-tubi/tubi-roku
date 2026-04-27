@@ -167,6 +167,9 @@ Function init()
   'this field holds the last fired pixel type which helps to fire the appropriate pixels in order
   m.lastFiredPixelType = ""
 
+  ' When user starts playback while preview-warm preroll is still fetching; discard adsPending and log preloadAdMissed
+  m.ignorePreviewWarmPrerollOnAdsPending = false
+
   'pauseAdAnimation helps for stopping the pause ad animation
   m.pauseAdAnimation = invalid
 
@@ -987,8 +990,25 @@ Function playContent()
 
         updatePlayerLogLib(m.playerLogLib, "setAdType", "preroll")
 
-        ' Start pre-roll fetch
-        m.top.adControl = "preroll"
+        ' Check whether VideoPlayerScreen has prefetched / in-flight preroll (preview warm can leave "fetching")
+        if m.top.adState = "adsPending"
+          tubiLog("VideoPlayer: Using pre-fetched preroll ads from preview")
+
+          ' Ads are already fetched and ready - play them immediately
+          showAdBreak()
+          m.showRatings = true
+        else if m.top.adState = "fetching" ' Edge case: occurs when an ad fetch is in progress on the home screen preview and the user presses the play button
+          tubiLog("VideoPlayer: In-flight preroll from preview warm; starting content; will ignore adsPending and log preloadAdMissed")
+          m.ignorePreviewWarmPrerollOnAdsPending = true
+          updatePlayerLogLib(m.playerLogLib, "setFirstFrameForContentStart")
+          m.Video.control = "play"
+          setInitialCCAndAudioTracks()
+        else
+          tubiLog("VideoPlayer: Fetching preroll ads")
+          ' Start pre-roll fetch
+          m.top.adControl = "preroll"
+        end if
+
       else
         updatePlayerLogLib(m.playerLogLib, "setFirstFrameForContentStart")
         m.Video.control = "play"
@@ -1004,6 +1024,34 @@ Function playContent()
     m.shouldFireStartVideoEvent = true
   end if
 
+End Function
+
+
+Function logPreviewWarmAdMissed() as Void
+  content = m.top.content
+  if content = invalid OR content.id = invalid
+    return
+  end if
+
+  adCount = 0
+  totalAdDurationMs = 0
+  if isAA(m.top.filledAdData) = true
+    if isNumber(m.top.filledAdData.adCount) = true
+      adCount = Int(m.top.filledAdData.adCount)
+    end if
+    if isNumber(m.top.filledAdData.totalAdsDuration) = true
+      totalAdDurationMs = Int(m.top.filledAdData.totalAdsDuration * 1000)
+    end if
+  end if
+
+  logPayload = {
+    preRequestFrom: "autoplay"
+    content_id: content.id.toStr()
+    adCount: adCount
+    isSeries: (content.type = m.constants.ui.contentTypes.series)
+    totalAdDuration: totalAdDurationMs
+  }
+  logInfo(FormatJson(logPayload), "adInfo", "preloadAdMissed")
 End Function
 
 
@@ -1903,7 +1951,14 @@ Function onAdStateChange(msg)
       ' to fix the issue.
       m.top.adControl = m.top.adControl
     end if
-  else if adState = "adsPending" AND (m.top.adControl = "preroll" OR m.top.adControl = "seek") AND m.top.enableAds = true then
+  else if m.ignorePreviewWarmPrerollOnAdsPending = true AND m.top.visible = true AND adState = "adsPending" AND (m.top.adControl = "preroll" OR m.top.adControl = "seek") AND m.top.enableAds = true
+    tubiLog("VideoPlayer: Discarding preview-warm preroll (adsPending); user already playing content")
+    logPreviewWarmAdMissed()
+    m.ignorePreviewWarmPrerollOnAdsPending = false
+    m.isMissedAdEventSent = true
+    m.adBufferingBeforeStart = false
+    m.top.adControl = "stop"
+  else if m.top.visible = true AND adState = "adsPending" AND (m.top.adControl = "preroll" OR m.top.adControl = "seek") AND m.top.enableAds = true then
     ' Midrolls are triggered from position changes since they are prefetched.  Other ad breaks have
     ' video playback stopped and should play right away when we get adsPending.
     ' pre-roll or resume-roll. Play ads right away
@@ -2347,7 +2402,13 @@ Function resetVideoPlayerState(content = invalid)
   m.isPixelFiredForCurrentPauseAd = true
   m.lastFiredPixelType = ""
 
-  m.top.adState = "init"
+  m.ignorePreviewWarmPrerollOnAdsPending = false
+
+  ' Keep ad shim state when a preroll request is in flight or already returned (see onAdStateChange / playContent)
+  if m.top.adState <> "adsPending" AND m.top.adState <> "fetching"
+    m.top.adState = "init"
+  end if
+
   m.top.upNextContentToAutoplay = invalid
   m.shouldShowUpNext = true
   m.UpNext.resetContent = true

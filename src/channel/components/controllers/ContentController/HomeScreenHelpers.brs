@@ -2329,6 +2329,8 @@ Function onRowFocusedItemChange(msg) as Void
     return
   end if
 
+  handleHomeFocusChangePrerollWarmAbortIfNeeded(screen, focusedItem)
+
   ' Handle video tile enabled containers
   isVideoTile = isVideoTileEnabledContainer(focusedItem.gridItemType)
   isVideoTileEnabled = isVideoTileEnabledScreen()

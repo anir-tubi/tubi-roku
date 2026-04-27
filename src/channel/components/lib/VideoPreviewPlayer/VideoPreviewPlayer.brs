@@ -40,6 +40,10 @@ Function init()
   ' does not update on time.
   ' Allowed values are "stop", "play", "pause", "prebuffer"
   m.videoState = "stop"
+
+  ' Preview ads functionality state
+  m.hasTriggeredAdFetch = false ' True once preview position crossed the preroll-warm threshold.
+  m.previewEndThreshold = 10 ' 10 seconds before preview ends
 End Function
 
 
@@ -164,13 +168,40 @@ Function onVideoStateChange(msg)
 End Function
 
 
+' Aligns with HomeScreen.trackingPageInfo.pageType; supports legacy `pagetype` from some call sites
+Function isVideoPreviewOnHomeScreen() as Boolean
+  if m.currentPageInfo = invalid
+    return false
+  end if
+  if m.currentPageInfo.pageType = "home_page"
+    return true
+  end if
+  return false
+End Function
+
+
 '''''''''''''''''''''''''
 ' onVideoPositionChange
 '
 Function onVideoPositionChange(msg)
   try
+
+    contentType = m.video.content.type
+    videoDuration = m.Video.duration
     m.playerPosition = msg.GetData()
-    deviceId = m.constants.deviceInfo.deviceId
+
+    ' Near-end preview fetch is home-only; roku_player_request_ads_when_preview_nearly_ends_v1
+    if m.hasTriggeredAdFetch = false AND videoDuration > 0 AND (contentType = "video" OR contentType = "series") AND m.constants.settings.noAds = false AND isVideoPreviewOnHomeScreen() = true
+      timeRemaining = videoDuration - int(m.playerPosition)
+
+      if timeRemaining <= m.previewEndThreshold AND timeRemaining > 0
+        if getStatsigExperimentResource("roku_player_request_ads_when_preview_nearly_ends", "roku_player_request_ads_when_preview_nearly_ends_v1", true).enabled = true
+          m.top.fetchContent = true
+        end if
+        m.hasTriggeredAdFetch = true
+      end if
+    end if
+
     ' Analytics
     if m.playerPosition >= m.lastPingTime + m.analyticsInterval
       previewProgressEvent = getPreviewProgressEvent(m.currentPageInfo, "onVideoPositionChange")
@@ -180,7 +211,7 @@ Function onVideoPositionChange(msg)
       end if
     end if
   catch e
-    ? deviceId
+    logDebug(FormatJson(e))
   end try
 
 End Function
@@ -244,6 +275,8 @@ Function stopContent()
 
     m.Video.control = "stop"
   end if
+
+  resetPreviewAdsState() ' Reset ads state when video stops
   m.videoState = "stop"
   m.top.content = invalid
 End Function
@@ -486,4 +519,9 @@ End Function
 
 Function checkIfMultipleVideoNodeError(errorMsg)
   return isNonEmptyString(errorMsg) = true AND LCase(errorMsg) = "player: only one playing instance supported."
+End Function
+
+
+Function resetPreviewAdsState()
+  m.hasTriggeredAdFetch = false
 End Function

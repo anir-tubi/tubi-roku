@@ -82,6 +82,9 @@ Function showVodDetailScreen(inputContent, playbackSource, successCb = invalid, 
     isPerformanceEnhanced = (v5Experiment <> invalid AND v5Experiment.variant = "performance_enhanced")
     screen.isPerformanceEnhanced = isPerformanceEnhanced
 
+    ' Reuse /content from home preview preroll warm (roku_player_request_ads_when_preview_nearly_ends) when ids match
+    previewFetchedContent = getPreviewFetchedContentForDetailIfMatching(content)
+
     isDeeplink = (isAA(playbackSource) = true AND playbackSource.srcForAds = m.constants.player.playbackOrigin.deeplink)
     if m.ymalDisplay = "default" OR isDeeplink = true
       getYouMayAlsoLikeContent(content)
@@ -89,7 +92,10 @@ Function showVodDetailScreen(inputContent, playbackSource, successCb = invalid, 
 
     if content.type = m.constants.ui.contentTypes.series
       screen.wasContentFetchCompleted = false
-      if isPerformanceEnhanced = true
+      if previewFetchedContent <> invalid
+        onGetSeasonListFallbackSuccess(previewFetchedContent)
+        clearPreviewFetchedContent()
+      else if isPerformanceEnhanced = true
         getSingleContentFromServer(content, onGetSeasonListFallbackSuccess, onGetSeasonListFallbackError)
       else
         getSeasonList(content.id, onGetSeasonListSuccess, onGetSeasonListError)
@@ -98,9 +104,16 @@ Function showVodDetailScreen(inputContent, playbackSource, successCb = invalid, 
       ' During deep-link use case we already have the complete content node, so we can skip the fetch.
       hasResources = (isNonEmptyArray(content.videoResources) = true)
       screen.wasContentFetchCompleted = hasResources
-      if hasResources <> true
+      if previewFetchedContent <> invalid AND hasResources <> true
+        onGetVodContentSuccess(previewFetchedContent)
+        clearPreviewFetchedContent()
+      else if hasResources <> true
         getSingleContentFromServer(content, onGetVodContentSuccess, onGetVodContentError)
       else
+        ' Deep-link (or cache) already has videoResources; discard unused preview warm /content so it is not reused on a later screen
+        if previewFetchedContent <> invalid
+          clearPreviewFetchedContent()
+        end if
         onGetVodContentSuccess(content)
         ' YMAL API does not return channel data. Fetch channelId async and refresh button list only.
         if isAA(playbackSource) = true AND playbackSource.srcForAds = m.constants.player.playbackOrigin.ymal

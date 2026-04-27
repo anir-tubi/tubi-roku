@@ -617,3 +617,236 @@ Function renderAutoStartPlaybackFromPreviewCounter(contentFocused, diff) as Void
     fade(m.autoStartPreviewToPlaybackTimer, "out", 0.1)
   end if
 End Function
+
+
+' Fetches full content from /content before warming preroll (preview node alone is not enough for ad/cue data)
+Function onVideoPreviewFetchContent(msg)
+  videoPreview = msg.getRoSGNode()
+  shouldFetch = msg.getData()
+
+  if shouldFetch = true AND videoPreview <> invalid AND videoPreview.content <> invalid
+    content = videoPreview.content.clone(true)
+    fetchContentForPreviewPrerollAds(content)
+  end if
+End Function
+
+
+' Resets state for roku_player_request_ads_when_preview_nearly_ends (no client log)
+Function clearPreviewPrerollAdWarmSession() as Void
+  m.previewPrerollAdWarmContentId = invalid
+  m.previewPrerollAdWarmIsSeries = false
+  m.previewPrerollAdWarmActive = false
+  m.previewPrerollAdPlayerPrepared = false
+End Function
+
+
+' Discards /content result from preview (focus abort, API error, or consumed in showDetailScreen)
+Function clearPreviewFetchedContent() as Void
+  m.previewFetchedContent = invalid
+End Function
+
+
+' When home row focus leaves the tile that triggered preroll warm, stop the ad shim and log preloadAdMissed
+Function handleHomeFocusChangePrerollWarmAbortIfNeeded(screen, newFocusedItem) as Void
+  if screen = invalid OR newFocusedItem = invalid
+    return
+  end if
+  if screen.id <> m.constants.ui.screenIds.homeScreen
+    return
+  end if
+  if m.previewPrerollAdWarmActive = false OR m.previewPrerollAdWarmContentId = invalid
+    return
+  end if
+  if m.previewPrerollAdWarmContentId.toStr() = newFocusedItem.id.toStr()
+    return
+  end if
+
+  abortPreviewPrerollAdWarmAndLog()
+End Function
+
+
+' Stops in-flight or pending preroll on the hidden VideoPlayerScreen and sends AD:INFO preloadAdMissed to client_logs
+Function abortPreviewPrerollAdWarmAndLog() as Void
+  warmContentId = m.previewPrerollAdWarmContentId
+  warmIsSeries = m.previewPrerollAdWarmIsSeries
+  adCount = 0
+  totalAdDurationMs = 0
+
+  if m.previewPrerollAdPlayerPrepared = true
+    videoPlayer = getFromScreenCache(m.constants.ui.screenIds.videoPlayerScreen)
+    if videoPlayer <> invalid
+      if isAA(videoPlayer.filledAdData) = true
+        if isNumber(videoPlayer.filledAdData.adCount) = true
+          adCount = Int(videoPlayer.filledAdData.adCount)
+        end if
+        if isNumber(videoPlayer.filledAdData.totalAdsDuration) = true
+          totalAdDurationMs = Int(videoPlayer.filledAdData.totalAdsDuration * 1000)
+        end if
+      end if
+      if videoPlayer.adState = "fetching" OR videoPlayer.adState = "adsPending"
+        videoPlayer.adControl = "stop"
+      end if
+    end if
+  end if
+
+  if warmContentId <> invalid
+    logPayload = {
+      preRequestFrom: "autoplay"
+      content_id: warmContentId.toStr()
+      adCount: adCount
+      isSeries: warmIsSeries
+      totalAdDuration: totalAdDurationMs
+    }
+    logInfo(FormatJson(logPayload), "adInfo", "preloadAdMissed")
+  end if
+
+  clearPreviewPrerollAdWarmSession()
+  clearPreviewFetchedContent()
+End Function
+
+
+' Full /content node from preview near-end warm; matches focused tile for reuse in showDetailScreen
+Function getPreviewFetchedContentForDetailIfMatching(detailRequestContent) as Object
+  if m.previewFetchedContent = invalid OR detailRequestContent = invalid OR detailRequestContent.id = invalid
+    return invalid
+  end if
+  if m.previewFetchedContent.id.toStr() = detailRequestContent.id.toStr()
+    return m.previewFetchedContent
+  end if
+  return invalid
+End Function
+
+
+' Invokes the content API, then runs preroll init on the refreshed node (or resolved episode for series)
+Function fetchContentForPreviewPrerollAds(content) as Void
+  tubiLog("VideoPreviewHelpers.fetchContentForPreviewPrerollAds")
+  if content = invalid OR content.id = invalid
+    return
+  end if
+  m.previewPrerollAdWarmActive = true
+  m.previewPrerollAdWarmContentId = content.id
+  m.previewPrerollAdWarmIsSeries = (content.type = m.constants.ui.contentTypes.series)
+  m.previewPrerollAdPlayerPrepared = false
+  m.previewFetchedContent = invalid
+  getSingleContentFromServer(content, onPreviewPrerollAdsContentSuccess, onPreviewPrerollAdsContentError)
+End Function
+
+
+' @param content - Tubi content node (video/episode) with optional cuepoints array
+' @return true when cuepoints includes 0 (preroll)
+Function contentHasPrerollCuepoint(content) as Boolean
+  if content = invalid OR content.cuepoints = invalid
+    return false
+  end if
+  for each cuepoint in content.cuepoints
+    if Int(cuepoint) = 0
+      return true
+    end if
+  end for
+  return false
+End Function
+
+
+' @param singleContent - Full content from getSingleContentFromServer
+Function onPreviewPrerollAdsContentSuccess(singleContent) as Void
+  tubiLog("VideoPreviewHelpers.onPreviewPrerollAdsContentSuccess")
+
+  if m.previewPrerollAdWarmActive = false
+    return
+  end if
+  if singleContent = invalid
+    clearPreviewPrerollAdWarmSession()
+    return
+  end if
+  if m.videoPreviewPlayer = invalid OR m.videoPreviewPlayer.content = invalid
+    clearPreviewPrerollAdWarmSession()
+    return
+  end if
+  if m.videoPreviewPlayer.content.id.toStr() <> singleContent.id.toStr()
+    clearPreviewPrerollAdWarmSession()
+    return
+  end if
+
+  m.previewFetchedContent = singleContent.clone(true)
+
+  contentForAds = singleContent.clone(true)
+  canInitPreroll = true
+
+  if contentForAds.type = m.constants.ui.contentTypes.series
+    playable = getEpisodeContent(contentForAds)
+    if playable.type <> m.constants.ui.contentTypes.series
+      contentForAds = playable.clone(true)
+    else
+      tubiLog("VideoPreviewHelpers.onPreviewPrerollAdsContentSuccess: getEpisodeContent did not resolve an episode, skipping preroll warm")
+      canInitPreroll = false
+    end if
+  end if
+
+  if canInitPreroll = true AND contentHasPrerollCuepoint(contentForAds) = true
+    initializeVideoPlayerForPreviewAds(contentForAds)
+  else
+    clearPreviewPrerollAdWarmSession()
+  end if
+End Function
+
+
+Function onPreviewPrerollAdsContentError(error) as Void
+  if error <> invalid
+    tubiLog("VideoPreviewHelpers.onPreviewPrerollAdsContentError: " + FormatJson(error))
+  else
+    tubiLog("VideoPreviewHelpers.onPreviewPrerollAdsContentError")
+  end if
+  clearPreviewPrerollAdWarmSession()
+  clearPreviewFetchedContent()
+End Function
+
+
+Function initializeVideoPlayerForPreviewAds(content)
+  videoPlayer = getFromScreenCache(m.constants.ui.screenIds.videoPlayerScreen)
+
+  if videoPlayer = invalid
+    videoPlayer = setupVideoPlayerForPreview(content)
+    setInScreenCache(videoPlayer)
+  else
+    updateVideoPlayerForPreview(videoPlayer, content)
+  end if
+
+  videoPlayer.adState = "init"
+  videoPlayer.adControl = "preroll"
+  m.previewPrerollAdPlayerPrepared = true
+End Function
+
+
+Function setupVideoPlayerForPreview(content)
+  videoPlayer = CreateObject("roSGNode", "VideoPlayerScreen")
+  videoPlayer.id = m.constants.ui.screenIds.videoPlayerScreen
+
+  if m.constants.settings.noAds = true
+    videoPlayer.enableAds = false
+  end if
+
+  videoPlayer.userConsentsOptOutStatus = getConsentsOptOutStatus()
+  videoPlayer.tcfString = getTCFString()
+
+  videoPlayer.playbackSource = {
+    "srcForAnalytic": m.constants.player.playbackSource.videoPreviews
+    "srcForAds": m.constants.player.playbackOrigin.previews
+  }
+
+  videoPlayer.content = content
+  videoPlayer.visible = false 'do not display videoplayer
+
+  return videoPlayer
+End Function
+
+
+' Updates existing VideoPlayerScreen with new content for preview ads
+Function updateVideoPlayerForPreview(videoPlayer, content)
+  if m.constants.settings.noAds = true
+    videoPlayer.enableAds = false
+  end if
+  videoPlayer.content = content
+  ' Match setupVideoPlayerForPreview: cached player may still be visible=true after full playback;
+  ' onAdStateChange gates preroll UI on m.top.visible and would otherwise call showAdBreak during warm.
+  videoPlayer.visible = false
+End Function

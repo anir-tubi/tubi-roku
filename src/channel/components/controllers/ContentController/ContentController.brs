@@ -204,6 +204,7 @@ Function addControllerUi()
     m.videoPreviewPlayer = CreateObject("roSGNode", "VideoPreviewPlayer")
   end if
   m.videoPreviewPlayer.id = "videoPreviewPlayer"
+  m.videoPreviewPlayer.observeFieldScoped("fetchContent", "onVideoPreviewFetchContent")
   m.backgroundVideoPreviewPlayerContainer.appendChild(m.videoPreviewPlayer)
 
   m.inlinePreviewFocusIndicator = m.top.findNode("inlinePreviewFocusIndicator")
@@ -221,6 +222,12 @@ Function addControllerUi()
   m.videoTileOverlayGroup.translation = [videoTilesListTranslation[0], -6]
 
   m.queuedVideoTilePreview = false
+
+  m.previewPrerollAdWarmContentId = invalid
+  m.previewPrerollAdWarmIsSeries = false
+  m.previewPrerollAdWarmActive = false
+  m.previewPrerollAdPlayerPrepared = false
+  m.previewFetchedContent = invalid
 
   m.inlinePreviewPlayerFadeAnimation = invalid
 
