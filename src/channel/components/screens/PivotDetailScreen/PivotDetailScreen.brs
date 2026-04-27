@@ -162,6 +162,12 @@ Function onFetchCollectionSuccess(response) as Void
   end if
   setRowHeights(response)
   m.top.content = response
+
+  ' Fall back to app title from API response if pivotTitle was not set
+  if isNonEmptyString(m.top.pivotTitle) = false AND response.hasField("appTitle") = true AND isNonEmptyString(response.appTitle) = true
+    m.top.pivotTitle = response.appTitle
+  end if
+
   m.titleGroup.visible = true
 
   m.rowList.update({

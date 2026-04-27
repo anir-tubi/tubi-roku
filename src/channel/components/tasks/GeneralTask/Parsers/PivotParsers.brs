@@ -149,23 +149,20 @@ Function parsePivotContainersSuccess(fullResponse, reqInfo)
   convertedMetadata = parseHomeScreenContentSuccess(fullResponse, reqInfo)
 
   parsedResponse = fullResponse.response.data
-  if parsedResponse.app <> invalid AND parsedResponse.app.images <> invalid
-    appImages = parsedResponse.app.images
+  if parsedResponse.app <> invalid
+    appFields = {}
 
-    logo = ""
-    if isNonEmptyArray(appImages.logo) then logo = appImages.logo[0]
+    if isString(parsedResponse.app.title) then appFields.appTitle = parsedResponse.app.title
 
-    background = ""
-    if isNonEmptyArray(appImages.hero) then background = appImages.hero[0]
+    if parsedResponse.app.images <> invalid
+      appImages = parsedResponse.app.images
 
-    titleArt = ""
-    if isNonEmptyArray(appImages.title_art) then titleArt = appImages.title_art[0]
+      if isNonEmptyArray(appImages.logo) then appFields.logo = appImages.logo[0]
+      if isNonEmptyArray(appImages.hero) then appFields.background = appImages.hero[0]
+      if isNonEmptyArray(appImages.title_art) then appFields.titleArt = appImages.title_art[0]
+    end if
 
-    convertedMetadata.update({
-      logo: logo
-      background: background
-      titleArt: titleArt
-    }, true)
+    convertedMetadata.update(appFields, true)
   end if
 
   return convertedMetadata
