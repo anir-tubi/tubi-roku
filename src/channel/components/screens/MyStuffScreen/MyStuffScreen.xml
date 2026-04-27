@@ -45,6 +45,7 @@
            the "play" input transport deeplink was triggered
       -->
     <field id="contentToPlay" type="node" />
+    <field id="playSelected" type="boolean" alwaysNotify="true" />
 
     <!-- set to true when the user wants to sign-up -->
     <field id="signUpButtonSelected" type="boolean" alwaysNotify="true" />

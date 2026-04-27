@@ -132,7 +132,7 @@ Function onVideoPreviewStateChanged(msg)
         isReplay = true
       end if
 
-      isFullPlayerBlockedForUser = (isOneTrustConsentEnabled() = true AND (isKidsUIOn() = true OR isParentalControlsAdultLevel() = false)) OR (item <> invalid AND item.needsLogin = true AND isLoggedInUser() = false) OR arrayIncludes(m.constants.ui.fullScreenVideoPlayerGridItemTypes, item.gridItemType) = true OR item.playerType = m.constants.ui.playerTypes.fox
+      isFullPlayerBlockedForUser = (isOneTrustConsentEnabled() = true AND (isKidsUIOn() = true OR isParentalControlsAdultLevel() = false)) OR (item <> invalid AND item.needsLogin = true AND isLoggedInUser() = false) OR arrayIncludes(m.constants.ui.fullScreenVideoPlayerGridItemTypes, item.gridItemType) = true OR item.playerType = m.constants.ui.playerTypes.fox OR isNonEmptyAA(item.scheduleData)
       if isReplay = true
         '//Loop the video in this case
         if m.maintask.isHdmiStatusOk = true
@@ -506,7 +506,7 @@ Function onVideoPreviewPositionChanged(msg) as Void
     '
     ' 4. Fox Content:
     '    - Content's playerType is Fox (requires special handling)
-    isFullPlayerBlockedForUser = (isOneTrustConsentEnabled() = true AND (isKidsUIOn() = true OR isParentalControlsAdultLevel() = false)) OR contentFocused.needsLogin = true OR arrayIncludes(m.constants.ui.fullScreenVideoPlayerGridItemTypes, contentFocused.gridItemType) = true OR contentFocused.playerType = m.constants.ui.playerTypes.fox
+    isFullPlayerBlockedForUser = (isOneTrustConsentEnabled() = true AND (isKidsUIOn() = true OR isParentalControlsAdultLevel() = false)) OR contentFocused.needsLogin = true OR arrayIncludes(m.constants.ui.fullScreenVideoPlayerGridItemTypes, contentFocused.gridItemType) = true OR contentFocused.playerType = m.constants.ui.playerTypes.fox OR isNonEmptyAA(contentFocused.scheduleData)
 
     if isFullPlayerBlockedForUser = false
       diff = duration - position
@@ -600,7 +600,7 @@ End Function
 
 
 Function renderAutoStartPlaybackFromPreviewCounter(contentFocused, diff) as Void
-  if contentFocused = invalid OR isVideoTileEnabledContainer(contentFocused.gridItemType) = false OR contentFocused.playerType = m.constants.ui.playerTypes.fox
+  if contentFocused = invalid OR isVideoTileEnabledContainer(contentFocused.gridItemType) = false OR contentFocused.playerType = m.constants.ui.playerTypes.fox OR isNonEmptyAA(contentFocused.scheduleData)
     fade(m.autoStartPreviewToPlaybackTimer, "out", 0.1)
     return
   end if

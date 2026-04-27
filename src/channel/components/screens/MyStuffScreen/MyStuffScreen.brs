@@ -592,6 +592,7 @@ Function handlePlayInput()
     if itemFocused <> invalid AND itemFocused.type <> m.constants.ui.contentTypes.linear AND category.gridItemType <> m.constants.ui.gridItemTypes.emptyContainer
       m.top.trackingComponentInfo = getTrackingComponentInfoOfRowList(itemFocused, positionFocused)
       m.top.contentToPlay = itemFocused
+      m.top.playSelected = true
       return true
     end if
   end if
