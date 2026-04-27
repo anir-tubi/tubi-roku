@@ -220,7 +220,7 @@ End Function
 ' @componentInfo: assocarray, value can be { componentType: "category_page", componentValues: {}}
 Function startVideoPreview(content, pageInfo = {}, componentInfo = {})
   tubiLog("VideoPreviewHelpers.startVideoPreview")
-  if content <> invalid AND (isVideoPreviewOn() = true OR (content.gridItemType = m.constants.ui.gridItemTypes.skinAd AND m.constants.deviceInfo.IsAutoplayEnabled = true AND m.constants.deviceInfo.limitedUi = false))
+  if content <> invalid AND (isVideoPreviewOn() = true OR (content.gridItemType = m.constants.ui.gridItemTypes.skinAd AND m.constants.deviceInfo.IsAutoplayEnabled = true AND m.constants.deviceInfo.limitedUi = false)) AND isNonEmptyString(content.videoPreviewUrl) = true
     '//::NOTE:: if this is a skinAd content, the above conditional statement checks if the device auto play setting is on and that the device is not a limited UI device before playing the looping background video
     videoPreview = m.videoPreviewPlayer
     videoPreview.isBufferingComplete = false
