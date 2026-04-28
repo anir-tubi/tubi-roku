@@ -83,6 +83,9 @@ Function refreshEPGScreen(epgScreen)
       end if
     else if epgChannelList <> invalid
       epgScreen.timeGridContent = epgChannelList
+      if epgChannelList.containersList <> invalid
+        epgScreen.containersList = epgChannelList.containersList
+      end if
       setTimeGridContentLoadingToComplete(epgScreen)
     end if
   end if
