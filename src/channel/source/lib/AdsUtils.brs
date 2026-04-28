@@ -48,11 +48,12 @@ Function createRAFStructure(adInfo)
     ' Handle quartile tracking events
     trackingEventKeys = trackingEvents.Keys()
     for each key in trackingEventKeys
-      pixelUrl = trackingEvents[key][0]
-      details = getQuartileTrackingDetails(key, duration, pixelUrl)
-      if details <> invalid
-        trackingPixels.push(details)
-      end if
+      for each pixelUrl in trackingEvents[key]
+        details = getQuartileTrackingDetails(key, duration, pixelUrl)
+        if details <> invalid
+          trackingPixels.push(details)
+        end if
+      end for
     end for
 
     ' Build ad unit
