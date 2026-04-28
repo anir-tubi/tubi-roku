@@ -47,6 +47,15 @@ Function getConstants()
     if settingsOverride.sudoCountry <> invalid then
       constants.settings.sudoCountry = settingsOverride.sudoCountry
     end if
+
+    if constants.settings.mode <> "production" then
+      if settingsOverride.noAds <> invalid then
+        constants.settings.noAds = (settingsOverride.noAds = "true")
+      end if
+      if settingsOverride.stagingApis <> invalid then
+        constants.settings.stagingApis = (settingsOverride.stagingApis = "true")
+      end if
+    end if
   end if
 
   ' Roku's channel/app id for the production Tubi app. It is used with the continue watching feature to enable testing the feature in sideloaded/beta channels.

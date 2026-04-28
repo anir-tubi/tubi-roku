@@ -14,6 +14,7 @@ settings:
   remoteComponentLibProvided: "{{remoteComponentLibProvided}}"
   suitest: false
   noAds: false
+  stagingApis: false
   # NEVER CHANGE THESE VALUES FOR PRODUCTION
   # charlesProxyEnabled should be false and charlesProxyUrl set to empty string.
   # follow exact format for bs_const: "consoleLoggingEnabled=false"

@@ -61,6 +61,16 @@ Function onItemFocused(msg)
     m.branchBuildsPanel.visible = false
   end if
 
+  ' Hide Config list and Restart button when navigating away from it
+  if item.id <> "config"
+    if m.configList <> invalid AND m.configList.visible = true
+      m.configList.visible = false
+    end if
+    if m.configRestartButton <> invalid AND m.configRestartButton.visible = true
+      m.configRestartButton.visible = false
+    end if
+  end if
+
   ' Hide Ads list when navigating away from it
   if item.id <> "rokuAds" AND m.rokuAdsList <> invalid AND m.rokuAdsList.visible = true
     m.rokuAdsList.visible = false
@@ -99,6 +109,8 @@ Function onItemFocused(msg)
     m.infoArea.text = "Select the language for testing." + chr(10) + "Current Locale: " + m.constants.deviceInfo.locale
   else if item.id = "playerStats"
     m.infoArea.text = "This toggles the display of player stats within the video player, helping QA and developers understand the current playback."
+  else if item.id = "config"
+    m.infoArea.text = "Config: noAds skips Rainmaker ad requests; stagingApis uses UAPI staging (matrix, cms, user_device). Toggles save to the settingsOverride registry. Changes require an app restart."
   else if item.id = "rokuAds"
     registrySection = CreateObject("roRegistrySection", m.constants.registrySectionIDs.settingsOverride)
     currentAdTypes = registrySection.read("mockServerAdTypes")
@@ -127,6 +139,7 @@ Function onItemFocused(msg)
   showLanguageList(item.id = "changeLanguage")
   displayProxyKB(item.id = "addProxy")
   showMockServerProfileList(item.id = "mockServer")
+  showConfigList(item.id = "config")
   showRokuAdsList(item.id = "rokuAds")
 End Function
 
@@ -184,7 +197,7 @@ End Function
 
 
 ' Creates a standard MarkupList for test aid selection panels
-Function createTestAidList(listId as String, selectionCallback as String, numRows = 10 as Integer, translation = "[350,81]" as String) as Object
+Function createTestAidList(listId as String, selectionCallback as String, numRows = 8 as Integer, translation = "[350,81]" as String) as Object
   list = createObject("roSGNode", "markupList")
   list.update({
     id: listId
@@ -192,13 +205,118 @@ Function createTestAidList(listId as String, selectionCallback as String, numRow
     itemSize: "[450,72]"
     itemSpacing: "[0,8]"
     itemComponentName: "CheckButton"
-    vertFocusAnimationStyle: "fixedFocus"
+    vertFocusAnimationStyle: "floatingFocus"
     translation: translation
   }, true)
   list.focusBitmapBlendColor = m.focusedColor
   m.top.appendChild(list)
   list.observeFieldScoped("itemSelected", selectionCallback)
   return list
+End Function
+
+
+' MarkupList (noAds, stagingApis) on top; EnhancedButton (Restart) at bottom. Primary pill = default theme (Vod detail Sign Up style).
+Function showConfigList(show = false) as Void
+  if show = true
+    if m.configList = invalid
+      m.configList = createTestAidList("configList", "onConfigItemSelected", 2, "[351,185]")
+    else
+      m.configList.numRows = 2
+      m.configList.translation = [351, 185]
+    end if
+    m.configList.content = buildTestAidConfigListContent()
+    m.configList.visible = true
+    ensureConfigRestartButton()
+    m.configRestartButton.visible = true
+    m.configRestartButton.translation = [351, 400]
+    m.top.appendChild(m.configRestartButton) ' On top in sibling order if MarkupList focus overlaps
+  else
+    if m.configList <> invalid
+      m.configList.visible = false
+    end if
+    if m.configRestartButton <> invalid
+      m.configRestartButton.visible = false
+    end if
+  end if
+End Function
+
+
+Function buildTestAidConfigListContent() as Object
+  contentNode = CreateObject("roSGNode", "ContentNode")
+  contentNode.id = "configListContent"
+  contentNode.update({
+    children: [
+      { id: "configNoAds", title: "noAds", checked: m.constants.settings.noAds = true }
+      { id: "configStagingApis", title: "stagingApis", checked: m.constants.settings.stagingApis = true }
+    ]
+  }, true)
+  return contentNode
+End Function
+
+
+' Primary pill; no backgroundBlendColor (same default neutral/ focus styling as Vod detail primary buttons e.g. Sign Up)
+Function ensureConfigRestartButton() as Void
+  if m.configRestartButton <> invalid
+    return
+  end if
+  button = CreateObject("roSGNode", "EnhancedButton")
+  button.id = "configRestartButton"
+  button.height = 105
+  button.translation = [351, 252]
+  itemContent = CreateObject("roSGNode", "ContentNode")
+  itemContent.update({
+    id: "configRestart"
+    title: getTranslation("test_aid_config_restart_app")
+    isPrimaryButton: true
+  }, true)
+  button.itemContent = itemContent
+  button.observeFieldScoped("wasSelected", "onConfigRestartButtonSelected")
+  m.top.appendChild(button)
+  m.configRestartButton = button
+End Function
+
+
+Function onConfigRestartButtonSelected(msg) as Void
+  m.top.appRestartRequested = true
+End Function
+
+
+Function onConfigItemSelected(msg) as Void
+  itemIndex = msg.getData()
+  if itemIndex = invalid OR itemIndex < 0
+    return
+  end if
+  if m.configList = invalid OR m.configList.content = invalid
+    return
+  end if
+  item = m.configList.content.getChild(itemIndex)
+  if item = invalid
+    return
+  end if
+
+  registrySection = CreateObject("roRegistrySection", m.constants.registrySectionIDs.settingsOverride)
+  if item.id = "configNoAds"
+    newVal = not (m.constants.settings.noAds = true)
+    m.constants.settings.noAds = newVal
+    if newVal = true
+      registrySection.write("noAds", "true")
+    else
+      registrySection.write("noAds", "false")
+    end if
+    item.checked = newVal
+  else if item.id = "configStagingApis"
+    newVal = not (m.constants.settings.stagingApis = true)
+    m.constants.settings.stagingApis = newVal
+    if newVal = true
+      registrySection.write("stagingApis", "true")
+    else
+      registrySection.write("stagingApis", "false")
+    end if
+    item.checked = newVal
+  else
+    return
+  end if
+  registrySection.flush()
 End Function
 
 
@@ -436,6 +554,12 @@ Function onKeyEvent(key as String, press as Boolean) as Boolean
       else if m.rokuAdsList <> invalid AND m.rokuAdsList.isInFocusChain() = true
         m.Menu.setFocus(true)
         handled = true
+      else if m.configRestartButton <> invalid AND m.configRestartButton.isInFocusChain() = true
+        m.Menu.setFocus(true)
+        handled = true
+      else if m.configList <> invalid AND m.configList.isInFocusChain() = true
+        m.Menu.setFocus(true)
+        handled = true
       else if m.countryListMenu <> invalid AND m.countryListMenu.isInFocusChain() = true
         m.Menu.setFocus(true)
         handled = true
@@ -453,6 +577,10 @@ Function onKeyEvent(key as String, press as Boolean) as Boolean
       if m.Menu.hasFocus() = true
         if m.proxyinputDialog <> invalid AND m.proxyinputDialog.visible = true
           m.proxyinputDialog.setFocus(true)
+          handled = true
+        else if m.configList <> invalid AND m.configList.visible = true
+          m.configList.jumpToItem = 0
+          m.configList.setFocus(true)
           handled = true
         else if m.rokuAdsList <> invalid AND m.rokuAdsList.visible = true
           m.rokuAdsList.setFocus(true)
@@ -497,6 +625,21 @@ Function onKeyEvent(key as String, press as Boolean) as Boolean
             end if
             handled = true
           end if
+        end if
+      end if
+    else if key = "down"
+      if m.configList <> invalid AND m.configList.hasFocus() = true
+        if m.configList.itemFocused = 1 AND m.configRestartButton <> invalid
+          m.configRestartButton.setFocus(true)
+          handled = true
+        end if
+      end if
+    else if key = "up"
+      if m.configRestartButton <> invalid AND m.configRestartButton.hasFocus() = true
+        if m.configList <> invalid
+          m.configList.jumpToItem = 1
+          m.configList.setFocus(true)
+          handled = true
         end if
       end if
     end if
@@ -555,6 +698,8 @@ Function onTestingAidPanelItemSelected(msg)
     end if
   else if item.id = "mockServer"
     showMockServerProfileList(true)
+  else if item.id = "config"
+    showConfigList(true)
   else if item.id = "playerStats"
     showPlayerStats = getPlayerStats()
 

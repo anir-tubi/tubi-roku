@@ -44,11 +44,11 @@
 
         <MarkupList
           id="testingAidMenu"
-          numRows="14"
+          numRows="9"
           itemSize="[420,80]"
           itemSpacing="[0,8]"
           itemComponentName="CheckButton"
-          vertFocusAnimationStyle="floatingFocus"
+          vertFocusAnimationStyle="fixedFocus"
           translation="[0,141]">
           <ContentNode
             id="SettingsMenuContent"
@@ -68,6 +68,9 @@
             <CheckButtonContentNode
               id="changeLanguage"
               title="Change Language" />
+            <CheckButtonContentNode
+              id="config"
+              title="Config" />              
             <CheckButtonContentNode
               id="viewRegistry"
               title="View Registry" />

@@ -2862,6 +2862,10 @@ Function getTranslation_en_US()
     "auth_already_signed_in_welcome_message": {
       "description": "A message that lets the user know they've been signed in with the given email",
       "message": "You're already signed in as {name}"
+    },
+    "test_aid_config_restart_app": {
+      "description": "Test Aid settings: button to restart the app after config changes.",
+      "message": "Restart App"
     }
   }
 End Function

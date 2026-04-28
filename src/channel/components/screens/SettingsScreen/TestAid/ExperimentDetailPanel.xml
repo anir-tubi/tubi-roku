@@ -47,12 +47,13 @@
         id="groupsGrid"
         translation="[0,100]"
         drawFocusFeedbackOnTop="false"
-        numRows="12"
+        fadeFocusFeedbackWhenAutoScrolling="true"
+        numRows="8"
         numColumns="1"
         itemSize="[400,56]"
         itemSpacing="[0,4]"
         itemComponentName="GroupDetailItem"
-        vertFocusAnimationStyle="floatingFocus">
+        vertFocusAnimationStyle="fixedFocus">
       </MarkupGrid>
     </Group>
   </children>
