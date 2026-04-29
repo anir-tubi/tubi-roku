@@ -326,7 +326,11 @@ Function renderButton(item as Object, isPrimaryButton as Dynamic, itemHasFocus a
       end if
     end if
   else
-    m.buttonBackground.opacity = 0
+    if item.showUnfocusedButtonBackground = true
+      m.buttonBackground.opacity = 1
+    else
+      m.buttonBackground.opacity = 0
+    end if
     m.label.text = ""
     m.labelFocused.text = ""
     m.top.calculatedTextWidth = 52
@@ -336,11 +340,24 @@ Function renderButton(item as Object, isPrimaryButton as Dynamic, itemHasFocus a
     iconWidth = m.icon.width
     if iconWidth = 0 then iconWidth = 36
 
-    m.buttonBackground.width = 105
-    m.buttonBackgroundFocused.width = m.buttonBackground.width
+    buttonHeight = m.top.height
+    if buttonHeight = 0 OR buttonHeight = invalid
+      buttonHeight = 72
+    end if
 
-    iconPadding = Int((105 - iconWidth) / 2)
-    m.elementsGroup.translation = [iconPadding, m.top.height / 2]
+    if item.showUnfocusedButtonBackground = true
+      tileWidth = buttonHeight
+    else
+      tileWidth = 105
+    end if
+
+    m.buttonBackground.width = tileWidth
+    m.buttonBackground.height = buttonHeight
+    m.buttonBackgroundFocused.width = tileWidth
+    m.buttonBackgroundFocused.height = buttonHeight
+
+    iconPadding = Int((tileWidth - iconWidth) / 2)
+    m.elementsGroup.translation = [iconPadding, buttonHeight / 2]
   end if
 End Function
 

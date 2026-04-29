@@ -2724,6 +2724,7 @@ Function transportIconButtonFields(id as String, text as String, iconUrl as Stri
     title: text
     iconUrl: iconUrl
     disabled: disabled
+    showUnfocusedButtonBackground: true
   }
 End Function
 
