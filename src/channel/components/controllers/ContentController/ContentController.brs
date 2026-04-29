@@ -312,6 +312,7 @@ Function addControllerUi()
   'initialize linearScreenAfterFn. This function is executed after fadeInController
   'in case fadeInContentController is still playing when we tried to play linear content which will result in playback error.
   m.linearScreenAfterFn = invalid
+  m.deferredDeeplinkFn = invalid
 
   m.mainTask.observeFieldScoped("roInputInfo", "onInputInfoReceived")
 
@@ -517,6 +518,9 @@ Function onFadeInContentController()
   if m.linearScreenAfterFn <> invalid
     m.linearScreenAfterFn()
     m.linearScreenAfterFn = invalid
+  else if m.deferredDeeplinkFn <> invalid
+    m.deferredDeeplinkFn()
+    m.deferredDeeplinkFn = invalid
   else if currentScreen <> invalid AND currentScreen.isInFocusChain() = false
 
     ' isDialogOpenAtStartup will be true if top screen is one of the dialogScreens.

@@ -77,7 +77,6 @@ Function onThemeChange(msg = invalid) as Void
     m.primaryTextColor = theme.primaryTextColor
     m.description.color = theme.primaryTextColor
     m.descriptionFocusButton.blendColor = theme.focusedColor
-    m.uhdAvailableBadge.backgroundColor = theme.shadeColor
     m.uhdAvailableBadge.backgroundUri = "pkg:/images/rounded-background-$$RES$$.9.png"
     m.uhdAvailableBadge.borderUri = ""
     m.uhdAvailableBadge.textColor = theme.primaryTextColor

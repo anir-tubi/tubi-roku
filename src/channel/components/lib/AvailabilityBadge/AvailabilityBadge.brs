@@ -100,7 +100,6 @@ Function applyAvailabilityStyle(badgeInfo) as Void
       topRef.text = getTranslation("onNow")
     end if
   else if availability = "upcoming" OR availability = "replay"
-    topRef.backgroundColor = theme.shadeColor
     topRef.backgroundUri = "pkg:/images/rounded-background-$$RES$$.9.png"
     topRef.text = badgeInfo.badgeText
   else

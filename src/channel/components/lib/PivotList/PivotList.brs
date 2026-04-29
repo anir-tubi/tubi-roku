@@ -14,7 +14,7 @@ Function init() as Void
   topRef.itemComponentName = "PivotItem"
   topRef.numRows = 1
   topRef.rowHeights = [itemHeight]
-  topRef.rowItemSpacing = [[24, 0]]
+  topRef.rowItemSpacing = [[12, 0]]
   topRef.showRowLabel = [false]
   topRef.showRowCounter = [false]
   topRef.variableWidthItems = [true]

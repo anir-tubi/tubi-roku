@@ -181,6 +181,7 @@ Function onVideoPreviewStateChanged(msg)
       else if isFullPlayerBlockedForUser = true
         'Updating backgroundUriList once video preview finished to show the background images instead of black background.
         currentScreen.backgroundUriList = currentScreen.backgroundUriList
+        stopVideoPreview()
       end if
     end if
   end if

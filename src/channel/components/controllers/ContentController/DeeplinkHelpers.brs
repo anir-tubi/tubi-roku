@@ -771,7 +771,22 @@ Function handleCollectionDeeplinkContent() as Void
     sendDeeplinkAnalytics(m.deeplinkContent, m.deeplinkContent, m.constants.deeplinks.entryPoints.collection, m.Tracking, m.trackingLoggingTask, m.constants)
   end if
 
-  pivot = { id: collectionId, title: "" }
+  'if fadeInContentController has not been set true, the animation is still playing.
+  'in that case, defer navigation until after the animation completes.
+  callback = navigateToCollectionDeeplink
+  if m.top.fadeInContentController = true
+    callback()
+  else
+    m.deferredDeeplinkFn = callback
+  end if
+End Function
+
+
+' Navigates to the collection/hub PivotDetailScreen after ensuring the launch animation has completed.
+Function navigateToCollectionDeeplink() as Void
+  if m.deeplinkContent = invalid then return
+
+  pivot = { id: m.deeplinkContent.id, title: "" }
   showPivotDetailScreen(pivot)
 
   sideNavID = m.constants.ui.screenIdToSideNavId[m.constants.ui.screenIds.homeScreen]

@@ -7,6 +7,7 @@ Function init()
   topRef.observeFieldScoped("posterVisible", "onPosterVisibleChange")
   topRef.observeFieldScoped("shouldRotateBackgrounds", "onShouldRotateBackgroundsChange")
   topRef.observeFieldScoped("circularMaskColor", "onCircularMaskColorChange")
+  topRef.observeFieldScoped("screenId", "onScreenIdChange")
   'set background info defaults; the uriList is invalid at first. Must set the background to properly display background
   topRef.backgroundInfo = {
     type: m.constants.ui.backgroundTypes.fullScreen
@@ -57,6 +58,19 @@ End Function
 Function onKidsModeChange()
   setMaskLayerUris()
   newBackgroundSet()
+End Function
+
+
+' Toggles sideNavBackground visibility when screenId changes while background type is spotlight.
+Function onScreenIdChange(msg)
+  screenId = msg.getData()
+  if m.aCurrentBackgroundInfo <> invalid AND m.aCurrentBackgroundInfo.type = m.constants.ui.backgroundTypes.spotlight
+    if screenId <> m.constants.ui.screenIds.linearDetailScreen
+      fade(m.sideNavBackground, "in", 0.5)
+    else
+      fade(m.sideNavBackground, "out", 0.5)
+    end if
+  end if
 End Function
 
 
@@ -185,7 +199,7 @@ Function newBackgroundSet()
       fade(m.defaultBackground, "out", 0.5)
       fade(m.fullScreenPosterGradient, "out", 0.5)
       fade(m.adDisplayGradient, "out", 0.5)
-      if backgroundType = backgroundTypes.spotlight
+      if backgroundType = backgroundTypes.spotlight AND m.top.screenId <> m.constants.ui.screenIds.linearDetailScreen
         fade(m.sideNavBackground, "in", 0.5)
       else
         fade(m.sideNavBackground, "out", 0.5)
