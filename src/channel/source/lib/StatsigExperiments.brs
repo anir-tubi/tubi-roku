@@ -104,6 +104,30 @@ Function StatsigExperimentsInterface(statsigExperimentsInfo) as Object
         }
       }
 
+      roku_sot_reverse_ui_test: {
+        roku_sot_reverse_ui_test_v1: {
+          default: { "enabled": false }
+        }
+      }
+
+      roku_multi_account: {
+        roku_multi_account_v1: {
+          default: { "variant": "none" } ' "none", "adult_with_kids"
+        }
+      }
+
+      roku_otp: {
+        roku_otp_v0: {
+          default: { "enabled": false }
+        }
+      }
+
+      roku_linear_epg_categories: {
+        roku_linear_epg_categories_v1: {
+          default: { "variant": "none" } ' "none", "categories", "categories_with_favorites"
+        }
+      }
+
       ' VodDetailScreen layout and YMAL experiment
       ' @param enabled - boolean: true to show VodDetailScreen, false for legacy DetailScreen
       ' @param is_expand_below - boolean: true to show button title label below icon on focus

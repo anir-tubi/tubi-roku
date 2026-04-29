@@ -362,6 +362,11 @@ Function registerParsingCallbacks()
     parseSuccess: parseGenericSuccess
     parseError: parseGenericError
   }
+
+  m.requestTypes[m.constants.reqNames.createOTP] = {
+    parseSuccess: parseCreateOTPSuccess
+    parseError: parseSignInError
+  }
 End Function
 
 

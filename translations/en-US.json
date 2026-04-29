@@ -2580,6 +2580,46 @@
     "description": "Title of the dialog window that is shown when a content is restricted",
     "message": "Restricted Content"
   },
+  "otpScreen_error_otp_mismatch": {
+    "description": "Error message shown when the user enters an incorrect OTP code",
+    "message": "Incorrect Code. Please try again."
+  },
+  "otpScreen_error_otp_expired": {
+    "description": "Error message shown when the OTP code has expired",
+    "message": "OTP expired. Please try again"
+  },
+  "otpScreen_error_too_many_attempts": {
+    "description": "Error message shown when the user has made too many OTP attempts",
+    "message": "Too many attempts. Please try later"
+  },
+  "otpScreen_error_unknown": {
+    "description": "Error message shown when the OTP code is invalid",
+    "message": "OTP error. Please try again"
+  },
+  "otpScreen_use_different_email_button_label": {
+    "description": "Button label to allow the user to go back and use a different email",
+    "message": "Use Different Email"
+  },
+  "otpScreen_resend_otp_button_label": {
+    "description": "Button label to resend the OTP code to the user",
+    "message": "Resend Code"
+  },
+  "otpScreen_header": {
+    "description": "Header text on the OTP screen",
+    "message": "Check your email"
+  },
+  "otpScreen_sub_heading": {
+    "description": "Subheader text on OTP screen instructing user to enter the sign-in code",
+    "message": "Enter the sign-in code we sent to"
+  },
+  "otpScreen_resend_otp_sent_label": {
+    "description": "Label for the resend OTP button when the OTP has been sent",
+    "message": "The sign-in code has been sent"
+  },
+  "otpScreen_resend_otp_message": {
+    "description": "Message for the resend OTP button when the OTP has been sent",
+    "message": "The sign-in code has been sent to "
+  },
   "explore": {
     "description": "Button text for exploring a hub or collection",
     "message": "Explore"

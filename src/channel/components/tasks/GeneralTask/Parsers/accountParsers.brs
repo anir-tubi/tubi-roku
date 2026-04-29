@@ -173,3 +173,12 @@ Function parseUpdatePinError(fullResponse, reqInfo)
   }
 
 End Function
+
+
+Function parseCreateOTPSuccess(fullResponse, reqInfo)
+  return {
+    requestInput: reqInfo.requestInput
+    parsedResponse: fullResponse.data
+  }
+
+End Function

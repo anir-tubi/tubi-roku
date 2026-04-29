@@ -377,7 +377,7 @@ Function getConstants()
   constants.reqNames.getAllPivots = "getAllPivots"
   constants.reqNames.getPivotContainers = "getPivotContainers"
   constants.reqNames.getBranchManifest = "getBranchManifest"
-
+  constants.reqNames.createOTP = "createOTP"
   ' Page names for request duration logging (messageMap.tags.page). Align with TRANSITION_PAGE_NAMES on web.
   constants.transitionPageNames = {}
   constants.transitionPageNames.home = "home"
@@ -458,6 +458,7 @@ Function getConstants()
   constants.reqNames.acceptsTubiAuth[constants.reqNames.validatePin] = true
   constants.reqNames.acceptsTubiAuth[constants.reqNames.getAllPivots] = true
   constants.reqNames.acceptsTubiAuth[constants.reqNames.getPivotContainers] = true
+  constants.reqNames.acceptsTubiAuth[constants.reqNames.createOTP] = true
 
   constants.anonymous = {}
   constants.anonymous.algorithm = "TUBI-HMAC-SHA256"
@@ -739,6 +740,7 @@ Function getConstants()
   constants.urls.account.signupForKids = constants.urls.account.urlBase + "/accounts/kids"
   constants.urls.account.updatePinforKids = constants.urls.account.urlBase + "/accounts/kids/pin"
   constants.urls.account.validatePin = constants.urls.account.urlBase + "/accounts/kids/pin/validate"
+  constants.urls.account.createOTP = constants.urls.account.urlBase + "/api/v1/device/otp"
 
   constants.urls.account.anonymousSigningKey = constants.urls.account.urlBase + "/device/anonymous/signing_key"
   constants.urls.account.anonymousToken = constants.urls.account.urlBase + "/device/anonymous/token"
@@ -1499,6 +1501,7 @@ Function getConstants()
   constants.ui.screenLevels.profileSelectorScreen = 90
   constants.ui.screenLevels.kidsAccountSetupScreen = 90
   constants.ui.screenLevels.parentalControlPinInputScreen = 90
+  constants.ui.screenLevels.otpScreen = 90
 
   constants.ui.screenIds = {}
   constants.ui.screenIds.homeScreen = "homeScreen"
@@ -1540,6 +1543,7 @@ Function getConstants()
   constants.ui.screenIds.movieDetailScreen = "movieDetailScreen"
   constants.ui.screenIds.seriesDetailScreen = "seriesDetailScreen"
   constants.ui.screenIds.videoDetailScreen = "videoDetailScreen"
+  constants.ui.screenIds.otpScreen = "otpScreen"
 
   ' Maps screen id to log page for request duration logging; used when makeRequest passes reqInfo.screenId.
   constants.ui.screenIdToLogPage = {}
@@ -1561,6 +1565,7 @@ Function getConstants()
   constants.ui.screenIdToLogPage[constants.ui.screenIds.channelListScreen] = constants.transitionPageNames.networks
   constants.ui.screenIdToLogPage[constants.ui.screenIds.signInScreen] = constants.transitionPageNames.activate
   constants.ui.screenIdToLogPage[constants.ui.screenIds.emailInputScreen] = constants.transitionPageNames.activate
+  constants.ui.screenIdToLogPage[constants.ui.screenIds.otpScreen] = constants.transitionPageNames.activate
 
   ' notAllowedContainerIds are the containers which are not allowed to be displayed on category screen,
   ' because currently we support only portrait style in category detail screen

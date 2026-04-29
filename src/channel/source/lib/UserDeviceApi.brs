@@ -29,6 +29,7 @@ Function UserDeviceApi(constants, apiUtilsInstance)
     signUpReqInfoForKids: userDeviceApi_signUpReqInfoForKids
     passwordValidateRegInfo: userDeviceApi_passwordValidateRegInfo
     validatePinReqInfoForKidsAccount: userDeviceApi_validatePinReqInfoForKidsAccount
+    createOTP: userDeviceApi_createOTP
 
     ' serverPersistentData related methods.
     createUserSettingsReqInfo: userDeviceApi_createUserSettingsReqInfo
@@ -650,6 +651,18 @@ End Function
 Function userDeviceApi_createPostLogoutReqInfo()
   url = m.constants.urls.account.logout
   options = m.getCommonOptions()
+  options["method"] = m.constants.reqTypes.post
+  return {
+    url: url
+    options: options
+  }
+End Function
+
+
+Function userDeviceApi_createOTP(email)
+  url = m.constants.urls.account.createOTP
+  options = m.getCommonOptions()
+  options.params["email"] = email
   options["method"] = m.constants.reqTypes.post
   return {
     url: url

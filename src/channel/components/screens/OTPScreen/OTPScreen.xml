@@ -1,0 +1,235 @@
+<?xml version="1.0" encoding="utf-8"?>
+<component name="OTPScreen" extends="BaseScreen">
+
+  <script type="text/brightscript" uri="OTPScreen.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/TypographyMixin.brs" />
+
+  <interface>
+
+    <!-- INPUT -->
+    <field id="signInInfo" type="assocarray" />
+    <field id="text" alias="NumberPad.text" />
+
+    <field id="email" type="string" />
+    <field id="otpError" type="assocarray" />
+
+    <!-- OUTPUT -->
+    <field id="otpSubmitted" type="boolean" alwaysNotify="true" />
+    <field id="userSelectedDifferentEmail" type="boolean" alwaysNotify="true" />
+    <field id="resendOTP" type="boolean" alwaysNotify="true" />
+
+  </interface>
+
+  <children>
+    <Poster
+      id="BackButtonPoster"
+      uri="pkg:/images/back_button.png"
+      translation="[126,60]"
+      visible="true"
+      width="171"
+      height="72" />
+
+    <LayoutGroup
+      layoutDirection="vert"
+      itemSpacings="[8,15,15,-80,20,8]"
+      horizAlignment="center"
+      vertAlignment="center"
+      translation="[960,540]">
+
+      <Label
+        id="pageHeader"
+        horizAlign="center"
+        width="1668">
+        <Font
+          role="font" />
+      </Label>
+      <MultiStyleLabel
+        id="PageSubHeader"
+        horizAlign="center"
+        width="1668" />
+
+      <LayoutGroup
+        id="otpGroup"
+        layoutDirection="horiz"
+        vertAlignment="center"
+        horizAlignment="center"
+        itemSpacings="[8]">
+        <Group>
+          <Poster
+            width="87"
+            height="75"
+            uri="pkg:/images/selectorRoundedCorners-$$RES$$.9.png"
+            id="digit1Poster">
+          </Poster>
+          <Poster
+            width="87"
+            height="75"
+            uri="pkg:/images/pin-bg-input.png"
+            id="digit1bg">
+          </Poster>
+          <Label
+            width="87"
+            height="75"
+            horizAlign="center"
+            vertAlign="center"
+            id="digit1">
+            <Font
+              role="font" />
+          </Label>
+        </Group>
+
+        <Group>
+          <Poster
+            width="87"
+            height="75"
+            uri="pkg:/images/selectorRoundedCorners-$$RES$$.9.png"
+            visible="false"
+            id="digit2Poster">
+          </Poster>
+          <Poster
+            width="87"
+            height="75"
+            uri="pkg:/images/pin-bg-input.png"
+            id="digit2bg">
+          </Poster>
+          <Label
+            width="87"
+            height="75"
+            horizAlign="center"
+            vertAlign="center"
+            id="digit2">
+            <Font
+              role="font" />
+          </Label>
+        </Group>
+
+        <Group>
+          <Poster
+            width="87"
+            height="75"
+            uri="pkg:/images/selectorRoundedCorners-$$RES$$.9.png"
+            visible="false"
+            id="digit3Poster">
+          </Poster>
+          <Poster
+            width="87"
+            height="75"
+            uri="pkg:/images/pin-bg-input.png"
+            id="digit3bg">
+          </Poster>
+          <Label
+            width="87"
+            height="75"
+            horizAlign="center"
+            vertAlign="center"
+            id="digit3">
+            <Font
+              role="font" />
+          </Label>
+        </Group>
+
+        <Group>
+          <Poster
+            width="87"
+            height="75"
+            uri="pkg:/images/selectorRoundedCorners-$$RES$$.9.png"
+            visible="false"
+            id="digit4Poster">
+          </Poster>
+          <Poster
+            width="87"
+            height="75"
+            uri="pkg:/images/pin-bg-input.png"
+            id="digit4bg">
+          </Poster>
+          <Label
+            width="87"
+            height="75"
+            horizAlign="center"
+            vertAlign="center"
+            id="digit4">
+            <Font
+              role="font" />
+          </Label>
+        </Group>
+        <Group>
+          <Poster
+            width="87"
+            height="75"
+            uri="pkg:/images/selectorRoundedCorners-$$RES$$.9.png"
+            visible="false"
+            id="digit5Poster">
+          </Poster>
+          <Poster
+            width="87"
+            height="75"
+            uri="pkg:/images/pin-bg-input.png"
+            id="digit5bg">
+          </Poster>
+          <Label
+            width="87"
+            height="75"
+            horizAlign="center"
+            vertAlign="center"
+            id="digit5">
+            <Font
+              role="font" />
+          </Label>
+        </Group>
+        <Group>
+          <Poster
+            width="87"
+            height="75"
+            uri="pkg:/images/selectorRoundedCorners-$$RES$$.9.png"
+            visible="false"
+            id="digit6Poster">
+          </Poster>
+          <Poster
+            width="87"
+            height="75"
+            uri="pkg:/images/pin-bg-input.png"
+            id="digit6bg">
+          </Poster>
+          <Label
+            width="87"
+            height="75"
+            horizAlign="center"
+            vertAlign="center"
+            id="digit6">
+            <Font
+              role="font" />
+          </Label>
+        </Group>
+      </LayoutGroup>
+
+      <Label
+        id="errorMessage"
+        visible="false">
+        <Font
+          role="font" />
+      </Label>
+
+      <NumberPad
+        id="NumberPad" />
+      <LayoutGroup
+        layoutDirection="vert"
+        id="buttonLayout"
+        horizAlignment="center"
+        vertAlignment="center"
+        itemSpacings="[8]">
+        <SimpleButton
+          id="continueButton"
+          width="420"
+          height="65" />
+        <SimpleButton
+          id="resendOTPButton"
+          width="420"
+          height="65" />
+        <SimpleButton
+          id="useDifferentEmailButton"
+          width="420"
+          height="65" />
+      </LayoutGroup>
+    </LayoutGroup>
+  </children>
+</component>

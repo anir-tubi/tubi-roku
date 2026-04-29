@@ -333,8 +333,12 @@ Function onEmailExistsResponse(response)
           emailScreen.isEmailValid = true
         end if
         m.email = email
-
-        showSignInScreen(rawInput)
+        ' check for OTP here
+        if getStatsigExperimentResource("roku_otp", "roku_otp_v0", false).enabled = true
+          createOTPRequest(rawInput)
+        else
+          showSignInScreen(rawInput)
+        end if
       else
         if parsedResponse.code = "AVAILABLE"
           '//user's email address does not exist in Tubi servers, so sign user up with a new Tubi account
@@ -466,6 +470,20 @@ Function onEmailExistsError(errorResponse)
 
     showModal(simpleModalInfo.modalInfo, simpleModalInfo.buttonInfo)
   end if
+End Function
+
+
+Function showOTPScreen(userInput)
+  otpScreen = CreateObject("roSGNode", "OTPScreen")
+  otpScreen.id = m.constants.ui.screenIds.otpScreen
+  otpScreen.screenLevel = m.constants.ui.screenLevels.otpScreen
+  otpScreen.email = userInput.email
+  otpScreen.signInInfo = userInput
+  otpScreen.observeFieldScoped("otpSubmitted", "onOTPContinueButtonSelected")
+  otpScreen.observeFieldScoped("userSelectedDifferentEmail", "showEmailScreen")
+  otpScreen.observeFieldScoped("resendOTP", "onResendOTPButtonSelected")
+  otpScreen.observeFieldScoped("backgroundUriList", "onScreenBackgroundUpdated")
+  pushScreen(otpScreen, true, true)
 End Function
 
 
@@ -602,6 +620,24 @@ Function onSignUpResponse(response)
 End Function
 
 
+Function onOTPContinueButtonSelected(msg)
+  otpScreen = msg.getRoSGNode()
+  otpSubmitted = msg.getData()
+  if otpSubmitted = true AND isAA(otpScreen.signInInfo)
+    signInInfo = otpScreen.signInInfo
+
+    email = ""
+    if isAA(signInInfo.rfiSignInInfo) = true
+      email = signInInfo.rfiSignInInfo.email
+    end if
+
+    otp = signInInfo.otp
+    signUserInWithOtp(email, otp, signInInfo.rfiSignInInfo, invalid, onSignInOTPError)
+  end if
+End Function
+
+
+
 ' onSignInSelected callback is triggered when user selects continue button on SignIn Screen
 ' @evt : roSGNodeEvent, it contains password
 Function onSignInSelected(evt)
@@ -611,6 +647,47 @@ Function onSignInSelected(evt)
   password = signInSelected.password
   signUserIn(email, password, signInSelected.rfiSignInInfo)
 End Function
+
+
+' @rfiSignInInfo: AssociativeArray - A record of the Roku account's signin info: i.e. email, firstname, gender, etc.
+Function signUserInWithOtp(email, otp, rfiSignInInfo = invalid, successCallback = invalid, errorCallback = invalid)
+  if isAA(rfiSignInInfo) = false then
+    rfiSignInInfo = {}
+  end if
+
+  if successCallback = invalid then
+    successCallback = onSignInResponse
+  end if
+  if errorCallback = invalid then
+    errorCallback = onSignInOTPError
+  end if
+
+  options = {}
+  options.body = {
+    platform: m.constants.platform
+    device_id: m.constants.deviceInfo.deviceId
+    type: "otp"
+    credentials: {
+      email: email
+      code: otp
+    }
+  }
+
+  requestInfo = m.userDeviceApi.signInReqInfo(options)
+
+  m.makeRequest({
+    url: requestInfo.url
+    requestType: m.constants.reqNames.signIn
+    options: requestInfo.options
+    successCallback: successCallback
+    errorCallback: errorCallback
+    responseType: "assocarray"
+    email: email
+    rfiSignInInfo: rfiSignInInfo
+    analyticsScreenId: m.constants.ui.screenIds.otpScreen
+  })
+End Function
+
 
 
 ' @rfiSignInInfo: AssociativeArray - A record of the Roku account's signin info: i.e. email, firstname, gender, etc.
@@ -729,6 +806,7 @@ End Function
 ' onSignInError callback is triggered when the sign In is failed
 ' @errorResponse : assocarray, the error response of signIn API in the form of AA
 Function onSignInError(errorResponse)
+
   requestInput = errorResponse.requestInput
 
   accountEvent = {
@@ -746,6 +824,8 @@ Function onSignInError(errorResponse)
   if shouldShowSignInSignUpErrorPage(errorResponse) = true
     showSignInSignUpErrorScreen("signIn", invalid, false)
   else
+
+
     currentScreen = getCurrentScreen()
     dialogEvent = {
       type: "dialog"
@@ -765,6 +845,50 @@ Function onSignInError(errorResponse)
     message = invalidPasswordDesc + chr(10) + requestInput.email
     buttons = [getTranslation("dialog_button_forgot_password"), getTranslation("retry")]
     showSimpleInstantResumableModal(title, message, buttons, dialogEvent, m.trackingLoggingTask, onForgotPasswordDialogButtonSelected, onForgotPasswordDialogCancelSelected)
+  end if
+
+End Function
+
+
+Function onSignInOTPError(errorResponse)
+  if getStatsigExperimentResource("roku_otp", "roku_otp_v0", false).enabled = true
+    currentScreen = getCurrentScreen()
+    accountEvent = {
+      type: "account"
+      values: {
+        manip: "SIGNIN"
+        status: "FAIL"
+        message: "invalid_otp"
+        current: "OTP"
+      }
+    }
+
+    fireUserTrackingEvent(accountEvent)
+
+
+    if currentScreen <> invalid AND currentScreen.isSubType("OTPScreen") = true
+
+      currentScreen.otpError = errorResponse
+    else
+      if shouldShowSignInSignUpErrorPage(errorResponse) = true
+        showSignInSignUpErrorScreen("signIn", invalid, false)
+      else if currentScreen <> invalid
+        dialogEvent = {
+          type: "dialog"
+          values: {
+            dialog_type: "SIGNIN_ERROR"
+            pageOneof: m.Tracking.getAnalyticsPage(currentScreen.trackingPageInfo.pageType, currentScreen.trackingPageInfo.pageValues)
+            dialog_action: "SHOW"
+            dialog_sub_type: "invalid_otp"
+          }
+        }
+
+        message = getTranslation("otpScreen_error_unknown")
+        title = getTranslation("dialog_defaultError_title")
+        buttons = [getTranslation("dialog_button_ok")]
+        showSimpleInstantResumableModal(title, message, buttons, dialogEvent, m.trackingLoggingTask, invalid)
+      end if
+    end if
   end if
 End Function
 
@@ -1271,6 +1395,7 @@ Function popScreenAfterSignInProcess()
   firstPopScreenTrackingInfo = invalid
 
   poppableScreenSubtypes = {
+    "OTPScreen": true
     "SignInScreen": true
     "EmailInputScreen": true
     "AgeVerificationScreen": true
@@ -1559,6 +1684,68 @@ Function createMagicLinkRequest(email)
     responseType: "assocarray"
     analyticsScreenId: m.constants.ui.screenIds.signInScreen
   })
+End Function
+
+
+Function createOTPRequest(input)
+  if input <> invalid AND input.email <> invalid
+
+    requestInfo = m.userDeviceApi.createOTP(input.email)
+    m.makeRequest({
+      url: requestInfo.url
+      requestType: m.constants.reqNames.createOTP
+      options: requestInfo.options
+      responseType: "assocarray"
+      requestInput: input
+      successCallback: onOTPResponse
+      errorCallback: onSignInOTPError
+    })
+
+  end if
+End Function
+
+
+Function onOTPResponse(response)
+  tubiLog("SignInHelpers.onOTPResponse")
+  if response <> invalid AND isAA(response.requestInput) = true
+    currentScreen = getCurrentScreen()
+    if currentScreen <> invalid
+      if currentScreen.isSubType("OTPScreen") = true 'resend OTP request is from OTP screen itself
+        headerText = getTranslation("otpScreen_resend_otp_message")
+        toastInfo = {
+          "selfDestructTimer": 5
+          "message": response.requestInput.email
+          "headerText": headerText
+          "messageColor": m.constants.ui.themes.default.focusedColor 'This email color is not changing with theme. Its just we want yello color
+        }
+        screen = getCurrentScreen()
+        toastDialogEventInfo = {
+          type: "dialog"
+          values: {
+            dialog_type: "TOAST"
+            pageOneof: m.Tracking.getAnalyticsPage(screen.trackingPageInfo.pageType, screen.trackingPageInfo.pageValues)
+            dialog_action: "SHOW"
+            dialog_sub_type: "resend_otp"
+          }
+        }
+        showToast(toastInfo, true, toastDialogEventInfo)
+      else
+        showOTPScreen(response.requestInput)
+      end if
+    end if
+  end if
+End Function
+
+
+Function onResendOTPButtonSelected(msg)
+  isButtonSelected = msg.getData()
+  otpScreen = getCurrentScreen()
+  if otpScreen <> invalid AND otpScreen.isSubType("OTPScreen") = true
+    rawInput = otpScreen.signInInfo
+    if isButtonSelected = true
+      createOTPRequest(rawInput)
+    end if
+  end if
 End Function
 
 

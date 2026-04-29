@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8" ?>
+<?xml version="1.0" encoding="utf-8"?>
 <!--
  - SimpleButton
  - A simple, stand alone button that changes width based on the length of the text, and
@@ -6,33 +6,33 @@
  - This component is used for all 480x80 buttons within the sign-in flow.
  -
  -->
-<component name="SimpleButton" extends="Group" >
+<component name="SimpleButton" extends="Group">
   <script type="text/brightscript" uri="SimpleButton.brs" />
   <script type="text/brightscript" uri="../../../source/lib/Log.brs" />
   <script type="text/brightscript" uri="pkg:/source/lib/StringUtils.brs" />
   <script type="text/brightscript" uri="pkg:/source/3rdparty/rta/typeUtils.brs" />
   <script type="text/brightscript" uri="pkg:/components/lib/GlobalMixin.brs" />
-  <script type="text/brightscript" uri="pkg:/components/lib/TypographyMixin.brs"/>
+  <script type="text/brightscript" uri="pkg:/components/lib/TypographyMixin.brs" />
 
   <interface>
 
     <!-- INPUTS -->
-      <field id="color" type="string"/>
+    <field id="color" type="string" />
 
-      <!-- only set a width for fixed width buttons. -->
-      <field id="width" type="integer" />
+    <!-- only set a width for fixed width buttons. -->
+    <field id="width" type="integer" />
 
-      <field id="height" alias="focus9Patch.height"/>
-      <field id="uri" alias="focus9Patch.uri"/>
-      <field id="notFilledBackgroundColor" alias="notFilledBackground.color"/>
-      <field id="fontSize" alias="labelFont.size"/>
-      <field id="isFilled" type="boolean" value="true" />
-      <field id="text" type="String" />
-      <field id="unfocusedBackgroundOpacity" type="float" value="0.17"/>
-      <field id="itemHasFocus" type="boolean" />
+    <field id="height" alias="focus9Patch.height" />
+    <field id="uri" alias="focus9Patch.uri" />
+    <field id="notFilledBackgroundColor" alias="notFilledBackground.color" />
+    <field id="fontSize" alias="labelFont.size" />
+    <field id="isFilled" type="boolean" value="true" />
+    <field id="text" type="String" />
+    <field id="unfocusedBackgroundOpacity" type="float" value="0.17" />
+    <field id="itemHasFocus" type="boolean" />
 
     <!-- OUTPUTS -->
-      <field id="selected" type="boolean" alwaysNotify="true" />
+    <field id="selected" type="boolean" alwaysNotify="true" />
 
   </interface>
 
@@ -55,7 +55,7 @@
       vertAlign="center">
       <Font
         id="labelFont"
-        role="font"/>
+        role="font" />
     </Label>
   </children>
 </component>
