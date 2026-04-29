@@ -146,13 +146,6 @@ Function cmsApi_createSingleContentReqInfo(contentId, includeChannels = false, b
   options.headers.append({ "x-capability": capability })
   url = m.constants.urls.content.singleContent
 
-  if m.statSigExperiments <> invalid
-    experimentResource = m.statSigExperiments.getExperimentResource("", "roku_content_v3_endpoints")
-    if experimentResource <> invalid AND experimentResource.enabled = true
-      url = m.constants.urls.content.singleContentV3
-    end if
-  end if
-
   return {
     url: url
     options: options
@@ -195,13 +188,6 @@ Function cmsApi_createSeriesEpisodesBySeasonReqInfo(seriesId, season = 1, pageIn
   capability = formatJson({ "content_types": ["se"] })
   options.headers.append({ "x-capability": capability })
   url = m.constants.urls.content.singleContent
-
-  if m.statSigExperiments <> invalid
-    experimentResource = m.statSigExperiments.getExperimentResource("", "roku_content_v3_endpoints")
-    if experimentResource <> invalid AND experimentResource.enabled = true
-      url = m.constants.urls.content.singleContentV3
-    end if
-  end if
 
   return {
     url: url
@@ -1094,16 +1080,7 @@ End Function
 ' @bKidsMode: boolean, Are we in kids mode
 ' @passedOptions: assocArray, additional options (params, headers, etc.)
 Function cmsApi_createGetSeasonListBySeriesIdReqInfo(seriesId, bKidsMode = false, passedOptions = {})
-  baseUrl = m.constants.urls.content.seriesEpisodes
-
-  if m.statSigExperiments <> invalid
-    experimentResource = m.statSigExperiments.getExperimentResource("", "roku_content_v3_endpoints")
-    if experimentResource <> invalid AND experimentResource.enabled = true
-      baseUrl = m.constants.urls.content.seriesEpisodesV3
-    end if
-  end if
-
-  url = baseUrl + "/" + seriesId + "/episodes"
+  url = m.constants.urls.content.seriesEpisodes + "/" + seriesId + "/episodes"
 
   options = m.getCommonOptions(true)
   params = options.params

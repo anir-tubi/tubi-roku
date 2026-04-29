@@ -161,10 +161,6 @@ Function StatsigExperimentsInterface(statsigExperimentsInfo) as Object
         default: { "enabled": false, "treatment_group": "control", "background_enabled": false, "remove_pivots": [] }
       }
 
-      roku_content_v3_endpoints: {
-        default: { "enabled": false }
-      }
-
       roku_dynamic_ad_load: {
         roku_dynamic_ad_load_v1: {
           default: { "enabled": false }

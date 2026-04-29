@@ -549,7 +549,6 @@ Function getSingleContentFromServer(content, successCallback, errorCallback, res
 
     if isComingSoon = false
       singleRequestInfo = m.cmsApi.createSingleContentReqInfo(content.id, true, shouldKidsModeBeSentToServer())
-      getStatsigExperimentResource("", "roku_content_v3_endpoints", true)
 
       m.makeRequest({
         url: singleRequestInfo.url

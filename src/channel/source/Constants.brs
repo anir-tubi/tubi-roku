@@ -642,11 +642,8 @@ Function getConstants()
   if constants.settings.mode <> "production" AND constants.settings.stagingApis = true
     constants.urls.content.urlBase = "https://content-cdn.staging-public.tubi.io/api"
   end if
-  constants.urls.content.singleContent = constants.urls.content.urlBase + "/v2/content"
-  constants.urls.content.seriesEpisodes = constants.urls.content.urlBase + "/v2/series" ' + series_id + "/episodes"
-
-  constants.urls.content.singleContentV3 = constants.urls.content.urlBase + "/v3/content"
-  constants.urls.content.seriesEpisodesV3 = constants.urls.content.urlBase + "/v3/series" ' + series_id + "/episodes"
+  constants.urls.content.singleContent = constants.urls.content.urlBase + "/v3/content"
+  constants.urls.content.seriesEpisodes = constants.urls.content.urlBase + "/v3/series" ' + series_id + "/episodes"
 
   'epgProgram url
   constants.urls.content.epgProgramContentUrlBase = "https://epg-cdn.production-public.tubi.io"
