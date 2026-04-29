@@ -536,6 +536,7 @@ Function onTimeContentChange()
     m.top.contentReady = true
     m.InfoPanel.visible = true
     setupEpgBanner()
+    getStatsigExperimentResource("roku_epg_favorites", "roku_epg_favorites_v1", true)
   end if
 End Function
 
@@ -561,7 +562,8 @@ End Function
 
 Function handleEPGCategoriesVisibility()
   if m.epgTimeGrid <> invalid
-    m.epgTimeGrid.channelGridFocusable = true
+    epgFavoritesExperiment = getStatsigExperimentResource("roku_epg_favorites", "roku_epg_favorites_v1", false)
+    m.epgTimeGrid.channelGridFocusable = (epgFavoritesExperiment <> invalid AND epgFavoritesExperiment.enabled = true)
     m.epgTimeGrid.categoriesMenuVisible = true
   end if
 End Function

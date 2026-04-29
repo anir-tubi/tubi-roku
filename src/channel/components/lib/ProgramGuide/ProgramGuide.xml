@@ -49,7 +49,7 @@
 
     <field id="isChannelGridFocused" type="boolean" value="false" />
 
-    <field id="channelGridFocusable" type="boolean" value="true" alwaysNotify="true" />
+    <field id="channelGridFocusable" type="boolean" value="false" alwaysNotify="true" />
 
     <field id="categoriesMenuVisible" type="boolean" value="true" alwaysNotify="true" />
 

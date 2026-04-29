@@ -2616,10 +2616,14 @@ Function tubiMetadataTranslate_translateEPGChannelIds(contentToTranslate, reques
   if contentToTranslate <> invalid AND contentToTranslate.contents <> invalid AND contentToTranslate.containers <> invalid
     containersArray = contentToTranslate.containers
 
+    isEpgFavoritesEnabled = m.statSigExperiments.getExperimentResource("roku_epg_favorites", "roku_epg_favorites_v1").enabled = true
     recommmendedIndex = 0
     for i = 0 to containersArray.count() - 1
-      if containersArray[i].container_id = "favorite_channels"
-        recommmendedIndex = 1
+      if isEpgFavoritesEnabled = true
+        ' EPG channel favorites — Will remove if we don't graduate roku_epg_favorites_v1 experiment.
+        if containersArray[i].container_id = "favorite_channels"
+          recommmendedIndex = 1
+        end if
       end if
 
       if containersArray[i].container_id = "featured_channels"
@@ -2668,8 +2672,8 @@ Function tubiMetadataTranslate_translateEPGChannelIds(contentToTranslate, reques
             channelContentNode.parentId = container.container_id
           end if
 
-          ' Set isFavorite field if channel is in favorites container
-          if container.container_id = "favorite_channels"
+          ' EPG channel favorites — Will remove if we don't graduate roku_epg_favorites_v1 experiment.
+          if isEpgFavoritesEnabled = true AND container.container_id = "favorite_channels"
             if channelContentNode.hasField("isFavorite") = false
               channelContentNode.addField("isFavorite", "bool", false)
             end if

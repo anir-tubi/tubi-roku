@@ -68,6 +68,12 @@ Function init()
   m.slideOutEPGTranslation = [390, m.EPGHorizontalSlide.translation[1]]
   resetUI(false)
   m.firstTimeEPGLaunched = true 'm.firstTimeEPGLaunched is a flag to avoid jumping to the content 'currently playing' causing epg to trigger stop video and refetch the channel.
+
+  m.epgFavoritesExperiment = getStatsigExperimentResource("roku_epg_favorites", "roku_epg_favorites_v1", false)
+
+  if m.EPG <> invalid
+    m.EPG.channelGridFocusable = (m.epgFavoritesExperiment <> invalid AND m.epgFavoritesExperiment.enabled = true)
+  end if
 End Function
 
 
@@ -228,7 +234,7 @@ Function onContainersListChanged(msg)
     m.containerMarkupGrid.visible = false
 
     if m.EPG <> invalid
-      m.EPG.channelGridFocusable = true
+      m.EPG.channelGridFocusable = (m.epgFavoritesExperiment <> invalid AND m.epgFavoritesExperiment.enabled = true)
       m.EPG.categoriesMenuVisible = true
     end if
   end if
@@ -581,6 +587,7 @@ Function onTimeContentChange()
       m.EPG.content = m.top.timeGridContent
       m.EPG.contentUpdated = true
       m.EPGError.visible = false
+      getStatsigExperimentResource("roku_epg_favorites", "roku_epg_favorites_v1", true)
       jumpEPGToCurrentPlayingVideo()
     else
       '//display inline error message

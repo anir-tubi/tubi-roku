@@ -2,6 +2,7 @@ Function init()
   m.poster = m.top.findNode("ChannelPoster")
   m.posterBg = m.top.findNode("channelPosterBG")
   m.starIcon = m.top.findNode("starIcon")
+  m.isEpgFavoritesExperimentEnabled = getStatsigExperimentResource("roku_epg_favorites", "roku_epg_favorites_v1", false).enabled = true
   m.observedFavoriteContent = invalid
   m.top.observeFieldscoped("itemContent", "onContentChange")
   m.top.observeFieldscoped("focusPercent", "onFocusPercentChange")
@@ -41,6 +42,7 @@ Function onIsFavoriteChange(msg)
 End Function
 
 
+' EPG channel favorites — Will remove if we don't graduate roku_epg_favorites_v1 experiment.
 Function updateStarIcon()
   item = m.top.itemContent
   focusPercent = 0.0
@@ -48,7 +50,7 @@ Function updateStarIcon()
     focusPercent = m.top.focusPercent
   end if
 
-  if focusPercent > 0.5
+  if focusPercent > 0.5 AND m.isEpgFavoritesExperimentEnabled = true
     m.starIcon.opacity = 1.0
 
     if item <> invalid AND item.isFavorite = true

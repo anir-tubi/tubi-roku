@@ -148,6 +148,7 @@ Function onEPGAndLikedBatchComplete(batchResponse)
   end if
 
   if likedResponse <> invalid AND likedResponse.nodes <> invalid AND likedResponse.nodes.count() > 0
+    ' EPG channel favorites — Will remove if we don't graduate roku_epg_favorites_v1 experiment
     m.likedContainer = {
       "name": getTranslation("epg_favorites"),
       "contents": [],
@@ -175,6 +176,7 @@ Function onEPGAndLikedBatchError(_error)
 End Function
 
 
+' EPG channel favorites — Will remove if we don't graduate roku_epg_favorites_v1 experiment.
 Function mergeLikedChannelsIntoEpgResponse(response)
   if m.likedContainer <> invalid AND m.likedContainer.contents <> invalid AND m.likedContainer.contents.count() > 0
     insertPosition = 0
@@ -230,6 +232,7 @@ Function findChannelInContentById(contentNode, channelId)
 End Function
 
 
+' EPG channel favorites — Will remove if we don't graduate roku_epg_favorites_v1 experiment.
 Function isLinearChannelLiked(channelId) as Boolean
   if channelId = invalid OR m.likedContainer = invalid OR m.likedContainer.contents = invalid
     return false
@@ -244,7 +247,7 @@ Function isLinearChannelLiked(channelId) as Boolean
 End Function
 
 
-' Add or remove channel from likedContainer when user adds/removes favorite (API persists)
+' EPG channel favorites — Will remove if we don't graduate roku_epg_favorites_v1 experiment.
 Function updateLikedContainerForLinear(channelId, action)
   if m.likedContainer <> invalid AND m.likedContainer.contents <> invalid AND channelId <> invalid
     idStr = channelId.toStr()
@@ -390,7 +393,12 @@ End Function
 
 ' @param response - roSGNode, translated EPG channel list with requestorID
 Function applyEpgChannelListToScreen(response)
-  mergeLikedChannelsIntoEpgResponse(response)
+  isEpgFavoritesExperimentEnabled = getStatsigExperimentResource("roku_epg_favorites", "roku_epg_favorites_v1", false).enabled = true
+
+  if isEpgFavoritesExperimentEnabled = true
+    ' EPG channel favorites — Will remove if we don't graduate roku_epg_favorites_v1 experiment.
+    mergeLikedChannelsIntoEpgResponse(response)
+  end if
 
   screen = getFromScreenCache(response.requestorID)
   if screen = invalid
@@ -404,7 +412,8 @@ Function applyEpgChannelListToScreen(response)
       screen.containersList = response.containersList
     end if
 
-    if isLoggedInUser() = true AND screen.timeGridContent <> invalid
+    if isEpgFavoritesExperimentEnabled = true AND isLoggedInUser() = true AND screen.timeGridContent <> invalid
+      ' EPG channel favorites — Will remove if we don't graduate roku_epg_favorites_v1 experiment.
       childCount = screen.timeGridContent.getChildCount()
       for i = 0 to childCount - 1
         channel = screen.timeGridContent.getChild(i)
@@ -951,6 +960,7 @@ Function setTimeGridContentLoadingToComplete(screen)
 End Function
 
 
+' EPG channel favorites — Will remove if we don't graduate roku_epg_favorites_v1 experiment.
 Function onChannelSelected(msg)
   screen = msg.getRoSgNode()
   contentId = msg.getData()
@@ -958,6 +968,7 @@ Function onChannelSelected(msg)
 End Function
 
 
+' EPG channel favorites — Will remove if we don't graduate roku_epg_favorites_v1 experiment.
 ' @param screen - EPGHomeScreen or LinearVideoPlayerScreen (has timeGridContent, containersList, channelIdSelected)
 ' @param contentId - channel id that was selected
 Function handleChannelSelectedForFavorites(screen, contentId)
@@ -977,7 +988,7 @@ Function handleChannelSelectedForFavorites(screen, contentId)
 End Function
 
 
-' Sets isFavorite on every timeGridContent row whose id matches contentIdStr.
+' EPG channel favorites — Will remove if we don't graduate roku_epg_favorites_v1 experiment.
 Function setEpgFavoriteOnMatchingChannels(screen, contentIdStr, isFavorite as Boolean) as Void
   if screen <> invalid AND screen.timeGridContent <> invalid AND isNonEmptyString(contentIdStr) = true
     i = 0
@@ -996,7 +1007,7 @@ Function setEpgFavoriteOnMatchingChannels(screen, contentIdStr, isFavorite as Bo
 End Function
 
 
-' Updates matching channel rows' isFavorite immediately so the EPG star icon updates before the API returns.
+' EPG channel favorites — Will remove if we don't graduate roku_epg_favorites_v1 experiment.
 ' @param action - m.constants.ui.likeDislikeActions.like or removeLike
 Function applyOptimisticEpgFavoriteState(screen, contentIdStr, action) as Void
   if isNonEmptyString(action) = true AND (action = m.constants.ui.likeDislikeActions.like OR action = m.constants.ui.likeDislikeActions.removeLike)
@@ -1005,7 +1016,7 @@ Function applyOptimisticEpgFavoriteState(screen, contentIdStr, action) as Void
 End Function
 
 
-' Reverts applyOptimisticEpgFavoriteState when setContentRating fails.
+' EPG channel favorites — Will remove if we don't graduate roku_epg_favorites_v1 experiment.
 Function revertOptimisticEpgFavoriteState(revertInfo) as Void
   if revertInfo <> invalid AND revertInfo.screen <> invalid AND isNonEmptyString(revertInfo.contentIdStr) = true AND isNonEmptyString(revertInfo.action) = true
     action = revertInfo.action
@@ -1017,6 +1028,7 @@ Function revertOptimisticEpgFavoriteState(revertInfo) as Void
 End Function
 
 
+' EPG channel favorites — Will remove if we don't graduate roku_epg_favorites_v1 experiment.
 Function handleAddRemoveFavorites(screen, likeDislike = "")
   if isNonEmptyString(likeDislike) = true
     sRatingChange = likeDislike
@@ -1050,6 +1062,7 @@ Function handleAddRemoveFavorites(screen, likeDislike = "")
 End Function
 
 
+' EPG channel favorites — Will remove if we don't graduate roku_epg_favorites_v1 experiment.
 Function onFavoritesAddRemoveSuccess(requestBody)
   m.optimisticFavoriteRevertInfo = invalid
 
@@ -1177,12 +1190,14 @@ Function onFavoritesAddRemoveSuccess(requestBody)
 End Function
 
 
+' EPG channel favorites — Will remove if we don't graduate roku_epg_favorites_v1 experiment.
 Function onFavoritesAddRemoveFailure(error)
   revertOptimisticEpgFavoriteState(m.optimisticFavoriteRevertInfo)
   m.optimisticFavoriteRevertInfo = invalid
 End Function
 
 
+' EPG channel favorites — Will remove if we don't graduate roku_epg_favorites_v1 experiment.
 Function revalidateEPGContentAfterLocalFavoritesAdd(epgScreen)
   if epgScreen <> invalid
     timeGridContent = epgScreen.timeGridContent
@@ -1199,6 +1214,7 @@ Function revalidateEPGContentAfterLocalFavoritesAdd(epgScreen)
 End Function
 
 
+' EPG channel favorites — Will remove if we don't graduate roku_epg_favorites_v1 experiment.
 Function removeFavoritesFromContainersList(containersList)
   if containersList <> invalid
     k = containersList.getChildCount() - 1
@@ -1214,6 +1230,7 @@ Function removeFavoritesFromContainersList(containersList)
 End Function
 
 
+' EPG channel favorites — Will remove if we don't graduate roku_epg_favorites_v1 experiment.
 Function removeEPGFavoritesOnSignOut()
   tubiLog("EPGScreenHelpers.removeEPGFavoritesOnSignOut")
 
@@ -1224,7 +1241,7 @@ Function removeEPGFavoritesOnSignOut()
 End Function
 
 
-' Send BookmarkEvent for EPG favorites add/remove (per analytics spec)
+' EPG channel favorites — Will remove if we don't graduate roku_epg_favorites_v1 experiment.
 ' @channelId: dynamic, the channel id
 ' @operation: string, likeDislikeActions.like or removeLike
 ' @epgScreen: roSGNode, the EPG screen for tracking page info

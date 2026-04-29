@@ -192,6 +192,12 @@ Function StatsigExperimentsInterface(statsigExperimentsInfo) as Object
         }
       }
 
+      roku_epg_favorites: {
+        roku_epg_favorites_v1: {
+          default: { "enabled": false }
+        }
+      }
+
       ' Remove container-level JSON blob experiment
       ' When enabled, video tiles eligible screens use full TubiContentNode children
       ' instead of abbreviated ContentNode + category.json for lazy resolution
