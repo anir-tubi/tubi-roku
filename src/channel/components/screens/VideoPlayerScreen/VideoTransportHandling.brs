@@ -1505,7 +1505,7 @@ End Function
 
 Function fireScrubberShowcaseExposure()
   ' Fire roku_branded_scrubber_v1 experiment exposure (control + variant when showcase payload is present)
-  getStatsigExperimentResource("roku_branded_scrubber", "roku_branded_scrubber_v1")
+  getStatsigExperimentResource("ads_player_layer", "roku_branded_scrubber_v1")
 End Function
 
 

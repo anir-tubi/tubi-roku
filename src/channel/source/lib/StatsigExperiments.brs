@@ -167,7 +167,7 @@ Function StatsigExperimentsInterface(statsigExperimentsInfo) as Object
         }
       }
 
-      roku_branded_scrubber: {
+      ads_player_layer: {
         roku_branded_scrubber_v1: {
           default: { "enabled": false }
         }

@@ -589,7 +589,7 @@ Function initExperiments()
   m.isBWWLandscapeEnabled = getStatsigExperimentResource("roku_player_improvement", "roku_bww_landscape_v2", false).enabled
 
   ' Branded Scrubber experiment
-  m.isBrandedScrubberEnabled = getStatsigExperimentResource("roku_branded_scrubber", "roku_branded_scrubber_v1", false).enabled
+  m.isBrandedScrubberEnabled = getStatsigExperimentResource("ads_player_layer", "roku_branded_scrubber_v1", false).enabled
 End Function
 
 
