@@ -822,8 +822,6 @@ Function getUserSwitchAction(authInfo, profileSelected)
   else if accountType(authInfo) = "adult"
     if m.uiMode = m.constants.ui.modes.kids
       fromAccount = "adultInKidsMode"
-    else if m.uiMode = m.constants.ui.modes.kidsParental
-      fromAccount = "adultInKidsPC"
     else
       fromAccount = "adultAccount"
     end if
@@ -849,57 +847,82 @@ Function getUserSwitchAction(authInfo, profileSelected)
     "ageGated-guest": "NotAllowed",
     "ageGated-adultAccount": "signInPasswordGate",
     "ageGated-kidsAccount": "allowed",
-    "adultAccount-guest": "allowed",
-    "adultAccount-adultAccount": "allowed",
-    "adultAccount-kidsAccount": "allowed",
-    "adultInKidsMode-guest": "passwordGate",
+    "adultAccount-guest": "pcCheckPasswordGate",
+    "adultAccount-adultAccount": "pcCheckPasswordGate",
+    "adultAccount-kidsAccount": "pcCheckPasswordGate",
+    "adultInKidsMode-guest": "pcCheckPasswordGate",
     "adultInKidsMode-adultAccount": "passwordGate",
     "adultInKidsMode-kidsAccount": "pcCheckPasswordGate",
-    "kidsAccount-guest": "pinGate",
+    "kidsAccount-guest": "pcCheckPinGate",
     "kidsAccount-kidsAccount": "pcCheckPinGate",
-    "kidsAccount-adultAccount": "pcCheckPinGate",
-    "adultInKidsPC-guest": "passwordGate",
-    "adultInKidsPC-adultAccount": "pcCheckPasswordGate",
-    "adultInKidsPC-kidsAccount": "pcCheckPasswordGate"
+    "kidsAccount-adultAccount": "pcCheckPinGate"
   }
 
   pcMap = {
-    "0": 1 'younger child
-    "1": 2 'older Child
-    "2": 4'teen child
-    "3": 5 'adult
-    "4": 0 'youngest child
-    "5": 3 'oldest child
+    "4": 0 ' youngest kid (parental_rating_v2 = 4)
+    "0": 1 ' younger kid  (parental_rating_v2 = 0)
+    "1": 2 ' older kid    (parental_rating_v2 = 1)
+    "5": 3 ' oldest kid   (parental_rating_v2 = 5)
+    "2": 4 ' teen         (parental_rating_v2 = 2)
+    "3": 5 ' adult        (parental_rating_v2 = 3)
   }
 
   key = fromAccount + "-" + switchToAccount
 
-  if switchmap.doesExist(key) = true
-    isAllowed = switchmap[key]
-    if isAllowed = "pcCheckPasswordGate" OR isAllowed = "pcCheckPinGate"
-      'check for PC ratings
-      if isNonEmptyString(authInfo.parentalRating) = true AND isNonEmptyString(profileSelected.parentalRating) = true AND pcMap[authInfo.parentalRating] >= pcMap[profileSelected.parentalRating]
-        switchAction = "allowed"
-      else if isAllowed = "pcCheckPinGate"
+
+  if fromAccount = "guestkid" OR fromAccount = "ageGated"
+    currentPCRating = 3 'guest Kid is highest pc rating
+  else if fromAccount = "guest"
+    currentPCRating = 5 'guest is adult by default
+  else if fromAccount = "adultInKidsMode"
+    currentPCRating = 3' adult is default
+  else if isNonEmptyString(authInfo.parentalRating) = true
+    currentPCRating = pcMap[authInfo.parentalRating]
+  else if m.pub_serverPersistentData.parentalRating <> invalid 'if missing in registry, try server persistent data
+    serverPCRating = m.pub_serverPersistentData.parentalRating.toStr()
+    currentPCRating = pcMap[serverPCRating]
+  else
+    currentPCRating = 5 ' adult is default
+  end if
+
+  if switchToAccount = "guest"
+
+    m.guestUserHasAgeInfo = getGuestUserHasAgeInfo()
+
+    if shouldShowAgeGate() = true AND m.guestUserHasAgeInfo <> invalid AND m.guestUserHasAgeInfo.hasAge = false AND m.guestUserHasAgeInfo.expired = false
+      inComingPCRating = 3
+    else
+      inComingPCRating = 5
+    end if
+  else if isNonEmptyString(profileSelected.parentalRating) = true
+    inComingPCRating = pcMap[profileSelected.parentalRating]
+  else
+    inComingPCRating = 5 ' adult is default
+  end if
+
+
+  if currentPCRating >= inComingPCRating
+    switchAction = "allowed"
+  else
+
+    if switchmap.doesExist(key) = true
+      isAllowed = switchmap[key]
+      if isAllowed = "pcCheckPinGate" OR isAllowed = "pinGate"
+
         if checkIfPinSetByParent(authInfo) = true 'parent has a pin set
           switchAction = "pinGate"
         else
           switchAction = "allowed"
         end if
-      else
-        switchAction = "passwordGate"
-      end if
-    else if isAllowed = "pinGate"
 
-      if checkIfPinSetByParent(authInfo) = true
-        switchAction = "pinGate"
+      else if isAllowed = "pcCheckPasswordGate" OR isAllowed = "passwordGate"
+        switchAction = "passwordGate"
+
+      else if isAllowed = "signInPasswordGate"
+        switchAction = "signInPasswordGate"
       else
-        switchAction = "allowed"
+        switchAction = isAllowed
       end if
-    else if isAllowed = "signInPasswordGate"
-      switchAction = "signInPasswordGate"
-    else
-      switchAction = isAllowed
     end if
 
   end if
