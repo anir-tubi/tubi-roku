@@ -5,21 +5,26 @@
  *   - start:        Notify dashboard that a test run has started
  *   - complete:     Notify dashboard that a test run has completed
  *   - send-suite:   Forward a single suite result from workflow dispatch
- *   - send-suites:  Send per-suite test results (populates "Completed Suites")
  *   - push-report:  Push the full Allure report for ingestion
+ *
+ * Per-suite results are dispatched live by the test runner (see
+ * js/automated-tests/mocha-reporter.ts) via the send-suite action, so there
+ * is no batch suite-reporting action here.
  *
  * Usage:
  *   node .github/scripts/dashboardReporter.js <action>
  *
  * Environment Variables (common):
- *   DASHBOARD_BASE_URL - Base API URL (required for start, complete, send-suites)
+ *   DASHBOARD_BASE_URL - Base API URL (required for all actions except push-report)
  *   PLATFORM           - Platform identifier (default: 'roku')
+ *   TEST_RUN_ID        - Deterministic test run ID ({platform}.{githubRunId})
  *
  * Environment Variables (start):
  *   TAG                - Test tag (default: 'Run All Tests')
- *   GITHUB_ACTION_ID   - GitHub run ID of the calling workflow
- *   ESTIMATED_TESTS    - Estimated number of tests (default: 605)
- *   ESTIMATED_SUITES   - Estimated number of suites (default: 49)
+ *   GITHUB_ACTION_ID   - GitHub run ID of the calling workflow (required)
+ *   ESTIMATED_TESTS    - Estimated number of tests (required)
+ *   ESTIMATED_SUITES   - Estimated number of suites (required)
+ *   DEVICE_COUNT       - Number of devices participating in the run (default: 1)
  *
  * Environment Variables (complete):
  *   TEST_OUTCOME       - 'success' or 'failure'
@@ -28,13 +33,13 @@
  *   FAILED_TESTS       - Failed count
  *   SKIPPED_TESTS      - Skipped count
  *   DURATION_MS        - Duration in milliseconds
- *   TOTAL_SUITES       - Total suites
  *
- * Environment Variables (send-suites, push-report):
- *   REPORT_DIR         - Path to the generated Allure report (default: 'allure-report')
+ * Environment Variables (send-suite):
+ *   SUITE_DATA         - JSON-encoded suite payload from mocha-reporter
  *
  * Environment Variables (push-report):
  *   API_URL            - Full ingest-direct endpoint URL
+ *   REPORT_DIR         - Path to the generated Allure report (default: 'allure-report')
  *   REPORT_ID          - Unique report identifier, typically github.run_id
  */
 var fs = require('fs');
@@ -48,13 +53,15 @@ var REPORT_DIR = process.env.REPORT_DIR || 'allure-report';
 // --- Shared helpers ---
 
 /**
- * Sends a JSON payload via HTTP POST and returns the parsed response.
+ * Sends a JSON payload via HTTP and returns the parsed response.
  * Automatically selects http or https transport based on the URL protocol.
- * @param {string} url - The full URL to POST to
+ * @param {string} url - The full URL
+ * @param {string} method - HTTP method (POST, PATCH, etc.)
  * @param {Object} data - The payload object (will be JSON-stringified)
+ * @param {number} [timeoutMs] - Optional request timeout in milliseconds
  * @returns {Promise<{statusCode: number, data: Object}>} Parsed response
  */
-function postJSON(url, data, timeoutMs) {
+function requestJSON(url, method, data, timeoutMs) {
   return new Promise(function (resolve, reject) {
     var body = JSON.stringify(data);
     var parsed = new URL(url);
@@ -64,7 +71,7 @@ function postJSON(url, data, timeoutMs) {
       hostname: parsed.hostname,
       port: parsed.port,
       path: parsed.pathname + parsed.search,
-      method: 'POST',
+      method: method,
       headers: {
         'Content-Type': 'application/json',
         'Content-Length': Buffer.byteLength(body)
@@ -91,6 +98,14 @@ function postJSON(url, data, timeoutMs) {
     req.write(body);
     req.end();
   });
+}
+
+function postJSON(url, data, timeoutMs) {
+  return requestJSON(url, 'POST', data, timeoutMs);
+}
+
+function patchJSON(url, data, timeoutMs) {
+  return requestJSON(url, 'PATCH', data, timeoutMs);
 }
 
 /**
@@ -136,223 +151,87 @@ function readSuitesData(reportDir) {
   return JSON.parse(fs.readFileSync(suitesPath, 'utf-8'));
 }
 
-/**
- * Recursively counts test results in an Allure suite tree node.
- * Leaf nodes (no children) are counted as individual tests.
- * @param {Object} node - An Allure suite tree node
- * @returns {{total: number, passed: number, failed: number, skipped: number, duration: number}}
- */
-function countTests(node) {
-  if (!node.children || node.children.length === 0) {
-    var status = node.status || 'unknown';
-    return {
-      total: 1,
-      passed: status === 'passed' ? 1 : 0,
-      failed: (status === 'failed' || status === 'broken') ? 1 : 0,
-      skipped: status === 'skipped' ? 1 : 0,
-      duration: (node.time && node.time.duration) || 0
-    };
-  }
-
-  var result = { total: 0, passed: 0, failed: 0, skipped: 0, duration: 0 };
-  for (var i = 0; i < node.children.length; i++) {
-    var child = countTests(node.children[i]);
-    result.total += child.total;
-    result.passed += child.passed;
-    result.failed += child.failed;
-    result.skipped += child.skipped;
-    result.duration += child.duration;
-  }
-  return result;
-}
-
-// --- start: POST /api/test-run/start ---
+// --- start: POST /api/v2/test-runs ---
 
 /**
- * Notifies the dashboard that a test run has started.
- * Sends estimated test/suite counts and the triggering GitHub Action ID.
+ * Creates a new test run on the dashboard.
+ * Returns a deterministic testRunId ({platform}.{githubRunId}).
  * @returns {Promise<void>}
  */
 function actionStart() {
   var baseUrl = requireEnv('DASHBOARD_BASE_URL');
+  var tag = process.env.TAG || 'Run All Tests';
 
   var payload = {
-    event: 'test_run_started',
-    timestamp: new Date().toISOString(),
     platform: PLATFORM,
-    runners: '1',
-    tag: process.env.TAG || 'Run All Tests',
-    githubActionId: process.env.GITHUB_ACTION_ID || '',
-    estimated: {
-      tests: parseInt(process.env.ESTIMATED_TESTS || '605', 10),
-      suites: parseInt(process.env.ESTIMATED_SUITES || '49', 10)
-    }
+    githubRunId: requireEnv('GITHUB_ACTION_ID'),
+    totalSuites: parseInt(requireEnv('ESTIMATED_SUITES'), 10),
+    tags: tag ? [tag] : [],
+    deviceCount: parseInt(process.env.DEVICE_COUNT || '1', 10),
+    type: 'regression'
   };
+
+  if (process.env.ESTIMATED_TESTS) {
+    payload.estimatedTests = parseInt(process.env.ESTIMATED_TESTS, 10);
+  }
 
   console.log('Starting test run: platform=' + PLATFORM);
 
-  return postJSON(baseUrl + '/test-run/start', payload).then(function (response) {
+  return postJSON(baseUrl + '/v2/test-runs', payload).then(function (response) {
     handleResponse(response, 'Test run started successfully', 'Failed to start test run');
 
     var resData = response.data || {};
-    var bucketId = (resData.data || {}).test_run_id_in_progress;
-    if (bucketId) {
-      console.log('Test bucket: ' + bucketId);
+    var testRunId = (resData.data || {}).testRunId;
+    if (testRunId) {
+      console.log('Test run ID: ' + testRunId);
     }
   });
 }
 
-// --- complete: POST /api/test-run/complete ---
+// --- complete: PATCH /api/v2/test-runs/:testRunId ---
 
 /**
- * Notifies the dashboard that a test run has completed.
- * Sends the test outcome (success/failure) and a summary of test counts.
+ * Marks a test run as completed on the dashboard.
  * @returns {Promise<void>}
  */
 function actionComplete() {
   var baseUrl = requireEnv('DASHBOARD_BASE_URL');
+  var testRunId = requireEnv('TEST_RUN_ID');
   var success = (process.env.TEST_OUTCOME || 'success') === 'success';
   var durationMs = parseInt(process.env.DURATION_MS || '0', 10);
-  var endTime = new Date();
-  var startTime = new Date(endTime.getTime() - durationMs);
 
   var payload = {
-    event: 'test_run_completed',
-    timestamp: endTime.toISOString(),
-    platform: PLATFORM,
-    success: success,
+    status: success ? 'completed' : 'failed',
     summary: {
-      totalTestSuites: parseInt(process.env.TOTAL_SUITES || '0', 10),
       totalTests: parseInt(process.env.TOTAL_TESTS || '0', 10),
       passed: parseInt(process.env.PASSED_TESTS || '0', 10),
       failed: parseInt(process.env.FAILED_TESTS || '0', 10),
       skipped: parseInt(process.env.SKIPPED_TESTS || '0', 10),
-      duration: durationMs
-    },
-    startTime: startTime.toISOString(),
-    endTime: endTime.toISOString()
+      durationMs: durationMs
+    }
   };
 
-  console.log('Completing test run: platform=' + PLATFORM + ', success=' + success +
+  console.log('Completing test run: id=' + testRunId + ', status=' + payload.status +
     ', tests=' + payload.summary.totalTests +
     ' (P:' + payload.summary.passed +
     ' F:' + payload.summary.failed +
     ' S:' + payload.summary.skipped + ')');
 
-  return postJSON(baseUrl + '/test-run/complete', payload).then(function (response) {
+  return patchJSON(baseUrl + '/v2/test-runs/' + testRunId, payload).then(function (response) {
     handleResponse(response, 'Test run completed successfully', 'Failed to complete test run');
   });
 }
 
-// --- send-suites: POST /api/test-suite/result for each suite ---
-
-var SUITE_REQUEST_TIMEOUT_MS = 30000;
+// --- send-suite: two-step suite lifecycle from workflow dispatch ---
 
 /**
- * Sends a single suite's test results to the dashboard.
- * @param {string} baseUrl - Dashboard API base URL
- * @param {Object} suite - Allure suite tree node
- * @param {number} index - Zero-based index of the suite (for logging)
- * @returns {Promise<{statusCode: number, data: Object}>} API response
- */
-function sendSuiteResult(baseUrl, suite, index) {
-  var counts = countTests(suite);
-  var suiteName = suite.name || ('Suite ' + index);
-
-  var payload = {
-    event: 'test_suite_completed',
-    timestamp: new Date().toISOString(),
-    platform: PLATFORM,
-    suite: {
-      path: suiteName,
-      name: suiteName,
-      duration: counts.duration
-    },
-    results: {
-      total: counts.total,
-      passed: counts.passed,
-      failed: counts.failed,
-      skipped: counts.skipped
-    }
-  };
-
-  return postJSON(baseUrl + '/test-suite/result', payload, SUITE_REQUEST_TIMEOUT_MS).then(function (response) {
-    var ok = response.statusCode >= 200 && response.statusCode < 300;
-    console.log('  [' + (index + 1) + '] "' + suiteName + '" -> HTTP ' + response.statusCode +
-      (ok ? ' (tests: ' + counts.total + ', P:' + counts.passed + ' F:' + counts.failed + ' S:' + counts.skipped + ')' : ' (ERROR)'));
-    return response;
-  });
-}
-
-/**
- * Sends suite results one at a time, continuing on error.
- * Failures are logged and counted but do not stop subsequent suites.
- * @param {string} baseUrl - Dashboard API base URL
- * @param {Array<Object>} suites - Array of Allure suite tree nodes
- * @param {number} index - Current index in the array
- * @param {number} failCount - Running count of failed sends
- * @returns {Promise<number>} Total number of failed sends
- */
-function sendSequentially(baseUrl, suites, index, failCount) {
-  if (failCount === undefined) failCount = 0;
-  if (index >= suites.length) {
-    return Promise.resolve(failCount);
-  }
-  return sendSuiteResult(baseUrl, suites[index], index)
-    .then(function (response) {
-      var ok = response.statusCode >= 200 && response.statusCode < 300;
-      return sendSequentially(baseUrl, suites, index + 1, ok ? failCount : failCount + 1);
-    })
-    .catch(function (err) {
-      var suiteName = suites[index].name || ('Suite ' + index);
-      console.error('  [' + (index + 1) + '] "' + suiteName + '" -> FAILED: ' + err.message);
-      return sendSequentially(baseUrl, suites, index + 1, failCount + 1);
-    });
-}
-
-/**
- * Reads Allure suites.json and sends per-suite results to the dashboard.
- * This populates the "Completed Suites" counter on the Automation UI.
- * Must run before test-run/complete so completedSuites metadata is preserved.
- * @returns {Promise<void>}
- */
-function actionSendSuites() {
-  var baseUrl = requireEnv('DASHBOARD_BASE_URL');
-
-  var suitesData = readSuitesData(REPORT_DIR);
-  if (!suitesData) {
-    console.log('suites.json not found in ' + REPORT_DIR + ', skipping');
-    process.exit(0);
-  }
-
-  var topLevelSuites = suitesData.children || [];
-  if (topLevelSuites.length === 0) {
-    console.log('No suites to send');
-    process.exit(0);
-  }
-
-  console.log('Sending ' + topLevelSuites.length + ' suite results to dashboard');
-
-  return sendSequentially(baseUrl, topLevelSuites, 0).then(function (failCount) {
-    var successCount = topLevelSuites.length - failCount;
-    console.log('Suite results sent: ' + successCount + '/' + topLevelSuites.length + ' succeeded' +
-      (failCount > 0 ? ', ' + failCount + ' failed' : ''));
-    if (failCount > 0) {
-      console.error('WARNING: ' + failCount + ' suite(s) failed to send to the dashboard');
-    }
-  });
-}
-
-// --- send-suite: POST a single suite result from workflow dispatch ---
-
-/**
- * Forwards a single suite result payload to the dashboard.
- * Reads the suite data from the SUITE_DATA environment variable (JSON string)
- * and POSTs it to /test-suite/result.
+ * Forwards a single suite result payload to the dashboard using the
+ * two-step suite lifecycle: POST to create, PATCH to complete.
  * @returns {Promise<void>}
  */
 function actionSendSuite() {
   var baseUrl = requireEnv('DASHBOARD_BASE_URL');
+  var testRunId = requireEnv('TEST_RUN_ID');
   var suiteDataStr = requireEnv('SUITE_DATA');
 
   var payload;
@@ -363,13 +242,53 @@ function actionSendSuite() {
     process.exit(1);
   }
 
-  payload.platform = payload.platform || PLATFORM;
+  var suite = payload.suite || {};
+  var suiteName = suite.name || 'unknown';
+  if (!suite.name || !suite.path) {
+    console.error('SUITE_DATA must include suite.name and suite.path');
+    process.exit(1);
+  }
 
-  var suiteName = (payload.suite && payload.suite.name) || 'unknown';
-  console.log('Sending suite result: ' + suiteName);
+  var deviceDesc = payload.device ? ' (device: ' + (payload.device.model || payload.device.id || 'unknown') + ')' : '';
+  console.log('Sending suite result: ' + suiteName + deviceDesc);
 
-  return postJSON(baseUrl + '/test-suite/result', payload).then(function (response) {
-    handleResponse(response, 'Suite result sent: ' + suiteName, 'Failed to send suite result: ' + suiteName);
+  var startPayload = {
+    suite: { path: suite.path, name: suite.name },
+    typeOfTest: 'functional'
+  };
+  if (payload.device) {
+    startPayload.device = payload.device;
+  }
+
+  var suiteUrl = baseUrl + '/v2/test-runs/' + testRunId + '/suites';
+
+  return postJSON(suiteUrl, startPayload).then(function (response) {
+    handleResponse(response, 'Suite created: ' + suiteName, 'Failed to create suite: ' + suiteName);
+
+    var suiteId = ((response.data || {}).data || {}).suiteId;
+    if (!suiteId) {
+      console.error('No suiteId returned from suite creation');
+      process.exit(1);
+    }
+
+    var tests = payload.tests || [];
+    var results = payload.results || {};
+
+    var completePayload = {
+      results: {
+        total: results.total || (results.passed || 0) + (results.failed || 0) + (results.broken || 0) + (results.skipped || 0),
+        passed: results.passed || 0,
+        failed: results.failed || 0,
+        broken: results.broken || 0,
+        skipped: results.skipped || 0
+      },
+      tests: tests,
+      status: 'completed'
+    };
+
+    return patchJSON(suiteUrl + '/' + suiteId, completePayload);
+  }).then(function (response) {
+    handleResponse(response, 'Suite completed: ' + suiteName, 'Failed to complete suite: ' + suiteName);
   });
 }
 
@@ -491,7 +410,6 @@ var ACTIONS = {
   'start': actionStart,
   'complete': actionComplete,
   'send-suite': actionSendSuite,
-  'send-suites': actionSendSuites,
   'push-report': actionPushReport
 };
 
@@ -499,7 +417,7 @@ var action = process.argv[2];
 var actionFn = ACTIONS[action];
 
 if (!actionFn) {
-  console.error('Usage: node dashboardReporter.js <start|complete|send-suite|send-suites|push-report>');
+  console.error('Usage: node dashboardReporter.js <start|complete|send-suite|push-report>');
   process.exit(1);
 }
 

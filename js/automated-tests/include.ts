@@ -3,6 +3,7 @@ import * as path from 'path';
 import { ecp, odc, device, utils } from 'roku-test-automation';
 import { auth, testUtils } from './test-utils';
 import { CIRCUIT_BREAKER_DIR, CIRCUIT_BREAKER_THRESHOLD } from './circuit-breaker-constants';
+import { DEVICE_INFO_DIR, fileKey } from './device-info-constants';
 
 
 function getCircuitBreakerPath(workerId: string): string {
@@ -33,6 +34,34 @@ function recordFailure(workerId: string): void {
   }
 }
 
+async function writeDeviceInfo(workerId: string): Promise<void> {
+  try {
+    const { body } = await device.sendEcpGet('query/device-info');
+    let serialNumber = '';
+    let modelName = '';
+    let modelNumber = '';
+    const children = (body && (body as any).children) || [];
+    for (const child of children) {
+      if (child.name === 'serial-number') serialNumber = child.value;
+      if (child.name === 'model-name') modelName = child.value;
+      if (child.name === 'model-number') modelNumber = child.value;
+    }
+    const model = modelNumber ? modelName + ' - ' + modelNumber : modelName;
+    if (!serialNumber && !model) {
+      const childNames = children.map((c: any) => c && c.name).filter(Boolean).join(',');
+      console.warn(`[DeviceInfo] worker ${workerId}: ECP returned no usable fields (children=[${childNames}]); skipping write`);
+      return;
+    }
+    if (!fs.existsSync(DEVICE_INFO_DIR)) {
+      fs.mkdirSync(DEVICE_INFO_DIR, { recursive: true });
+    }
+    const infoPath = path.join(DEVICE_INFO_DIR, `worker-${workerId}.json`);
+    fs.writeFileSync(infoPath, JSON.stringify({ id: serialNumber, model: model }));
+  } catch (err: any) {
+    console.warn(`[DeviceInfo] worker ${workerId}: query failed: ${err.message}`);
+  }
+}
+
 function resetFailures(workerId: string): void {
   try {
     const filePath = getCircuitBreakerPath(workerId);
@@ -43,6 +72,8 @@ function resetFailures(workerId: string): void {
     console.warn(`Circuit breaker I/O error (reset): ${err.message}`);
   }
 }
+
+const fileWorkerMapWritten = new Set<string>();
 
 exports.mochaHooks = {
   async beforeAll() {
@@ -130,10 +161,29 @@ exports.mochaHooks = {
 
       // Suite setup succeeded — reset the circuit breaker for this worker
       resetFailures(workerId);
+      await writeDeviceInfo(workerId);
     } catch (error) {
       // Record this failure for the circuit breaker
       recordFailure(workerId);
       throw error;
+    }
+  },
+  beforeEach() {
+    const test: Mocha.Test = this.currentTest;
+    const file = (test as any).file as string;
+    const workerId = process.env.MOCHA_WORKER_ID ?? '0';
+    if (file && !fileWorkerMapWritten.has(file)) {
+      fileWorkerMapWritten.add(file);
+      try {
+        if (!fs.existsSync(DEVICE_INFO_DIR)) {
+          fs.mkdirSync(DEVICE_INFO_DIR, { recursive: true });
+        }
+        const safeKey = fileKey(file);
+        const entryPath = path.join(DEVICE_INFO_DIR, `fwm-${safeKey}.json`);
+        fs.writeFileSync(entryPath, JSON.stringify({ file, workerId }));
+      } catch (err: any) {
+        console.warn(`[DeviceInfo] worker ${workerId}: failed to write file-worker map: ${err.message}`);
+      }
     }
   },
   async afterEach() {

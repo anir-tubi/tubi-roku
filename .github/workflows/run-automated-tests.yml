@@ -68,7 +68,11 @@ jobs:
         run: npm install
 
       - name: Generate rta-config.json
+        id: generate-rta-config
         run: node js/workflows/generateRtaConfig.js
+
+      - name: Clear stale device-info from previous runs
+        run: rm -rf "${TMPDIR:-/tmp}/rta-device-info"
 
       - name: Clear Allure Results
         if: steps.branch-check.outputs.reporting == 'true'
@@ -90,6 +94,11 @@ jobs:
                 platform: 'roku',
                 tag: '${{ inputs.tag || 'Run All Tests' }}',
                 github_action_id: String(${{ github.run_id }}),
+                device_count: '${{ steps.generate-rta-config.outputs.device_count }}',
+                // Placeholder counts shown on the dashboard during the run;
+                // actual totals are PATCHed in the complete action.
+                estimated_suites: '49',
+                estimated_tests: '605',
               },
             });
         continue-on-error: true
@@ -176,18 +185,16 @@ jobs:
             FAILED=$(jq -r '.stats.failures // 0' "$REPORT_PATH")
             SKIPPED=$(jq -r '.stats.pending // 0' "$REPORT_PATH")
             DURATION=$(jq -r '.stats.duration // 0' "$REPORT_PATH")
-            SUITES=$(jq -r '.stats.suites // 0' "$REPORT_PATH")
-            echo "Tests: $TOTAL passed=$PASSED failed=$FAILED skipped=$SKIPPED duration=${DURATION}ms suites=$SUITES"
+            echo "Tests: $TOTAL passed=$PASSED failed=$FAILED skipped=$SKIPPED duration=${DURATION}ms"
           else
             echo "Report not found, using defaults"
-            TOTAL=0; PASSED=0; FAILED=0; SKIPPED=0; DURATION=0; SUITES=0
+            TOTAL=0; PASSED=0; FAILED=0; SKIPPED=0; DURATION=0
           fi
           echo "total=$TOTAL" >> "$GITHUB_OUTPUT"
           echo "passed=$PASSED" >> "$GITHUB_OUTPUT"
           echo "failed=$FAILED" >> "$GITHUB_OUTPUT"
           echo "skipped=$SKIPPED" >> "$GITHUB_OUTPUT"
           echo "duration=$DURATION" >> "$GITHUB_OUTPUT"
-          echo "suites=$SUITES" >> "$GITHUB_OUTPUT"
 
       - name: Trigger Dashboard Complete and Report Push
         if: (success() || failure()) && steps.branch-check.outputs.reporting == 'true'
@@ -211,7 +218,6 @@ jobs:
                 failed_tests: '${{ steps.test-stats.outputs.failed }}',
                 skipped_tests: '${{ steps.test-stats.outputs.skipped }}',
                 duration_ms: '${{ steps.test-stats.outputs.duration }}',
-                total_suites: '${{ steps.test-stats.outputs.suites }}',
               },
             });
         continue-on-error: true

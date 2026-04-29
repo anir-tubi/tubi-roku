@@ -80,6 +80,10 @@ function main() {
   const config = generateConfig(devices);
   fs.writeFileSync(CONFIG_PATH, JSON.stringify(config, null, 4));
   console.log(`Generated rta-config.json with ${devices.length} device(s)`);
+
+  if (process.env.GITHUB_OUTPUT) {
+    fs.appendFileSync(process.env.GITHUB_OUTPUT, `device_count=${devices.length}\n`);
+  }
 }
 
 main();

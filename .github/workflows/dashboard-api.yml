@@ -22,16 +22,18 @@ on:
         required: false
         default: 'Run All Tests'
       github_action_id:
-        description: 'GitHub run ID of the calling workflow'
+        description: 'GitHub run ID of the calling workflow (required for start, send-suite, complete)'
         required: false
       estimated_tests:
-        description: 'Estimated number of tests'
+        description: 'Estimated number of tests (optional, used by start action)'
         required: false
-        default: '605'
       estimated_suites:
-        description: 'Estimated number of suites'
+        description: 'Estimated number of suites (required for start action)'
         required: false
-        default: '49'
+      device_count:
+        description: 'Number of devices participating in the run (used by start action)'
+        required: false
+        default: '1'
       test_outcome:
         description: 'Test outcome (success or failure) - used for complete action'
         required: false
@@ -62,16 +64,13 @@ on:
         description: 'Test duration in milliseconds'
         required: false
         default: '0'
-      total_suites:
-        description: 'Total number of test suites'
-        required: false
-        default: '0'
       suite_data:
         description: 'JSON-encoded suite result payload (used for send-suite action)'
         required: false
 
 env:
   DASHBOARD_BASE_URL: https://automation-ui.infra.tubi-core-staging.tubi.io/api
+  TEST_RUN_ID: ${{ inputs.platform }}.${{ inputs.github_action_id || inputs.run_id }}
 
 jobs:
   dashboard-api:
@@ -89,6 +88,7 @@ jobs:
           GITHUB_ACTION_ID: ${{ inputs.github_action_id }}
           ESTIMATED_TESTS: ${{ inputs.estimated_tests }}
           ESTIMATED_SUITES: ${{ inputs.estimated_suites }}
+          DEVICE_COUNT: ${{ inputs.device_count }}
         run: node .github/scripts/dashboardReporter.js start
 
       - name: Send suite result to dashboard
@@ -96,6 +96,7 @@ jobs:
         env:
           DASHBOARD_BASE_URL: ${{ env.DASHBOARD_BASE_URL }}
           PLATFORM: ${{ inputs.platform }}
+          TEST_RUN_ID: ${{ env.TEST_RUN_ID }}
           SUITE_DATA: ${{ inputs.suite_data }}
         run: node .github/scripts/dashboardReporter.js send-suite
 
@@ -108,27 +109,18 @@ jobs:
           OUTPUT_DIR: allure-report
         run: node .github/scripts/downloadArtifact.js
 
-      - name: Send suite results to dashboard
-        if: always() && inputs.action == 'complete-and-push'
-        env:
-          DASHBOARD_BASE_URL: ${{ env.DASHBOARD_BASE_URL }}
-          PLATFORM: ${{ inputs.platform }}
-          REPORT_DIR: allure-report
-        run: node .github/scripts/dashboardReporter.js send-suites
-        continue-on-error: true
-
       - name: Complete test run
         if: always() && (inputs.action == 'complete' || inputs.action == 'complete-and-push')
         env:
           DASHBOARD_BASE_URL: ${{ env.DASHBOARD_BASE_URL }}
           PLATFORM: ${{ inputs.platform }}
+          TEST_RUN_ID: ${{ env.TEST_RUN_ID }}
           TEST_OUTCOME: ${{ inputs.test_outcome }}
           TOTAL_TESTS: ${{ inputs.total_tests }}
           PASSED_TESTS: ${{ inputs.passed_tests }}
           FAILED_TESTS: ${{ inputs.failed_tests }}
           SKIPPED_TESTS: ${{ inputs.skipped_tests }}
           DURATION_MS: ${{ inputs.duration_ms }}
-          TOTAL_SUITES: ${{ inputs.total_suites }}
         run: node .github/scripts/dashboardReporter.js complete
 
       - name: Push report to dashboard

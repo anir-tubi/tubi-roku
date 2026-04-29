@@ -9,8 +9,10 @@
 // progress updates are dispatched to dashboard-api.yml after each suite completes.
 import * as mocha from 'mocha';
 import * as Mochawesome from 'mochawesome';
+import * as fs from 'fs';
 import * as https from 'https';
 import * as path from 'path';
+import { DEVICE_INFO_DIR, fileKey } from './device-info-constants';
 
 interface TestResult {
   title: string;
@@ -33,7 +35,11 @@ class MochaReporter {
   private githubRepository: string;
   private dashboardBranch: string;
   private platform: string;
+  private githubRunId: string;
   private pendingTests: Map<string, PendingSuite> = new Map();
+  private inflightDispatches: Promise<void>[] = [];
+  private dispatchSuccessCount: number = 0;
+  private dispatchFailureCount: number = 0;
 
   constructor(runner: mocha.Runner, options: mocha.MochaOptions) {
     this.mochawesomeReporter = new Mochawesome(runner, options);
@@ -43,6 +49,7 @@ class MochaReporter {
     this.githubRepository = process.env.GITHUB_REPOSITORY || '';
     this.dashboardBranch = process.env.DASHBOARD_BRANCH || 'master';
     this.platform = process.env.PLATFORM || 'roku';
+    this.githubRunId = process.env.runId || '';
     this.dashboardEnabled =
       process.env.DASHBOARD_REPORTING === 'true' &&
       !!this.githubToken &&
@@ -57,6 +64,10 @@ class MochaReporter {
 
       runner.on(mocha.Runner.constants.EVENT_TEST_FAIL, (test: mocha.Test) => {
         this.accumulateTest(test, 'failed');
+      });
+
+      runner.on(mocha.Runner.constants.EVENT_TEST_PENDING, (test: mocha.Test) => {
+        this.accumulateTest(test, 'skipped');
       });
 
       runner.on(mocha.Runner.constants.EVENT_SUITE_END, (suite: mocha.Suite) => {
@@ -105,106 +116,165 @@ class MochaReporter {
     }
   }
 
+  /**
+   * Reads device info written by the worker that executed the given file.
+   * Returns {id, model} or undefined if unavailable.
+   */
+  private getDeviceInfoForFile(file: string): { id: string; model: string } | undefined {
+    try {
+      const entryPath = path.join(DEVICE_INFO_DIR, `fwm-${fileKey(file)}.json`);
+      if (!fs.existsSync(entryPath)) return undefined;
+      const entry = JSON.parse(fs.readFileSync(entryPath, 'utf-8'));
+      const infoPath = path.join(DEVICE_INFO_DIR, `worker-${entry.workerId}.json`);
+      if (!fs.existsSync(infoPath)) return undefined;
+      const info = JSON.parse(fs.readFileSync(infoPath, 'utf-8'));
+      if (!info.id && !info.model) return undefined;
+      return info;
+    } catch {
+      return undefined;
+    }
+  }
+
   /** Builds and dispatches a suite result payload. */
   private reportSuite(file: string, data: PendingSuite): void {
     const passed = data.tests.filter(t => t.state === 'passed');
     const failed = data.tests.filter(t => t.state === 'failed');
+    const skipped = data.tests.filter(t => t.state === 'skipped');
 
-    if (passed.length === 0 && failed.length === 0) return;
+    if (passed.length === 0 && failed.length === 0 && skipped.length === 0) return;
 
     const suitePath = path.relative(process.cwd(), file);
 
-    const suiteData = {
-      event: 'test_suite_completed',
-      timestamp: new Date().toISOString(),
-      workerId: process.env.MOCHA_WORKER_ID || '0',
+    const suiteData: Record<string, unknown> = {
       platform: this.platform,
       suite: {
         path: suitePath,
         name: data.suiteName,
-        duration: data.tests.reduce((sum, t) => sum + t.duration, 0),
       },
       results: {
+        total: data.tests.length,
         passed: passed.length,
         failed: failed.length,
+        broken: 0,
+        skipped: skipped.length,
       },
-      tests: {
-        passed: passed.map(t => ({
-          title: t.title,
-          fullName: t.fullTitle,
-          duration: t.duration,
-        })),
-        failed: failed.map(t => ({
-          title: t.title,
-          fullName: t.fullTitle,
-          duration: t.duration,
-          failureMessages: [t.error || 'Unknown error'],
-        })),
-      },
+      tests: data.tests.map(t => ({
+        title: t.title,
+        fullName: t.fullTitle,
+        duration: t.duration,
+        status: t.state,
+        ...(t.state === 'failed' ? { failureMessages: [t.error || 'Unknown error'] } : {}),
+      })),
     };
 
-    const status = failed.length > 0 ? 'FAIL' : 'PASS';
-    console.log(`  [Dashboard] ${status} ${data.suiteName} (P:${passed.length} F:${failed.length})`);
+    const deviceInfo = this.getDeviceInfoForFile(file);
+    if (deviceInfo) {
+      suiteData.device = deviceInfo;
+    }
 
-    this.dispatchSuiteResult(suiteData);
+    const status = failed.length > 0 ? 'FAIL' : 'PASS';
+    console.log(`  [Dashboard] ${status} ${data.suiteName} (P:${passed.length} F:${failed.length} S:${skipped.length})`);
+
+    this.inflightDispatches.push(this.dispatchSuiteResult(suiteData, data.suiteName));
   }
 
   /**
    * Dispatches dashboard-api.yml with send-suite action via the GitHub API.
-   * Fire-and-forget: errors are logged but never disrupt tests.
+   * Returns a promise that resolves once the HTTP response is received.
+   * Successes increment a counter (logged once in done()); failures are logged
+   * inline with the suite name for diagnosability.
    */
-  private dispatchSuiteResult(suiteData: unknown): void {
-    try {
-      const [owner, repo] = this.githubRepository.split('/');
-      const body = JSON.stringify({
-        ref: this.dashboardBranch,
-        inputs: {
-          action: 'send-suite',
-          platform: this.platform,
-          suite_data: JSON.stringify(suiteData),
-        },
-      });
+  private dispatchSuiteResult(suiteData: unknown, suiteName: string): Promise<void> {
+    return new Promise((resolve) => {
+      const recordFailure = (reason: string) => {
+        this.dispatchFailureCount++;
+        console.log(`  [Dashboard] Dispatch failed for "${suiteName}": ${reason}`);
+      };
 
-      const req = https.request({
-        hostname: 'api.github.com',
-        path: `/repos/${owner}/${repo}/actions/workflows/dashboard-api.yml/dispatches`,
-        method: 'POST',
-        headers: {
-          'Authorization': `token ${this.githubToken}`,
-          'Accept': 'application/vnd.github.v3+json',
-          'User-Agent': 'roku-mocha-reporter',
-          'Content-Type': 'application/json',
-          'Content-Length': Buffer.byteLength(body),
-        },
-      }, (res) => {
-        if (res.statusCode === 204) {
-          console.log('  [Dashboard] Dispatch accepted');
-        } else {
+      try {
+        const [owner, repo] = this.githubRepository.split('/');
+        const body = JSON.stringify({
+          ref: this.dashboardBranch,
+          inputs: {
+            action: 'send-suite',
+            platform: this.platform,
+            github_action_id: this.githubRunId,
+            suite_data: JSON.stringify(suiteData),
+          },
+        });
+
+        const req = https.request({
+          hostname: 'api.github.com',
+          path: `/repos/${owner}/${repo}/actions/workflows/dashboard-api.yml/dispatches`,
+          method: 'POST',
+          headers: {
+            'Authorization': `token ${this.githubToken}`,
+            'Accept': 'application/vnd.github.v3+json',
+            'User-Agent': 'roku-mocha-reporter',
+            'Content-Type': 'application/json',
+            'Content-Length': Buffer.byteLength(body),
+          },
+          timeout: 15000,
+        }, (res) => {
           let responseBody = '';
           res.on('data', (chunk: Buffer) => { responseBody += chunk; });
           res.on('end', () => {
-            console.log(`  [Dashboard] Dispatch HTTP ${res.statusCode}: ${responseBody}`);
+            if (res.statusCode === 204) {
+              this.dispatchSuccessCount++;
+            } else {
+              recordFailure(`HTTP ${res.statusCode}: ${responseBody}`);
+            }
+            resolve();
           });
-        }
-      });
+          res.resume();
+        });
 
-      req.on('error', (err: Error) => {
-        console.log(`  [Dashboard] Dispatch error: ${err.message}`);
-      });
+        req.on('timeout', () => {
+          req.destroy(new Error('Request timed out'));
+        });
 
-      req.write(body);
-      req.end();
-    } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : String(err);
-      console.log(`  [Dashboard] Dispatch failed: ${message}`);
-    }
+        req.on('error', (err: Error) => {
+          recordFailure(err.message);
+          resolve();
+        });
+
+        req.write(body);
+        req.end();
+      } catch (err: unknown) {
+        recordFailure(err instanceof Error ? err.message : String(err));
+        resolve();
+      }
+    });
   }
 
   done(failures: number, fn?: (failures: number) => void): void {
-    if (this.mochawesomeReporter.done) {
-      this.mochawesomeReporter.done(failures, fn);
-    } else if (fn) {
-      fn(failures);
+    const finish = () => {
+      const total = this.inflightDispatches.length;
+      if (total > 0) {
+        const succeeded = this.dispatchSuccessCount;
+        const failed = this.dispatchFailureCount;
+        const indeterminate = total - succeeded - failed;
+        let summary = `  [Dashboard] Dispatched ${succeeded}/${total} suites`;
+        if (failed > 0) summary += `, ${failed} failed`;
+        if (indeterminate > 0) summary += `, ${indeterminate} unresolved (drain timeout)`;
+        console.log(summary);
+      }
+      if (this.mochawesomeReporter.done) {
+        this.mochawesomeReporter.done(failures, fn);
+      } else if (fn) {
+        fn(failures);
+      }
+    };
+
+    if (this.inflightDispatches.length > 0) {
+      console.log(`  [Dashboard] Waiting for ${this.inflightDispatches.length} pending dispatch(es)...`);
+      const timeout = new Promise<void>((resolve) => setTimeout(() => {
+        console.log('  [Dashboard] Drain timeout reached, proceeding with exit');
+        resolve();
+      }, 30000));
+      Promise.race([Promise.all(this.inflightDispatches), timeout]).then(finish, finish);
+    } else {
+      finish();
     }
   }
 }
