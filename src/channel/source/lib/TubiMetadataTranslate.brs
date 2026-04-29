@@ -1954,8 +1954,8 @@ Function tubiMetadataTranslate_buildCategoryChildrenInfo(container, contents, co
               end for
               fullChild.programs = programs
               fullChild.schedules = []
-              bSingleContentFullData = true
             end if
+            bSingleContentFullData = true
           end if
 
           if bFullData = true OR bSingleContentFullData = true

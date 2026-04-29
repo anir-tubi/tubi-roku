@@ -139,6 +139,10 @@ Function fetchCollectionData(pivotId) as Void
   ]
 
   reqInfo = m.cmsApi.createGetCollectionInfo(pivotId, options, imageParamTypes)
+
+  titleArtH = Int(63 * m.constants.ui.imageSizeMultiplier)
+  reqInfo.options.params["app_images[title_art]"] = "w0h" + titleArtH.toStr() + "_title"
+
   reqInfo.requestType = m.constants.reqNames.getPivotContainers
   reqInfo.responseType = "node"
   reqInfo.successCallback = onFetchCollectionSuccess

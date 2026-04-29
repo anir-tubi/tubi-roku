@@ -375,9 +375,10 @@ Function getTrackingComponentInfo(itemIndex, numColumns, category, trackingLib)
       category_col: column
     }
 
-    if content.type = m.constants.ui.contentTypes.channel
+    contentType = content.type
+    if contentType = m.constants.ui.contentTypes.channel
       componentInfo.utility_tile = m.Tracking.getUtilityTile(content, column, row)
-    else
+    else if contentType <> m.constants.ui.appTypes.pivot AND contentType <> m.constants.ui.appTypes.explore AND contentType <> m.constants.ui.appTypes.creator
       componentInfo.content_tile = m.Tracking.getAnalyticsTile(content, column, row)
     end if
 
@@ -410,9 +411,10 @@ Function updateTrackingInfo(category, content, itemSelected)
       category_col: col
     }
 
-    if content.type = m.constants.ui.contentTypes.channel
+    contentType = content.type
+    if contentType = m.constants.ui.contentTypes.channel
       componentInfo.utility_tile = m.Tracking.getUtilityTile(content, col, row)
-    else
+    else if contentType <> m.constants.ui.appTypes.pivot AND contentType <> m.constants.ui.appTypes.explore AND contentType <> m.constants.ui.appTypes.creator
       componentInfo.content_tile = m.Tracking.getAnalyticsTile(content, col, row)
     end if
 

@@ -576,4 +576,5 @@ Function onTrackingComponentInfoChange(msg)
     pageOneof: m.Tracking.getAnalyticsPage(pageInfo.pageType, pageInfo.pageValues)
     componentOneof: m.Tracking.getAnalyticsComponent(componentTrackingInfo.componentType, componentTrackingInfo.componentValues)
   }
+  m.top.trackingComponentInfo = componentTrackingInfo
 End Function
