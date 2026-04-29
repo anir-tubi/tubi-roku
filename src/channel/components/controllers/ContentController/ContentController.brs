@@ -2322,7 +2322,7 @@ Function onCustomSuspend(msg)
       end if
 
       ' This is needed to avoid having to use alwaysnotify on featuredListHasFocus and when app is suspended it does not fire focus change event on home screen.
-      if currentScreen <> invalid
+      if currentScreen <> invalid AND currentScreen.hasField("listHasFocus")
         currentScreen.listHasFocus = false
       end if
     end if
