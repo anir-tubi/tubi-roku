@@ -130,7 +130,7 @@ Function searchFromScreen(searchText, personalizationID = invalid, inputDevice =
       analyticsScreenId: m.constants.ui.screenIds.searchScreen
     })
 
-    if isKidsUIOn() = false AND getExperimentResource("roku_search_autocomplete", "roku_search_autocomplete_v3", true).enabled = true
+    if isKidsUIOn() = false
       autocompleteReqInfo = m.CmsApi.createAutocompleteReqInfo(searchText)
       m.currentAutocompleteSearchScreenRequestInfo = m.makeRequest({
         url: autocompleteReqInfo.url

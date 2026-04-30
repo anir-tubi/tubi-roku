@@ -713,10 +713,6 @@ Function getTranslation_en_US()
       "description": "message after loading search results.",
       "message": "Results"
     },
-    "screenSearch_matchingTitles": {
-      "description": "text after number of search results for searchedString",
-      "message": "titles matching"
-    },
     "screenSearch_matchingTitles_plural": {
       "description": "text after number of search results for searchedString (plural versions)",
       "message": "{matches} titles found"
@@ -3351,10 +3347,6 @@ Function getTranslation_es_MX()
       "description": "message after loading search results.",
       "message": "Resultados"
     },
-    "screenSearch_matchingTitles": {
-      "description": "text after number of search results for searchedString",
-      "message": "títulos coinciden"
-    },
     "screenSearch_matchingTitles_plural": {
       "description": "text after number of search results for searchedString (plural versions)",
       "message": "{matches} títulos encontrados"
@@ -5870,10 +5862,6 @@ Function getTranslation_fr_CA()
     "screenSearch_results": {
       "description": "message after loading search results.",
       "message": "Résultats"
-    },
-    "screenSearch_matchingTitles": {
-      "description": "text after number of search results for searchedString",
-      "message": "titres correspondants"
     },
     "screenSearch_matchingTitles_plural": {
       "description": "text after number of search results for searchedString (plural versions)",

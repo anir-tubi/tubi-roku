@@ -446,10 +446,6 @@
     "description": "message after loading search results.",
     "message": "Results"
   },
-  "screenSearch_matchingTitles": {
-    "description": "text after number of search results for searchedString",
-    "message": "titles matching"
-  },
   "screenSearch_matchingTitles_plural": {
     "description": "text after number of search results for searchedString (plural versions)",
     "message": "{matches} titles found"

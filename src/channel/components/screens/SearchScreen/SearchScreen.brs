@@ -483,19 +483,13 @@ Function onSearchContentChange()
       else
         matchingText = getTranslation("screenSearch_matchingTitles_plural", { matches: nMatches.toStr() })
       end if
+      m.searchHintText.text = matchingText
 
 
       if getStatsigExperimentResource("roku_search_screen_animate_grid", "roku_search_screen_animate_grid_v1", false).enabled = true
         m.searchHintText.width = 0
         m.searchHintText.numLines = 0
         m.searchHintText.wrap = false
-      end if
-
-      if getExperimentResource("roku_search_autocomplete", "roku_search_autocomplete_v3", false).enabled = true
-        m.searchHintText.text = matchingText
-      else
-        matchingText = getTranslation("screenSearch_matchingTitles")
-        m.searchHintText.text = nMatches.toStr() + " " + matchingText + " " + Chr(34) + m.searchMenuText.text + Chr(34)
       end if
 
       m.SearchText.text = getTranslation("screenSearch_results")
@@ -544,9 +538,6 @@ Function onSearchContentChange()
       end if
       m.searchHintText.text = ""
       m.SearchText.text = ""
-      if getExperimentResource("roku_search_autocomplete", "roku_search_autocomplete_v3", false).enabled = false AND m.microphone <> invalid
-        m.microphone.visible = false
-      end if
     else
       displayNoResults()
     end if
@@ -610,22 +601,13 @@ Function onKeyboardTextChanged()
   m.autocomplete.visible = false
   m.autocompleteMenu.content = invalid
 
-  if getExperimentResource("roku_search_autocomplete", "roku_search_autocomplete_v3", false).enabled = true
-    '//Move some text to the right side
-    '//if the roku_search_autocomplete_v3 fails, then we need to change the XML so searchDirectionsGroup is on the leftside
-    m.rightSideTextGroup.insertChild(m.searchDirectionsGroup, 0)
-  end if
+  '//Move some text to the right side
+  m.rightSideTextGroup.insertChild(m.searchDirectionsGroup, 0)
 
   if isNonEmptyString(m.Keyboard.text) = true
     m.searchMenuText.text = LCase(m.Keyboard.text)
   else
-    if getExperimentResource("roku_search_autocomplete", "roku_search_autocomplete_v3", false).enabled = true
-      '// when searchMenuText is on the right side when the roku_search_autocomplete_v3 experiment is enabled,
-      '// then do not display the search title as it looks out of place
-      m.searchMenuText.text = ""
-    else
-      m.searchMenuText.text = m.searchTitleText
-    end if
+    m.searchMenuText.text = ""
   end if
   moveSearchGridIntoPosition()
   ' making backend request only after 0.5s
@@ -655,7 +637,7 @@ Function prepareScreenForSearchChange()
   m.SearchText.text = ""
   m.searchHintText.text = ""
   m.KidsModeMessage.text = ""
-  if getExperimentResource("roku_search_autocomplete", "roku_search_autocomplete_v3", false).enabled = true AND m.microphone <> invalid
+  if m.microphone <> invalid
     m.microphone.visible = false
   end if
 End Function
@@ -1273,7 +1255,7 @@ Function setDefaultText()
     m.searchText.text = ""
     m.autocomplete.visible = false
 
-    if getExperimentResource("roku_search_autocomplete", "roku_search_autocomplete_v3", false).enabled = true AND m.microphone <> invalid
+    if m.microphone <> invalid
       m.microphone.visible = true
     end if
   end if
@@ -1298,10 +1280,6 @@ Function handleInfoPanelVisibilityForLeftPress()
     setDefaultText()
   end if
   setVisibilityForDefaultText(true)
-
-  if getExperimentResource("roku_search_autocomplete", "roku_search_autocomplete_v3", false).enabled = false AND m.microphone <> invalid
-    m.microphone.visible = true
-  end if
 
   autocompleteContent = m.autocompleteMenu.content
   if autocompleteContent <> invalid
