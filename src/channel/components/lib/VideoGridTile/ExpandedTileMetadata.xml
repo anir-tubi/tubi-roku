@@ -101,10 +101,9 @@
           width="36"
           loadDisplayMode="scaleToFit"
           loadSync="true" />
-        <Poster
-          id="tubiPresentsLogo"
-          height="27"
-          loadDisplayMode="scaleToFit" />
+        <ExclusiveContentBadgeGroup
+          id="exclusiveContentBadgeGroup"
+          visible="false" />
       </LayoutGroup>
 
       <LayoutGroup

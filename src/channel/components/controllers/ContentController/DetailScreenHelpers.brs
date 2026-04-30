@@ -389,6 +389,10 @@ Function populateDetailScreen(detailScreen, content, shouldResetButtonIndex = fa
     lineOneData.hasCC = false
     lineOneData.hasAudioDescription = false
 
+    if getSotBadgeType(content) = "onlyOnTubi"
+      lineOneData.onlyOnTubi = content.sotInfo.sotPosterLabels
+    end if
+
     if episode <> invalid
       if episode.hasSubtitles = true OR m._.empty(episode.subtitleTracks) = false
         lineOneData.hasCC = true
@@ -2066,7 +2070,13 @@ Function onCreatorSelected(msg)
     if lcase(content.creatorTensorApp.type) <> m.constants.ui.appTypes.creator
       showPivotDetailScreen(content.creatorTensorApp)
     else
-      showCollectionScreen(content.creatorTensorApp.id)
+      sourceContentId = ""
+      if content.id <> invalid
+        sourceContentId = content.id.toStr()
+      end if
+
+      sotBadgeType = getSotBadgeType(content)
+      showCollectionScreen(content.creatorTensorApp.id, sourceContentId, sotBadgeType)
     end if
   end if
 End Function

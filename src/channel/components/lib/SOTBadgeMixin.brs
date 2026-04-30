@@ -250,3 +250,103 @@ Function createSotPosterLabels(sotInfo, config)
 
   return invalid
 End Function
+
+
+' @param sotPosterLabels - optional AA from content.sotInfo.sotPosterLabels
+Function isOnlyOnTubiAvailable(sotPosterLabels)
+  showOnlyOn = false
+  onlyOnPrefix = getTranslation("info_panel_only_on")
+  if isNonEmptyAA(sotPosterLabels) = true AND isNonEmptyString(sotPosterLabels.sotLabelText) = true AND isNonEmptyString(onlyOnPrefix) = true AND InStr(1, sotPosterLabels.sotLabelText, onlyOnPrefix) > 0
+    showOnlyOn = true
+  end if
+
+  return showOnlyOn
+End Function
+
+
+' @param sotInfo - content.sotInfo assoc
+' @returns - sotMetaData or sotMetadata array from translate (both keys supported)
+Function getTubiExclusiveMetaDataArrayFromSotInfo(sotInfo) as Object
+  if isAA(sotInfo) = false
+    return invalid
+  end if
+
+  if isNonEmptyArray(sotInfo.sotMetaData) = true
+    return sotInfo.sotMetaData
+  end if
+
+  return invalid
+End Function
+
+
+' Applies the first tubiPresentsLogo entry from sotMetaDataArray onto result (mutates result).
+' @param result - assoc with badgeType, tubiPresentsIconUri, tubiPresentsWidth, tubiPresentsHeight
+' @param sotMetaDataArray - optional array of sot metadata AAs
+Function applyTubiPresentsPresentationFromSotMetaDataArray(result, sotMetaDataArray) as Void
+  if isNonEmptyArray(sotMetaDataArray) = false
+    return
+  end if
+
+  for each sotMetadata in sotMetaDataArray
+    if isNonEmptyAA(sotMetadata) = true AND sotMetadata.sotType <> invalid AND sotMetadata.sotType = "tubiPresentsLogo"
+      result.badgeType = "tubiPresents"
+      if isNonEmptyString(sotMetadata.sotIcon) = true
+        result.tubiPresentsIconUri = sotMetadata.sotIcon
+      end if
+      if isNumber(sotMetadata.width) = true
+        result.tubiPresentsWidth = sotMetadata.width
+      end if
+      if isNumber(sotMetadata.height) = true
+        result.tubiPresentsHeight = sotMetadata.height
+      end if
+      exit for
+    end if
+  end for
+End Function
+
+
+' @param onlyOnTubiAA - optional sotPosterLabels-shaped AA from detail line-one
+' @param sotMetaDataArray - optional array from line-one sotMetaData
+' @returns - assoc: badgeType ("", "onlyOnTubi", "tubiPresents"), tubiPresentsIconUri, tubiPresentsWidth, tubiPresentsHeight
+Function getTubiExclusiveSotSignals(onlyOnTubiAA, sotMetaDataArray) as Object
+  result = {
+    badgeType: ""
+    tubiPresentsIconUri: ""
+    tubiPresentsWidth: 0
+    tubiPresentsHeight: 0
+  }
+
+  if isOnlyOnTubiAvailable(onlyOnTubiAA) = true
+    result.badgeType = "onlyOnTubi"
+    return result
+  end if
+
+  applyTubiPresentsPresentationFromSotMetaDataArray(result, sotMetaDataArray)
+
+  return result
+End Function
+
+
+' Same as line-field resolver but reads from content.sotInfo (expanded tile, grids, etc.).
+Function getTubiExclusiveSotSignalsFromSotInfo(sotInfo) as Object
+  result = {
+    badgeType: ""
+    tubiPresentsIconUri: ""
+    tubiPresentsWidth: 0
+    tubiPresentsHeight: 0
+  }
+
+  if isAA(sotInfo) = false
+    return result
+  end if
+
+  if isOnlyOnTubiAvailable(sotInfo.sotPosterLabels) = true
+    result.badgeType = "onlyOnTubi"
+    return result
+  end if
+
+  metaDataArray = getTubiExclusiveMetaDataArrayFromSotInfo(sotInfo)
+  applyTubiPresentsPresentationFromSotMetaDataArray(result, metaDataArray)
+
+  return result
+End Function

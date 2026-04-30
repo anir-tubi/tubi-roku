@@ -11,6 +11,7 @@
     <script type="text/brightscript" uri="Parsers/VideoScreenParsers.brs" />
     <script type="text/brightscript" uri="Parsers/SignInScreenParser.brs" />
     <script type="text/brightscript" uri="Parsers/DetailScreenParsers.brs" />
+    <script type="text/brightscript" uri="pkg:/components/lib/SOTBadgeMixin.brs" />
     <script type="text/brightscript" uri="Parsers/HomeScreenParsers.brs" />
     <script type="text/brightscript" uri="Parsers/CategoryListScreenParsers.brs" />
     <script type="text/brightscript" uri="Parsers/CategoryDetailsScreenParsers.brs" />

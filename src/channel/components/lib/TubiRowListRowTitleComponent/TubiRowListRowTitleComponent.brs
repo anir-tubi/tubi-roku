@@ -1,7 +1,9 @@
 Function init()
+  m.exclusiveContentRow = m.top.findNode("exclusiveContentRow")
   m.titleLabel = m.top.findNode("titleLabel")
 
   m.enhancedButton = invalid
+  m.exclusiveContentBadgeGroup = invalid
 
   m.top.observeFieldScoped("content", "onContentChange")
 
@@ -42,7 +44,6 @@ Function onContentChange()
         m.enhancedButton.backgroundUri = "pkg:/images/pill_button_72_$$RES$$.9.png"
       end if
 
-      ' Have to add isPrimaryButton to content to get proper styling
       content.update({
         "isPrimaryButton": true
         "rightAlignedIcon": true
@@ -50,7 +51,12 @@ Function onContentChange()
       }, true)
 
       m.enhancedButton.itemContent = content
-      m.top.insertChild(m.enhancedButton, 0)
+
+      if m.enhancedButton.getParent() = invalid OR m.enhancedButton.getParent().id <> m.exclusiveContentRow.id then
+        m.exclusiveContentRow.insertChild(m.enhancedButton, 0)
+      end if
+
+      m.exclusiveContentRow.visible = true
 
       m.titleLabel.scale = [0, 0]
       m.titleLabel.visible = false
@@ -59,18 +65,96 @@ Function onContentChange()
         m.enhancedButton.itemContent.unobserveFieldScoped("isRowFocused")
       end if
 
-      m.top.removeChild(m.enhancedButton)
+      if m.enhancedButton.getParent() <> invalid AND m.enhancedButton.getParent().id = m.exclusiveContentRow.id then
+        m.exclusiveContentRow.removeChild(m.enhancedButton)
+      end if
       m.enhancedButton = invalid
+
+      removeExclusiveContentBadgeGroupIfPresent()
 
       m.titleLabel.scale = [1, 1]
       m.titleLabel.visible = true
     end if
+
+    updateOnlyOnTubiRowTitleUi(content)
+  else
+    if m.enhancedButton <> invalid AND m.enhancedButton.getParent() <> invalid AND m.enhancedButton.getParent().id = m.exclusiveContentRow.id then
+      m.exclusiveContentRow.removeChild(m.enhancedButton)
+    end if
+    m.enhancedButton = invalid
+
+    removeExclusiveContentBadgeGroupIfPresent()
+
+    updateOnlyOnTubiRowTitleUi(invalid)
   end if
 End Function
 
 
-Function onIsRowFocusedChange(msg)
-  isFocused = msg.getData()
+Function removeExclusiveContentBadgeGroupIfPresent() as Void
+  if m.exclusiveContentBadgeGroup = invalid
+    return
+  end if
 
-  m.enhancedButton.itemHasFocus = isFocused
+  m.exclusiveContentBadgeGroup.exclusiveContentInfo = invalid
+
+  if m.exclusiveContentBadgeGroup.getParent() <> invalid AND m.exclusiveContentBadgeGroup.getParent().id = m.exclusiveContentRow.id then
+    m.exclusiveContentRow.removeChild(m.exclusiveContentBadgeGroup)
+  end if
+  m.exclusiveContentBadgeGroup = invalid
+End Function
+
+
+Function updateOnlyOnTubiRowTitleUi(content) as Void
+  if content = invalid OR m.exclusiveContentRow = invalid
+    removeExclusiveContentBadgeGroupIfPresent()
+    return
+  end if
+
+  useEnhancedRowTitle = content.hasField("isRowFocused") AND m.enhancedButton <> invalid
+  showBadge = useEnhancedRowTitle AND content.hasField("showOnlyOnTubiRowTitle") AND content.showOnlyOnTubiRowTitle = true
+
+  if showBadge = false
+    removeExclusiveContentBadgeGroupIfPresent()
+    return
+  end if
+
+  badgeType = ""
+  if content.hasField("sotBadgeType") AND content.sotBadgeType <> invalid
+    badgeType = content.sotBadgeType.toStr().trim()
+  end if
+
+  if isNonEmptyString(badgeType) = false
+    removeExclusiveContentBadgeGroupIfPresent()
+    return
+  end if
+
+  if m.enhancedButton = invalid OR m.enhancedButton.getParent() = invalid OR m.enhancedButton.getParent().id <> m.exclusiveContentRow.id
+    if m.exclusiveContentBadgeGroup <> invalid
+      m.exclusiveContentBadgeGroup.exclusiveContentInfo = invalid
+    end if
+    return
+  end if
+
+  if m.exclusiveContentBadgeGroup = invalid
+    m.exclusiveContentBadgeGroup = createObject("roSGNode", "ExclusiveContentBadgeGroup")
+    m.exclusiveContentBadgeGroup.id = "exclusiveContentBadgeGroup"
+  end if
+
+  m.exclusiveContentBadgeGroup.exclusiveContentInfo = {
+    targetGroup: m.exclusiveContentRow
+    exclusiveSignalsInsertIndex: 1
+    linePromoData: invalid
+    content: content
+  }
+End Function
+
+
+Function onIsRowFocusedChange(msg)
+  if m.enhancedButton <> invalid AND m.enhancedButton.getParent() <> invalid AND m.enhancedButton.getParent().id = m.exclusiveContentRow.id then
+    m.enhancedButton.itemHasFocus = msg.getData()
+  end if
+
+  if m.top.content <> invalid
+    updateOnlyOnTubiRowTitleUi(m.top.content)
+  end if
 End Function

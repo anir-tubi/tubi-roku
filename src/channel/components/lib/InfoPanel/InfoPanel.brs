@@ -36,8 +36,7 @@ Function init()
   m.ratingLabel = m.rating.findNode("RatingLabel")
   m.descriptorCode = m.firstLineGroup.findNode("DescriptorCode")
   m.expireWarning = m.firstLineGroup.findNode("ExpireWarning")
-  m.partnerLogo = m.firstLineGroup.findNode("PartnerLogo")
-  m.tubiPresentsLogo = m.firstLineGroup.findNode("tubiPresentsLogo")
+  m.exclusiveContentBadgeGroup = m.firstLineGroup.findNode("exclusiveContentBadgeGroup")
 
   m.secondLineGroup = m.top.findNode("SecondLineGroup")
   m.secondLineAvailabilityBadge = m.secondLineGroup.findNode("SecondLineAvailabilityBadge")
@@ -872,40 +871,20 @@ Function onLineOneDataChange(msg)
       shouldCalculateHeight()
     end if
 
-    ' handle sotMetaData - append tubiPresentsLogo Poster to firstLineGroup if type is "tubiPresentsLogo"
-    tubiPresentsLogoIsPresent = (m.tubiPresentsLogo.getParent() <> invalid)
-    ' Remove the poster if no sotMetaData or no matching type
-    if tubiPresentsLogoIsPresent = true
-      firstLineGroup.removeChild(m.tubiPresentsLogo)
-      m.tubiPresentsLogo.visible = false
+    m.exclusiveContentBadgeGroup.exclusiveContentInfo = {
+      targetGroup: firstLineGroup
+      exclusiveSignalsInsertIndex: insertIndex
+      linePromoData: {
+        onlyOnTubi: data.onlyOnTubi
+        sotMetaData: data.sotMetaData
+      }
+      content: invalid
+    }
+
+  else
+    if m.exclusiveContentBadgeGroup <> invalid
+      m.exclusiveContentBadgeGroup.exclusiveContentInfo = invalid
     end if
-
-    if isNonEmptyArray(data.sotMetaData) = true
-      for each sotMetadata in data.sotMetaData
-        if sotMetadata.sotType = "tubiPresentsLogo"
-
-          ' Set Poster properties - use sotIcon as the uri
-          if isNonEmptyString(sotMetadata.sotIcon) = true
-            m.tubiPresentsLogo.uri = sotMetadata.sotIcon
-          end if
-
-          ' Set dimensions if provided
-          if isNumber(sotMetadata.width) = true
-            m.tubiPresentsLogo.width = sotMetadata.width
-          end if
-
-          if isNumber(sotMetadata.height) = true
-            m.tubiPresentsLogo.height = sotMetadata.height
-          end if
-
-          ' Append the tubiPresentsLogo Poster to firstLineGroup
-          firstLineGroup.appendChild(m.tubiPresentsLogo)
-          m.tubiPresentsLogo.visible = true
-          exit for ' Only process the first matching item
-        end if
-      end for
-    end if
-
   end if
 
   shouldCalculateHeight()

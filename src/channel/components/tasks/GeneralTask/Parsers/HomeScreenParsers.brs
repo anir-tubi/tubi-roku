@@ -196,11 +196,125 @@ Function parseSoTStaticConfigSuccess(fullResponse, reqInfo)
 End Function
 
 
+' @param reqInfo - request info; reads options.params.series_content_id_for_collections
+Function getSeriesContentIdForCollectionsParam(reqInfo as Object) as String
+  if reqInfo = invalid OR reqInfo.options = invalid OR reqInfo.options.params = invalid
+    return ""
+  end if
+
+  params = reqInfo.options.params
+  seriesContentId = params.series_content_id_for_collections
+  if seriesContentId = invalid
+    return ""
+  end if
+
+  idStr = AnyToStringButNotInvalid(seriesContentId)
+
+  'Removing the prefix 0 for seriesId as we are adding in TubiMetadataTranslate
+  if Len(idStr) > 0 AND Left(idStr, 1) = "0"
+    idStr = Mid(idStr, 2)
+  end if
+
+  return idStr
+End Function
+
+
+Function processCollectionOnlyOnTubiIdsToRows(dataAA as Object, reqInfo as Object) as Object
+  emptyResult = {
+    containerTitle: ""
+  }
+  if dataAA = invalid
+    return emptyResult
+  end if
+
+  seriesParam = getSeriesContentIdForCollectionsParam(reqInfo)
+  if isNonEmptyString(seriesParam) = false
+    return emptyResult
+  end if
+
+  containerTitle = ""
+  for each container in dataAA.containers
+    if isAA(container) = true AND isNonEmptyArray(container.related_to) = true
+      if seriesParam = container.related_to[0].value
+        containerTitle = container.title
+        exit for
+      end if
+    end if
+  end for
+
+  return {
+    containerTitle: containerTitle
+  }
+End Function
+
+
+Function getCollectionSotBadgeTypeFromReqInfo(reqInfo as Object) as String
+  if reqInfo = invalid OR reqInfo.sotBadgeType = invalid
+    return ""
+  end if
+  return reqInfo.sotBadgeType
+End Function
+
+
+Function getCollectionRowSotBadgeType(row as Object, reqInfo as Object) as String
+  badgeFromReq = getCollectionSotBadgeTypeFromReqInfo(reqInfo)
+  if isNonEmptyString(badgeFromReq) = true
+    return badgeFromReq
+  end if
+
+  if row = invalid
+    return ""
+  end if
+
+  for each item in row.getChildren(-1, 0)
+    if item <> invalid AND item.hasField("sotInfo") AND isAA(item.sotInfo) = true
+      sotSignals = getTubiExclusiveSotSignalsFromSotInfo(item.sotInfo)
+      if sotSignals <> invalid AND isNonEmptyString(sotSignals.badgeType) = true
+        return sotSignals.badgeType
+      end if
+    end if
+  end for
+  return ""
+End Function
+
+
+Function applyMatchedOnlyOnTubiContainerToGridRows(gridContentNode as Object, matchedOnlyOnTubiContainer as Object, reqInfo as Object) as Void
+  if gridContentNode = invalid OR matchedOnlyOnTubiContainer = invalid OR isNonEmptyAA(matchedOnlyOnTubiContainer) = false
+    return
+  end if
+
+  containerTitle = matchedOnlyOnTubiContainer.containerTitle
+  if isNonEmptyString(containerTitle) = false
+    return
+  end if
+
+  for each row in gridContentNode.getChildren(-1, 0)
+    if row <> invalid AND isNonEmptyString(row.title) AND row.title = containerTitle
+      badgeType = getCollectionRowSotBadgeType(row, reqInfo)
+      hasSotBadge = isNonEmptyString(badgeType) = true
+      row.update({
+        showOnlyOnTubiRowTitle: hasSotBadge
+        sotBadgeType: badgeType
+      }, true)
+      exit for
+    end if
+  end for
+End Function
+
+
 ' @fullResponse: assocArray, as returned by Request.handleEvent, but with
 '                            .data value converted from JSON to AA already
 ' @reqInfo: AA, info passed in for request as part of generalTask_makeRequest containing info needed to make the request
 Function parseCollectionSuccess(fullResponse, reqInfo)
   gridContentNode = parseHomeScreenContentSuccess(fullResponse, reqInfo)
+
+  dataAA = fullResponse.response.data
+  matchedOnlyOnTubiContainer = invalid
+  if type(dataAA) = "roAssociativeArray"
+    matchedOnlyOnTubiContainer = processCollectionOnlyOnTubiIdsToRows(dataAA, reqInfo)
+  end if
+
+  applyMatchedOnlyOnTubiContainerToGridRows(gridContentNode, matchedOnlyOnTubiContainer, reqInfo)
 
   appNode = invalid
   appAA = fullResponse.response.data.app

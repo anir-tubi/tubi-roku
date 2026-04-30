@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<component name="ExclusiveContentBadgeGroup" extends="Group">
+  <script type="text/brightscript" uri="pkg:/source/lib/Log.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/TubiLanguageTranslate.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/GlobalMixin.brs" />
+  <script type="text/brightscript" uri="pkg:/source/3rdparty/rta/typeUtils.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/StringUtils.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/TypographyMixin.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/SOTBadgeMixin.brs" />
+  <script type="text/brightscript" uri="ExclusiveContentBadgeGroup.brs" />
+
+  <interface>
+    <!-- Set once per update: { targetGroup, exclusiveSignalsInsertIndex, linePromoData, content } -->
+    <field id="exclusiveContentInfo" type="assocarray" />
+  </interface>
+
+  <children>
+    <LayoutGroup
+      id="exclusiveContentRowGroup"
+      layoutDirection="horiz"
+      vertAlignment="center"
+      itemSpacings="[0]"
+      addItemSpacingAfterChild="false" >
+      <LayoutGroup
+        id="onlyOnRow"
+        layoutDirection="horiz"
+        vertAlignment="center"
+        itemSpacings="[9]" >
+        <Label
+          id="onlyOnTubiLabel"
+          height="30"
+          vertAlign="center">
+          <Font
+            role="font" />
+        </Label>
+        <Poster
+          id="onlyOnTubiBadgePoster"
+          height="27"
+          width="66"
+          loadDisplayMode="scaleToFit"
+          loadSync="true" />
+      </LayoutGroup>
+      <Poster
+        id="tubiPresentsLogo"
+        width="192"
+        height="27"
+        loadDisplayMode="scaleToFit"
+        visible="false" />
+    </LayoutGroup>
+  </children>
+</component>

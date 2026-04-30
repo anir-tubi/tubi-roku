@@ -17,6 +17,13 @@
   </interface>
 
   <children>
+    <LayoutGroup
+      id="exclusiveContentRow"
+      layoutDirection="horiz"
+      vertAlignment="center"
+      itemSpacings="[12]"
+      visible="false" />
+
     <Label
       id="titleLabel"
       width="1000" />

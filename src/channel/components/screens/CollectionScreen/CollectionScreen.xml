@@ -8,6 +8,8 @@
 
   <interface>
     <field id="appId" type="string" alwaysNotify="true" />
+    <field id="sourceContentId" type="string" value="" />
+    <field id="sotBadgeType" type="string" value="" />
     <field id="content" alias="tubiRowList.content" />
     <field id="playContentIndex" alias="tubiRowList.playContentIndex" alwaysNotify="true" />
     <field id="selectedContentIndex" alias="tubiRowList.selectedContentIndex" alwaysNotify="true" />

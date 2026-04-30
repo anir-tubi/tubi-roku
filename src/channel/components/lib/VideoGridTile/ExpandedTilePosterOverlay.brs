@@ -101,8 +101,15 @@ Function onItemContentChange(msg)
     sotInfo = itemContent.sotInfo
     sotposterlabels = itemContent.sotposterlabels
     if isBadgeAdded = false AND (isNonEmptyAA(sotInfo) = true OR isNonEmptyAA(sotposterlabels) = true)
+      isOnlyOnTubiPresents = false
+      if isAA(sotInfo) = true
+        isOnlyOnTubiPresents = isOnlyOnTubiAvailable(sotInfo.sotPosterLabels)
+      end if
+
       removeAllSotBadges()
-      setBadge(m.badgeTypes.sot, sotInfo, sotposterlabels)
+      if isOnlyOnTubiPresents = false
+        setBadge(m.badgeTypes.sot, sotInfo, sotposterlabels)
+      end if
     end if
 
     if itemContent.type = "linear"

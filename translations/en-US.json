@@ -1718,6 +1718,10 @@
     "description": "Lets user know this content is available in 4k (although may not be available on their device)",
     "message": "Available in 4K"
   },
+  "info_panel_only_on": {
+    "description": "Prefix before the Only on Tubi logo on the content detail info first metadata line",
+    "message": "Only on"
+  },
   "goBack_videoPlayer_ad": {
     "description": "Navigational instructions to users when pause Ad is displayed on video screen",
     "message": "Press any button to close the ad"

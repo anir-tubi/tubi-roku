@@ -57,12 +57,18 @@ End Function
 
 Function onAppIdChange(msg)
   appId = msg.getData()
-  getCollectionReqInfo = m.cmsApi.createGetCollectionInfo(appId)
+  opts = {}
+  if isNonEmptyString(m.top.sourceContentId)
+    opts = { params: { series_content_id_for_collections: m.top.sourceContentId } }
+  end if
+
+  getCollectionReqInfo = m.cmsApi.createGetCollectionInfo(appId, opts)
   if getCollectionReqInfo <> invalid then
     getCollectionReqInfo["requestType"] = m.constants.reqNames.getCollection
     getCollectionReqInfo["responseType"] = "node"
     getCollectionReqInfo["isSignedInUser"] = isLoggedInUser()
     getCollectionReqInfo["screenId"] = m.constants.ui.screenIds.collectionScreen
+    getCollectionReqInfo["sotBadgeType"] = m.top.sotBadgeType
 
     isKidsMode = false
     id = { "type": "app_id", "id": appId }

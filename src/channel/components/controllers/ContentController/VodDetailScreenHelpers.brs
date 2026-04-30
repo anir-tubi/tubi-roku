@@ -452,7 +452,13 @@ Function onVodDetailCtaSelectedButtonIdChange(msg) as Void
         if lcase(screenContent.creatorTensorApp.type) <> m.constants.ui.appTypes.creator
           showPivotDetailScreen(screenContent.creatorTensorApp)
         else
-          showCollectionScreen(screenContent.creatorTensorApp.id)
+          sourceContentId = ""
+          if screenContent.id <> invalid
+            sourceContentId = screenContent.id.toStr()
+          end if
+
+          sotBadgeType = getSotBadgeType(screenContent)
+          showCollectionScreen(screenContent.creatorTensorApp.id, sourceContentId, sotBadgeType)
         end if
       end if
     else if id = "removeFromHistory"

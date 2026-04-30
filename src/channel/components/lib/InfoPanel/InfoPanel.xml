@@ -88,6 +88,7 @@ content.category/categories,
                                "TV-MA", "TV-PG", "TV-Y", "TV-Y7"  or lowercase
         partnerLogoUri: ""    'The URI used to display the partner/channel logo
         availabilityEnds: "2019-03-31T00:00:00Z"
+        onlyOnTubi: { }        'optional; when set with sotPosterLabels shape, shows "Only on" + badge poster in first line
         descriptorCode: "L V"  'This is rating descriptor code for a program
         badgeText: "Upcoming"  'Upcoming, Replay, Live
         has4k: true            'indicates if 4k is available
@@ -290,16 +291,10 @@ content.category/categories,
               <Font
                 role="font" />
             </Label>
-            <Poster
-              id="PartnerLogo"
-              height="36"
-              loadHeight="36"
-              loadDisplayMode="scaleToFit" />
-            <Poster
-              id="tubiPresentsLogo"
-              height="27"
+            <ExclusiveContentBadgeGroup
+              id="exclusiveContentBadgeGroup"
               translation="[0,5]"
-              loadDisplayMode="scaleToFit" />
+              visible="false" />
           </LayoutGroup>
           <LayoutGroup
             id="SecondLineGroup"

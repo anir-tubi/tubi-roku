@@ -1,16 +1,27 @@
-Function showCollectionScreen(appId)
+Function showCollectionScreen(appId, sourceContentId = "", sotBadgeType = "")
   screen = createScreen("CollectionScreen")
 
   screen.observeFieldScoped("selectedContentIndex", "onCollectionScreenSelectedContentIndexChanged")
   screen.observeFieldScoped("playContentIndex", "onCollectionScreenPlayContentIndexChanged")
 
+  pageValues = {
+    id: appId
+    section: UCase(m.constants.ui.appTypes.creator)
+  }
+
+  if isNonEmptyString(sourceContentId) = true
+    pageValues.sourceContentId = sourceContentId
+    screen.sourceContentId = sourceContentId
+  else
+    screen.sourceContentId = ""
+  end if
+
   screen.trackingPageInfo = {
     pageType: "collection_page"
-    pageValues: {
-      id: appId
-      section: UCase(m.constants.ui.appTypes.creator)
-    }
+    pageValues: pageValues
   }
+
+  screen.sotBadgeType = sotBadgeType
 
   screen.appId = appId
 
@@ -64,4 +75,14 @@ Function onCollectionScreenSelectedContentIndexChanged(msg) as Void
       logWarn("Warning: No relatedTo content found for rowContent id: " + rowContent.id)
     end if
   end if
+End Function
+
+
+' @content - screen.content for VOD/detail (series or movie)
+Function getSotBadgeType(content)
+  if content = invalid
+    return ""
+  end if
+
+  return getTubiExclusiveSotSignalsFromSotInfo(content.sotInfo).badgeType
 End Function
