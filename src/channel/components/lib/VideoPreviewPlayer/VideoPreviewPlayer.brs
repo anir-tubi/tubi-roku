@@ -28,7 +28,7 @@ Function init()
 
   ' asyncStopSemantics was broken prior to 14.0 so we are not running it on older firmware versions
   isFirmwareOk = createObject("roDeviceInfo").getOSVersion().major.toInt() >= 14
-  if isFirmwareOk = true AND getExperimentResource("roku_async_stop", "roku_async_stop_v6", false).enabled = true then
+  if isFirmwareOk = true AND getStatsigExperimentResource("roku_async_stop", "roku_async_stop_v6", false).enabled = true then
     m.Video.asyncStopSemantics = true
   end if
 
@@ -245,7 +245,7 @@ Function pauseContent()
 
     ' asyncStopSemantics was broken prior to 14.0 so we are not running it on older firmware versions and don't want to expose for the experiment on older firmware versions
     if createObject("roDeviceInfo").getOSVersion().major.toInt() >= 14
-      getExperimentResource("roku_async_stop", "roku_async_stop_v6", true)
+      getStatsigExperimentResource("roku_async_stop", "roku_async_stop_v6", true)
     end if
 
     m.Video.control = "stop"
@@ -270,7 +270,7 @@ Function stopContent()
 
     ' asyncStopSemantics was broken prior to 14.0 so we are not running it on older firmware versions and don't want to expose for the experiment on older firmware versions
     if createObject("roDeviceInfo").getOSVersion().major.toInt() >= 14
-      getExperimentResource("roku_async_stop", "roku_async_stop_v6", true)
+      getStatsigExperimentResource("roku_async_stop", "roku_async_stop_v6", true)
     end if
 
     m.Video.control = "stop"

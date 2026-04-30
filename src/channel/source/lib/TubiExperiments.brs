@@ -38,14 +38,6 @@ Function TubiExperiments(experimentsInfo) as Object
         }
       }
 
-      roku_async_stop: {
-        roku_async_stop_v6: {
-          default: { "enabled": false }
-          holdout_control: { "enabled": false }
-          holdout_winning: { "enabled": false }
-        }
-      }
-
       'This experiment will not be under holdout and will clean up once we take the decision.
       roku_no_change_experiment: {
         roku_no_change_experiment_v3: {

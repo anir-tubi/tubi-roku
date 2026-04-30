@@ -575,7 +575,7 @@ Function initExperiments()
 
   ' Async stop experiment - only enable on firmware 14.0+
   isFirmwareOk = createObject("roDeviceInfo").getOSVersion().major.toInt() >= 14
-  if isFirmwareOk = true AND getExperimentResource("roku_async_stop", "roku_async_stop_v6", false).enabled = true then
+  if isFirmwareOk = true AND getStatsigExperimentResource("roku_async_stop", "roku_async_stop_v6", false).enabled = true then
     m.video.asyncStopSemantics = true
   end if
 
@@ -2218,7 +2218,7 @@ Function showAdBreak()
 
     ' asyncStopSemantics was broken prior to 14.0 so we are not running it on older firmware versions
     isFirmwareOk = createObject("roDeviceInfo").getOSVersion().major.toInt() >= 14
-    if isFirmwareOk = true AND getExperimentResource("roku_async_stop", "roku_async_stop_v6", true).enabled = true then
+    if isFirmwareOk = true AND getStatsigExperimentResource("roku_async_stop", "roku_async_stop_v6", true).enabled = true then
       ' the ad break will be shown by showAdBreakStoppedCallback() which will be triggered by
       ' onVideoStateChange() when the video node's state is updated to "stopped".
       ' m.isShowAdBreakPendingStop keeps state to let us know if an break is waiting for the
@@ -2483,7 +2483,7 @@ Function stopVideo()
   if videoState <> "stop" AND m.Video.state <> "stopped" then
     ' asyncStopSemantics was broken prior to 14.0 so we are not running it on older firmware versions and don't want to expose for the experiment on older firmware versions
     if createObject("roDeviceInfo").getOSVersion().major.toInt() >= 14
-      getExperimentResource("roku_async_stop", "roku_async_stop_v6", true)
+      getStatsigExperimentResource("roku_async_stop", "roku_async_stop_v6", true)
     end if
 
     m.Video.control = "stop"

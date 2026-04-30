@@ -239,6 +239,13 @@ Function StatsigExperimentsInterface(statsigExperimentsInfo) as Object
         }
       }
 
+      'Moved from popper.  Please create the experiment if needed in future.
+      roku_async_stop: {
+        roku_async_stop_v6: {
+          default: { "enabled": false }
+        }
+      }
+
     }
     statsigExperimentsInfo: statsigExperimentsInfo
     getExperimentResource: statsigExperiments_getExperimentResource
