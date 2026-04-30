@@ -6,27 +6,21 @@ import { testHelpers } from "../test-helpers";
 
 /**
  * Account switching matrix tests
- *
- * Covers the gate logic in ProfileHelpers.getUserSwitchAction():
- *   guest        → guest/adult/kids        = allowed
- *   guestkid     → guest/adult             = ageGate
- *   guestkid     → kids                    = allowed
- *   ageGated     → adult                   = signInPasswordGate
- *   ageGated     → kids                    = allowed
- *   adultAccount → guest/adult/kids        = allowed
- *   adultInKidsMode → guest/adult          = passwordGate
- *   adultInKidsMode → kids                 = pcCheckPasswordGate
- *   kidsAccount  → guest                   = pinGate
- *   kidsAccount  → kids/adult              = pcCheckPinGate
- *   adultInKidsPC → guest                  = passwordGate
- *   adultInKidsPC → adult/kids             = pcCheckPasswordGate
- *
- * pcCheck* gates compare parental ratings: if current >= target → allowed
- * pinGate checks if parent has PIN enabled: if yes → pinGate, else → allowed
- *
- * Uses: automationparent1@tubi.tv / 111111, automationparent2@tubi.tv / 111111
+ *This is a complex function which maps the below table to the various switch requirements.
+* From ↓ Switch To →
+*                           | Guest_Normal            | Guest_(Kids_Mode)           | Adult_Account            | Adult_Account(Kids_mode) | Kids_Account_(younger_or_same)     | Kids_Account_(older) | "Add_a_new_account:_Sign_In/_Sign_up
+* |-------------------------|-------------------------|-----------------------------|--------------------------|--------------------------|---------------------------------   |----------------------|--------------------------------------------|
+* | Guest_Normal            | -------                 | allowed                     | Allowed                  | No_Path                  | allowed                            | allowed              | allowed
+* | Guest_(Kids_Mode)       | Age_gate                | -------                     | Age_gate                 | No_Path                  | Age_gate                           | Age_gate             | allowed
+* | Guest_(Locked_Kids_Mode)| No_Path                 | -------                     | signInPasswordGate       | No_Path                  | allowed                            | allowed              | allowed
+* | Adult_Account           | allowed                 | No_Path                     | allowed                  | allowed                  | allowed                            | allowed              | allowed
+* | Adult_Account(Kids_mode)| passWordGate            | No_Path                     | passwordGate             | -------                  | allowed                            | PasswordGate         | allowed
+* | Kids_Account_(younger)  | PIN,_if_enabled         | No_Path                     | PIN,_if_enabled          | No_Path                  | allowed                            | PIN,_if_enabled      | allowed
+* | Kids_Account_(older)    | PIN,_if_enabled         | No_Path                     | PIN,_if_enabled          | No_Path                  | allowed                            | PIN,_if_enabled      | allowed
+* | Adult Account(Kid pc)   | passWordGate            | No_Path                     | passwordGate             | No_path                  | allowed                            | PasswordGate         | allowed
+
  */
-describe.skip('account-switching-matrix', function () {
+describe('account-switching-matrix', function () {
 
   before(async () => {
     await proxy.start();
@@ -116,7 +110,6 @@ describe.skip('account-switching-matrix', function () {
     await testUtils.waitForCurrentScreenToEqual('parentalControlPinInputScreen', 15000);
     await testUtils.waitForElementToFullyShowOnScreen('parentalControlPinInputScreenHeader');
     await ecp.sendText(pin);
-    await ecp.sendKeypress(ecp.Key.Down, { count: 3, wait: 1000 });
     await ecp.sendKeypress(ecp.Key.Ok);
     await utils.sleep(1000);
 
@@ -201,18 +194,9 @@ describe.skip('account-switching-matrix', function () {
     await utils.sleep(100);
     await ecp.sendKeypress(ecp.Key.Right);
     await testUtils.waitForGridContentToLoad('kidsParentalControlsMenu');
-    // await testUtils.waitForElementToFullyShowOnScreen('adultControlSelected');
     await testUtils.jumpToGridItemWithTitle('kidsParentalControlsMenu', level);
-
     await ecp.sendKeypress(ecp.Key.Ok);
-
-    // await testHelpers.enterPassword('111111');
-
-    // await testUtils.waitForElementToShowOnScreen('parentalControlsChangeDialog', 'Content Settings Updated dialog did not appear', 10000);
-    //await ecp.sendKeypress(ecp.Key.Ok);
     await utils.sleep(1000);
-    // await ecp.sendKeypress(ecp.Key.Ok);
-    // await utils.sleep(1000);
     await ecp.sendKeypress(ecp.Key.Back);
     await utils.sleep(1000);
     await ecp.sendKeypress(ecp.Key.Back);
@@ -227,13 +211,9 @@ describe.skip('account-switching-matrix', function () {
     await utils.sleep(100);
     await ecp.sendKeypress(ecp.Key.Right);
     await testUtils.waitForGridContentToLoad('kidsParentalControlsMenu');
-    // await testUtils.waitForElementToFullyShowOnScreen('adultControlSelected');
     await testUtils.jumpToGridItemWithTitle('kidsParentalControlsMenu', level);
-
     await ecp.sendKeypress(ecp.Key.Ok);
-
     await testHelpers.enterPassword('111111');
-
     await testUtils.waitForElementToShowOnScreen('parentalControlsChangeDialog', 'Content Settings Updated dialog did not appear', 10000);
     await ecp.sendKeypress(ecp.Key.Ok);
     await utils.sleep(1000);
@@ -244,12 +224,56 @@ describe.skip('account-switching-matrix', function () {
   }
 
 
+  /**
+   * Wipes the registry, relaunches the app, and rebuilds the
+   * AP1 + AP2 + testkid1 environment from scratch.
+   *
+   * Password cache (pwExpTs) lives in the registry under each profile's auth
+   * info for 24 hours. The only reliable way to reset it within a test run is
+   * to clear the registry and re-add the users. Call this before any test
+   * block that needs a deterministic passwordGate to appear.
+   *
+   * After this helper returns, AP1 is the active profile and testkid1 exists
+   * under AP1 with PIN 1111.
+   */
+  async function resetAndRecreateUsers() {
+    await testUtils.startApplicationAtPage('home' as any, {
+      clearRegistry: true,
+      shouldCreateNewUser: true,
+    });
+    await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus after reset');
+
+    await addAdultAccount('automationparent1@tubi.tv', '111111');
+    await waitForHomeScreen();
+
+    await addAdultAccount('automationparent2@tubi.tv', '111111');
+    await waitForHomeScreen();
+
+    // Restart so the kid-account flow sees a hydrated profile list
+    await testUtils.restartApplication();
+    await testUtils.waitForApplicationStartup();
+    await testUtils.waitForCurrentScreenToEqual('homeScreen', 18000);
+    await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus after reset restart', 20000);
+
+    await addKidsAccount('Automation', 'testkid1', '1111');
+
+    // `addKidsAccount` ends with testkid1 active. Kids → Adult routes through
+    // pcCheckPinGate, which is pinGate since the parent (AP1) now has a PIN.
+    // pinGate (unlike passwordGate) does NOT prime the pwExpTs cache, so using
+    // it here is safe for downstream passwordGate assertions.
+    await switchToProfile('AUTOMATIONPARENT1');
+    await enterPinGate('1111');
+    await testUtils.waitForCurrentScreenToEqual('homeScreen', 15000);
+    await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Home screen did not load after reset', 20000);
+  }
+
+
 
   // ═══════════════════════════════════════════════════════════════════
   // SETUP: Create multi-account environment with 2 adults + 1 kid
   // ═══════════════════════════════════════════════════════════════════
 
-  it('Setup: Start fresh and login with automationparent1, @setup', async () => {
+  it('C791743 - Account creation existing user, not parent: Returning adult user can activate account and see "Welcome, First Name", @account_switching', async () => {
     await testUtils.startApplicationAtPage('home' as any, {
       clearRegistry: true,
       shouldCreateNewUser: true,
@@ -261,13 +285,9 @@ describe.skip('account-switching-matrix', function () {
   });
 
 
-  it('Setup: Add automationparent2 as second adult account, @setup', async () => {
+  it('C791741 - Account creation: Returning adult user can add account for adults, @account_switching', async () => {
     await addAdultAccount('automationparent2@tubi.tv', '111111');
     await waitForHomeScreen();
-  });
-
-
-  it('Setup: Restart app and verify adult accounts persist, @setup', async () => {
     await testUtils.restartApplication();
     await testUtils.waitForApplicationStartup();
     await testUtils.waitForCurrentScreenToEqual('homeScreen', 18000);
@@ -287,44 +307,33 @@ describe.skip('account-switching-matrix', function () {
   });
 
 
-  it('Setup: Add kid account (testkid1) under automationparent1 with PIN 1111, @setup', async () => {
-    // Kid creation must happen after restart so that the parent's hasPin flag
-    // stays in memory for processKidsPinGate / checkIfPinSetByParent
-    await addKidsAccount('Automation', 'testkid1', '1111');
-  });
-
-
   // ═══════════════════════════════════════════════════════════════════
   // FROM ADULT ACCOUNT → Various (default Adult content settings)
-  // switchmap: adultAccount-guest/adultAccount/kidsAccount = "allowed"
+  // switchmap: adultAccount-* = "pcCheckPasswordGate"
+  // With both source and target on the default Adult rating (pcMap=5),
+  // the currentPCRating >= inComingPCRating short-circuit returns "allowed"
+  // and no gate is shown.
   // ═══════════════════════════════════════════════════════════════════
 
-  it('Adult → Adult: switches to another adult account without any gate (allowed), @adult_switch', async () => {
-    // After restart, we are on the last active adult profile
-    // Switch to AUTOMATIONPARENT2 — adultAccount-adultAccount = "allowed"
-    await switchToProfile('AUTOMATIONPARENT2');
+  it('C824324 - Account switching: Registered adult to registered adult, @account_switching', async () => {
+    await switchToProfile('AUTOMATIONPARENT1');
     await testUtils.waitForCurrentScreenToEqual('homeScreen', 15000);
     await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Home screen did not load after adult → adult switch', 20000);
   });
 
 
-  it('Adult → Kids: switches to kids account without any gate (allowed), @adult_switch', async () => {
+  it('C824325 - Account switching: Registered adult to registered kid, @account_switching', async () => {
+    // Default Adult (pcMap=5) → Kid (pcMap 0-2): 5 >= * → allowed.
     await switchToProfile('magalu1');
     await testUtils.waitForCurrentScreenToEqual('homeScreen', 15000);
     await utils.sleep(2000);
   });
 
 
-  // ═══════════════════════════════════════════════════════════════════
-  // FROM KIDS ACCOUNT → Various
-  // switchmap: kidsAccount-guest = "pinGate"
-  //            kidsAccount-adultAccount = "pcCheckPinGate"
-  //            kidsAccount-kidsAccount = "pcCheckPinGate"
-  // pcCheckPinGate: if current rating >= target → allowed, else pinGate if PIN set
-  // ═══════════════════════════════════════════════════════════════════
 
-  it('Kids → Adult: requires PIN gate when parent has PIN set (pinGate), @kids_switch', async () => {
-    // Currently on testkid1, switch to AUTOMATIONPARENT1
+
+  it('C824330 - Account switching: Registered Kid to Registered Adult - with Pin, @account_switching', async () => {
+    // Currently on testkid1 does not have a PIN set, switch to AUTOMATIONPARENT1
     // processKidsPinGate checks parentAuthInfo.hasPin → shows ParentalControlPinInputScreen
     await switchToProfile('AUTOMATIONPARENT1');
     await enterPinGate('1111');
@@ -334,31 +343,25 @@ describe.skip('account-switching-matrix', function () {
   });
 
 
-  it('Kids → Another Adult: also requires PIN gate (pcCheckPinGate), @kids_switch', async () => {
-    // Switch to testkid1 first
-    await switchToProfile('magalu1');
-    await testUtils.waitForCurrentScreenToEqual('homeScreen', 15000);
-    await utils.sleep(2000);
-
-    // Switch from testkid1 to AUTOMATIONPARENT2 — pcCheckPinGate with rating comparison
-    await switchToProfile('AUTOMATIONPARENT2');
-    await enterPinGate('1111');
-
+  it('C791742 - Account creation: Returning adult user can add account for kids, @account_switching', async () => {
+    // Kid creation must happen after restart so that the parent's hasPin flag
+    // stays in memory for processKidsPinGate / checkIfPinSetByParent
+    await addKidsAccount('Automation', 'testkid1', '1111');
     await testUtils.waitForCurrentScreenToEqual('homeScreen', 15000);
     await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Home screen did not load after PIN gate', 20000);
   });
 
 
-  it('Kids → Guest: switches to guest without gate (pass), @kids_switch', async () => {
-    // Switch to testkid1 first
-    await switchToProfile('testkid1');
-    await testUtils.waitForCurrentScreenToEqual('homeScreen', 15000);
-    await utils.sleep(2000);
+  it('C824333 - Account switching: Registered Kid to Guest Adult, @account_switching', async () => {
 
-    // Switch from testkid1 to Guest — direct pass (no gate)
+    // Switch to testkid1 first (AP1 has PIN set from setup)
+
+    // Kid (rating 0) → Guest (rating 5): 0 < 5 → pcCheckPinGate.
+    // checkIfPinSetByParent(testkid1) === true because AP1 has PIN → pinGate.
     await switchToProfile('Guest');
+    await enterPinGate('1111');
     await testUtils.waitForCurrentScreenToEqual('homeScreen', 15000);
-    await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Home screen did not load after kids → guest switch', 20000);
+    await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Home screen did not load after kids → guest pin gate', 20000);
   });
 
 
@@ -367,45 +370,33 @@ describe.skip('account-switching-matrix', function () {
   // switchmap: guest-guest/adultAccount/kidsAccount = "allowed"
   // ═══════════════════════════════════════════════════════════════════
 
-  it('Guest Normal → Adult: switches without gate (allowed), @guest_switch', async () => {
+  it('C824339 - Account switching: Guest adult to Registered adult, @account_switching', async () => {
     // Currently on Guest from previous test
-    await switchToProfile('AUTOMATIONPARENT1');
+    await switchToProfile('AUTOMATIONPARENT2');
     await testUtils.waitForCurrentScreenToEqual('homeScreen', 15000);
     await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Home screen did not load after guest → adult', 20000);
   });
 
 
-  it('Adult → Guest Normal: switches without gate (allowed), @guest_switch', async () => {
+  it('C824328 - Account switching: Registered adult to Guest Adult, @account_switching', async () => {
     await switchToProfile('Guest');
     await testUtils.waitForCurrentScreenToEqual('homeScreen', 15000);
     await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Home screen did not load after adult → guest', 20000);
   });
 
 
-  it('Guest Normal → Kids: switches without gate (allowed), @guest_switch', async () => {
+  it('C824340 - Account switching: Guest adult to Registered kid, @account_switching', async () => {
     // Currently on Guest
     await switchToProfile('magalu1');
     await testUtils.waitForCurrentScreenToEqual('homeScreen', 15000);
     await utils.sleep(2000);
-
-    // Return to adult for next tests (PIN gate from kid)
-    await switchToProfile('AUTOMATIONPARENT1');
-    await enterPinGate('1111');
-    await testUtils.waitForCurrentScreenToEqual('homeScreen', 15000);
-    await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Home screen did not load', 20000);
   });
 
 
-  // ═══════════════════════════════════════════════════════════════════
-  // FROM GUEST (Kids Mode) → Various
-  // switchmap: guestkid-guest = "ageGate"
-  //            guestkid-adultAccount = "ageGate"
-  //            guestkid-kidsAccount = "allowed"
-  // ═══════════════════════════════════════════════════════════════════
-
-  it('Guest (Kids Mode) → Guest Normal: requires age gate, @guest_kids_mode', async () => {
+  it('C824344 - Account switching: Guest Adult to Guest kid, @account_switching', async () => {
     // Switch to Guest, then enter Kids Mode
     await switchToProfile('Guest');
+    await enterPinGate('1111');
     await testUtils.waitForCurrentScreenToEqual('homeScreen', 15000);
     await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Home screen did not load', 20000);
 
@@ -413,10 +404,11 @@ describe.skip('account-switching-matrix', function () {
 
     // Exit kids mode → age gate per switchmap guestkid-guest
     await testHelpers.exitKidsModeWithAgeGate(18);
+
   });
 
 
-  it('Guest (Kids Mode) → Adult: age gate only shown first time, second exit is pass, @guest_kids_mode', async () => {
+  it('C824347 - Account switching: Guest kid to registered adult when there are previously registered users, @account_switching', async () => {
     // Re-enter kids mode
     await testHelpers.openKidsMode();
 
@@ -433,7 +425,7 @@ describe.skip('account-switching-matrix', function () {
   });
 
 
-  it('Guest (Kids Mode) → Kids: switches without age gate (allowed), @guest_kids_mode', async () => {
+  it('C824349 - Account switching: Guest Kid to Registered Kids, @account_switching', async () => {
     // Re-enter kids mode as guest
     await switchToProfile('Guest');
     await testUtils.waitForCurrentScreenToEqual('homeScreen', 15000);
@@ -455,15 +447,16 @@ describe.skip('account-switching-matrix', function () {
 
   // ═══════════════════════════════════════════════════════════════════
   // FROM ADULT (Teen content setting) → Various
-  // uiMode = kidsParental when parental rating < 2 OR = 4/5
-  // Teen (rating 2) does NOT trigger kidsParental mode (only < 2 or 4/5 do)
-  // So Teen adult remains in "adultAccount" mode.
-  // switchmap: adultAccount-* = "allowed"
-  // HOWEVER: pcCheckPasswordGate may apply if switching between adults
-  //          with different parental ratings
+  // With the new logic, every `adultAccount-*` entry in switchmap is
+  // `pcCheckPasswordGate`. Teen has currentPCRating = pcMap["2"] = 4,
+  // while a default adult has inComingPCRating = pcMap["3"] = 5.
+  // Teen (4) < Adult (5) so switching Teen → Adult falls through to the
+  // pcCheckPasswordGate branch → passwordGate is required.
+  // Teen → Kids (<=4) is still allowed because 4 >= kidRating.
+  // Adult (default, 5) → Teen (4) is allowed because 5 >= 4.
   // ═══════════════════════════════════════════════════════════════════
 
-  it('Setup: Change AUTOMATIONPARENT1 content settings to Teens, @content_settings', async () => {
+  it('C825289 - Parental control: when adult user switches to Teen account, @parental_controls', async () => {
     await navigateToContentSettings();
     await testUtils.waitForElementToShowOnScreen('kidsParentalControlsMenu', 'Parental controls menu did not open', 5000);
 
@@ -478,194 +471,157 @@ describe.skip('account-switching-matrix', function () {
     await utils.sleep(500);
     await ecp.sendKeypress(ecp.Key.Back);
     await utils.sleep(500);
+    await ecp.sendKeypress(ecp.Key.Back);
+    await utils.sleep(500);
+    await ecp.sendKeypress(ecp.Key.Right);
+
 
     await testUtils.waitForCurrentScreenToEqual('homeScreen', 15000);
     await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Home screen did not load after PIN gate', 20000);
   });
 
 
-  it('Adult (Teen) → Kids: switches without gate (allowed), @teen_switch', async () => {
-    // Teen (rating 2, pcMap=4) switching to kid — adultAccount-kidsAccount = allowed
+  it('C824336 - Account switching: Registered Kid older kid to Registered Kid - Teen (No Pin set), @account_switching', async () => {
+    // Teen (pcMap=4) → Kid (pcMap 0-2): 4 >= * → allowed (short-circuits the
+    // adultAccount-kidsAccount pcCheckPasswordGate entry).
     await switchToProfile('magalu1');
     await testUtils.waitForCurrentScreenToEqual('homeScreen', 15000);
-    await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Home screen did not load after PIN gate', 20000);
+    await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Home screen did not load after adult(teen) → kids', 20000);
     await utils.sleep(2000);
   });
 
 
-  it('Kids → Adult (Teen) back: requires PIN gate (pcCheckPinGate), @teen_switch', async () => {
+  it('C824335 - Account switching: Registered Kid older kid to Registered Kid - Teen (with Pin), @account_switching', async () => {
     await switchToProfile('AUTOMATIONPARENT1');
     await enterPinGate('1111');
+    await utils.sleep(2000);
     await testUtils.waitForCurrentScreenToEqual('homeScreen', 15000);
     await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Home screen did not load after PIN gate', 20000);
   });
 
 
-  it('Adult (Teen) → Adult (Adult settings): switches (adultAccount-adultAccount = allowed), @teen_switch', async () => {
-    // AP1 Teen (rating 2) → AP2 Adult (rating 3)
-    // Since Teen does not trigger kidsParental mode, this is adultAccount-adultAccount = allowed
+
+
+  //adult to Teen
+  it('C825289 - Parental control: when adult user switches to Teen account, @parental_controls', async () => {
     await switchToProfile('AUTOMATIONPARENT2');
+    await enterPasswordGate('111111');
     await testUtils.waitForCurrentScreenToEqual('homeScreen', 15000);
-    await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Home screen did not load after teen → adult switch', 20000);
-  });
-
-
-  it('Adult → Adult (Teen): switches without gate (allowed), @teen_switch', async () => {
-    // AP2 Adult → AP1 Teen: adultAccount-adultAccount = allowed
+    await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Home screen did not load after teen → adult password gate', 20000);
     await switchToProfile('AUTOMATIONPARENT1');
+    await testUtils.waitForCurrentScreenToEqual('homeScreen', 15000);
+    await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Home screen did not load', 20000);
+
+    // it('Setup: Reset registry and rebuild AP1+AP2+testkid1 for Little Kids section, @content_settings', async () => {
+    // Reset registry and rebuild AP1+AP2+testkid1 for Little Kids section,
+    await resetAndRecreateUsers();
+    await testUtils.waitForCurrentScreenToEqual('homeScreen', 15000);
+    await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Home screen did not load', 20000);
+    await switchToProfile('AUTOMATIONPARENT1');
+    await testUtils.waitForCurrentScreenToEqual('homeScreen', 15000);
+    await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Home screen did not load', 20000);
+    await changeParentalControlLevel('Age Rating 4-6');
     await testUtils.waitForCurrentScreenToEqual('homeScreen', 15000);
     await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Home screen did not load', 20000);
   });
 
 
-  // ═══════════════════════════════════════════════════════════════════
-  // FROM ADULT (Kids content setting / kidsParental mode) → Various
-  // setUiModeForProfileSelected: pcRating < 2 OR = 4/5 → kidsParental
-  // Little Kids (rating 0 or 4) triggers kidsParental mode
-  // switchmap: adultInKidsPC-guest = "passwordGate"
-  //            adultInKidsPC-adultAccount = "pcCheckPasswordGate"
-  //            adultInKidsPC-kidsAccount = "pcCheckPasswordGate"
-  // pcCheckPasswordGate: if current pc >= target pc → allowed, else passwordGate
-  // ═══════════════════════════════════════════════════════════════════
-
-  it('Setup: Change AUTOMATIONPARENT1 content settings to Little Kids, @content_settings', async () => {
-    // AP1 currently has Teen, change to Little Kids to trigger kidsParental mode
-    await changeParentalControlLevel('Age Rating 4-6');
-  });
-
-
-  it('Adult (Kids PC) → Adult: requires password gate (pcCheckPasswordGate), @kids_pc_switch', async () => {
-    // AP1 Little Kids (pcMap=1) → AP2 Adult (pcMap=5): 1 < 5 → passwordGate
+  it('C825288 - Parental control: when user switch from adult to kids account, @parental_controls', async () => {
     await switchToProfile('AUTOMATIONPARENT2');
     await enterPasswordGate('111111');
 
     await testUtils.waitForCurrentScreenToEqual('homeScreen', 15000);
     await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Home screen did not load after password gate', 20000);
-  });
 
-
-  it('Adult → Adult (Kids PC): switches without gate (allowed), @kids_pc_switch', async () => {
-    // AP2 Adult → AP1 Little Kids: adultAccount-adultAccount = allowed
+    // AP2 default Adult (pcMap=5) → AP1 Little Kids (pcMap=1): 5 >= 1 → allowed.
     await switchToProfile('AUTOMATIONPARENT1');
     await testUtils.waitForCurrentScreenToEqual('homeScreen', 15000);
-    await utils.sleep(2000);
-  });
+    await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Home screen did not load after password gate', 20000);
 
-
-  it('Adult (Kids PC) → Kids same/younger: switches without gate (pcCheckPasswordGate allowed), @kids_pc_switch', async () => {
-    // AP1 Little Kids (pcMap=1) → testkid1 (young kid, pcMap likely 0 or 1)
-    // pcCheckPasswordGate: if pcMap[AP1] >= pcMap[kid] → allowed
-    await switchToProfile('magalu1');
+    // AP1 Little Kids (pcMap=1) → testkid1 (young kid, pcMap 0 or 1).
+    // 1 >= 0/1 → allowed up-front, no gate.
+    await switchToProfile('testkid1');
     await testUtils.waitForCurrentScreenToEqual('homeScreen', 15000);
     await utils.sleep(2000);
 
-    // Return to AP1 (PIN gate from kid)
+    // Return to AP1 — kidsAccount-adultAccount = pcCheckPinGate → pinGate.
     await switchToProfile('AUTOMATIONPARENT1');
     await enterPinGate('1111');
     await testUtils.waitForCurrentScreenToEqual('homeScreen', 15000);
-    await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Home screen did not load', 20000);
+    await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Home screen did not load', 20000)
   });
 
 
-  it('Adult (Kids PC) → Guest: requires password gate (passwordGate), @kids_pc_switch', async () => {
-    // AP1 in kidsParental mode → Guest: adultInKidsPC-guest = passwordGate
-    await utils.sleep(20000);
+
+
+
+
+
+
+
+
+
+
+  it('C835213 - [Kids v1] Adult Registration - Submit age gate, @kids_v1', async () => {
+
+    await testUtils.restartApplication();
+    await testUtils.waitForCurrentScreenToEqual('homeScreen');
+    await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Home screen did not load after cached guest switch', 20000);
     await switchToProfile('Guest');
-
-    // await enterPasswordGate('111111');
-
     await testUtils.waitForCurrentScreenToEqual('homeScreen', 15000);
-    await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Home screen did not load after password gate to guest', 20000);
-  });
-
-
-  // ═══════════════════════════════════════════════════════════════════
-  // CLEANUP: Reset content settings to Adult
-  // ═══════════════════════════════════════════════════════════════════
-
-  it('Setup: Reset AUTOMATIONPARENT1 content settings to Adults, @content_settings', async () => {
-    await switchToProfile('AUTOMATIONPARENT1');
-    await testUtils.waitForCurrentScreenToEqual('homeScreen', 15000);
-    await utils.sleep(2000);
-    await changeParentalControlLevelwithPassword('Age Rating 18+');
-    // await ecp.sendKeypress(ecp.Key.Back);
-    // await utils.sleep(1000);
-    // await ecp.sendKeypress(ecp.Key.Back);
-    // await utils.sleep(1000);
-    // await testUtils.waitForCurrentScreenToEqual('homeScreen', 15000);
-    // await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Home screen did not load after password gate', 20000);
-  });
-
-
-  // ═══════════════════════════════════════════════════════════════════
-  // FROM ADULT (Kids Mode via side nav) → Various
-  // When adult enters Kids Mode via side nav, uiMode = kids
-  // switchmap: adultInKidsMode-guest = "passwordGate"
-  //            adultInKidsMode-adultAccount = "passwordGate"
-  //            adultInKidsMode-kidsAccount = "pcCheckPasswordGate"
-  // ═══════════════════════════════════════════════════════════════════
-
-  it('Adult enters Kids Mode via side nav, @adult_kids_mode', async () => {
-    await testUtils.waitForCurrentScreenToEqual('homeScreen', 15000);
-    await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Home screen did not load after password gate', 20000);
-    await utils.sleep(1000);
+    await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Home screen did not load after cached guest switch', 20000);
     await testHelpers.openKidsMode();
-  });
-
-
-  it('Adult (Kids Mode) → exit to Normal: direct pass (age gate already passed earlier), @adult_kids_mode', async () => {
-    // Age gate was already passed in the guest kids mode tests earlier,
-    // so exiting kids mode is a direct pass this time
+    await testUtils.waitForCurrentScreenToEqual('homeScreen', 15000);
+    await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Home screen did not load after cached guest switch', 20000);
     await testHelpers.exitKidsMode();
 
+    // Wait for age gate screen to appear
+    await testUtils.waitForElementToShowOnScreen(
+      'ageVerificationNumberPad',
+      'Age gate not shown after selecting Exit Kids',
+      10000,
+    );
+
+    // Enter birth year for the given age
+    const birthYear = new Date().getFullYear() - 11;
+    await ecp.sendText(birthYear.toString());
+
+    // Navigate to submit button and press OK
+    await ecp.sendKeypress(ecp.Key.Down, { count: 4 });
+    await ecp.sendKeypress(ecp.Key.Ok);
+    await utils.sleep(2000);
+    await ecp.sendKeypress(ecp.Key.Ok);
     await testUtils.waitForCurrentScreenToEqual('homeScreen', 15000);
-    await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Home screen did not load after exiting adult kids mode', 20000);
-  });
+    await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Home screen did not load after cached guest switch', 20000);
+    await switchToProfile('AUTOMATIONPARENT2');
+    await enterPasswordGate('111111');
+    await testUtils.waitForCurrentScreenToEqual('homeScreen', 15000);
+    await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Home screen did not load after cached guest switch', 20000);
+    // Age Gated to kids
+    await switchToProfile('Guest');
+    await testUtils.waitForCurrentScreenToEqual('homeScreen', 15000);
+    await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Home screen did not load after cached guest switch', 20000);
+    await switchToProfile('testkid1');
+
+    await testUtils.waitForCurrentScreenToEqual('homeScreen', 15000);
+    await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Home screen did not load after cached guest switch', 20000);
 
 
-  // ═══════════════════════════════════════════════════════════════════
-  // SIGN OUT: Verify adult can sign out and remaining accounts persist
-  // ═══════════════════════════════════════════════════════════════════
+    //Reset Automation
 
-  it('Adult parent can sign out from their profile, @signout', async () => {
+
+    await switchToProfile('AUTOMATIONPARENT2');
+    await enterPinGate('1111');
+    await testUtils.waitForCurrentScreenToEqual('homeScreen', 15000);
+    await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Home screen did not load', 20000);
+
     await switchToProfile('AUTOMATIONPARENT1');
     await testUtils.waitForCurrentScreenToEqual('homeScreen', 15000);
-    await utils.sleep(2000);
+    await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Home screen did not load', 20000);
+    await changeParentalControlLevelwithPassword('Age Rating 18+');
 
-    await testHelpers.openLeftNav();
-    await testUtils.jumpToRowIndex('sideNavMenu', 10);
-    await utils.sleep(500);
-    await ecp.sendKeypress(ecp.Key.Ok);
-    await testUtils.waitForCurrentScreenToEqual('settingsScreen', 10000);
-    await testUtils.waitForElementToFullyShowOnScreen('settingsMenu');
-    await ecp.sendKeypress(ecp.Key.Left);
-    await utils.sleep(1000);
-    await ecp.sendKeypress(ecp.Key.Ok);
-    await utils.sleep(1000);
-    await ecp.sendKeypress(ecp.Key.Ok);
-    await utils.sleep(1000);
-    await testUtils.waitForElementToShowOnScreen('signOutVerificationModalMessage', 'Sign Out verification modal did not appear', 10000);
-    const modalMessage = await testUtils.getNodeForElement('signOutVerificationModalMessage');
-    expect(modalMessage.text).to.contain('sign out');
-    await ecp.sendKeypress(ecp.Key.Down);
-    await utils.sleep(1000);
-
-    await ecp.sendKeypress(ecp.Key.Ok);
-    await utils.sleep(3000);
-    await ecp.sendKeypress(ecp.Key.Back);
-    await testUtils.waitForCurrentScreenToEqual('homeScreen', 15000);
-    await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Home screen did not load after sign out', 20000);
   });
 
 
-  it('After sign out, remaining accounts are still switchable, @signout', async () => {
-    // AP1 signed out (along with its linked kid testkid1).
-    // AP2 and Guest should still be available.
-    await openProfileMenu();
-    await testUtils.jumpToRowWithTitle('profileSelectionMenu', 'AUTOMATIONPARENT2');
-    await utils.sleep(500);
-    await ecp.sendKeypress(ecp.Key.Ok);
-    await testUtils.waitForCurrentScreenToEqual('homeScreen', 15000);
-    await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Could not switch to AP2 after AP1 sign out', 20000);
-  });
+
 });
