@@ -2616,7 +2616,13 @@ Function tubiMetadataTranslate_translateEPGChannelIds(contentToTranslate, reques
   if contentToTranslate <> invalid AND contentToTranslate.contents <> invalid AND contentToTranslate.containers <> invalid
     containersArray = contentToTranslate.containers
 
-    isEpgFavoritesEnabled = m.statSigExperiments.getExperimentResource("roku_epg_favorites", "roku_epg_favorites_v1").enabled = true
+    isEpgFavoritesEnabled = false
+    if m.statSigExperiments <> invalid
+      epgFavoritesResource = m.statSigExperiments.getExperimentResource("roku_epg_favorites", "roku_epg_favorites_v1")
+      if epgFavoritesResource <> invalid
+        isEpgFavoritesEnabled = (epgFavoritesResource.enabled = true)
+      end if
+    end if
     recommmendedIndex = 0
     for i = 0 to containersArray.count() - 1
       if isEpgFavoritesEnabled = true
