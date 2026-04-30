@@ -326,7 +326,7 @@ Function getConstants()
   constants.reqNames.checkBirthdayInfo = "checkBirthdayInfo" 'verify age
   constants.reqNames.patchUserSettings = "patchUserSettings"
 
-  '//::TODO::ads_ott_hdc_adformats_v1, remove the sponsorPixel & skinAdPixel once the new ad carousel is fully rolled out.
+  '//::TODO:: remove the sponsorPixel & skinAdPixel when we perform a submission release.
   constants.reqNames.sponsorPixel = "sponsorPixel"
   constants.reqNames.skinAdPixel = "skinAdPixel"
 

@@ -30,15 +30,6 @@ Function TubiExperiments(experimentsInfo) as Object
         }
       }
 
-      '//This experiment will be for the new showcase cad campaigns. The possible "enabled_arm" values are "control", "carousel", "spotlight"
-      ads_ott_hdc_adformats: {
-        ads_ott_hdc_adformats_v1: {
-          default: { "enabled_arm": "control" }
-          holdout_control: { "enabled_arm": "control" }
-          holdout_winning: { "enabled_arm": "control" }
-        }
-      }
-
       roku_add_movies_series: {
         roku_add_movies_series_uk_v2: {
           default: { "enabled": false }
