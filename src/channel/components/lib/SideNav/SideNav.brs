@@ -140,7 +140,6 @@ End Function
 
 
 Function onCreateMenuItems()
-  sCountryCode = UCase(m.constants.deviceInfo.countryCode)
   m.mainItems = m.top.findNode("mainItems")
 
   menuItems = [
@@ -154,10 +153,11 @@ Function onCreateMenuItems()
   menuItems.push(m.constants.ui.sideNavIds.categories)
   menuItems.push(m.constants.ui.sideNavIds.myList)
 
-  bInMoviesSeriesExperimentUK = ((sCountryCode = "GB" OR sCountryCode = "UK") AND getExperimentResource("roku_add_movies_series", "roku_add_movies_series_uk_v2").enabled = true)
-
-  if (sCountryCode = "US" OR sCountryCode = "CA" OR sCountryCode = "MX" OR bInMoviesSeriesExperimentUK = true)
+  if getExternalConfigValueFromGlobal("enable_movie_mode", false) = true
     menuItems.push(m.constants.ui.sideNavIds.movies)
+  end if
+
+  if getExternalConfigValueFromGlobal("enable_tv_mode", false) = true
     menuItems.push(m.constants.ui.sideNavIds.tv)
   end if
 
@@ -390,16 +390,15 @@ End Function
 Function onSetSideNavForProfileTypeChanged(profileType)
 
   if profileType = "adult"
-    sCountryCode = UCase(m.constants.deviceInfo.countryCode)
-
     insertMenuItemInMenuLists(m.constants.ui.sideNavIds.kidsMode)
     insertMenuItemInMenuLists(m.constants.ui.sideNavIds.categories)
     insertMenuItemInMenuLists(m.constants.ui.sideNavIds.myList)
 
-    bInMoviesSeriesExperimentUK = ((sCountryCode = "GB" OR sCountryCode = "UK") AND getExperimentResource("roku_add_movies_series", "roku_add_movies_series_uk_v2").enabled = true)
-
-    if (sCountryCode = "US" OR sCountryCode = "CA" OR sCountryCode = "MX" OR bInMoviesSeriesExperimentUK = true)
+    if getExternalConfigValueFromGlobal("enable_movie_mode", false) = true
       insertMenuItemInMenuLists(m.constants.ui.sideNavIds.movies)
+    end if
+
+    if getExternalConfigValueFromGlobal("enable_tv_mode", false) = true
       insertMenuItemInMenuLists(m.constants.ui.sideNavIds.tv)
     end if
 

@@ -15,7 +15,6 @@ Function StatsigExperimentsInterface(statsigExperimentsInfo) as Object
     ' Default resources - used when Statsig doesn't return a config or fails
     ' Same structure as TubiExperiments for consistency
     defaultResources: {
-
       ' POC Statsig "no change" experiment on search screen
       ' It is to validate Statsig integration, exposure logging, and experiment flow.
       roku_no_change_statsig_experiment: {
