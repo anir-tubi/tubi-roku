@@ -1319,6 +1319,8 @@ Function displayAdDisplayCarousel()
       m.ContentArea.maskUri = "pkg:/images/poster-mask-ads.png"
     end if
 
+    moveContentAreaMask(m.CategoryGridList.listCurrFocusRow)
+
     fade(m.adRowlistCarouselComponent, "in", 0.1)
   end if
 End Function
@@ -1331,6 +1333,7 @@ Function onCarouselFadeOutComplete()
   if isAdDisplayCarouselAvailable() = false OR m.adRowlistCarouselComponent.isInFocusChain() = false
     '//because onCarouselFadeOutComplete is sometimes called on a delay, we need to check if the component is still out of focus before resetting the mask
     m.ContentArea.maskUri = m.maskUri
+    moveContentAreaMask(m.CategoryGridList.listCurrFocusRow)
   end if
 End Function
 
