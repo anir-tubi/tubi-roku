@@ -65,6 +65,11 @@ Function StatsigExperimentsInterface(statsigExperimentsInfo) as Object
         resume_playback_preroll_strategy_v1: {
           default: { "strategy": "resume_ad_break_at_now_pos" }
         }
+
+        ' When enabled: skip preroll for in-player Browse While Watching YMAL only (playbackSource.fromBrowseWhileWatching).
+        roku_bww_skip_preroll_v1: {
+          default: { "enabled": false }
+        }
       }
 
       roku_linear_reg_gate: {

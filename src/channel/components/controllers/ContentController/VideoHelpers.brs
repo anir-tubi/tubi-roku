@@ -205,6 +205,13 @@ Function setupVideoPlayer(content, playbackSource = { "srcForAnalytic": "unknown
         }
       end if
 
+      ' Propagate BWW-only marker for experiments (e.g. preroll); detail-screen YMAL skip also uses srcForAds ymal.
+      if playbackSource.fromBrowseWhileWatching = true AND isAA(videoPlayer.playbackSource) = true
+        ps = videoPlayer.playbackSource
+        ps.fromBrowseWhileWatching = true
+        videoPlayer.playbackSource = ps
+      end if
+
       if content.adParam = invalid
         content.addField("adParam", "assocarray", false)
       end if
@@ -1783,6 +1790,7 @@ Function onPlayerRelatedContentToPlay(msg)
       playbackSource = {
         "srcForAnalytic": m.constants.player.playbackSource.unknown
         "srcForAds": m.constants.player.playbackOrigin.ymal
+        "fromBrowseWhileWatching": true
       }
       playUpNextContent(content, playbackSource)
     end if
@@ -1794,6 +1802,7 @@ Function handleYMALContentSuccessResponse(content)
   playbackSource = {
     "srcForAnalytic": m.constants.player.playbackSource.unknown
     "srcForAds": m.constants.player.playbackOrigin.ymal
+    "fromBrowseWhileWatching": true
   }
   playUpNextContent(content, playbackSource)
 End Function

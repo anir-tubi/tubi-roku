@@ -985,6 +985,13 @@ Function playContent()
         end if
       end if
 
+      ' Skip pre-roll for BWW only: in-player YMAL sets fromBrowseWhileWatching (relatedContentToPlay). Detail-screen YMAL uses ymal too but does not set that flag.
+      if fetchPreroll = true AND isAA(m.top.playbackSource) = true AND m.top.playbackSource.fromBrowseWhileWatching = true
+        if getStatsigExperimentResource("roku_player_improvement", "roku_bww_skip_preroll_v1", true).enabled = true
+          fetchPreroll = false
+        end if
+      end if
+
       if fetchPreroll = true
         getStatsigExperimentResource("roku_dynamic_ad_load", "roku_dynamic_ad_load_v1")
 
