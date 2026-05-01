@@ -1252,6 +1252,7 @@ Function executeVodDetailSuccessCallback(content, playbackSource, episodes = inv
       end if
       if isComingSoon = false
         playSelectedVodContent(content, playbackSource, episodes)
+        clearCastingSessionFlag(getDetailScreenFromStackWithId(m.constants.ui.screenIds.vodDetailScreen))
       end if
     else if successCb <> invalid
       successCb(content)
@@ -1293,6 +1294,7 @@ Function playVodContentFromDetailScreen(content) as Void
     isComingSoon = isComingSoonContent(content)
     if isComingSoon = false
       playSelectedVodContent(content, screen.playbackSource, screen.episodes)
+      clearCastingSessionFlag(screen)
     end if
   end if
 End Function

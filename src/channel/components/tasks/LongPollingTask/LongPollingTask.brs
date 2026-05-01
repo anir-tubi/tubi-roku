@@ -59,7 +59,7 @@ End Function
 
 Function startSession(roomId = m.roomId as String) as Void
   if isNonEmptyString(roomId) = false
-    logWarn("LongPollingTask.startSession - No room ID provided")
+    logWarn("LongPollingTask.startSession - No room ID provided", "castingWarn", "casting-no-room-id", 0.1)
     return
   else
     m.roomId = roomId
@@ -70,7 +70,7 @@ Function startSession(roomId = m.roomId as String) as Void
 
   authInfo = m.auth.getAuthInfo()
   if authInfo = invalid OR authInfo.accessToken = invalid
-    logError("LongPollingTask.startSession - Authentication token not available")
+    logError("LongPollingTask.startSession - Authentication token not available", "castingError", "casting-auth-unavailable", 0.1)
     setConnectionState("error")
     m.shouldStop = true
     return
@@ -98,7 +98,7 @@ Function onEstablishSessionSuccess(response, m) as Void
     m.sessionToken = data.token
     joinRoom()
   else if data.status = 403 OR (data.status = 410 AND data.token = invalid)
-    logError("LongPollingTask.onEstablishSessionSuccess - Authentication failed; response: " + response.data)
+    logError("LongPollingTask.onEstablishSessionSuccess - Authentication failed; response: " + response.data, "castingError", "casting-session-auth-failed", 0.1)
     setConnectionState("error")
     m.shouldStop = true
   else
@@ -109,7 +109,7 @@ End Function
 
 ' Callback for session establishment error
 Function onEstablishSessionError(error, m) as Void
-  logError("LongPollingTask.onEstablishSessionError - Failed to establish session; unexpected response: " + FormatJson(error))
+  logError("LongPollingTask.onEstablishSessionError - Failed to establish session; unexpected response: " + FormatJson(error), "castingError", "casting-session-establish-failed", 0.1)
   setConnectionState("error")
   m.shouldStop = true
 End Function
@@ -121,7 +121,7 @@ End Function
 
 Function joinRoom() as Void
   if m.sessionToken = invalid
-    logError("LongPollingTask.joinRoom - No session token available; cannot join room")
+    logError("LongPollingTask.joinRoom - No session token available; cannot join room", "castingError", "casting-join-no-token", 0.1)
     setConnectionState("error")
     m.shouldStop = true
     return
@@ -174,7 +174,7 @@ End Function
 
 ' Callback for room join error
 Function onJoinRoomError(error, m) as Void
-  logError("LongPollingTask.onJoinRoomError - Failed to join Voyager room: " + FormatJson(error))
+  logError("LongPollingTask.onJoinRoomError - Failed to join Voyager room: " + FormatJson(error), "castingError", "casting-join-room-failed", 0.1)
   setConnectionState("error")
   m.shouldStop = true
 End Function
@@ -228,7 +228,7 @@ Function onPollSuccess(response, m) as Void
   if isNonEmptyString(data.token) = true
     m.sessionToken = data.token
   else if data.status = 410
-    logError("LongPollingTask.onPollSuccess - Session expired; need to reconnect")
+    logError("LongPollingTask.onPollSuccess - Session expired; need to reconnect", "castingError", "casting-session-expired", 0.1)
     setConnectionState("error")
     startSession()
     return
@@ -258,7 +258,7 @@ End Function
 
 ' Callback for poll error
 Function onPollError(error, m)
-  logError("LongPollingTask.onPollError - Error polling for new messages: " + FormatJson(error))
+  logError("LongPollingTask.onPollError - Error polling for new messages: " + FormatJson(error), "castingError", "casting-poll-failed", 0.1)
   setConnectionState("error")
   stopSession()
 End Function

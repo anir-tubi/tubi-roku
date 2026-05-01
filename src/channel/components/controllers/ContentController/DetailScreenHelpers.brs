@@ -2274,6 +2274,7 @@ Function skipDetailScreen(refreshedContent) as Void
         if m.top.fadeInContentController = true
           if nowPos >= 0
             playVideoContentWhileSkippingDetailScreen(episode, nowPos, trackingPageInfo, trackingComponentInfo, detailScreen.playbackSource)
+            clearCastingSessionFlag(detailScreen)
           end if
         else
           if nowPos > 0

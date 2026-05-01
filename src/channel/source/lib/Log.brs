@@ -26,6 +26,7 @@ Function TubiLogger(constants, requestInstance, auth, sentryInstance = invalid)
           videoLoad: "VIDEO:LOAD"
           videoBuffer: "VIDEO:BUFFER"
           adError: "AD:ERROR"
+          castingError: "CASTING:ERROR"
         }
       }
       info: {
@@ -48,6 +49,7 @@ Function TubiLogger(constants, requestInstance, auth, sentryInstance = invalid)
           clientDisk: "CLIENT:DISK"
           adTimeout: "AD:TIMEOUT"
           adBadResponse: "AD:BAD_RESPONSE"
+          castingWarn: "CASTING:WARN"
         }
       }
     }

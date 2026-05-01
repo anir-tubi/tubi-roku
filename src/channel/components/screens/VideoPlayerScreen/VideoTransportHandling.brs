@@ -396,6 +396,10 @@ End Function
 
 'Resume play from a paused state
 Function resumeFromPause(shouldSendAnalytics)
+  ' Dismiss pause ad overlay if visible (e.g. casting resume bypasses onKeyEvent)
+  resetPauseAdOverlay()
+  hidePauseAdOverlay()
+
   animateTransport("out")
   hideBrowseWhileWatching()
   'Only hide the button, don't clear the button so that the button will be shown again

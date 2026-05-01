@@ -969,7 +969,7 @@ Function playContent()
         end for
       end if
 
-      ' Skip pre-roll for casting-initiated sessions starting from the beginning when the experiment is enabled.
+      ' Check if pre-roll should be skipped for casting-initiated sessions when the experiment is enabled.
       if fetchPreroll = true AND m.top.isCastingSession = true
         fetchPreroll = (getStatsigExperimentResource("casting_playback_preroll_skip", "casting_playback_preroll_skip_v1").enabled = false)
       else if fetchPreroll = true AND playNowPos > 0

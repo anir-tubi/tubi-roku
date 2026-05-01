@@ -1162,7 +1162,7 @@ Function getPlaybackSourceForDeeplinkType()
     return {
       "srcForAnalytic": m.constants.player.playbackSource.unknown
       "srcForAds": m.constants.player.playbackOrigin.deeplink
-      "isCastingSession": (m.deeplinkContent <> invalid AND isNonEmptyString(m.deeplinkContent.sourceDeviceId) = true)
+      "isCastingSession": (m.deeplinkContent <> invalid AND isMobileDeeplinkSource(m.deeplinkContent.source) = true)
     }
   else
     return {
@@ -1171,6 +1171,31 @@ Function getPlaybackSourceForDeeplinkType()
     }
   end if
 
+End Function
+
+
+' Checks if the deeplink source indicates a mobile device (iOS or Android)
+' @param source: string - the deeplinkContent.source value (set from args.entry)
+' @return: boolean
+Function isMobileDeeplinkSource(source as Dynamic) as Boolean
+  if isNonEmptyString(source) = false
+    return false
+  end if
+
+  lcSource = Lcase(source)
+  return (lcSource = "iphone" OR lcSource = "ipad" OR lcSource = "ios" OR lcSource = "android")
+End Function
+
+
+' Clears the isCastingSession flag from a screen's playbackSource field
+' Called after the first deeplink-initiated playback to prevent subsequent plays from inheriting it
+' @param screen: roSGNode - detail screen node with a playbackSource assocarray field
+Function clearCastingSessionFlag(screen as Object) as Void
+  if screen = invalid OR isAA(screen.playbackSource) = false then return
+
+  source = screen.playbackSource
+  source.delete("isCastingSession")
+  screen.playbackSource = source
 End Function
 
 

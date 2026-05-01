@@ -544,6 +544,7 @@ Function onFadeInContentController()
     if (currentScreen.id = m.constants.ui.screenIds.detailScreen OR currentScreen.id = m.constants.ui.screenIds.vodDetailScreen) AND m.detailScreenAfterFn <> invalid
       m.detailScreenAfterFn(currentScreen)
       m.detailScreenAfterFn = invalid
+      clearCastingSessionFlag(currentScreen)
     end if
 
   end if

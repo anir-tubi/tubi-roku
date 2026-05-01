@@ -33,7 +33,7 @@ End Function
 ' Start a Voyager session using room ID from m.deeplinkContent
 Function startCastingSession() as Void
   if isNonEmptyString(m.deeplinkContent.roomId) = false
-    logWarn("CrossDeviceCastingHelpers.startCastingSession - No room ID")
+    logWarn("CrossDeviceCastingHelpers.startCastingSession - No room ID", "castingWarn", "casting-start-no-room-id", 0.1)
     resetDeeplinkValues()
     return
   end if
@@ -138,7 +138,7 @@ Function onCastingMessagesReceived(msg) as Void
   for each message in messages
     commandPayload = extractCastingCommandPayload(message)
     if commandPayload = invalid
-      logWarn("CrossDeviceCastingHelpers.onCastingMessagesReceived - No command in message payload: " + FormatJson(message))
+      logWarn("CrossDeviceCastingHelpers.onCastingMessagesReceived - No command in message payload: " + FormatJson(message), "castingWarn", "casting-malformed-payload", 0.1)
     else
       handleCastingCommand(commandPayload)
     end if
@@ -176,7 +176,7 @@ Function handleCastingCommand(payload as Object) as Void
     handleCastingStopCastingCommand()
 
   else
-    logWarn("CrossDeviceCastingHelpers.handleCastingCommand - Unknown command type: " + FormatJson(payload))
+    logWarn("CrossDeviceCastingHelpers.handleCastingCommand - Unknown command type: " + FormatJson(payload), "castingWarn", "casting-unknown-command", 0.1)
   end if
 End Function
 
@@ -187,7 +187,7 @@ End Function
 Function handleCastingPlayContentCommand(payload as Object) as Void
   contentId = payload.contentId
   if isNonEmptyString(contentId) = false
-    logError("CrossDeviceCastingHelpers.handleCastingPlayContentCommand: No content ID")
+    logError("CrossDeviceCastingHelpers.handleCastingPlayContentCommand: No content ID", "castingError", "casting-play-no-content-id", 0.1)
     return
   end if
 
@@ -210,7 +210,7 @@ End Function
 ' Callback for successful content fetch from Voyager play command
 Function onCastingContentFetchSuccess(content as Object) as Void
   if content = invalid
-    logError("CrossDeviceCastingHelpers.onCastingContentFetchSuccess: Fetched content is invalid")
+    logError("CrossDeviceCastingHelpers.onCastingContentFetchSuccess: Fetched content is invalid", "castingError", "casting-content-fetch-invalid", 0.1)
     return
   end if
 
@@ -249,7 +249,7 @@ End Function
 
 ' Callback for content fetch error from Voyager play command
 Function onCastingContentFetchError(error as Object)
-  logError("CrossDeviceCastingHelpers.onCastingContentFetchError: " + FormatJson(error))
+  logError("CrossDeviceCastingHelpers.onCastingContentFetchError: " + FormatJson(error), "castingError", "casting-content-fetch-failed", 0.1)
 End Function
 
 
