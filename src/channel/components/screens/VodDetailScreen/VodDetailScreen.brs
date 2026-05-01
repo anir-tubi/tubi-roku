@@ -513,7 +513,7 @@ sub onActionButtonSelected(msg)
     end if
 
     ' Reset expanded state when user confirms a like/dislike selection
-    if m.isRatingsExpanded = true AND (buttonId = "like" OR buttonId = "dislike")
+    if m.isRatingsExpanded = true AND (buttonId = "like" OR buttonId = "dislike") AND isLoggedInUser() = true
       m.isRatingsExpanded = false
     end if
 
