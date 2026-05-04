@@ -1119,8 +1119,15 @@ End Function
 Function skipDetailScreenDeeplinkWrapper(refreshedContent) as Void
   ' This is a hack to handle cases where wrong media type is passed in the deeplink for fox player.
   if refreshedContent <> invalid AND refreshedContent.playerType = m.constants.ui.playerTypes.fox
-    popScreen()
-    onDeeplinkLiveEventContentSuccess(refreshedContent)
+    'if fadeInContentController has not been set true, the animation is still playing.
+    'in that case, defer navigation until after the animation completes.
+    m.foxLiveDeeplinkedEventContent = refreshedContent
+    callback = processFoxLiveEventUniversalSearchDeeplinkContent
+    if m.top.fadeInContentController = true
+      callback()
+    else
+      m.deferredDeeplinkFn = callback
+    end if
   else if refreshedContent.type = m.constants.ui.contentTypes.linear
     handleSingleContentDeeplinkError(invalid) 'if the content type is linear, then do not show detailScreen instead show error dialog.
   else
@@ -1239,4 +1246,10 @@ Function onDeeplinkLiveEventContentSuccess(content)
   else
     handleLinearDeeplinkContent()
   end if
+End Function
+
+
+Function processFoxLiveEventUniversalSearchDeeplinkContent()
+  popScreen()
+  onDeeplinkLiveEventContentSuccess(m.foxLiveDeeplinkedEventContent)
 End Function

@@ -2268,6 +2268,7 @@ Function onListHasFocusChange(msg)
     updateVideoTileOverlayVisibility(screen, isVideoTileEnabled)
     if isVideoTileEnabled = true
       updateVideoTileScreenBackground(content, screen)
+      setInlineVideoMetadataOverlay(screen.content, screen.rowCurrFocusColumn, screen.listCurrFocusRow)
     end if
 
     previewState = getVideoPreviewStateForThisContent(content)
