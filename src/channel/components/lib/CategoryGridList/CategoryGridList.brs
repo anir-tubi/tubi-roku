@@ -863,8 +863,9 @@ Function onSkinAdRowItemSelected(msg)
   if content <> invalid
     m.top.oldCategoryId = m.top.currCategoryId
     m.top.currCategoryId = "skinAdRow"
-    m.top.selectedPosition = rowItemSelected
     m.top.itemSelected = content.clone(true)
+    ' Since we are observing selection and accessing itemselected field we need to reset the value before setting the selected position.
+    m.top.selectedPosition = rowItemSelected
   end if
 End Function
 
