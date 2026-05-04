@@ -13,15 +13,11 @@ Function init() as Void
   m.description = topRef.findNode("description")
   m.metadata = topRef.findNode("metadata")
   m.subtitlesIcon = topRef.findNode("subtitlesIcon")
-  m.rating = topRef.findNode("rating")
-  m.ratingBackground = topRef.findNode("ratingBackground")
-  m.ratingLabel = topRef.findNode("ratingLabel")
+  m.ratingBadge = topRef.findNode("ratingBadge")
 
   setTypographyOfLabel(m.contentTitle, typographyConstants.ids.subheaderSmall, { lineSpacing: 2 })
   setTypographyOfLabel(m.description, typographyConstants.ids.bodyMedium, { lineSpacing: 2 })
   setTypographyOfLabel(m.metadata, typographyConstants.ids.bodyMedium)
-  setTypographyOfLabel(m.ratingLabel, typographyConstants.ids.bodyExtraSmallStrong)
-
   if m.global <> invalid
     m.global.observeFieldScoped("theme", "onThemeChange")
   end if
@@ -46,7 +42,6 @@ Function onThemeChange(msg = invalid) as Void
     m.contentTitle.color = theme.primaryTextColor
     m.description.color = theme.primaryTextColor
     m.metadata.color = theme.secondaryTextColor
-    m.ratingLabel.color = theme.secondaryTextColor
     m.focusIndicator.blendColor = theme.focusedColor
   end if
 End Function
@@ -91,8 +86,7 @@ Function onItemContentChange(msg = invalid) as Void
   metadataText = buildMetadataText(content)
   m.metadata.text = metadataText
 
-  ' Set rating badge
-  setRatingBadge(content.rating)
+  m.ratingBadge.rating = content.rating
 
   ' Set subtitles icon
   m.subtitlesIcon.visible = (content.hasSubtitles = true OR isNonEmptyArray(content.subtitleTracks) = true)
@@ -137,25 +131,4 @@ Function buildMetadataText(content) as String
   end if
 
   return ""
-End Function
-
-
-' Sets the rating badge visibility and sizing
-' @param rating - Rating string (e.g. "PG-13") or invalid to hide
-Function setRatingBadge(rating) as Void
-  if not isNonEmptyString(rating)
-    m.rating.visible = false
-    return
-  end if
-
-  ratingLabel = m.ratingLabel
-  ratingLabel.width = 0
-  ratingLabel.text = UCase(rating)
-
-  badgeWidth = ratingLabel.boundingRect().width + 24
-  badgeWidth = ensureDivisibleBy3(badgeWidth)
-
-  ratingLabel.width = badgeWidth
-  m.ratingBackground.width = badgeWidth
-  m.rating.visible = true
 End Function

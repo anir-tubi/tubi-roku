@@ -83,24 +83,8 @@
             width="36"
             loadDisplayMode="scaleToFit"
             loadSync="true" />
-          <Group
-            id="ratingGroup"
-            visible="false">
-            <Poster
-              id="ratingBackground"
-              height="30"
-              uri="pkg:/images/rating_background_video_tile_$$RES$$.9.png"
-              loadDisplayMode="scaleToFit"
-              loadSync="true" />
-            <Label
-              id="ratingLabel"
-              height="30"
-              width="0"
-              numLines="1"
-              wrap="false"
-              horizAlign="center"
-              vertAlign="center" />
-          </Group>
+          <RatingBadge
+            id="ratingBadge" />
         </LayoutGroup>
 
         <Group

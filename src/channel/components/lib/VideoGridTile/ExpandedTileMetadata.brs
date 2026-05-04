@@ -13,9 +13,7 @@ Function init()
   m.description = m.top.findNode("description")
   m.progressBar = m.top.findNode("progressBar")
   m.progressBarGroup = m.top.findNode("progressBarGroup")
-  m.rating = m.firstLineGroup.findNode("Rating")
-  m.ratingBackground = m.rating.findNode("RatingBackground")
-  m.ratingLabel = m.rating.findNode("RatingLabel")
+  m.ratingBadge = m.firstLineGroup.findNode("ratingBadge")
   m.sotBadge = m.firstLineGroup.findNode("sotBadge")
   m.closedCaptions = m.firstLineGroup.findNode("ClosedCaptionPoster")
   m.subHeadlinePrefixGroup = m.top.findNode("subHeadlinePrefixGroup")
@@ -41,7 +39,6 @@ Function init()
   m.title = invalid
   m.currentEpisodeTitleLabel = invalid
   setTypographyOfLabel(m.description, m.bodyMediumFont)
-  setTypographyOfLabel(m.ratingLabel, m.bodyExtraSmallStrongFont)
 
   m.description.observeFieldScoped("isTextEllipsized", "onIsTextEllipsizedChange")
 
@@ -64,7 +61,6 @@ Function onThemeChange(msg = invalid)
   if theme <> invalid
     m.primaryTextColor = theme.primaryTextColor
     m.secondaryTextColor = theme.secondaryTextColor
-    m.ratingLabel.color = theme.secondaryTextColor
     m.description.color = m.primaryTextColor
     m.focusedTextColor = theme.focusedTextColor
     m.shadeColor = theme.shadeColor
@@ -73,7 +69,7 @@ Function onThemeChange(msg = invalid)
     m.progressBar.focusColor = theme.focusedColor
     m.progressBar.trackColor = theme.neutralColor
     m.progressBar.unfocusColor = theme.focusedColor
-    m.ratingBackground.blendColor = theme.tertiaryTextColor
+    m.ratingBadge.backgroundBlendColor = theme.tertiaryTextColor
 
     if m.title <> invalid
       m.title.color = m.primaryTextColor
@@ -169,7 +165,7 @@ Function setupTitleAndConfig(itemContent) as Void
   end if
 
   ' Resetting the visibility of the rating and sot badge.
-  m.rating.visible = true
+  m.ratingBadge.visible = true
   m.sotBadge.visible = true
   onWidthChange()
 
@@ -464,20 +460,15 @@ Function metadataOnPosterContent(itemContent)
   end if
 
   ' handle rating
-  ratingIsPresent = (m.rating.getParent() <> invalid)
+  ratingIsPresent = (m.ratingBadge.getParent() <> invalid)
   if isNonEmptyString(itemContent.rating) = true
     if ratingIsPresent = false
-      ratingSotParent.insertChild(m.rating, insertIndex)
+      ratingSotParent.insertChild(m.ratingBadge, insertIndex)
     end if
-    m.ratingLabel.width = 0
-    m.ratingLabel.text = UCase(itemContent.rating)
-    nRatingBoundingBoxIncrease = m.ratingLabel.boundingRect().width + 24
-    nRatingBoundingBoxIncrease = ensureDivisibleBy3(nRatingBoundingBoxIncrease)
-    m.ratingBackground.width = nRatingBoundingBoxIncrease
-    m.ratingLabel.width = nRatingBoundingBoxIncrease
+    m.ratingBadge.rating = itemContent.rating
   else
     if ratingIsPresent = true
-      ratingSotParent.removeChild(m.rating)
+      ratingSotParent.removeChild(m.ratingBadge)
     end if
   end if
 
@@ -502,7 +493,7 @@ Function metadataOnPosterContent(itemContent)
 
   if itemContent.type <> "linear" AND isAA(sotBadge) = true AND sotBadge.count() > 0 AND sotBadge.sotType <> "tubiPresentsLogo"
     if isSotBadgePresent = false
-      ratingIndex = m.nodeHelpers.getChildIndex(ratingSotParent, m.rating)
+      ratingIndex = m.nodeHelpers.getChildIndex(ratingSotParent, m.ratingBadge)
       if ratingIndex <> -1
         insertIndex = ratingIndex
       end if
@@ -533,7 +524,7 @@ Function metadataOnPosterContent(itemContent)
 
   if itemContent.hasSubtitles = true
     if m.closedCaptions.getParent() = invalid
-      index = m.nodeHelpers.getChildIndex(ratingSotParent, m.rating)
+      index = m.nodeHelpers.getChildIndex(ratingSotParent, m.ratingBadge)
       ' Which means rating is not present in the first line group.
       ' As a fallback displaying in a fixed position.
       if index = -1
@@ -560,7 +551,7 @@ End Function
 ' @param itemContent - Content node with viewing history
 Function metadataOnContinueWatchingContent(itemContent)
   m.closedCaptions.visible = false
-  m.rating.visible = false
+  m.ratingBadge.visible = false
   ' Sot badge is will not be present in the continue watching content portrait mode.
   ' Due to progress bar being present in the poster already.
   m.sotBadge.visible = false
@@ -627,22 +618,16 @@ End Function
 Function displayLiveRating(currentProgram)
   firstLineGroup = m.firstLineGroup
   ' handle rating
-  ratingIsPresent = (m.rating.getParent() <> invalid)
+  ratingIsPresent = (m.ratingBadge.getParent() <> invalid)
   if isNonEmptyString(currentProgram.rating) = true
     if ratingIsPresent = false
       insertIndex = m.nodeHelpers.getChildIndex(m.firstLineGroup, m.subHeadlineSuffixGroup) + 1
-      firstLineGroup.insertChild(m.rating, insertIndex)
+      firstLineGroup.insertChild(m.ratingBadge, insertIndex)
     end if
-
-    m.ratingLabel.width = 0
-    m.ratingLabel.text = UCase(currentProgram.rating)
-
-    nRatingBoundingBoxIncrease = m.ratingLabel.boundingRect().width + 24
-    m.ratingBackground.width = nRatingBoundingBoxIncrease
-    m.ratingLabel.width = nRatingBoundingBoxIncrease
+    m.ratingBadge.rating = currentProgram.rating
   else
     if ratingIsPresent = true
-      firstLineGroup.removeChild(m.rating)
+      firstLineGroup.removeChild(m.ratingBadge)
     end if
   end if
 End Function
@@ -771,7 +756,7 @@ Function displayRatingDescriptor(itemContent) as Void
   end for
 
   ' Insert badges into firstLineGroup after rating using appendChildren
-  ratingIndex = m.nodeHelpers.getChildIndex(m.firstLineGroup, m.rating)
+  ratingIndex = m.nodeHelpers.getChildIndex(m.firstLineGroup, m.ratingBadge)
   if ratingIndex <> -1
     m.firstLineGroup.insertChildren(m.ratingDescriptorBadges, ratingIndex + 1)
   end if
@@ -780,7 +765,7 @@ End Function
 
 ' Displays the audio description badge in the first line group
 Function displayAudioDescriptionBadge()
-  audioDescriptionIndex = m.nodeHelpers.getChildIndex(m.firstLineGroup, m.rating)
+  audioDescriptionIndex = m.nodeHelpers.getChildIndex(m.firstLineGroup, m.ratingBadge)
 
   audioDescriptionPoster = createPoster("pkg:/images/icon-audio-description.webp", {
     id: "audioDescriptionPoster"

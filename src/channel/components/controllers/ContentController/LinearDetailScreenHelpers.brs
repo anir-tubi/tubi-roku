@@ -52,7 +52,10 @@ Function onLinearDetailContentRefreshSuccess(refreshedContent) as Void
 End Function
 
 
-Function onLinearDetailsBackgroundChange(msg)
+Function onLinearDetailsBackgroundChange(msg) as Void
+  currentScreen = getCurrentScreen()
+  if currentScreen = invalid OR currentScreen.id <> m.constants.ui.screenIds.linearDetailScreen then return
+
   screen = msg.getRoSGNode()
   if screen.isInFocusChain() = true
     m.backgroundGroup.backgroundInfo = {

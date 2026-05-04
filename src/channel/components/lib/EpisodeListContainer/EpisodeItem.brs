@@ -8,17 +8,13 @@ Function init() as Void
   m.description = topRef.findNode("description")
   m.duration = topRef.findNode("duration")
   m.subtitlesIcon = topRef.findNode("subtitlesIcon")
-  m.rating = topRef.findNode("rating")
-  m.ratingBackground = topRef.findNode("ratingBackground")
-  m.ratingLabel = topRef.findNode("ratingLabel")
+  m.ratingBadge = topRef.findNode("ratingBadge")
   m.progressBarGroup = topRef.findNode("progressBarGroup")
   m.progressBar = topRef.findNode("progressBar")
 
   setTypographyOfLabel(m.episodeTitle, m.typographyConstants.ids.subheaderSmall, { lineSpacing: 2 })
   setTypographyOfLabel(m.description, m.typographyConstants.ids.bodyMedium, { lineSpacing: 2 })
   setTypographyOfLabel(m.duration, m.typographyConstants.ids.bodySmall)
-  setTypographyOfLabel(m.ratingLabel, m.typographyConstants.ids.bodyExtraSmallStrong)
-
   if m.global <> invalid
     m.global.observeFieldScoped("theme", "onThemeChange")
     m.global.observeFieldScoped("historyUpdated", "onHistoryUpdated")
@@ -66,7 +62,6 @@ Function onThemeChange(msg = invalid) as Void
     m.episodeTitle.color = theme.primaryTextColor
     m.description.color = theme.primaryTextColor
     m.duration.color = theme.secondaryTextColor
-    m.ratingLabel.color = theme.secondaryTextColor
     m.progressBar.focusColor = theme.focusedColor
     m.progressBar.trackColor = theme.neutralColor
     m.progressBar.unfocusColor = theme.focusedColor
@@ -136,8 +131,7 @@ Function onItemContentChange(msg = invalid) as Void
   end if
   m.duration.text = durationText
 
-  ' Set rating badge
-  setRatingBadge(content.rating)
+  m.ratingBadge.rating = content.rating
   m.subtitlesIcon.visible = content.hasSubtitles
 
   ' Set progress bar based on viewing history
@@ -186,24 +180,4 @@ Function calculateProgressPercentage(history, duration) as Float
   if not isNumber(duration) OR duration <= 0 then return 0
 
   return (history.nowPos / duration) * 100
-End Function
-
-
-' Sets the rating badge visibility and sizing
-' @param rating - String, the content rating (e.g., "PG", "R")
-Function setRatingBadge(rating) as Void
-  if not isNonEmptyString(rating) then return
-
-  ' Calculate badge width based on text
-  ratingLabel = m.ratingLabel
-  ratingLabel.width = 0
-  ratingLabel.text = UCase(rating)
-
-  badgeWidth = ratingLabel.boundingRect().width + 24
-  badgeWidth = ensureDivisibleBy3(badgeWidth)
-
-  ' Batch update both label and background
-  ratingLabel.width = badgeWidth
-  m.ratingBackground.width = badgeWidth
-  m.rating.visible = true
 End Function
