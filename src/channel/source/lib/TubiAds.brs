@@ -226,8 +226,8 @@ Function tubiAds_populateUrlRainmaker(episode, breakPos = 0) as String
   adsOverrideParams = {}
 
   if m.statsigExperiments <> invalid then
-    result = m.statSigExperiments.getExperimentResource("roku_dynamic_ad_load", "roku_dynamic_ad_load_v1")
-    if result <> invalid AND result.enabled = true then
+    experiment = m.statsigExperiments.getExperimentResource("roku_dynamic_ad_load", "roku_dynamic_ad_load_v2")
+    if experiment <> invalid AND experiment.enabled = true then
       contentId = episode.id
       currentTime = createObject("roDateTime").asSeconds()
 
@@ -241,7 +241,7 @@ Function tubiAds_populateUrlRainmaker(episode, breakPos = 0) as String
           ' If the cached result has expired then remove it from the cache
           m.dynamicAdCache.delete(contentId)
         end if
-      else
+      else if experiment.requestOnPreroll = true OR breakPos <> 0 then
         options = {}
         authInfo = m.auth.getAuthInfo()
         if authInfo <> invalid AND authInfo.accessToken <> invalid then
@@ -252,7 +252,7 @@ Function tubiAds_populateUrlRainmaker(episode, breakPos = 0) as String
         url = m.request.addParamsToUrl(m.constants.urls.adOverride, {
           content_id: contentId
           platform: m.constants.analyticsPlatform
-          now_pos: breakPos.toStr()
+          now_pos: round(breakPos).toStr()
         })
         tubiReq = m.request.createAsync(url, "adOverride", options)
 
@@ -282,6 +282,12 @@ Function tubiAds_populateUrlRainmaker(episode, breakPos = 0) as String
               adsOverrideJson = parseJson(adsOverrideResponse)
               if adsOverrideJson <> invalid AND adsOverrideJson.result <> invalid AND adsOverrideJson.personalization_id <> invalid then
                 adsOverrideParams = adsOverrideJson.result
+
+                if experiment.resultOverride.isEmpty() = false then
+                  adsOverrideParams = {}
+                  adsOverrideParams.append(experiment.resultOverride)
+                end if
+
                 adsOverrideParams["personalization_id"] = adsOverrideJson.personalization_id
 
                 m.dynamicAdCache[contentId] = {

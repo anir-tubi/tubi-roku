@@ -189,9 +189,17 @@ Function StatsigExperimentsInterface(statsigExperimentsInfo) as Object
         default: { "enabled": false, "treatment_group": "control", "background_enabled": false, "remove_pivots": [] }
       }
 
+      ' T1: Client calls TUS + DYAD for all cue points, gets results from TUS, but does NOT send to RainMaker
+      ' T2: Client calls TUS + DYAD for all cue points except cue point 0, gets results from TUS, but does NOT send to RainMaker
+      ' T3: Client calls TUS + DYAD for all cue points except cue point 0, gets results from TUS, and sends to RainMaker as is.
+      ' T4: Client calls TUS + DYAD for all cue points except cue point 0, gets results from TUS, and sends to RainMaker with fixed {"min_time_between_ad_breaks":"+0%", "max_break_count":"+0", "max_break_duration":"+0"}
       roku_dynamic_ad_load: {
-        roku_dynamic_ad_load_v1: {
-          default: { "enabled": false }
+        roku_dynamic_ad_load_v2: {
+          default: {
+            "enabled": false
+            "requestOnPreroll": false
+            "resultOverride": {}
+          }
         }
       }
 
