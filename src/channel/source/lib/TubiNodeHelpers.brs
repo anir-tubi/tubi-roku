@@ -302,6 +302,8 @@ Function tubiNodeHelpers_getNodeFromPosition(contentNode, position)
   rowIndex = position[0]
   columnIndex = position[1]
 
+  if rowIndex = invalid OR columnIndex = invalid then return invalid
+
   ' Get the row node
   if rowIndex < 0 OR rowIndex >= contentNode.getChildCount() then return invalid
   rowNode = contentNode.getChild(rowIndex)

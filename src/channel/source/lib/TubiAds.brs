@@ -1266,11 +1266,11 @@ Function tubiAds_updateYouboraOptions(youboraTask, ctx, impressionCount)
       end if
 
       if ctx.ad.streams <> invalid AND ctx.ad.streams[0] <> invalid AND ctx.ad.streams[0].id <> invalid
-        youboraOptions["ad.extraparam.2"] = ctx.ad.streams[0].id
+        youboraOptions["ad.extraparam.2"] = ctx.ad.streams[0].id.toStr()
       end if
 
       if youboraOptions["ad.extraparam.1"] <> invalid AND youboraOptions["ad.extraparam.2"] <> invalid
-        youboraOptions["ad.extraparam.3"] = youboraOptions["ad.extraparam.1"] + "-" + youboraOptions["ad.extraparam.2"]
+        youboraOptions["ad.extraparam.3"] = youboraOptions["ad.extraparam.1"].toStr() + "-" + youboraOptions["ad.extraparam.2"].toStr()
       end if
 
       if impressionCount <> invalid
