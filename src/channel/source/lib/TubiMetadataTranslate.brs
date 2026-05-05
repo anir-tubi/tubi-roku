@@ -1877,6 +1877,10 @@ Function tubiMetadataTranslate_buildCategoryChildrenInfo(container, contents, co
               childAA.seriesTitle = fullChild.series_title
             end if
 
+            if isNonEmptyString(fullChild.series_id)
+              childAA.seriesId = "0" + fullChild.series_id
+            end if
+
             if isNonEmptyArray(fullChild.video_previews) = true AND isAA(fullChild.video_previews[0])
               childAA.videoPreviewUrl = fullChild.video_previews[0].url
               childAA.previewId = fullChild.video_previews[0].uuid
