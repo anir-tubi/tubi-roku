@@ -4,6 +4,11 @@
 
 <<Replace this with a non technical description of what should be provided for this PR in the release notes. Prefix your release notes with 'Experiment', 'Graduation', 'Feature', 'BugFix', 'Enhancement' if applicable. If no release notes are needed, remove this line. >>
 
+## QA Testing Type (select one)
+- [ ] Testing Required
+- [ ] Regression
+- [ ] No Testing
+
 ## QA What Changed
 
 ---

@@ -38,6 +38,9 @@ const { makeReleasePrs, pushTag, createGithubRelease, findCommitsNotOnProduction
 // importing functions related to client error config
 const { updateLocalClientErrorConfigFile, verifyLocalClientErrorConfigIsCurrent } = require('./js/local-client-error-config');
 
+// Importing QA ticket automation
+const { createOrUpdateQaTicket } = require('./js/qa-ticket');
+
 /* Allow some environment variables to drive which config we're building.
    Environment variables are set on options, along with any parameters passed in
    to the gulp command line call.
@@ -1083,8 +1086,25 @@ async function buildQaChangesOutput(done) {
   console.log('-----------------------------------------------------------------------');
   console.log('');
   clipboardy.writeSync(qaChanges.text);
-  console.log('QA Changes have been copied to your clipboard! Paste into QA ticket.');
+  console.log('QA Changes have been copied to your clipboard!');
 
+  try {
+    await createOrUpdateQaTicket(qaChanges.changes);
+  } catch (error) {
+    console.error(`Jira ticket update failed (non-blocking): ${error.message}`);
+  }
+
+  done();
+}
+
+
+async function createQaTicket(done) {
+  const qaChanges = await buildQaChanges(done);
+  try {
+    await createOrUpdateQaTicket(qaChanges.changes);
+  } catch (error) {
+    console.error(`Jira ticket creation failed: ${error.message}`);
+  }
   done();
 }
 
@@ -1160,10 +1180,13 @@ exports.bumpQa = exports.bumpQA; //Create bumpQA command alias
 exports.install = series(exports.build, conditionalPackage, sideLoad);
 exports.test = series(setTest, clean, preprocessTests, buildInstalled, sideLoad);
 exports.buildQaBranch = buildQaBranch;
-exports.stage = series(validateBuildEnvironment, verifyLocalClientErrorConfigIsCurrent, uploadLatestTranslationsAndCreateTicketForMissingTranslations, setStaging, bumpRevision, addMissingImagesAndPush, exports.build, packageAll, pushStaging, pushBranch);
+exports.stage = series(validateBuildEnvironment, verifyLocalClientErrorConfigIsCurrent, uploadLatestTranslationsAndCreateTicketForMissingTranslations, setStaging, bumpRevision, addMissingImagesAndPush, exports.build, packageAll, pushStaging, pushBranch, createQaTicket);
 exports.releaseOnGithub = series(tagBuild, pushTag, createGithubRelease);
 exports.release = series(validateBuildEnvironment, confirmRelease, verifyLocalClientErrorConfigIsCurrent, setProduction, bumpBuild, exports.build, packageAll, makeReleasePrs, exports.releaseOnGithub);
 exports.compareProd = findCommitsNotOnProductionBranch;
+exports.compareProdGrouped = function compareProdGrouped(done) {
+  return findCommitsNotOnProductionBranch(done, true);
+};
 exports.compareCheckedOut = findCommitsNotOnCurrentBranch;
 exports.addMissingImages = addMissingImagesToRemoteLibrary;
 exports.tasks = listTasks;
@@ -1428,6 +1451,7 @@ exports.packageCompanionChannel = packageCompanionChannel;
 
 exports.buildReleaseNotes = buildReleaseNotesOutput;
 exports.buildQaChanges = buildQaChangesOutput;
+exports.createQaTicket = createQaTicket;
 exports.runPerformanceTests = series(setPerformanceTestsConfig, clean, buildInstalled, runPerformanceTests);
 
 //command lines related to the crowdin language translations

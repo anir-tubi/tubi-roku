@@ -664,6 +664,7 @@ async function buildQaChanges(done) {
       commit: commitHash,
       whatChanged: qaInfo.whatChanged,
       testingSteps: qaInfo.testingSteps,
+      testingType: qaInfo.testingType,
       pointDeveloper: githubDeveloperInfo[userLogin],
       ticketUrl: ticketUrl
     };
@@ -707,15 +708,54 @@ ${qaChangesText.join('\n\n<hr>\n\n')}`;
 }
 
 
+function stripCursorSummary(text) {
+  return text.replace(/<!-- CURSOR_SUMMARY -->[\s\S]*?<!-- \/CURSOR_SUMMARY -->/g, '').trim();
+}
+
+
+function extractQaTestingType(body, testingSteps) {
+  const typeMap = {
+    'testing required': 'Testing Required',
+    'regression': 'Regression',
+    'no testing': 'No Testing',
+  };
+
+  if (body) {
+    const section = body.match(/## QA Testing Type([\s\S]*?)## QA What Changed/i);
+    if (section) {
+      const checked = section[1].match(/- \[x\]\s+(.+)/i);
+      if (checked) {
+        const normalized = typeMap[checked[1].trim().toLowerCase()];
+        if (normalized) return normalized;
+      }
+    }
+  }
+
+  if (testingSteps) {
+    const lower = testingSteps.toLowerCase();
+    if (/\bno\s+testing\b/.test(lower) || /\bn\/a\b/.test(lower) || /\bnone\b/.test(lower)) {
+      return 'No Testing';
+    }
+    if (/\bregression\b/.test(lower)) {
+      return 'Regression';
+    }
+  }
+
+  return null;
+}
+
+
 function extractQaChangesFromPullRequestBody(body) {
   if (body) {
     const match = body.match(/## QA What Changed.*?---(.*)## QA Testing Steps.*?---(.*)/s);
     if (match) {
-      const whatChanged = match[1].trim();
-      const testingSteps = match[2].trim();
+      const whatChanged = stripCursorSummary(match[1]).trim();
+      const testingSteps = stripCursorSummary(match[2]).trim();
+      const testingType = extractQaTestingType(body, testingSteps);
       return {
         whatChanged: whatChanged,
-        testingSteps: testingSteps
+        testingSteps: testingSteps,
+        testingType: testingType
       };
     }
   }
@@ -724,7 +764,7 @@ function extractQaChangesFromPullRequestBody(body) {
 
 function extractReleaseNotesFromPullRequestBody(body) {
   if (body) {
-    const match = body.match(/## Release Notes.*?---(.*)## QA What Changed/s);
+    const match = body.match(/## Release Notes.*?---(.*?)(?=## QA Testing Type|## QA What Changed)/s);
     if (match) {
       return match[1].trim();
     }
@@ -791,16 +831,68 @@ async function findPullRequestCommitDifferences(done, branchA, branchB, includeA
 
 
 // @compareBranch: string, the branch name we are comparing to master
-async function findCommitsOnMasterNotOnBranch(done, compareBranch) {
+async function findCommitsOnMasterNotOnBranch(done, compareBranch, groupByTestingType = false) {
   const commitsFromMasterNotOnCompareBranch = await findPullRequestCommitDifferences(done, 'master', compareBranch, true);
   commitsFromMasterNotOnCompareBranch.reverse();
+
+  if (!groupByTestingType) {
+    console.log('');
+    console.log(`COMMITS THAT HAVE NOT BEEN CHERRY PICKED FROM master TO ${compareBranch}`);
+    console.log('-----------------------------------------------------------------------');
+    commitsFromMasterNotOnCompareBranch.forEach((item) => {
+      console.log(item.message);
+    });
+    console.log('-----------------------------------------------------------------------');
+    return done();
+  }
+
+  const groups = {
+    'Testing Required': [],
+    'Regression': [],
+    'No Testing': [],
+    'Undetermined': [],
+  };
+
+  for (const item of commitsFromMasterNotOnCompareBranch) {
+    let testingType = null;
+    if (item.prId) {
+      try {
+        const { data: pr } = await octokit().pulls.get({
+          owner: ghInfo.owner,
+          repo: ghInfo.rokuRepo,
+          pull_number: +item.prId
+        });
+        const qaInfo = extractQaChangesFromPullRequestBody(pr.body);
+        if (qaInfo) {
+          testingType = qaInfo.testingType;
+        }
+      } catch (e) {
+        // Fall through with default
+      }
+    }
+    const groupKey = testingType && groups[testingType] ? testingType : 'Undetermined';
+    groups[groupKey].push(item);
+  }
+
   console.log('');
   console.log(`COMMITS THAT HAVE NOT BEEN CHERRY PICKED FROM master TO ${compareBranch}`);
-  console.log('-----------------------------------------------------------------------');
-  commitsFromMasterNotOnCompareBranch.forEach((item) => {
-    console.log(item.message);
-  });
-  console.log('-----------------------------------------------------------------------');
+  console.log('=======================================================================');
+
+  for (const [type, commits] of Object.entries(groups)) {
+    if (commits.length === 0) continue;
+    console.log('');
+    console.log(`  ${type} (${commits.length})`);
+    console.log('  ---------------------------------------------------------------');
+    commits.forEach((item) => {
+      const prLink = item.prId ? `  \x1b[36mhttps://github.com/adRise/tubi-roku/pull/${item.prId}\x1b[0m` : '';
+      console.log(`  ${item.message}${prLink}`);
+    });
+  }
+
+  console.log('');
+  console.log('=======================================================================');
+  console.log(`  Total: ${commitsFromMasterNotOnCompareBranch.length} commits`);
+  console.log('=======================================================================');
   return done();
 }
 
@@ -843,9 +935,9 @@ function getCurrentBranch(done) {
 }
 
 
-function findCommitsNotOnProductionBranch(done) {
+function findCommitsNotOnProductionBranch(done, groupByTestingType = false) {
   const prodBranch = getProductionBranchName();
-  return findCommitsOnMasterNotOnBranch(done, prodBranch);
+  return findCommitsOnMasterNotOnBranch(done, prodBranch, groupByTestingType);
 }
 
 
@@ -1607,6 +1699,7 @@ module.exports = {
   buildReleaseNotes,
   buildQaChanges,
   extractQaChangesFromPullRequestBody,
+  extractQaTestingType,
   extractReleaseNotesFromPullRequestBody,
   buildQaBranch,
   bumpBuild,

@@ -119,7 +119,9 @@ __The most commonly used Gulp commands__
 * `$ gulp addMissingImages` - updates new_images_since file with images that need to be included in the remote component library.
 * `$ gulp bumpQA` - bumps the revision number. This is used during the QA process. As changes are made and new QA builds are created, the revision number is used to distinguish between builds.
 * `$ gulp release` - bump the build number, build starter and remote components .pkgs using the "production" config. This command will also make PRs to the CDN repo and this tubi-roku repo on Github.
-* `$ gulp buildQaChanges` - Generates the output for the ticket that we give to QA of the changes between the current branch and the current production branch. Will automatically copy to the clipboard.
+* `$ gulp buildQaChanges` - Generates the output for the ticket that we give to QA of the changes between the current branch and the current production branch. Will automatically copy to the clipboard and create/update the Jira QA ticket.
+* `$ gulp createQaTicket` - Creates or updates the Jira QA ticket from the current branch's QA changes without the clipboard copy step.
+* `$ gulp compareProdGrouped` - Same as `compareProd` but groups commits by QA Testing Type (Testing Required, Regression, No Testing). Useful for QA sync calls.
 * `$ gulp buildReleaseNotes` -Generates the output for the release notes to be pasted on the release: https://github.com/adRise/tubi-roku/tags
 
 __Gulp options__
@@ -318,15 +320,13 @@ TBD
 ```
 7\. Check with your fellow Roku developers to see if there are any experiments from this build that should be added to Popper Staging. If there are, then [deploy the experiments to popper staging.](#deploying-an-experiment-on-popper-staging)
 
-8\. Create a SC ticket with any changes that have been made and give the ticket to the QA team for manual testing.
+8\. Create a Jira ticket with any changes that have been made and give the ticket to the QA team for manual testing.
 
-  - Go to [JIRA](https://tubitv.atlassian.net/)
-  - Create a QA ticket
-  - Run the command `gulp buildQaChanges`, which will build most of the copy for this ticket and place it in your clipboard
-  - Paste the copy in the newly created SC ticket from the previous step
-  - Change the branch name within the SC ticket to reflect the new created submission branch (`x_y_branch`). The `buildQaChanges` command does not yet handle submission builds so the command will assume that it should use the remote submission naming convention. 
-  - Make sure that no work is missing in the list and that the included info looks correct
-  - Provide QA with a link to the ticket within the roku_qa slack channel
+  - The `gulp stage` command automatically creates or updates the Jira QA ticket as its last step. You can also run `gulp createQaTicket` separately.
+  - Requires `JIRA_EMAIL` and `JIRA_TOKEN` environment variables to be set.
+  - The ticket groups changes by QA Testing Type (Testing Required, Regression, No Testing) based on each PR's template selection.
+  - Make sure that no work is missing in the list and that the included info looks correct.
+  - Provide QA with a link to the ticket within the roku_qa slack channel.
 
 9\. Any bugs found by QA should be fixed, committed to master, and then cherry picked into this QA branch and update private channel.
 
@@ -436,6 +436,8 @@ __NOTE__ you can also use the new `gulp compareCheckedOut` after the initial qa 
 
 __NOTE__ The compareProd command will list commits in order from oldest to newest. When cherry picking the commits to the new QA build, you will need to start from the top of the list - which are earlier commits.
 
+__NOTE__ Use `gulp compareProdGrouped` to see the same list grouped by QA Testing Type (Testing Required, Regression, No Testing). This is useful during QA sync calls to quickly identify what needs manual testing vs regression vs no testing.
+
 4\. Cherry pick any commits from local `master` that are to be included in the next release onto the qa branch `qa_x_y_z`.
 (See [this page](https://www.previousnext.com.au/blog/intro-cherry-picking-git) for more info info on the cherry pick git command.)
 
@@ -457,13 +459,11 @@ Ensure the cherry pick commit names include the name of PR number. This usually 
 6\. Check with your fellow Roku developers to see if there are any experiments from this build that should be added to Popper Staging. If there are, then [deploy the experiments to popper staging.](#deploying-an-experiment-on-popper-staging)
 
 
-7\. Create a JIRA ticket with any changes that have been made and give the ticket to the QA team for manual testing.
-  - Go to [JIRA](https://tubitv.atlassian.net/)
-  - Create a QA ticket.
-  - Run the command `gulp buildQaChanges`, which will build most of the copy for this ticket and place it in your clipboard
-  - Paste the copy in the newly created SC ticket from the previous step
-  - Make sure that no work is missing in the list and that the included info looks correct
-  - Provide QA with a link to the ticket within the roku_qa slack channel
+7\. Create a Jira ticket with any changes that have been made and give the ticket to the QA team for manual testing.
+  - The `gulp stage` command automatically creates or updates the Jira QA ticket as its last step. You can also run `gulp createQaTicket` separately.
+  - Requires `JIRA_EMAIL` and `JIRA_TOKEN` environment variables to be set.
+  - Make sure that no work is missing in the list and that the included info looks correct.
+  - Provide QA with a link to the ticket within the roku_qa slack channel.
 
 8\. Any bugs found by QA should be fixed, committed to master, and then cherry picked into this QA build. Use the following command to update the staging channel with the latest version of the QA branch.
 
