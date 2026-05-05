@@ -144,7 +144,10 @@ Function showDetailScreen(content, sendTrackingOnResponse = true, successCb = in
     previewFetchedContent = getPreviewFetchedContentForDetailIfMatching(content)
 
     ' don't send tracking in case of series until we resolve series episode and send tracking if we already populate the detail screen to avoid wrong order of events
-    if sendTrackingOnResponse = true
+    isSkippingDetailScreen = (successCb = skipDetailScreen OR successCb = skipDetailScreenDeeplinkWrapper)
+    if isSkippingDetailScreen = true
+      pushScreen(detailScreen, false, false)
+    else if sendTrackingOnResponse = true
       if m.isScreenLoaded = true OR seriesContent <> invalid
         pushScreen(detailScreen, true, true)
       else

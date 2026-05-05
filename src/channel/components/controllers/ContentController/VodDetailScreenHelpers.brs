@@ -43,7 +43,8 @@ Function showVodDetailScreen(inputContent, playbackSource, successCb = invalid, 
     screen.trackingPageInfo = getDetailScreenAnalyticsPageInfo(content, m.constants)
     screen.shouldTrackViewableImpressionEvent = (isUserInAdultsMode() = true AND isKidsUIOn() = false)
 
-    pushScreen(screen, true, true)
+    isSkippingDetailScreen = (successCb = skipDetailScreen OR successCb = skipDetailScreenDeeplinkWrapper)
+    pushScreen(screen, not isSkippingDetailScreen, not isSkippingDetailScreen)
 
     m.showVodDetailScreenCallback = {
       "success": successCb

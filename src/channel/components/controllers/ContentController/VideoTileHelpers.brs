@@ -382,6 +382,7 @@ End Function
 ' @param columnFocused integer - Column index
 ' @param rowFocused integer - Row index
 Function updateCurrentRowMetadata(content, columnFocused, rowFocused) as Void
+  if isNode(content) = false then return
   currCategory = content.getChild(rowFocused)
   if currCategory = invalid
     return
@@ -405,6 +406,7 @@ End Function
 ' @param rowFocused integer - Current row index
 ' @param screen roSGNode - Current screen node
 Function updatePredictedRowMetadata(content, rowFocused, screen) as Void
+  if isNode(content) = false then return
   ' Determine next row based on scroll direction
   nextRow = 1
   if screen.listScrollDirection = "down"
