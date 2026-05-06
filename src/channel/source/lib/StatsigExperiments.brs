@@ -199,6 +199,12 @@ Function StatsigExperimentsInterface(statsigExperimentsInfo) as Object
             "enabled": false
             "requestOnPreroll": false
             "resultOverride": {}
+            ' decoupledPrefetch: when true, fire TUS asynchronously tusLeadSec earlier than the
+            ' Rainmaker prefetch trigger and serve the override from a per-cuepoint cache. On
+            ' cache miss the Rainmaker call goes out without an override (Control behavior for
+            ' that break), so TUS latency cannot push the Rainmaker call past the cuepoint.
+            "decoupledPrefetch": false
+            "tusLeadSec": 5
           }
         }
       }

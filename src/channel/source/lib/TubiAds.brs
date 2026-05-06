@@ -88,6 +88,8 @@ Function TubiAds(constants, requestInstance, requestQueue, auth, tracking, adCon
     replaceMacro: tubiAds_replaceMacro
     setLimitAdTracking: tubiAds_setLimitAdTracking
     setAdType: tubiAds_setAdType
+    prefetchAdOverride: tubiAds_prefetchAdOverride
+    handleAdOverrideResponse: tubiAds_handleAdOverrideResponse
 
     appMode: "DEFAULT_MODE"
     notUsedAdPodPixels: {} ' List of pixels for the current ad pod that should be sent if playback is stopped before we get an impression for that ad
@@ -98,6 +100,11 @@ Function TubiAds(constants, requestInstance, requestQueue, auth, tracking, adCon
     isAdultParentalLevel: true
     statsigExperiments: statsigExperimentsLib
     dynamicAdCache: {} ' Cache for dynamic ad load experiment to store ad override params at the content id level
+    ' Used by the decoupled prefetch path (roku_dynamic_ad_load_v2.decoupledPrefetch=true).
+    ' Keyed by "<contentId>_<round(breakPos)>" so each cuepoint gets its own override.
+    dynamicAdCacheV2: {}
+    ' Dedup map for in-flight TUS prefetch requests, keyed the same way as dynamicAdCacheV2.
+    dynamicAdInFlight: {}
   }
 End Function
 
@@ -231,8 +238,20 @@ Function tubiAds_populateUrlRainmaker(episode, breakPos = 0) as String
       contentId = episode.id
       currentTime = createObject("roDateTime").asSeconds()
 
+      ' Decoupled prefetch path (gated by Statsig). Override is served from a per-cuepoint
+      ' cache that the screen warms up tusLeadSec earlier than the Rainmaker prefetch trigger.
+      ' On cache miss we send the Rainmaker call without an override (Control behavior for
+      ' that break), so TUS latency cannot push Rainmaker past the cuepoint.
+      if experiment.decoupledPrefetch = true then
+        cacheKey = contentId + "_" + round(breakPos).toStr()
+        cachedV2 = m.dynamicAdCacheV2[cacheKey]
+        if cachedV2 <> invalid AND cachedV2.expireTime <> invalid AND cachedV2.expireTime > currentTime AND cachedV2.params <> invalid then
+          adsOverrideParams = cachedV2.params
+        else if cachedV2 <> invalid AND cachedV2.expireTime <> invalid AND cachedV2.expireTime <= currentTime then
+          m.dynamicAdCacheV2.delete(cacheKey)
+        end if
       ' If we have a cached result and it hasn't expired use that instead of making a new network request
-      if m.dynamicAdCache[contentId] <> invalid AND m.dynamicAdCache[contentId].expireTime <> invalid then
+      else if m.dynamicAdCache[contentId] <> invalid AND m.dynamicAdCache[contentId].expireTime <> invalid then
         if m.dynamicAdCache[contentId].expireTime > currentTime then
           if m.dynamicAdCache[contentId].params <> invalid then
             adsOverrideParams = m.dynamicAdCache[contentId].params
@@ -1411,4 +1430,109 @@ End Function
 ' @adType: string, the type of ad being fetched ("preroll", "midroll", "seek")
 Function tubiAds_setAdType(adType)
   m.currentAdType = adType
+End Function
+
+
+' ----------------------------------------------
+' tubiAds_prefetchAdOverride
+'
+' Fires a TUS ad-override request asynchronously for a single (contentId, breakPos) ahead of
+' the Rainmaker prefetch window. The response is handled out-of-band by tubiAds_handleAdOverrideResponse,
+' which writes the parsed override into m.dynamicAdCacheV2 keyed by "<contentId>_<round(breakPos)>".
+'
+' Safe to call multiple times: a dedup map (m.dynamicAdInFlight) and the cache itself prevent
+' duplicate network calls for the same cuepoint within the cache TTL.
+'
+' Caller must have decoupledPrefetch = true on the active roku_dynamic_ad_load_v2 experiment;
+' this function does not re-check the experiment so it can be used by clients that already
+' resolved the experiment once per content.
+'
+' @episode: node, TubiContentNode for a video (movie or episode)
+' @breakPos: integer, the cuepoint (in seconds) the override is for
+' ----------------------------------------------
+Function tubiAds_prefetchAdOverride(episode, breakPos)
+  if episode = invalid OR episode.id = invalid then return invalid
+
+  contentId = episode.id
+  cacheKey = contentId + "_" + round(breakPos).toStr()
+  currentTime = createObject("roDateTime").asSeconds()
+
+  ' Skip if we already have a fresh cached entry or an in-flight request for this cuepoint.
+  cachedV2 = m.dynamicAdCacheV2[cacheKey]
+  if cachedV2 <> invalid AND cachedV2.expireTime <> invalid AND cachedV2.expireTime > currentTime then
+    return invalid
+  end if
+  if m.dynamicAdInFlight[cacheKey] = true then return invalid
+
+  options = {}
+  authInfo = m.auth.getAuthInfo()
+  if authInfo <> invalid AND authInfo.accessToken <> invalid then
+    options.headers = m.auth.getAuthHeaders(authInfo.accessToken, true)
+  end if
+
+  url = m.request.addParamsToUrl(m.constants.urls.adOverride, {
+    content_id: contentId
+    platform: m.constants.analyticsPlatform
+    now_pos: round(breakPos).toStr()
+  })
+  tubiReq = m.request.createAsync(url, "adOverridePrefetch", options)
+  if tubiReq = invalid then return invalid
+
+  ' Stash the cache key on the request itself; the response handler will pull it back off.
+  tubiReq.cacheKey = cacheKey
+
+  m.dynamicAdInFlight[cacheKey] = true
+  m.requestQueue.pushRequest(tubiReq)
+  return tubiReq
+End Function
+
+
+' ----------------------------------------------
+' tubiAds_handleAdOverrideResponse
+'
+' Process the response from an "adOverridePrefetch" request that has already been routed by
+' the request queue. Parses the body, computes the cache TTL from Cache-Control: max-age,
+' and writes the override into m.dynamicAdCacheV2 under the cache key the request was tagged with.
+'
+' Mirrors the parsing block in tubiAds_populateUrlRainmaker so the override shape is the same
+' regardless of which path produced it.
+'
+' @completedRequest: object, the request returned by m.requestQueue.handleEvent
+' ----------------------------------------------
+Function tubiAds_handleAdOverrideResponse(completedRequest)
+  if completedRequest = invalid OR completedRequest.name <> "adOverridePrefetch" then return invalid
+  if completedRequest.cacheKey = invalid then return invalid
+
+  cacheKey = completedRequest.cacheKey
+  m.dynamicAdInFlight.delete(cacheKey)
+
+  if completedRequest.response = invalid then return invalid
+  responseCode = completedRequest.response.code
+  if responseCode = invalid OR responseCode < 200 OR responseCode >= 400 then return invalid
+
+  cacheControl = invalid
+  if completedRequest.response.headers <> invalid then
+    cacheControl = completedRequest.response.headers["Cache-Control"]
+  end if
+  if cacheControl = invalid then cacheControl = "private, max-age=300"
+
+  regex = CreateObject("roRegex", "max-age=(\d+)", "i")
+  match = regex.match(cacheControl)
+  maxAge = 0
+  if match.count() > 1 then maxAge = match[1].toInt()
+
+  body = completedRequest.response.data
+  if body = invalid then return invalid
+  parsed = parseJson(body)
+  if parsed = invalid OR parsed.result = invalid OR parsed.personalization_id = invalid then return invalid
+
+  adsOverrideParams = parsed.result
+  adsOverrideParams["personalization_id"] = parsed.personalization_id
+
+  currentTime = createObject("roDateTime").asSeconds()
+  m.dynamicAdCacheV2[cacheKey] = {
+    "params": adsOverrideParams
+    "expireTime": currentTime + maxAge
+  }
+  return adsOverrideParams
 End Function

@@ -205,6 +205,14 @@
     <!-- field for communicating playback position to the ad shim -->
     <field id="adPosition" type="float" />
 
+    <!--
+        - Decoupled TUS prefetch trigger (roku_dynamic_ad_load_v2.decoupledPrefetch=true).
+        - Screen writes the upcoming cuepoint (in seconds) here when it enters the early
+        - prefetch window (m.adPrefetchTime + experiment.tusLeadSec). The ad shim observes
+        - this field and fires TUS asynchronously for that cuepoint.
+        -->
+    <field id="adOverridePrefetchPosition" type="float" value="0" alwaysNotify="true" />
+
     <field id="adProgress" type="integer" value="0" />
 
     <!-- Error message to be displayed to the user -->
