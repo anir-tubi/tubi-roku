@@ -44,6 +44,9 @@ Function tubiSGAdShim_run(videoPlayerNode) as Boolean
   port = m.ads.adMessagePort
   m.videoPlayerNode.observeField("adControl", port)
   m.videoPlayerNode.observeField("position", port)
+  ' Decoupled TUS prefetch trigger (roku_dynamic_ad_load_v2.decoupledPrefetch): the screen
+  ' writes the upcoming cuepoint here ahead of the Rainmaker prefetch, and we fire TUS async.
+  m.videoPlayerNode.observeField("adOverridePrefetchPosition", port)
   m.videoPlayerNode.observeFieldScoped("userConsentsOptOutStatus", port)
   m.videoPlayerNode.observeFieldScoped("tcfString", port)
   userConsentsOptOutStatus = videoPlayerNode.userConsentsOptOutStatus
@@ -83,9 +86,19 @@ Function tubiSGAdShim_run(videoPlayerNode) as Boolean
         end if
       else if msg.GetField() = "tcfString"
         m.ads.tracking.tcfString = msg.getData()
+      else if msg.GetField() = "adOverridePrefetchPosition"
+        breakPos = m.videoPlayerNode.adOverridePrefetchPosition
+        if m.videoPlayerNode.content <> invalid AND breakPos > 0
+          episode = m.videoPlayerNode.content.getFields()
+          episode.videoSponsorExposureId = m.videoPlayerNode.videoSponsorExposureId
+          m.ads.prefetchAdOverride(episode, breakPos)
+        end if
       end if
     else if msgType = "roUrlEvent" then
-      m.ads.requestQueue.handleEvent(msg)
+      completed = m.ads.requestQueue.handleEvent(msg)
+      if completed <> invalid AND completed.name = "adOverridePrefetch"
+        m.ads.handleAdOverrideResponse(completed)
+      end if
     end if
   end while
   return false

@@ -915,6 +915,9 @@ Function playContent()
 
     ' Always reset ad state when we first start playback.  Preroll fetch will populate midrolls list
     m.midrolls = {}
+    ' Dedup map for the decoupled TUS prefetch trigger; one entry per cuepoint that has been
+    ' scheduled for prefetch this content. Cleared here on new playback.
+    m.tusPrefetchedCuepoints = {}
     cleanupAdFetchCooldownTimer() ' Reset cooldown timer for new playback
 
     ' reset the seekReferenceQueue
@@ -1824,6 +1827,37 @@ Function onVideoPositionChange(msg) as Void
       end if
 
 
+    end if
+
+    ' Decoupled TUS prefetch: fire TUS asynchronously tusLeadSec earlier than the Rainmaker
+    ' prefetch window so the override is cached by the time the existing prefetch trigger
+    ' (above) calls Rainmaker. Gated by roku_dynamic_ad_load_v2.decoupledPrefetch; when off,
+    ' this whole block is a no-op and the existing inline-sync path runs unchanged.
+    if (adState <> "adsPending" AND adState <> "fetching") AND m.midrolls.count() > 0 AND m.tusPrefetchedCuepoints <> invalid then
+      v2Cfg = getStatsigExperimentResource("roku_dynamic_ad_load", "roku_dynamic_ad_load_v2", false)
+      if v2Cfg <> invalid AND v2Cfg.enabled = true AND v2Cfg.decoupledPrefetch = true then
+        tusLead = v2Cfg.tusLeadSec
+        if tusLead = invalid OR tusLead < 0 then tusLead = 5
+        currentPosForTus = m.playerPosition
+        earlyWindow = m.adPrefetchTime + tusLead
+        for each cuepointStr in m.midrolls
+          cuepoint = val(cuepointStr)
+          timeToCuepoint = cuepoint - currentPosForTus
+          if timeToCuepoint > 0 AND timeToCuepoint <= earlyWindow AND m.tusPrefetchedCuepoints[cuepointStr] = invalid
+            m.tusPrefetchedCuepoints[cuepointStr] = true
+            m.top.adOverridePrefetchPosition = cuepoint
+            exit for
+          end if
+        end for
+        ' Drop dedup entries for cuepoints already in the past so the map stays small.
+        toDelete = []
+        for each prefetchedStr in m.tusPrefetchedCuepoints
+          if val(prefetchedStr) <= currentPosForTus then toDelete.push(prefetchedStr)
+        end for
+        for each k in toDelete
+          m.tusPrefetchedCuepoints.delete(k)
+        end for
+      end if
     end if
 
     ' Fetch midroll ads if conditions are met
